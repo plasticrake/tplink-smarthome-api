@@ -1,0 +1,33 @@
+{
+  "name": "hs100-api",
+  "version": "1.0.0",
+  "description": "TPLink HS100/HS110 WiFi Smart Plug API",
+  "author": "Patrick Seal",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/plasticrake/hs100-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/plasticrake/hs100-api/issues",
+    "email": "code@plasticrake.com"
+  },
+  "keywords": [
+    ""
+  ],
+  "engines": {
+    "node": ">5.0.0"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
+    "eslint": "^3.0.1",
+    "mocha": "^2.5.3"
+  },
+  "scripts": {
+    "preversion": "npm test",
+    "test": "./node_modules/.bin/mocha"
+  }
+}

@@ -1,0 +1,73 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true,
+            "blockBindings": true
+        }
+    },
+    "extends": "eslint:recommended",
+    "env": {
+        "node": true,
+        "es6": true,
+        "mocha": true
+    },
+
+    "rules": {
+        // Errors
+        //"valid-jsdoc": ["warn"],
+        "no-unexpected-multiline": ["error"],
+        "quote-props": ["error", "as-needed", {
+            "keywords": true
+        }],
+
+        // Best Practices
+        "accessor-pairs": ["error", {
+            "getWithoutSet": true
+        }],
+        "block-scoped-var": ["warn"],
+        "curly": ["error", "all"],
+        "eqeqeq": ["error", "smart"],
+        //"complexity": ["warn", 8],
+        "default-case": ["error"],
+        "guard-for-in": ["warn"],
+        "no-else-return": ["warn"],
+        "no-floating-decimal": ["warn"],
+        "no-param-reassign": ["off"],
+        "no-self-compare": ["error"],
+        "no-throw-literal": ["error"],
+        "no-void": ["error"],
+        "no-warning-comments": ["warn", {
+            "terms": ["todo", "fixme", "xxx"],
+            "location": "anywhere"
+        }],
+        "no-unused-vars": ["warn"],
+        "radix": ["error"],
+        //"vars-on-top": ["warn"],
+        "wrap-iife": ["error", "any"],
+        "no-console": ["off"],
+
+        // Strict Mode
+        //"strict": ["error", "function"],
+
+        // Stylistic Issues
+        "camelcase": ["error", {
+            "properties": "always"
+        }],
+        "indent": ["warn", 2, {
+            "SwitchCase": 1,
+            "VariableDeclarator": 2
+        }],
+        "semi": ["error", "always"],
+        "quotes": ["warn", "single", "avoid-escape"]
+
+
+    },
+
+    "globals": {
+    }
+
+
+
+}
