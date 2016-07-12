@@ -12,6 +12,6 @@ hs.setPowerState(true);
 hs.getSysInfo().then(console.log);
 ```
 
-## Thanks
-George Georgovassilis & Thomas Baust for reverse engineering the protocol.
+## Credits
+Thanks to George Georgovassilis and Thomas Baust for reverse engineering the HS1XX protocol.
 https://georgovassilis.blogspot.com/2016/05/controlling-tp-link-hs100-wi-fi-smart.html
