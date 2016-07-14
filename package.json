@@ -23,16 +23,16 @@
   "engines": {
     "node": ">6.0.0"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
     "eslint": "^3.0.1",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "semistandard": "^8.0.0"
   },
   "scripts": {
     "preversion": "npm test",
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/semistandard &&  ./node_modules/.bin/mocha"
   }
 }

@@ -1,3 +1,5 @@
+/* global describe, it, before */
+
 'use strict';
 
 var chai = require('chai');
