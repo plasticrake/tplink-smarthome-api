@@ -2,11 +2,11 @@
 
 'use strict';
 
-var chai = require('chai');
+const chai = require('chai');
 chai.should();
 
-var encryptWithHeader = require('../utils').encryptWithHeader;
-var decrypt = require('../utils').decrypt;
+const encryptWithHeader = require('../utils').encryptWithHeader;
+const decrypt = require('../utils').decrypt;
 
 var payloads = {
   on: ['{"system":{"set_relay_state":{"state":1}}}', 'AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=='],

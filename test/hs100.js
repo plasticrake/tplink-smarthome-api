@@ -2,18 +2,19 @@
 
 'use strict';
 
-var chai = require('chai');
-var chaiAsPromised = require('chai-as-promised');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 chai.should();
 chai.use(chaiAsPromised);
 
-var Hs100Api = require('..');
+const config = require('./lib/config');
+const Hs100Api = require('..');
 
 describe('Hs100Api', function () {
   var hs;
 
   before(function () {
-    hs = new Hs100Api({host: '10.0.1.58'});
+    hs = new Hs100Api(config);
   });
 
   describe('#setPowerState', function () {
