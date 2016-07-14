@@ -27,7 +27,6 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
-    "eslint": "^3.0.1",
     "mocha": "^2.5.3",
     "semistandard": "^8.0.0"
   },
