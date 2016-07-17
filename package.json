@@ -1,6 +1,6 @@
 {
   "name": "hs100-api",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "TPLink HS100/HS110 WiFi Smart Plug API",
   "author": "Patrick Seal",
   "license": "MIT",
