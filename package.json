@@ -21,7 +21,7 @@
     "api"
   ],
   "engines": {
-    "node": ">6.0.0"
+    "node": ">4.4.0"
   },
   "dependencies": {},
   "devDependencies": {

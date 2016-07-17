@@ -16,7 +16,8 @@ var payloads = {
 };
 
 function decodeAndDecrypt (input) {
-  return decrypt(Buffer.from(input, 'base64')).toString('ascii');
+  // node v6: return decrypt(Buffer.from(input, 'base64')).toString('ascii')
+  return decrypt(new Buffer(input, 'base64')).toString('ascii');
 }
 
 function encryptAndEncode (input) {

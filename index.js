@@ -13,7 +13,8 @@ var commands = {
   getConsumption: '{ "emeter":{ "get_realtime":null } }'
 };
 
-function Hs100Api (config = {}) {
+function Hs100Api (config) {
+  if (typeof config === 'undefined') config = {};
   this.host = config.host;
   this.port = config.port || 9999;
 }
