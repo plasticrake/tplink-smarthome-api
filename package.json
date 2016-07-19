@@ -21,12 +21,13 @@
     "api"
   ],
   "engines": {
-    "node": ">4.4.0"
+    "node": ">=4.4.0"
   },
   "dependencies": {},
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "chai-things": "^0.2.0",
     "mocha": "^2.5.3",
     "semistandard": "^8.0.0"
   },

@@ -1,16 +1,31 @@
 'use strict';
 
-var net = require('net');
-var encryptWithHeader = require('./utils').encryptWithHeader;
-var decrypt = require('./utils').decrypt;
+const net = require('net');
+const dgram = require('dgram');
+const encryptWithHeader = require('./utils').encryptWithHeader;
+const encrypt = require('./utils').encrypt;
+const decrypt = require('./utils').decrypt;
 
 module.exports = Hs100Api;
 
 var commands = {
+  search: '{"system":{"get_sysinfo":{}}}',
+
+  info: '{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}}}',
+  getInfo: '{"system":{"get_sysinfo":{}}}',
+  getCloudInfo: '{"cnCloud":{"get_info":{}}}',
+
+  getScheduleNextAction: '{"schedule":{"get_next_action":{}}}',
+  getScheduleRules: '{"schedule":{"get_rules":{}}}',
+  getAwayRules: '{"anti_theft":{"get_rules":{}}}',
+  getTimerRules: '{"count_down":{"get_rules":{}}}',
+  getConsumption: '{"emeter":{"get_realtime":{}}}',
+  getTime: '{"time":{"get_time":{}}}',
+  getTimeZone: '{"time":{"get_timezone":{}}}',
+  getScanInfo: '{"netif":{"get_scaninfo":{"refresh":0,"timeout":17}}}',
+
   setPowerStateOn: '{"system":{"set_relay_state":{"state":1}}}',
-  setPowerStateOff: '{"system":{"set_relay_state":{"state":0}}}',
-  getSysInfo: '{ "system":{ "get_sysinfo":null } }',
-  getConsumption: '{ "emeter":{ "get_realtime":null } }'
+  setPowerStateOff: '{"system":{"set_relay_state":{"state":0}}}'
 };
 
 function Hs100Api (config) {
@@ -19,46 +34,57 @@ function Hs100Api (config) {
   this.port = config.port || 9999;
 }
 
-Hs100Api.prototype.getPowerState = function () {
-  return this.getSysInfo().then((sysInfo) => {
-    return (sysInfo.relay_state === 1);
-  });
-};
+Hs100Api.prototype.search = function (timeout, maxSearchCount) {
+  if (typeof timeout === 'undefined') timeout = 3000;
+  if (typeof maxSearchCount === 'undefined') maxSearchCount = 0;
 
-Hs100Api.prototype.setPowerState = function (value) {
   return new Promise((resolve, reject) => {
-    var cmd = (value ? commands.setPowerStateOn : commands.setPowerStateOff);
-    var socket = this.send(cmd);
-    socket.on('data', () => {
-      socket.end();
-      resolve();
-    }).on('error', (err) => {
-      socket.end();
+    const socket = dgram.createSocket('udp4');
+
+    var responses = new Map();
+
+    socket.on('error', (err) => {
+      console.log(`server error:\n${err.stack}`);
+      socket.close();
       reject(err);
     });
-  });
-};
 
-Hs100Api.prototype.getSysInfo = function () {
-  return new Promise((resolve, reject) => {
-    var socket = this.send(commands.getSysInfo);
-    socket.on('data', (data) => {
-      data = decrypt(data).toString('ascii');
-      data = JSON.parse(data);
-      socket.end();
-      resolve(data.system.get_sysinfo);
-    }).on('error', (err) => {
-      socket.end();
-      reject(err);
+    socket.on('listening', () => {
+      socket.setBroadcast(true);
     });
+
+    socket.on('message', (msg, rinfo) => {
+      const decryptedMsg = decrypt(msg).toString('ascii');
+      const jsonMsg = JSON.parse(decryptedMsg);
+      const sysinfo = jsonMsg.system.get_sysinfo;
+      responses.set(sysinfo.deviceId, sysinfo);
+      if (maxSearchCount > 0 && responses >= maxSearchCount) {
+        socket.close();
+        resolve(Array.from(responses.values()));
+      }
+    });
+
+    socket.on('close', (msg, rinfo) => {
+      console.log('close');
+    });
+
+    socket.bind();
+
+    var msgBuf = encrypt(commands.search);
+    socket.send(msgBuf, 0, msgBuf.length, 9999, '255.255.255.255');
+
+    setTimeout(() => {
+      socket.close();
+      resolve(Array.from(responses.values()));
+    }, timeout);
   });
 };
 
-Hs100Api.prototype.getConsumption = function () {
+Hs100Api.prototype.get = function (command) {
   return new Promise((resolve, reject) => {
-    var socket = this.send(commands.getConsumption);
+    var socket = this.send(command);
     socket.on('data', (data) => {
-      data = decrypt(data).toString('ascii');
+      data = decrypt(data.slice(4)).toString('ascii');
       data = JSON.parse(data);
       socket.end();
       resolve(data);
@@ -66,6 +92,93 @@ Hs100Api.prototype.getConsumption = function () {
       socket.end();
       reject(err);
     });
+  });
+};
+
+Hs100Api.prototype.set = function (command) {
+  return this.get(command);
+};
+
+Hs100Api.prototype.getInfo = function () {
+  return this.get(commands.getInfo).then((data) => {
+    return data.system.get_sysinfo;
+  });
+};
+
+Hs100Api.prototype.getCloudInfo = function () {
+  return this.get(commands.getCloudInfo).then((data) => {
+    return data.cnCloud.get_info;
+  });
+};
+
+Hs100Api.prototype.getScheduleNextAction = function () {
+  return this.get(commands.getScheduleNextAction).then((data) => {
+    return data.schedule.get_next_action;
+  });
+};
+
+Hs100Api.prototype.getScheduleRules = function () {
+  return this.get(commands.getScheduleRules).then((data) => {
+    return data.schedule.get_rules;
+  });
+};
+
+Hs100Api.prototype.getAwayRules = function () {
+  return this.get(commands.getAwayRules).then((data) => {
+    return data.anti_theft.get_rules;
+  });
+};
+
+Hs100Api.prototype.getTimerRules = function () {
+  return this.get(commands.getTimerRules).then((data) => {
+    return data.count_down.get_rules;
+  });
+};
+
+Hs100Api.prototype.getTime = function () {
+  return this.get(commands.getTime).then((data) => {
+    return data.time.get_time;
+  });
+};
+
+Hs100Api.prototype.getTimeZone = function () {
+  return this.get(commands.getTimeZone).then((data) => {
+    return data.time.get_timezone;
+  });
+};
+
+Hs100Api.prototype.getScanInfo = function () {
+  return this.get(commands.getScanInfo).then((data) => {
+    return data.netif.get_scaninfo;
+  });
+};
+
+Hs100Api.prototype.getModel = function () {
+  return this.getInfo().then((sysInfo) => {
+    return (sysInfo.model);
+  });
+};
+
+Hs100Api.prototype.getPowerState = function () {
+  return this.getInfo().then((sysInfo) => {
+    return (sysInfo.relay_state === 1);
+  });
+};
+
+Hs100Api.prototype.setPowerState = function (value) {
+  var cmd = (value ? commands.setPowerStateOn : commands.setPowerStateOff);
+  return this.set(cmd).then((data) => {
+    try {
+      var errCode = data.system.set_relay_state.err_code;
+      return (errCode === 0);
+    } catch (e) {}
+    if (errCode !== 0) { throw data; }
+  });
+};
+
+Hs100Api.prototype.getConsumption = function () {
+  return this.get(commands.getConsumption).then((data) => {
+    return data.emeter;
   });
 };
 

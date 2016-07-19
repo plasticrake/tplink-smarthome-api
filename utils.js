@@ -26,7 +26,7 @@ module.exports.encryptWithHeader = function (input, firstKey) {
 
 module.exports.decrypt = function (input, firstKey) {
   if (typeof firstKey === 'undefined') firstKey = 0x2B;
-  var buf = new Buffer(input.slice(4)); // node v6: Buffer.from(input.slice(4))
+  var buf = new Buffer(input); // node v6: Buffer.from(input)
   var key = firstKey;
   var nextKey;
   for (var i = 0; i < buf.length; i++) {
