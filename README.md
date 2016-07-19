@@ -17,27 +17,31 @@ hs.getInfo().then(console.log);
 
 ## API
 The API is currently not stable and there may be breaking changes. All functions return a promise.
-##### search (timeout = 3000, maxSearchCount = 0)
+#### new Hs100Api(config);
+```javascript
+config: { host [, port = 9999] }
+```
+#### search( [timeout = 3000] [, maxSearchCount = 0] )
 Sends out a broadcast and waits for plugs to respond until the until the timeout is reached. If maxSearchCount is > 0 then stop waiting (return early) after that number of plugs respond. Returns an array of data matching getInfo for each plug.
-##### getInfo
+#### getInfo
 Get general plug info.
-##### getPowerState
+#### getPowerState
 Returns true if plug is on.
-##### setPowerState(value)
+#### setPowerState(value)
 Turns the plug on or off.
-##### getConsumption
+#### getConsumption
 Get power consumption data for HS110 plugs.
-##### getCloudInfo
+#### getCloudInfo
 Get TP-Link Cloud information.
-##### getScheduleNextAction
-##### getScheduleRules
-##### getAwayRules
-##### getTimerRules
-##### getTime
-##### getTimeZone
-##### getScanInfo
+#### getScheduleNextAction
+#### getScheduleRules
+#### getAwayRules
+#### getTimerRules
+#### getTime
+#### getTimeZone
+#### getScanInfo
 Get list of networks from last scan.
-##### getModel
+#### getModel
 
 
 ## Credits
