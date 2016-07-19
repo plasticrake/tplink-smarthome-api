@@ -5,8 +5,8 @@
 const chai = require('chai');
 chai.should();
 
-const encryptWithHeader = require('../utils').encryptWithHeader;
-const decrypt = require('../utils').decrypt;
+const encryptWithHeader = require('../lib/utils').encryptWithHeader;
+const decrypt = require('../lib/utils').decrypt;
 
 var payloads = {
   setPowerStateOn: ['{"system":{"set_relay_state":{"state":1}}}', 'AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=='],

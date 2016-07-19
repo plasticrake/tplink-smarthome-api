@@ -4,25 +4,45 @@
 
 TPLink HS100/HS110 WiFi Smart Plug API
 
-
-
 ## Example
 ```javascript
-var Hs100Api = require('hs100-api');
+const Hs100Api = require('hs100-api');
 
-var hs = new Hs100Api({host: '10.0.1.2'});
-hs.setPowerState(true);
-hs.getInfo().then(console.log);
+const client = new Hs100Api.Client();
+const plug = client.getPlug({host: '10.0.1.2'});
+plug.setPowerState(true);
+plug.getInfo().then(console.log);
+
+// Look for plugs, log to console, and turn them on
+client.search().then((plugInfoArray) => {
+  plugInfoArray.forEach((plugInfo) => {
+    console.log(plugInfo);
+    client.getPlug(plugInfo).setPowerState(true);
+  })
+})
 ```
 
 ## API
-The API is currently not stable and there may be breaking changes. All functions return a promise.
-#### new Hs100Api(config);
+The API is currently not stable and there may be breaking changes. All functions return a promise unless indicated.
+
+### Client
+
+#### new Client(options)
+Returns a Client object. ***Not a promise.***
 ```javascript
-config: { host [, port = 9999] }
+options: { [broadcast = '255.255.255.255'] }
 ```
+
+#### getPlug(options)
+Returns a Plug object. ***Not a promise.***
+```javascript
+options: { host [, port = 9999] }
+```
+
 #### search( [timeout = 3000] [, maxSearchCount = 0] )
-Sends out a broadcast and waits for plugs to respond until the until the timeout is reached. If maxSearchCount is > 0 then stop waiting (return early) after that number of plugs respond. Returns an array of data matching getInfo for each plug.
+Sends out a broadcast and waits for plugs to respond until the until the timeout is reached. If maxSearchCount is > 0 then stop waiting (return early) after that number of plugs respond. Returns an array of data matching getInfo for each plug plus host and port.
+
+### Plug
 #### getInfo
 Get general plug info.
 #### getPowerState
