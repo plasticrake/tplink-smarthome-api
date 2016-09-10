@@ -57,6 +57,9 @@ Hs100Api.prototype.search = function (timeout, maxSearchCount) {
       const decryptedMsg = decrypt(msg).toString('ascii');
       const jsonMsg = JSON.parse(decryptedMsg);
       const sysinfo = jsonMsg.system.get_sysinfo;
+      //append the device IP to the sysinfo
+      sysinfo.ip = rinfo.address;
+
       responses.set(sysinfo.deviceId, sysinfo);
       if (maxSearchCount > 0 && responses >= maxSearchCount) {
         socket.close();
