@@ -2,6 +2,7 @@
 
 const net = require('net');
 const dgram = require('dgram');
+const util = require('util');
 const encryptWithHeader = require('./utils').encryptWithHeader;
 const encrypt = require('./utils').encrypt;
 const decrypt = require('./utils').decrypt;
@@ -20,6 +21,8 @@ var commands = {
   getAwayRules: '{"anti_theft":{"get_rules":{}}}',
   getTimerRules: '{"count_down":{"get_rules":{}}}',
   getConsumption: '{"emeter":{"get_realtime":{}}}',
+  getDailyStatisticsForMonth: '{"emeter":{"get_daystat":{"month":%d,"year":%d}}}',
+  getMonthlyStatisticsForYear: '{"emeter":{"get_monthstat":{"year": %d}}}',
   getTime: '{"time":{"get_time":{}}}',
   getTimeZone: '{"time":{"get_timezone":{}}}',
   getScanInfo: '{"netif":{"get_scaninfo":{"refresh":0,"timeout":17}}}',
@@ -179,6 +182,36 @@ Hs100Api.prototype.setPowerState = function (value) {
 Hs100Api.prototype.getConsumption = function () {
   return this.get(commands.getConsumption).then((data) => {
     return data.emeter;
+  });
+};
+
+/**
+ * Get Daily Statistic for the given month of the given year
+ * @param number [month] the number of month
+ * @param number [year] the full year, e.g. 2016
+ * @returns {Promise.<T>}
+ */
+Hs100Api.prototype.getDailyStatisticsForMonth = function (month, year) {
+  var d = new Date();
+  if (typeof month === 'undefined') month = d.getMonth() + 1;
+  if (typeof year === 'undefined') year = d.getFullYear();
+  return this.get(util.format(commands.getDailyStatisticsForMonth, month, year)).then((data) => {
+        return data.emeter;
+  });
+};
+
+/**
+ * Get Monthly Statistic for given year
+ * @param number [year] the full year, e.g. 2016
+ * @returns {Promise.<T>}
+ */
+Hs100Api.prototype.getMonthlyStatisticsForYear = function (year) {
+  if (typeof year === 'undefined') {
+    var d = new Date();
+    year = d.getFullYear();
+  }
+  return this.get(util.format(commands.getMonthlyStatisticsForYear, year)).then((data) => {
+        return data.emeter;
   });
 };
 
