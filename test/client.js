@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, beforeEach, afterEach */
 
 'use strict';
 
@@ -15,39 +15,63 @@ describe('Client', function () {
   var plug;
   var invalidPlug;
 
-  before(function () {
-    client = new Hs100Api.Client();
-    plug = client.getPlug(config);
-    invalidPlug = client.getPlug({host: '1.2.3.4', timeout: 1000});
+  beforeEach(function () {
+    client = new Hs100Api.Client(config.client);
+    plug = client.getPlug(config.plug);
+    invalidPlug = client.getPlug(config.invalidPlug);
+  });
+
+  afterEach(function () {
+    client.stopDiscovery();
+  });
+
+  describe('#sendDiscovery', function () {
+    it('should emit plug-new when finding a new plug', function (done) {
+      this.timeout(3500);
+      this.slow(3500);
+
+      client.sendDiscovery().once('plug-new', (plug) => {
+        plug.should.exist;
+        done();
+      });
+    });
+
+    it('should emit plug-online when finding an existing plug', function (done) {
+      this.timeout(3500);
+      this.slow(3500);
+
+      client.sendDiscovery();
+      client.sendDiscovery().once('plug-online', (plug) => {
+        plug.should.exist;
+        done();
+      });
+    });
+
+    it('should emit plug-offline when calling discovery with an offline plug', function (done) {
+      this.timeout(3500);
+      this.slow(3500);
+
+      client.discoveryInterval = '50';
+      client.offlineTolerance = 2;
+
+      invalidPlug.status = 'online';
+      client.devices.set(invalidPlug.deviceId, invalidPlug);
+
+      client.startDiscovery().once('plug-offline', (plug) => {
+        plug.should.exist;
+        done();
+      });
+    });
   });
 
   describe('#getPlug', function () {
     it('should find a plug by IP address', function () {
-      return plug.getInfo().should.eventually.have.property('err_code', 0);
+      return plug.getInfo().should.eventually.have.property('sysInfo');
     });
 
     it('should be rejected with an invalid IP address', function () {
+      this.timeout(1500);
       return invalidPlug.getInfo().should.eventually.be.rejected;
-    });
-  });
-
-  describe('#search', function () {
-    it('should search and find plugs', function () {
-      this.timeout(3500);
-      this.slow(3500);
-      client.search().should.eventually.include.something.with.property('err_code', 0)
-        .and.include.something.with.property('host', config.host)
-        .and.include.something.with.property('port', config.port);
-    });
-
-    it('should search and find plugs to turn on', function () {
-      this.skip();
-      this.timeout(5000);
-      return client.search().then((plugInfoArray) => {
-        plugInfoArray.forEach((plugInfo) => {
-          client.getPlug(plugInfo).setPowerState(true);
-        });
-      }).should.eventually.be.fulfilled;
     });
   });
 });

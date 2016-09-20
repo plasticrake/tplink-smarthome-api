@@ -16,7 +16,7 @@ describe('Plug', function () {
 
   before(function () {
     client = new Hs100Api.Client();
-    plug = client.getPlug(config);
+    plug = client.getPlug(config.plug);
   });
 
   describe('#setPowerState', function () {
@@ -58,7 +58,13 @@ describe('Plug', function () {
 
   describe('#getInfo', function () {
     it('should return info', function () {
-      return plug.getInfo().should.eventually.have.property('err_code', 0);
+      return plug.getInfo().should.eventually.have.property('sysInfo');
+    });
+  });
+
+  describe('#getSysInfo', function () {
+    it('should return info', function () {
+      return plug.getSysInfo().should.eventually.have.property('err_code', 0);
     });
   });
 
@@ -112,7 +118,13 @@ describe('Plug', function () {
 
   describe('#getScanInfo', function () {
     it('should return get scan info', function () {
-      return plug.getScanInfo().should.eventually.have.property('err_code', 0);
+      this.timeout(5000);
+      this.slow(3500);
+      return plug.getScanInfo(true, 3).should.eventually.have.property('err_code', 0);
+    });
+
+    it('should return get cached scan info', function () {
+      return plug.getScanInfo(false).should.eventually.have.property('err_code', 0);
     });
   });
 });
