@@ -34,6 +34,7 @@ options: {
   [, broadcast = '255.255.255.255']
   [, discoveryInterval = 30000]
   [, offlineTolerance = 3]
+  [, filter = false]
   [, debug = false]
 }
 ```
