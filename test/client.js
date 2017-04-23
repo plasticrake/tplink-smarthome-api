@@ -1,4 +1,5 @@
-/* global describe, it, beforeEach, afterEach */
+/* eslint-env mocha */
+/* eslint no-unused-expressions: ["off"] */
 
 'use strict';
 
