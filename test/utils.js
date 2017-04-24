@@ -1,5 +1,4 @@
 /* eslint-env mocha */
-/* jshint expr: true */
 /* eslint no-unused-expressions: ["off"] */
 
 'use strict';
