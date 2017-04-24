@@ -1,4 +1,5 @@
-/* global describe, it, before */
+/* eslint-env mocha */
+/* eslint no-unused-expressions: ["off"] */
 
 'use strict';
 
@@ -20,13 +21,27 @@ describe('Plug', function () {
   });
 
   describe('#setPowerState', function () {
+    it('should emit power-on', function (done) {
+      plug.once('power-on', (plug) => {
+        plug.should.exist;
+        done();
+      });
+
+      plug.setPowerState(false).then(() => {
+        plug.setPowerState(true);
+      }).catch((reason) => {
+        done(reason);
+      });
+    });
+
     it('should turn on', function () {
       return plug.setPowerState(true).should.eventually.be.true;
     });
   });
+
   describe('#getPowerState', function () {
     it('should return power state when on', function () {
-      return plug.getPowerState().should.eventually.equal(true);
+      return plug.getPowerState().should.eventually.be.true;
     });
   });
 
@@ -38,6 +53,8 @@ describe('Plug', function () {
         } else {
           return plug.getConsumption().should.eventually.have.property('err_code', -1);
         }
+      }).catch((reason) => {
+        return reason;
       });
 
     // return  plug.getConsumption().should.be.fulfilled
@@ -45,6 +62,19 @@ describe('Plug', function () {
   });
 
   describe('#setPowerState', function () {
+    it('should emit power-off', function (done) {
+      plug.once('power-off', (plug) => {
+        plug.should.exist;
+        done();
+      });
+
+      plug.setPowerState(true).then(() => {
+        plug.setPowerState(false);
+      }).catch((reason) => {
+        done(reason);
+      });
+    });
+
     it('should turn off', function () {
       return plug.setPowerState(false).should.eventually.be.true;
     });
@@ -52,7 +82,7 @@ describe('Plug', function () {
 
   describe('#getPowerState', function () {
     it('should return power state when off', function () {
-      return plug.getPowerState().should.eventually.equal(false);
+      return plug.getPowerState().should.eventually.be.false;
     });
   });
 
@@ -118,8 +148,8 @@ describe('Plug', function () {
 
   describe('#getScanInfo', function () {
     it('should return get scan info', function () {
-      this.timeout(5000);
-      this.slow(3500);
+      this.timeout(10000);
+      this.slow(5000);
       return plug.getScanInfo(true, 3).should.eventually.have.property('err_code', 0);
     });
 
