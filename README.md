@@ -34,13 +34,13 @@ options: {
   [, broadcast = '255.255.255.255']
   [, discoveryInterval = 30000]
   [, offlineTolerance = 3]
-  [, typeFilter = 'IOT.SMARTPLUGSWITCH']
+  [, deviceTypes = ['IOT.SMARTPLUGSWITCH']]
   [, debug = false]
 }
 ```
 
 #### startDiscovery([plugs])
-Sends a discovery packet to the broadcast address every `discoveryInterval`. An array of addresses can be specified to query directly. If `typeFilter` is specified only matching devices are found. Returns Client that emits `plug-new` when a response from a new plug is received and `plug-online` for known plugs. If a known plug has not been heard from after `offlineTolerance` number of discovery attempts then emits `plug-offline`.
+Sends a discovery packet to the broadcast address every `discoveryInterval`. An array of addresses can be specified to query directly. If `deviceTypes` is specified only matching devices are found. Returns Client that emits `plug-new` when a response from a new plug is received and `plug-online` for known plugs. If a known plug has not been heard from after `offlineTolerance` number of discovery attempts then emits `plug-offline`.
 
 #### stopDiscovery
 Stops discovery process.
