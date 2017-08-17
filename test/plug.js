@@ -47,17 +47,11 @@ describe('Plug', function () {
 
   describe('#getConsumption', function () {
     it('should return consumption', function () {
-      plug.getModel().then((value) => {
-        if (/HS110/.test(value)) {
-          return plug.getConsumption().should.eventually.have.property('err_code', 0);
-        } else {
-          return plug.getConsumption().should.eventually.have.property('err_code', -1);
-        }
-      }).catch((reason) => {
-        return reason;
-      });
-
-    // return  plug.getConsumption().should.be.fulfilled
+      if (plug.supportsConsumption) {
+        return plug.getConsumption().should.eventually.have.property('err_code', 0);
+      } else {
+        return plug.getConsumption().should.eventually.have.property('err_code', -1);
+      }
     });
   });
 
