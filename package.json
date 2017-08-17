@@ -37,5 +37,8 @@
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
     "test": "./node_modules/.bin/semistandard &&  ./node_modules/.bin/mocha"
+  },
+  "bin": {
+    "hs100-api": "cli.js"
   }
 }
