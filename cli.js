@@ -18,8 +18,8 @@ var search = function search (sysInfo, timeout) {
 
 program
   .command('search')
-  .option('-s, --sysinfo', 'Output sysInfo')
-  .option('-t, --timeout [timeout]', 'Timeout (ms)', 10000)
+  .option('-s, --sysinfo', 'output sysInfo')
+  .option('-t, --timeout [timeout]', 'timeout (ms)', 10000)
   .action(function (options) { search(options.sysinfo, options.timeout); });
 
 program.parse(process.argv);
