@@ -4,6 +4,17 @@
 
 TPLink HS100/HS105/HS110 WiFi Smart Plug API
 
+## Supported Devices
+
+| Model | Type | deviceType | Support |
+|-------|------|------------|---------|
+| HS100, HS105, HS110 | Plugs | IOT.SMARTPLUGSWITCH | Good |
+| HS200 | Switch | | Good |
+| LB100, LB110, LB120 | Bulb | IOT.SMARTBULB | Limited |
+
+I only own HS100, HS105 and HS110 (plugs), so Switch and Bulb support is difficult for me to test. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
+
+
 ## Example
 ```javascript
 const Hs100Api = require('hs100-api');
@@ -32,7 +43,8 @@ options: {
   [address]
   [, port]
   [, broadcast = '255.255.255.255']
-  [, discoveryInterval = 30000]
+  [, discoveryInterval = 10000]
+  [, discoveryTimeout = 0]
   [, offlineTolerance = 3]
   [, deviceTypes = ['IOT.SMARTPLUGSWITCH']]
   [, debug = false]
@@ -40,7 +52,7 @@ options: {
 ```
 
 #### startDiscovery([plugs])
-Sends a discovery packet to the broadcast address every `discoveryInterval`. An array of addresses can be specified to query directly. If `deviceTypes` is specified only matching devices are found. Returns Client that emits `plug-new` when a response from a new plug is received and `plug-online` for known plugs. If a known plug has not been heard from after `offlineTolerance` number of discovery attempts then emits `plug-offline`.
+Sends a discovery packet to the broadcast address every `discoveryInterval`(ms). Stops discovery after `discoveryTimeout`(ms) if it is greater than 0. An array of addresses can be specified to query directly. If `deviceTypes` is specified only matching devices are found. Returns Client that emits `plug-new` when a response from a new plug is received and `plug-online` for known plugs. If a known plug has not been heard from after `offlineTolerance` number of discovery attempts then emits `plug-offline`.
 
 #### stopDiscovery
 Stops discovery process.
