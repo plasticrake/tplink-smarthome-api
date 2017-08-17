@@ -11,13 +11,13 @@ chai.use(require('chai-as-promised'));
 const config = require('./lib/config');
 const Hs100Api = require('..');
 
-describe('Plug', function () {
+describe('Device', function () {
   var client;
   var plug;
 
   before(function () {
     client = new Hs100Api.Client();
-    plug = client.getPlug(config.plug);
+    plug = client.getDevice(config.plug);
   });
 
   describe('#setPowerState', function () {
