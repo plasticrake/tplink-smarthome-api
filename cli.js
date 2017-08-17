@@ -17,7 +17,6 @@ var search = function search (sysInfo, timeout) {
 };
 
 program
-  .version(process.env.npm_package_version)
   .command('search')
   .option('-s, --sysinfo', 'Output sysInfo')
   .option('-t, --timeout [timeout]', 'Timeout (ms)', 10000)
