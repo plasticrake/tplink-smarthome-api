@@ -7,6 +7,6 @@ const client = { debug: false };
 const device = { host: process.env.TEST_DEVICE_HOST, port: 9999 };
 const plug = { host: process.env.TEST_PLUG_HOST, port: 9999 };
 
-const invalidDevice = { deviceId: 'invalidDevice', host: '1.2.3.4', timeout: 1000 };
+const invalidDevice = { deviceId: 'invalidDevice', host: '192.0.2.0', timeout: 1000 };
 
 module.exports = {client, device, plug, invalidDevice};
