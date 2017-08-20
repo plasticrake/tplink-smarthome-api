@@ -26,13 +26,14 @@ describe('Client', function () {
     client.stopDiscovery();
   });
 
-  describe('#sendDiscovery', function () {
+  describe('#startDiscovery', function () {
     it('should emit device-new when finding a new device', function (done) {
       this.timeout(3500);
       this.slow(3500);
 
-      client.sendDiscovery().once('device-new', (device) => {
+      client.startDiscovery(undefined, 0).once('device-new', (device) => {
         device.should.exist;
+        client.stopDiscovery();
         done();
       });
     });
@@ -41,9 +42,9 @@ describe('Client', function () {
       this.timeout(3500);
       this.slow(3500);
 
-      client.sendDiscovery();
-      client.sendDiscovery().once('device-online', (device) => {
+      client.startDiscovery(500, 3000).once('device-online', (device) => {
         device.should.exist;
+        client.stopDiscovery();
         done();
       });
     });
@@ -67,12 +68,14 @@ describe('Client', function () {
 
   describe('#getDevice', function () {
     it('should find a device by IP address', function () {
-      return device.getInfo().should.eventually.have.property('sysInfo');
+      return device.getSysInfo().should.eventually.have.property('err_code', 0);
     });
 
     it('should be rejected with an invalid IP address', function () {
-      this.timeout(1500);
-      return invalidDevice.getInfo().should.eventually.be.rejected;
+      this.timeout(2000);
+      this.slow(1500);
+      invalidDevice.timeout;
+      return invalidDevice.getSysInfo({timeout: 1000}).should.eventually.be.rejected;
     });
   });
 });
