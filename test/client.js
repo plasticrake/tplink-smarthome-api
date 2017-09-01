@@ -12,14 +12,12 @@ const config = require('./lib/config');
 const Hs100Api = require('..');
 
 describe('Client', function () {
-  var client;
-  var device;
-  var invalidDevice;
+  let client;
+  let invalidDevice;
 
   beforeEach(function () {
     client = new Hs100Api.Client(config.client);
-    device = client.getDevice(config.plug);
-    invalidDevice = client.getDevice(config.invalidDevice);
+    invalidDevice = client.getGeneralDevice(config.invalidDevice);
   });
 
   afterEach(function () {
@@ -29,9 +27,9 @@ describe('Client', function () {
   describe('#startDiscovery', function () {
     it('should emit device-new when finding a new device', function (done) {
       this.timeout(3500);
-      this.slow(3500);
+      this.slow(2000);
 
-      client.startDiscovery(undefined, 0).once('device-new', (device) => {
+      client.startDiscovery({ discoveryInterval: 0 }).once('device-new', (device) => {
         device.should.exist;
         client.stopDiscovery();
         done();
@@ -40,9 +38,9 @@ describe('Client', function () {
 
     it('should emit device-online when finding an existing device', function (done) {
       this.timeout(3500);
-      this.slow(3500);
+      this.slow(2000);
 
-      client.startDiscovery(500, 3000).once('device-online', (device) => {
+      client.startDiscovery({ discoveryInterval: 500, discoveryTimeout: 3000 }).once('device-online', (device) => {
         device.should.exist;
         client.stopDiscovery();
         done();
@@ -51,15 +49,12 @@ describe('Client', function () {
 
     it('should emit device-offline when calling discovery with an offline device', function (done) {
       this.timeout(3500);
-      this.slow(3500);
-
-      client.discoveryInterval = '50';
-      client.offlineTolerance = 2;
+      this.slow(2000);
 
       invalidDevice.status = 'online';
       client.devices.set(invalidDevice.deviceId, invalidDevice);
 
-      client.startDiscovery().once('device-offline', (device) => {
+      client.startDiscovery({ discoveryInterval: 50, discoveryTimeout: 3000, offlineTolerance: 1 }).once('device-offline', (device) => {
         device.should.exist;
         done();
       });
@@ -67,7 +62,15 @@ describe('Client', function () {
   });
 
   describe('#getDevice', function () {
+    let device;
+
+    beforeEach(function (done) {
+      client.getDevice(config.plug).then((theDevice) => { device = theDevice; done(); });
+    });
+
     it('should find a device by IP address', function () {
+      this.timeout(2000);
+      this.slow(1500);
       return device.getSysInfo().should.eventually.have.property('err_code', 0);
     });
 

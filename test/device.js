@@ -17,7 +17,7 @@ describe('Device', function () {
 
   before(function () {
     client = new Hs100Api.Client();
-    device = client.getDevice(config.plug);
+    device = client.getGeneralDevice(config.plug);
   });
 
   describe('#getSysInfo', function () {
