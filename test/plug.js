@@ -15,12 +15,9 @@ describe('Plug', function () {
   let client;
   let plug;
 
-  before(function (done) {
+  before(function () {
     client = new Hs100Api.Client();
-    client.getSpecificDevice(config.plug).then((device) => {
-      plug = device;
-      done();
-    });
+    plug = client.getPlug(config.plug);
   });
 
   describe('#setPowerState', function () {
