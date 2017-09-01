@@ -62,21 +62,12 @@ Returns a specific Device object (Plug or Bulb) after querying the device to det
 
 #### `getGeneralDevice({host, port = 9999, timeout = 3000})`
 Returns a generic TP Link Device object.
-```javascript
-options: { host [, port = 9999] [, timeout = 0] }
-```
 
-#### `getPlug({host, port = 9999, timeout = 3000})`
+#### `getPlug({host, port = 9999, timeout = 3000, inUseThreshold = 0})`
 Returns a Plug object.
-```javascript
-options: { host [, port = 9999] [, timeout = 0] [, inUseThreshold = 0] }
-```
 
 #### `getBulb({host, port = 9999, timeout = 3000})`
 Returns a Bulb object.
-```javascript
-options: { host [, port = 9999] [, timeout = 0] }
-```
 
 ### Device
 
@@ -127,6 +118,8 @@ Turns the device on or off.
 #### `getTimeZone()` _(promise)_
 #### `getScanInfo([refresh = false] [, timeout = 17])` _(promise)_
 Get list of networks.
+#### `inUseThreshold`
+Threshold for `in-use` event.
 
 ### Bulb
 Derives from Device and includes Device functions above.
