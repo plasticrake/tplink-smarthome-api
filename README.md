@@ -6,13 +6,13 @@ TPLink Smart Home API
 
 ## Supported Devices
 
-| Model | Type | deviceType | Support |
+| Model | Type | TP Link Device Type | Support |
 |-------|------|------------|---------|
 | HS100, HS105, HS110 | Plug | IOT.SMARTPLUGSWITCH | Good |
-| HS200 | Switch | | Not tested, Reported as working as a Plug |
+| HS200 | Switch (Plug) | IOT.SMARTPLUGSWITCH | Reported Good, Not personally tested, same API as Plug |
 | LB100, LB110, LB120 | Bulb | IOT.SMARTBULB | Not tested |
 
-I only have HS100, HS105 and HS110 (plugs), so Switch and Bulb support is difficult for me to test. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
+I only have HS100, HS105 and HS110 (plugs), so I am unable to test Switch and Bulb support. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
 
 ## Example
 ```javascript
@@ -20,13 +20,13 @@ const Hs100Api = require('hs100-api');
 
 const client = new Hs100Api.Client();
 const plug = client.getDevice({host: '10.0.1.2'}).then((device)=>{
-  device.getInfo().then(console.log);
+  device.getSysInfo().then(console.log);
   device.setPowerState(true);
 });
 
 // Look for devices, log to console, and turn them on
 client.startDiscovery().on('device-new', (device) => {
-  device.getInfo().then(console.log);
+  device.getSysInfo().then(console.log);
   device.setPowerState(true);
 });
 ```
@@ -38,6 +38,9 @@ The API is not stable and there may be breaking changes.
 
 #### `new Client({debug = false})`
 Returns a Client object.
+
+#### `.send ({host, port = 9999, payload, timeout = 3000})` _(promise)_
+Send TPLink encrypted `payload` to device. Promise resolves to parsed JSON response.
 
 #### `startDiscovery(options)`
 ```javascript
@@ -52,7 +55,18 @@ options: {
   [, devices]
 }
 ```
-Sends a discovery packet to the `broadcast` address every `discoveryInterval`(ms). Stops discovery after `discoveryTimeout`(ms) if greater than 0. If `deviceTypes` is specified only matching devices are found. Returns Client that emits `device-new` when a response from a new device is received and `device-online` for known devices. If a known device has not been heard from after `offlineTolerance` number of discovery attempts then emits `device-offline`. If `devices` is specified it will attempt to contact them directly in addition to sending to the broadcast address. `devices` are an array of `[{host, [port: 9999]}]`.
+Sends a discovery packet to the `broadcast` address every `discoveryInterval`(ms). Stops discovery after `discoveryTimeout`(ms) if greater than 0. If `deviceTypes` is specified only matching devices are found. Returns Client that emits the events below. If `devices` is specified it will attempt to contact them directly in addition to sending to the broadcast address. `devices` are specified as an array of `[{host, [port: 9999]}]`.
+
+A device event in addition to a specific device type event will be emitted.
+
+Response from new device is received:
+`device-new` and `plug-new` / `bulb-new`
+
+Response from a previously seen device:
+`device-online` and `plug-online` / `bulb-online`
+
+Previously seen device is not heard from after `offlineTolerance` number of discovery attempts:
+`device-offline` and `plug-offline` / `bulb-offline`
 
 #### `stopDiscovery()`
 Stops discovery process.
@@ -71,17 +85,13 @@ Returns a Bulb object.
 
 ### Device
 
-#### `static send ({host, port = 9999, payload, timeout = 3000})` _(promise)_
+#### `#send(payload, timeout = 0)` _(promise)_
 Send `payload` to device. Promise resolves to parsed JSON response.
 
-#### `send(payload, timeout = 0)` _(promise)_
-Send `payload` to device. Promise resolves to parsed JSON response.
-
-#### `startPolling(interval)`
+#### `#startPolling(interval)`
 Polls the device every `interval`. Returns device that emits events based on state changes. Refer to specific device sections below for details.
 
-
-#### `getSysInfo({timeout} = {})` _(promise)_
+#### `#getSysInfo({timeout} = {})` _(promise)_
 Get general info.
 
 #### `sysInfo`
@@ -90,6 +100,8 @@ Returns cached data from last `getSysInfo()`.
 #### `getModel()` _(promise)_
 Get device model.
 
+#### `type`
+Get device type ('plug', 'bulb'). Returns 'device' if unknown or device has not been queried yet.
 
 ### Plug
 Derives from Device and includes Device functions above.

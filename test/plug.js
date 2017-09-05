@@ -5,7 +5,6 @@
 
 const chai = require('chai');
 chai.should();
-chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
 const config = require('./lib/config');
@@ -15,18 +14,25 @@ describe('Plug', function () {
   let client;
   let plug;
 
-  before(function () {
+  beforeEach(function () {
     client = new Hs100Api.Client();
     plug = client.getPlug(config.plug);
   });
 
   describe('#setPowerState', function () {
+    it('should turn on', function () {
+      return plug.setPowerState(true).should.eventually.be.true;
+    });
+
+    it('should turn off', function () {
+      return plug.setPowerState(false).should.eventually.be.true;
+    });
+
     it('should emit power-on', function (done) {
       plug.once('power-on', (plug) => {
         plug.should.exist;
         done();
       });
-
       plug.setPowerState(false).then(() => {
         plug.setPowerState(true);
       }).catch((reason) => {
@@ -34,49 +40,68 @@ describe('Plug', function () {
       });
     });
 
-    it('should turn on', function () {
-      return plug.setPowerState(true).should.eventually.be.true;
-    });
-  });
-
-  describe('#getPowerState', function () {
-    it('should return power state when on', function () {
-      return plug.getPowerState().should.eventually.be.true;
-    });
-  });
-
-  describe('#getConsumption', function () {
-    it('should return consumption', function () {
-      if (plug.supportsConsumption) {
-        return plug.getConsumption().should.eventually.have.property('err_code', 0);
-      } else {
-        return plug.getConsumption().should.eventually.have.property('err_code', -1);
-      }
-    });
-  });
-
-  describe('#setPowerState', function () {
     it('should emit power-off', function (done) {
       plug.once('power-off', (plug) => {
         plug.should.exist;
         done();
       });
-
       plug.setPowerState(true).then(() => {
         plug.setPowerState(false);
       }).catch((reason) => {
         done(reason);
       });
     });
-
-    it('should turn off', function () {
-      return plug.setPowerState(false).should.eventually.be.true;
-    });
   });
 
   describe('#getPowerState', function () {
+    it('should return power state when on', function () {
+      return plug.setPowerState(true).then(() => {
+        plug.getPowerState().should.eventually.be.true;
+      });
+    });
+
     it('should return power state when off', function () {
-      return plug.getPowerState().should.eventually.be.false;
+      return plug.setPowerState(false).then(() => {
+        plug.getPowerState().should.eventually.be.false;
+      });
+    });
+  });
+
+  describe('#setLedState', function () {
+    this.slow(1000);
+    it('should turn LED on', function () {
+      return plug.setLedState(true).should.eventually.be.true;
+    });
+
+    it('should turn LED off', function () {
+      return plug.setLedState(false).should.eventually.be.true;
+    });
+  });
+
+  describe('#getLedState', function () {
+    this.slow(1000);
+    it('should return LED state when on', function () {
+      return plug.setLedState(true).then(() => {
+        plug.getLedState().should.eventually.be.true;
+      });
+    });
+
+    it('should return LED state when off', function () {
+      return plug.setLedState(false).then(() => {
+        plug.getLedState().should.eventually.be.false;
+      });
+    });
+  });
+
+  describe('#getConsumption', function () {
+    it('should return consumption', function () {
+      return plug.getSysInfo((si) => {
+        if (plug.supportsConsumption) {
+          plug.getConsumption().should.eventually.have.property('err_code', 0);
+        } else {
+          plug.getConsumption().should.eventually.have.property('err_code', -1);
+        }
+      });
     });
   });
 
