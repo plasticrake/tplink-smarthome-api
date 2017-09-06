@@ -122,6 +122,8 @@ Returns true if device is on.
 Turns the device on or off.
 #### `getLedState()` _(promise)_
 #### `setLedState()` _(promise)_
+#### `blink([times = 5] [, rate = 1000])` _(promise)_
+Turn LED on and off `times` every `rate`. Sets LED back to original state when complete.
 #### `getScheduleNextAction()` _(promise)_
 #### `getScheduleRules()` _(promise)_
 #### `getAwayRules()` _(promise)_
