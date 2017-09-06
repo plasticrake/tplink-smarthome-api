@@ -31,6 +31,9 @@ client.startDiscovery().on('device-new', (device) => {
 });
 ```
 
+## CLI
+There is a command line utility you can install with `npm install -g hs100-api`. Run `hs100-api --help` for help.
+
 ## API
 The API is not stable and there may be breaking changes.
 
@@ -51,8 +54,8 @@ options: {
   [, discoveryInterval = 10000]
   [, discoveryTimeout = 0]
   [, offlineTolerance = 3]
-  [, deviceTypes]
-  [, devices]
+  [, deviceTypes] // Array, possible values: 'plug', 'bulb'
+  [, devices] // Array
 }
 ```
 Sends a discovery packet to the `broadcast` address every `discoveryInterval`(ms). Stops discovery after `discoveryTimeout`(ms) if greater than 0. If `deviceTypes` is specified only matching devices are found. Returns Client that emits the events below. If `devices` is specified it will attempt to contact them directly in addition to sending to the broadcast address. `devices` are specified as an array of `[{host, [port: 9999]}]`.
