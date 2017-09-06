@@ -10,7 +10,7 @@ let debug = false;
 let search = function (sysInfo, timeout) {
   console.log('Searching...');
   client.debug = debug;
-  client.startDiscovery(3000, timeout)
+  client.startDiscovery({discoveryInterval: 2500, discoveryTimeout: timeout})
     .on('device-new', (device) => {
       console.log(`${device.model} ${device.type} ${device.host} ${device.deviceId}`);
       if (sysInfo) {
