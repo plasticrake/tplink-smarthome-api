@@ -39,10 +39,10 @@ The API is not stable and there may be breaking changes.
 #### `new Client({debug = false})`
 Returns a Client object.
 
-#### `.send ({host, port = 9999, payload, timeout = 3000})` _(promise)_
+#### `#send ({host, port = 9999, payload, timeout = 3000})` _(promise)_
 Send TPLink encrypted `payload` to device. Promise resolves to parsed JSON response.
 
-#### `startDiscovery(options)`
+#### `#startDiscovery(options)`
 ```javascript
 options: {
   [address] // address to bind socket, bind to all if not specified
@@ -68,19 +68,19 @@ Response from a previously seen device:
 Previously seen device is not heard from after `offlineTolerance` number of discovery attempts:
 `device-offline` and `plug-offline` / `bulb-offline`
 
-#### `stopDiscovery()`
+#### `#stopDiscovery()`
 Stops discovery process.
 
-#### `getDevice({host, port = 9999, timeout = 3000})` _(promise)_
+#### `#getDevice({host, port = 9999, timeout = 3000})` _(promise)_
 Returns a specific Device object (Plug or Bulb) after querying the device to determine the type.
 
-#### `getGeneralDevice({host, port = 9999, timeout = 3000})`
+#### `#getGeneralDevice({host, port = 9999, timeout = 3000})`
 Returns a generic TP Link Device object.
 
-#### `getPlug({host, port = 9999, timeout = 3000, inUseThreshold = 0})`
+#### `#getPlug({host, port = 9999, timeout = 3000, inUseThreshold = 0})`
 Returns a Plug object.
 
-#### `getBulb({host, port = 9999, timeout = 3000})`
+#### `#getBulb({host, port = 9999, timeout = 3000})`
 Returns a Bulb object.
 
 ### Device
@@ -94,56 +94,56 @@ Polls the device every `interval`. Returns device that emits events based on sta
 #### `#getSysInfo({timeout} = {})` _(promise)_
 Get general info.
 
-#### `sysInfo`
+#### `#sysInfo`
 Returns cached data from last `getSysInfo()`.
 
-#### `getModel()` _(promise)_
+#### `#getModel()` _(promise)_
 Get device model.
 
-#### `type`
+#### `#type`
 Get device type ('plug', 'bulb'). Returns 'device' if unknown or device has not been queried yet.
 
 ### Plug
 Derives from Device and includes Device functions above.
 
-#### `startPolling(interval)`
+#### `#startPolling(interval)`
 Polls the device every `interval`. Returns device that emits events based on state changes. Emits `power-on`/`power-off` based on the relay state and `in-use`/`not-in-use` when the device is drawing more than power than the `inUseThreshold` if it supports power monitoring. These events are emitted during any query of the device, not only when using `startPolling`.
 
-#### `getInfo()` _(promise)_
+#### `#getInfo()` _(promise)_
 Get all device info. Same as calling getSysInfo, getCloudInfo, getConsumption, getScheduleNextAction.
 
-#### `getCloudInfo()` _(promise)_
+#### `#getCloudInfo()` _(promise)_
 Get TP-Link Cloud information.
-#### `getConsumption()` _(promise)_
+#### `#getConsumption()` _(promise)_
 Get power consumption data for HS110 plugs and devices that support it.
-#### `getPowerState()` _(promise)_
+#### `#getPowerState()` _(promise)_
 Returns true if device is on.
-#### `setPowerState(value)` _(promise)_
+#### `#setPowerState(value)` _(promise)_
 Turns the device on or off.
-#### `getLedState()` _(promise)_
-#### `setLedState()` _(promise)_
-#### `blink([times = 5] [, rate = 1000])` _(promise)_
+#### `#getLedState()` _(promise)_
+#### `#setLedState()` _(promise)_
+#### `#blink([times = 5] [, rate = 1000])` _(promise)_
 Turn LED on and off `times` every `rate`. Sets LED back to original state when complete.
-#### `getScheduleNextAction()` _(promise)_
-#### `getScheduleRules()` _(promise)_
-#### `getAwayRules()` _(promise)_
-#### `getTimerRules()` _(promise)_
-#### `getTime()` _(promise)_
-#### `getTimeZone()` _(promise)_
-#### `getScanInfo([refresh = false] [, timeout = 17])` _(promise)_
+#### `#getScheduleNextAction()` _(promise)_
+#### `#getScheduleRules()` _(promise)_
+#### `#getAwayRules()` _(promise)_
+#### `#getTimerRules()` _(promise)_
+#### `#getTime()` _(promise)_
+#### `#getTimeZone()` _(promise)_
+#### `#getScanInfo([refresh = false] [, timeout = 17])` _(promise)_
 Get list of networks.
-#### `inUseThreshold`
+#### `#inUseThreshold`
 Threshold for `in-use` event.
 
 ### Bulb
 Derives from Device and includes Device functions above.
-#### `getInfo()` _(promise)_
-#### `getLightState()` _(promise)_
-#### `setLightState()` _(promise)_
-#### `getPowerState()` _(promise)_
-#### `setPowerState(value)` _(promise)_
-#### `getScheduleRules()` _(promise)_
-#### `getCloudInfo()` _(promise)_
+#### `#getInfo()` _(promise)_
+#### `#getLightState()` _(promise)_
+#### `#setLightState()` _(promise)_
+#### `#getPowerState()` _(promise)_
+#### `#setPowerState(value)` _(promise)_
+#### `#getScheduleRules()` _(promise)_
+#### `#getCloudInfo()` _(promise)_
 Get TP-Link Cloud information.
 
 ## Credits
