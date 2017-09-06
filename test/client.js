@@ -30,15 +30,35 @@ describe('Client', function () {
 
   describe('#startDiscovery()', function () {
     it('should emit device-new when finding a new device', function (done) {
-      return client.startDiscovery({ discoveryInterval: 250 }).once('device-new', (device) => {
+      client.startDiscovery({ discoveryInterval: 250 }).once('device-new', (device) => {
         device.should.be.an.instanceof(Device);
         client.stopDiscovery();
         done();
       });
     });
 
+    it('should emit device-new when finding a new device with a deviceType filter', function (done) {
+      client.startDiscovery({ discoveryInterval: 250, deviceTypes: ['plug'] }).once('device-new', (device) => {
+        device.should.be.an.instanceof(Device);
+        client.stopDiscovery();
+        done();
+      });
+    });
+
+    it('should NOT emit device-new with an incorrect deviceType filter', function (done) {
+      client.startDiscovery({ discoveryInterval: 250, deviceTypes: ['invalidDeviceType'] }).once('device-new', (device) => {
+        client.stopDiscovery();
+        try {
+          device.should.not.exist;
+        } catch (err) {
+          done(err);
+        }
+      });
+      setTimeout(done, 1000);
+    });
+
     it('should emit plug-new when finding a new plug', function (done) {
-      return client.startDiscovery({ discoveryInterval: 250 }).once('plug-new', (device) => {
+      client.startDiscovery({ discoveryInterval: 250 }).once('plug-new', (device) => {
         device.should.be.an.instanceof(Plug);
         client.stopDiscovery();
         done();
