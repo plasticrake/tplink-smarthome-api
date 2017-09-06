@@ -19,7 +19,7 @@ describe('Plug', function () {
     plug = client.getPlug(config.plug);
   });
 
-  describe('#setPowerState', function () {
+  describe('#setPowerState()', function () {
     it('should turn on', function () {
       return plug.setPowerState(true).should.eventually.be.true;
     });
@@ -53,7 +53,7 @@ describe('Plug', function () {
     });
   });
 
-  describe('#getPowerState', function () {
+  describe('#getPowerState()', function () {
     it('should return power state when on', function () {
       return plug.setPowerState(true).then(() => {
         plug.getPowerState().should.eventually.be.true;
@@ -67,33 +67,42 @@ describe('Plug', function () {
     });
   });
 
-  describe('#setLedState', function () {
+  describe('#setLedState()', function () {
     this.slow(1000);
-    it('should turn LED on', function () {
-      return plug.setLedState(true).should.eventually.be.true;
-    });
-
     it('should turn LED off', function () {
       return plug.setLedState(false).should.eventually.be.true;
     });
+
+    it('should turn LED on', function () {
+      return plug.setLedState(true).should.eventually.be.true;
+    });
   });
 
-  describe('#getLedState', function () {
+  describe('#getLedState()', function () {
     this.slow(1000);
-    it('should return LED state when on', function () {
-      return plug.setLedState(true).then(() => {
-        plug.getLedState().should.eventually.be.true;
-      });
-    });
 
     it('should return LED state when off', function () {
       return plug.setLedState(false).then(() => {
         plug.getLedState().should.eventually.be.false;
       });
     });
+
+    it('should return LED state when on', function () {
+      return plug.setLedState(true).then(() => {
+        plug.getLedState().should.eventually.be.true;
+      });
+    });
   });
 
-  describe('#getConsumption', function () {
+  describe('#blink()', function () {
+    this.slow(2000);
+    this.timeout(4000);
+    it('should blink LED', function () {
+      return plug.blink(3, 100).should.eventually.be.true;
+    });
+  });
+
+  describe('#getConsumption()', function () {
     it('should return consumption', function () {
       return plug.getSysInfo((si) => {
         if (plug.supportsConsumption) {
@@ -105,67 +114,67 @@ describe('Plug', function () {
     });
   });
 
-  describe('#getInfo', function () {
+  describe('#getInfo()', function () {
     it('should return info', function () {
       return plug.getInfo().should.eventually.have.property('sysInfo');
     });
   });
 
-  describe('#getSysInfo', function () {
+  describe('#getSysInfo()', function () {
     it('should return info', function () {
       return plug.getSysInfo().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getModel', function () {
+  describe('#getModel()', function () {
     it('should return model', function () {
       return plug.getModel().should.eventually.match(/^HS1[01]0/);
     });
   });
 
-  describe('#getCloudInfo', function () {
+  describe('#getCloudInfo()', function () {
     it('should return cloud info', function () {
       return plug.getCloudInfo().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getScheduleNextAction', function () {
+  describe('#getScheduleNextAction()', function () {
     it('should return schedule next action', function () {
       return plug.getScheduleNextAction().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getScheduleRules', function () {
+  describe('#getScheduleRules()', function () {
     it('should return schedule rules', function () {
       return plug.getScheduleRules().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getAwayRules', function () {
+  describe('#getAwayRules()', function () {
     it('should return away rules', function () {
       return plug.getAwayRules().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getTimerRules', function () {
+  describe('#getTimerRules()', function () {
     it('should return timer rules', function () {
       return plug.getTimerRules().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getTime', function () {
+  describe('#getTime()', function () {
     it('should return time', function () {
       return plug.getTime().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getTimeZone', function () {
+  describe('#getTimeZone()', function () {
     it('should return get time zone', function () {
       return plug.getTimeZone().should.eventually.have.property('err_code', 0);
     });
   });
 
-  describe('#getScanInfo', function () {
+  describe('#getScanInfo()', function () {
     it('should return get scan info', function () {
       this.timeout(10000);
       this.slow(5000);

@@ -38,6 +38,15 @@ let details = function (host, port, timeout) {
   });
 };
 
+let blink = function (host, port, times, rate, timeout) {
+  console.log('Sending blink commands...');
+  client.getDevice({host, port, debug}).then((device) => {
+    device.blink(times, rate).then(() => {
+      console.log('Blinking complete');
+    });
+  });
+};
+
 program
   .option('-D, --debug', 'turn on debug level logging', () => { debug = true; })
   .option('-c, --color [on]', 'output will be styled with ANSI color codes', 'on');
@@ -64,6 +73,14 @@ program
   .action(function (host, options) {
     let [hostOnly, port] = host.split(':');
     details(hostOnly, port, options.timeout);
+  });
+
+program
+  .command('blink <host> [times] [rate]')
+  .option('-t, --timeout [timeout]', 'timeout (ms)', 5000)
+  .action(function (host, times, rate, options) {
+    let [hostOnly, port] = host.split(':');
+    blink(hostOnly, port, times, rate, options.timeout);
   });
 
 program.parse(process.argv);
