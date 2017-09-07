@@ -39,6 +39,7 @@
     "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
     "dotenv": "^4.0.0",
+    "loglevel": "^1.4.1",
     "mocha": "^3.5.0",
     "semistandard": "^11.0.0"
   },
