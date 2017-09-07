@@ -14,7 +14,7 @@ let search = function (sysInfo, timeout) {
     .on('device-new', (device) => {
       console.log(`${device.model} ${device.type} ${device.host} ${device.deviceId}`);
       if (sysInfo) {
-        console.dir(device.sysInfo);
+        console.dir(device.sysInfo, {colors: program.color === 'on', depth: 10});
       }
     });
 };
@@ -23,7 +23,7 @@ let send = function (host, port, payload, timeout) {
   console.log('Sending...');
   client.send({host, port, payload, timeout, debug}).then((data) => {
     console.log('response:');
-    console.dir(data);
+    console.dir(data, {colors: program.color === 'on', depth: 10});
   }).catch((reason) => {
     console.log('no response: %s', reason);
   });
@@ -33,7 +33,7 @@ let details = function (host, port, timeout) {
   console.log('Getting details...');
   client.getDevice({host, port, debug}).then((device) => {
     device.getInfo().then((info) => {
-      console.dir(info, {colors: program.color === 'on'});
+      console.dir(info, {colors: program.color === 'on', depth: 10});
     });
   });
 };
