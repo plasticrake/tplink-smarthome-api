@@ -19,6 +19,16 @@ describe('Device', function () {
     device = client.getGeneralDevice(config.plug);
   });
 
+  describe('constructor', function () {
+    it('inherit timeout from Client', function () {
+      let timeout = 9999;
+      client = new Hs100Api.Client({timeout: timeout});
+      device = client.getGeneralDevice(config.plug);
+      client.timeout.should.equal(timeout);
+      device.timeout.should.equal(timeout);
+    });
+  });
+
   describe('#getSysInfo()', function () {
     it('should return info', function () {
       return device.getSysInfo().should.eventually.have.property('err_code', 0);
