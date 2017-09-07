@@ -39,7 +39,7 @@ The API is not stable and there may be breaking changes.
 
 ### Client
 
-#### `new Client({debug = false})`
+#### `new Client({timeout = 3000, logLevel, logger})`
 Returns a Client object.
 
 #### `#send ({host, port = 9999, payload, timeout = 3000})` _(promise)_
