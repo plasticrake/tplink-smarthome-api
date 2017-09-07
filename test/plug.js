@@ -176,12 +176,14 @@ describe('Plug', function () {
 
   describe('#getScanInfo()', function () {
     it('should return get scan info', function () {
-      this.timeout(10000);
-      this.slow(5000);
+      this.timeout(8000);
+      this.slow(6000);
+      plug.timeout = 3000;
       return plug.getScanInfo(true, 3).should.eventually.have.property('err_code', 0);
     });
 
     it('should return get cached scan info', function () {
+      this.slow(1000);
       return plug.getScanInfo(false).should.eventually.have.property('err_code', 0);
     });
   });
