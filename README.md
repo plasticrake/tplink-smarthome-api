@@ -55,8 +55,13 @@ options: {
   [, discoveryTimeout = 0]
   [, offlineTolerance = 3]
   [, deviceTypes] // Array, possible values: 'plug', 'bulb'
+  [, deviceOptions] // options passed to device constructors
   [, devices] // Array
 }
+
+startDiscovery ({address, port, broadcast = '255.255.255.255', discoveryInterval = 10000, discoveryTimeout = 0, offlineTolerance = 3, deviceTypes, deviceOptions, devices} = {}) {
+
+
 ```
 Sends a discovery packet to the `broadcast` address every `discoveryInterval`(ms). Stops discovery after `discoveryTimeout`(ms) if greater than 0. If `deviceTypes` is specified only matching devices are found. Returns Client that emits the events below. If `devices` is specified it will attempt to contact them directly in addition to sending to the broadcast address. `devices` are specified as an array of `[{host, [port: 9999]}]`.
 
