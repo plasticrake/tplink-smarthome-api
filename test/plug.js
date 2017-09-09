@@ -14,7 +14,7 @@ const configPlug = Object.assign({}, config.plug);
 const configPlugMemoized = Object.assign({}, config.plug);
 configPlugMemoized.memoize = 1000;
 
-let delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
+// const delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
 
 const testConfigs = [
   {name: 'plug', config: configPlug},
@@ -28,7 +28,7 @@ testConfigs.forEach((test) => {
     let plug;
 
     before(function () {
-      client = new Hs100Api.Client();
+      client = new Hs100Api.Client({deviceConfig: test.config});
       plug = client.getPlug(test.config);
     });
 
@@ -74,19 +74,31 @@ testConfigs.forEach((test) => {
     });
 
     describe('#getPowerState()', function () {
-      this.timeout(2000 + (test.config.memoize * 2));
-      this.slow(1000 + (test.config.memoize * 1.5));
+      this.timeout(2000);
+      this.slow(1000);
       it('should return power state when on', function () {
         return plug.setPowerState(true)
-          .then(() => { return delay(test.config.memoize * 1.3); })
           .then(() => { return plug.getPowerState().should.eventually.be.true; });
       });
 
       it('should return power state when off', function () {
         return plug.setPowerState(false)
-          .then(() => { return delay(test.config.memoize * 1.3); })
           .then(() => { return plug.getPowerState().should.eventually.be.false; });
       });
+
+      if (test.config.memoize) {
+        it.skip('should return memoized power state', function () {
+          return plug.setPowerState(true)
+            .then(() => { return plug.getPowerState().should.eventually.be.true; })
+            .then(() => { return plug.getPowerState().should.eventually.be.true; })
+            .then(() => { return plug.getPowerState().should.eventually.be.true; })
+            .then(() => { return plug.getPowerState().should.eventually.be.true; })
+            .then(() => { return plug.getPowerState().should.eventually.be.true; })
+            .then(() => {
+              // TODO
+            });
+        });
+      }
     });
 
     describe('#setLedState()', function () {
@@ -101,24 +113,24 @@ testConfigs.forEach((test) => {
     });
 
     describe('#getLedState()', function () {
-      this.timeout(2000 + (test.config.memoize * 2));
-      this.slow(1000 + (test.config.memoize * 1.5));
+      this.timeout(2000);
+      this.slow(1000);
 
       it('should return LED state when off', function () {
         return plug.setLedState(false)
-          .then(() => { return delay(test.config.memoize * 1.3); })
+          // .then(() => { return delay(test.config.memoize * 1.3); })
           .then(() => { return plug.getLedState().should.eventually.be.false; });
       });
 
       it('should return LED state when on', function () {
         return plug.setLedState(true)
-          .then(() => { return delay(test.config.memoize * 1.3); })
+          // .then(() => { return delay(test.config.memoize * 1.3); })
           .then(() => { return plug.getLedState().should.eventually.be.true; });
       });
     });
 
     describe('#blink()', function () {
-      this.slow(2000);
+      this.slow(2500);
       this.timeout(4000);
       it('should blink LED', function () {
         return plug.blink(3, 100).should.eventually.be.true;
