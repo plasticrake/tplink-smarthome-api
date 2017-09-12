@@ -29,7 +29,7 @@
     "api"
   ],
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=6.5.0"
   },
   "dependencies": {
     "commander": "^2.11.0",
