@@ -5,11 +5,11 @@ const program = require('commander');
 const Hs100Api = require('.');
 const client = new Hs100Api.Client();
 
-let debug = false;
+let logLevel;
 
 let search = function (sysInfo, timeout) {
   console.log('Searching...');
-  client.debug = debug;
+  client.log.setLevel(logLevel);
   client.startDiscovery({discoveryInterval: 2500, discoveryTimeout: timeout})
     .on('device-new', (device) => {
       console.log(`${device.model} ${device.type} ${device.host} ${device.deviceId}`);
@@ -21,7 +21,8 @@ let search = function (sysInfo, timeout) {
 
 let send = function (host, port, payload, timeout) {
   console.log('Sending...');
-  client.send({host, port, payload, timeout, debug}).then((data) => {
+  client.log.setLevel(logLevel);
+  client.send({host, port, payload, timeout}).then((data) => {
     console.log('response:');
     console.dir(data, {colors: program.color === 'on', depth: 10});
   }).catch((reason) => {
@@ -31,24 +32,30 @@ let send = function (host, port, payload, timeout) {
 
 let details = function (host, port, timeout) {
   console.log('Getting details...');
-  client.getDevice({host, port, debug}).then((device) => {
-    device.getInfo().then((info) => {
+  client.log.setLevel(logLevel);
+  client.getDevice({host, port}).then((device) => {
+    return device.getInfo().then((info) => {
       console.dir(info, {colors: program.color === 'on', depth: 10});
     });
+  }).catch((reason) => {
+    console.error(reason);
   });
 };
 
 let blink = function (host, port, times, rate, timeout) {
   console.log('Sending blink commands...');
-  client.getDevice({host, port, debug}).then((device) => {
-    device.blink(times, rate).then(() => {
+  client.log.setLevel(logLevel);
+  client.getDevice({host, port}).then((device) => {
+    return device.blink(times, rate).then(() => {
       console.log('Blinking complete');
     });
+  }).catch((reason) => {
+    console.error(reason);
   });
 };
 
 program
-  .option('-D, --debug', 'turn on debug level logging', () => { debug = true; })
+  .option('-D, --debug', 'turn on debug level logging', () => { logLevel = 'debug'; })
   .option('-c, --color [on]', 'output will be styled with ANSI color codes', 'on');
 
 program
