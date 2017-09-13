@@ -129,6 +129,35 @@ testConfigs.forEach((test) => {
       });
     });
 
+    describe('#setAlias()', function () {
+      this.slow(1000);
+      it('should change the alias', function () {
+        let origAlias = 'Test Plug'; // Default
+        let testAlias = `Testing ${(new Date()).toISOString()}`;
+
+        return plug.getSysInfo()
+        .then((si) => {
+          origAlias = si.alias;
+          return plug.setAlias(testAlias).should.eventually.be.true;
+        })
+        .then(() => {
+          return plug.getSysInfo();
+        })
+        .then((si) => {
+          return si.alias.should.equal(testAlias);
+        })
+        .then(() => {
+          return plug.setAlias(origAlias).should.eventually.be.true;
+        })
+        .then(() => {
+          return plug.getSysInfo();
+        })
+        .then((si) => {
+          return si.alias.should.equal(origAlias);
+        }).should.eventually.be.fulfilled;
+      });
+    });
+
     describe('#blink()', function () {
       this.slow(2500);
       this.timeout(4000);
