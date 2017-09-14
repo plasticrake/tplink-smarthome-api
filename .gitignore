@@ -34,3 +34,5 @@ node_modules
 
 # dotenv
 .env
+
+lib

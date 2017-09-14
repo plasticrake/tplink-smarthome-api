@@ -28,29 +28,36 @@
     "smartbulb",
     "api"
   ],
+  "main": "lib/index.js",
   "engines": {
     "node": ">=6.5.0"
   },
   "dependencies": {
     "commander": "^2.11.0",
     "lodash.wrap": "^4.1.1",
-    "loglevel": "^1.4.1",
-    "memoizee": "^0.4.10"
+    "loglevel": "^1.5.0",
+    "memoizee": "^0.4.11"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
     "dotenv": "^4.0.0",
-    "mocha": "^3.5.0",
+    "mocha": "^3.5.3",
     "semistandard": "^11.0.0"
   },
   "scripts": {
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
-    "test": "./node_modules/.bin/semistandard &&  ./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/semistandard && ./node_modules/.bin/mocha --compilers js:babel-register",
+    "build": "./node_modules/.bin/babel src -d lib",
+    "prepublish": "npm run build"
   },
   "bin": {
-    "hs100-api": "cli.js"
+    "hs100-api": "lib/cli.js"
   }
 }
