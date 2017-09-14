@@ -85,7 +85,7 @@ program
 program
   .command('blink <host> [times] [rate]')
   .option('-t, --timeout [timeout]', 'timeout (ms)', 5000)
-  .action(function (host, times, rate, options) {
+  .action(function (host, times = 5, rate = 500, options) {
     let [hostOnly, port] = host.split(':');
     blink(hostOnly, port, times, rate, options.timeout);
   });
