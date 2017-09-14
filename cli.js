@@ -21,7 +21,7 @@ let search = function (sysInfo, timeout) {
 
 let send = function (host, port, payload, timeout) {
   console.log('Sending...');
-  client.log.setLevel(logLevel);
+  if (logLevel) client.log.setLevel(logLevel);
   client.send({host, port, payload, timeout}).then((data) => {
     console.log('response:');
     console.dir(data, {colors: program.color === 'on', depth: 10});
@@ -32,7 +32,7 @@ let send = function (host, port, payload, timeout) {
 
 let details = function (host, port, timeout) {
   console.log('Getting details...');
-  client.log.setLevel(logLevel);
+  if (logLevel) client.log.setLevel(logLevel);
   client.getDevice({host, port}).then((device) => {
     return device.getInfo().then((info) => {
       console.dir(info, {colors: program.color === 'on', depth: 10});
@@ -44,7 +44,7 @@ let details = function (host, port, timeout) {
 
 let blink = function (host, port, times, rate, timeout) {
   console.log('Sending blink commands...');
-  client.log.setLevel(logLevel);
+  if (logLevel) client.log.setLevel(logLevel);
   client.getDevice({host, port}).then((device) => {
     return device.blink(times, rate).then(() => {
       console.log('Blinking complete');
