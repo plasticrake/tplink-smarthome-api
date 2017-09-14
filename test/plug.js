@@ -168,13 +168,9 @@ testConfigs.forEach((test) => {
 
     describe('#getConsumption()', function () {
       it('should return consumption', function () {
-        return plug.getSysInfo((si) => {
-          if (plug.supportsConsumption) {
-            return plug.getConsumption().should.eventually.have.property('err_code', 0);
-          } else {
-            return plug.getConsumption().should.eventually.have.property('err_code', -1);
-          }
-        });
+        return plug.getSysInfo().then((si) => {
+          return plug.getConsumption().should.eventually.have.property('err_code', (plug.supportsConsumption ? 0 : -1));
+        }).should.eventually.be.fulfilled;
       });
     });
 
