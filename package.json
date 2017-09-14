@@ -48,12 +48,14 @@
     "chai-things": "^0.2.0",
     "dotenv": "^4.0.0",
     "mocha": "^3.5.3",
+    "nyc": "^11.2.1",
     "semistandard": "^11.0.0"
   },
   "scripts": {
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
-    "test": "./node_modules/.bin/semistandard && ./node_modules/.bin/mocha --compilers js:babel-register",
+    "test": "semistandard && nyc mocha --compilers js:babel-register",
+    "coverage": "nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "./node_modules/.bin/babel src -d lib",
     "prepublish": "npm run build"
   },
