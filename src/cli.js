@@ -9,7 +9,7 @@ let logLevel;
 
 let search = function (sysInfo, timeout) {
   console.log('Searching...');
-  client.log.setLevel(logLevel);
+  if (logLevel) client.log.setLevel(logLevel);
   client.startDiscovery({discoveryInterval: 2500, discoveryTimeout: timeout})
     .on('device-new', (device) => {
       console.log(`${device.model} ${device.type} ${device.host} ${device.deviceId}`);
