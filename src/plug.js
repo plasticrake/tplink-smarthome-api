@@ -238,6 +238,7 @@ class Plug extends Device {
     if (currLedState !== origLedState) {
       await this.setLedState(origLedState);
     }
+    return true;
   }
 }
 
