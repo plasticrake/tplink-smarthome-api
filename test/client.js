@@ -8,10 +8,10 @@ const should = chai.should();
 chai.use(require('chai-as-promised'));
 
 const config = require('./lib/config');
-const Hs100Api = require('..');
+const Hs100Api = require('../src');
 
-const Device = require('../lib/device.js');
-const Plug = require('../lib/plug.js');
+const Device = require('../src/device.js');
+const Plug = require('../src/plug.js');
 
 describe('Client', function () {
   this.timeout(5000);

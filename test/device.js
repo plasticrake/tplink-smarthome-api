@@ -8,7 +8,7 @@ chai.should();
 chai.use(require('chai-as-promised'));
 
 const config = require('./lib/config');
-const Hs100Api = require('..');
+const Hs100Api = require('../src');
 
 describe('Device', function () {
   let client;
