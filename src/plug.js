@@ -122,7 +122,7 @@ class Plug extends Device {
     let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}');
     this.sysInfo = data.system.get_sysinfo;
     this.cloudInfo = data.cnCloud.get_info;
-    this.consumption = data.emeter;
+    this.consumption = data.emeter.get_realtime;
     this.scheduleNextAction = data.schedule.get_next_action;
     return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, consumption: this.consumption, scheduleNextAction: this.scheduleNextAction};
   }
@@ -130,7 +130,7 @@ class Plug extends Device {
   async getSysInfoAndConsumption () {
     let data = await this.send('{"emeter":{"get_realtime":{}},"system":{"get_sysinfo":{}}}');
     this.sysInfo = data.system.get_sysinfo;
-    this.consumption = data.emeter;
+    this.consumption = data.emeter.get_realtime;
     return {sysInfo: this.sysInfo, consumption: this.consumption};
   }
 
