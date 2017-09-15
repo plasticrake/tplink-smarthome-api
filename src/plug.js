@@ -112,6 +112,10 @@ class Plug extends Device {
     } else {
       this.emit('power-update', this, powerOn);
     }
+
+    if (this.supportsConsumption) {
+      this.emit('consumption-update', this, this.consumption);
+    }
   }
 
   async getInfo () {
