@@ -2,8 +2,8 @@ const Hs100Api = require('../../hs100-api');
 
 const client = new Hs100Api.Client();
 
-var logEvent = function (eventName, device) {
-  console.log(`${(new Date()).toISOString()} ${eventName} ${device.model} ${device.host} ${device.deviceId}`);
+var logEvent = function (eventName, device, state = '') {
+  console.log(`${(new Date()).toISOString()} ${eventName} ${device.model} ${device.host} ${device.deviceId} ${state}`);
 };
 
 client.on('device-new', (device) => {
@@ -12,13 +12,13 @@ client.on('device-new', (device) => {
 
   device.on('power-on', (device) => { logEvent('power-on', device); });
   device.on('power-off', (device) => { logEvent('power-off', device); });
-  device.on('power-update', (device, powerOn) => { logEvent('power-update', device); });
+  device.on('power-update', (device, powerOn) => { logEvent('power-update', device, powerOn); });
 
   device.on('in-use', (device) => { logEvent('in-use', device); });
   device.on('not-in-use', (device) => { logEvent('not-in-use', device); });
-  device.on('in-use-update', (device, inUse) => { logEvent('in-use-update', device); });
+  device.on('in-use-update', (device, inUse) => { logEvent('in-use-update', device, inUse); });
 
-  device.on('consumption-update', (device, consumption) => { logEvent('consumption-update', device); });
+  device.on('consumption-update', (device, consumption) => { logEvent('consumption-update', device, String(consumption.power) ); });
 });
 client.on('device-online', (device) => { logEvent('device-online', device); });
 client.on('device-offline', (device) => { logEvent('device-offline', device); });
