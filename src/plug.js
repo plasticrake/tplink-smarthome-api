@@ -94,19 +94,23 @@ class Plug extends Device {
     if (this.lastState.inUse !== inUse) {
       this.lastState.inUse = inUse;
       if (inUse) {
-        this.emit('in-use', this);
+        this.emit('in-use', this, inUse);
       } else {
-        this.emit('not-in-use', this);
+        this.emit('not-in-use', this, inUse);
       }
+    } else {
+      this.emit('in-use-update', this, inUse);
     }
 
     if (this.lastState.powerOn !== powerOn) {
       this.lastState.powerOn = powerOn;
       if (powerOn) {
-        this.emit('power-on', this);
+        this.emit('power-on', this, powerOn);
       } else {
-        this.emit('power-off', this);
+        this.emit('power-off', this, powerOn);
       }
+    } else {
+      this.emit('power-update', this, powerOn);
     }
   }
 
