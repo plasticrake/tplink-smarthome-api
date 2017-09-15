@@ -32,3 +32,8 @@ module.exports.decrypt = function (input, firstKey = 0xAB) {
   }
   return buf;
 };
+
+module.exports.decryptWithHeader = function (input, firstKey = 0xAB) {
+  let buf = Buffer.from(input).slice(4);
+  return module.exports.decrypt(buf);
+};

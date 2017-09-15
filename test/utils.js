@@ -1,57 +1,66 @@
 /* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
 
 'use strict';
 
 const chai = require('chai');
 chai.should();
 
+const encrypt = require('../src/utils').encrypt;
 const encryptWithHeader = require('../src/utils').encryptWithHeader;
 const decrypt = require('../src/utils').decrypt;
+const decryptWithHeader = require('../src/utils').decryptWithHeader;
 
 var payloads = {
-  setPowerStateOn: ['{"system":{"set_relay_state":{"state":1}}}', 'AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=='],
-  setPowerStateOff: ['{"system":{"set_relay_state":{"state":0}}}', 'AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeow=='],
-  getSysInfo: ['{ "system":{ "get_sysinfo":null } }', 'AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr'],
-  getConsumption: ['{ "emeter":{ "get_realtime":null } }', 'AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA==']
+  setPowerStateOn: {
+    plain: '{"system":{"set_relay_state":{"state":1}}}',
+    encrypted: '0PKB+Iv/mvfV75S2xaDUi/mc8JHot8Sw0aXA4tijgfKG55P21O7fot+i',
+    encryptedWithHeader: 'AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=='
+  },
+  setPowerStateOff: {
+    plain: '{"system":{"set_relay_state":{"state":0}}}',
+    encrypted: '0PKB+Iv/mvfV75S2xaDUi/mc8JHot8Sw0aXA4tijgfKG55P21O7eo96j',
+    encryptedWithHeader: 'AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeow=='
+  },
+  getSysInfo: {
+    plain: '{ "system":{ "get_sysinfo":null } }',
+    encrypted: '0PDSodir37rX9c+0lLbRtMCf7JXmj+GH6MrwnuuH68u2lus=',
+    encryptedWithHeader: 'AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr'
+  },
+  getConsumption: {
+    plain: '{ "emeter":{ "get_realtime":null } }',
+    encrypted: '0PDSt9q/y67c/sS/n73av8uU5oPijvqT/pu5g+2Y9Ji4xeWY',
+    encryptedWithHeader: 'AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=='
+  }
 };
 
-function decodeAndDecrypt (input) {
-  return decrypt(Buffer.from(input, 'base64').slice(4)).toString('ascii');
-}
+describe('utils', () => {
+  Object.keys(payloads).forEach((plKey) => {
+    describe('#decrypt', () => {
+      it(`should decrypt ${plKey} payload`, () => {
+        let buf = Buffer.from(payloads[plKey].encrypted, 'base64');
+        decrypt(buf).toString('ascii').should.eql(payloads[plKey].plain);
+      });
+    });
 
-function encryptAndEncode (input) {
-  return encryptWithHeader(input).toString('base64');
-}
+    describe('#decryptWithHeader', () => {
+      it(`should decrypt ${plKey} payload`, () => {
+        let buf = Buffer.from(payloads[plKey].encryptedWithHeader, 'base64');
+        decryptWithHeader(buf).toString('ascii').should.eql(payloads[plKey].plain);
+      });
+    });
 
-describe('utils', function () {
-  describe('#decrypt', function () {
-    it('should decrypt setState ON payload', function () {
-      decodeAndDecrypt(payloads.setPowerStateOn[1]).should.eql(payloads.setPowerStateOn[0]);
+    describe('#encrypt', () => {
+      it(`should encrypt ${plKey} payload`, () => {
+        let buf = encrypt(payloads[plKey].plain);
+        buf.toString('base64').should.eql(payloads[plKey].encrypted);
+      });
     });
-    it('should decrypt setState OFF payload', function () {
-      decodeAndDecrypt(payloads.setPowerStateOff[1]).should.eql(payloads.setPowerStateOff[0]);
-    });
-    it('should decode and decrypt getState payload', function () {
-      decodeAndDecrypt(payloads.getSysInfo[1]).should.eql(payloads.getSysInfo[0]);
-    });
-    it('should decode and decrypt usage payload', function () {
-      decodeAndDecrypt(payloads.getConsumption[1]).should.eql(payloads.getConsumption[0]);
-    });
-  });
 
-  describe('#encryptWithHeader', function () {
-    it('should encrypt setState ON payload', function () {
-      encryptAndEncode(payloads.setPowerStateOn[0]).should.eql(payloads.setPowerStateOn[1]);
-    });
-    it('should encrypt setState OFF payload', function () {
-      encryptAndEncode(payloads.setPowerStateOff[0]).should.eql(payloads.setPowerStateOff[1]);
-    });
-    it('should encrypt getState payload', function () {
-      encryptAndEncode(payloads.getSysInfo[0]).should.eql(payloads.getSysInfo[1]);
-    });
-    it('should encrypt usage payload', function () {
-      encryptAndEncode(payloads.getConsumption[0]).should.eql(payloads.getConsumption[1]);
+    describe('#encryptWithHeader', () => {
+      it(`should encrypt ${plKey} payload`, () => {
+        let buf = encryptWithHeader(payloads[plKey].plain);
+        buf.toString('base64').should.eql(payloads[plKey].encryptedWithHeader);
+      });
     });
   });
 });
