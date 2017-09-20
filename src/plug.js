@@ -9,41 +9,20 @@ class Plug extends Device {
 
     this.log.debug('plug.constructor()');
 
+    this.apiModuleNamespace = {
+      'system': 'system',
+      'cloud': 'cnCloud',
+      'schedule': 'schedule',
+      'timesetting': 'time',
+      'emeter': 'emeter',
+      'netif': 'netif'
+    };
+
     this.inUseThreshold = options.inUseThreshold || 0;
 
     this.lastState = Object.assign(this.lastState, { powerOn: null, inUse: null });
 
-    this._consumption = {};
-
     this.emitEventsEnabled = true;
-  }
-
-  memoize (maxAge = 5000) {
-    super.memoize(maxAge);
-    this.log.debug('[%s] plug.memoize(%d)', this.name, maxAge);
-    const memoize = require('memoizee');
-
-    this.getInUse = memoize(this.getInUse.bind(this), { promise: true, maxAge: maxAge });
-    this.getInfo = memoize(this.getInfo.bind(this), { promise: true, maxAge: maxAge });
-    this.getSysInfoAndConsumption = memoize(this.getSysInfoAndConsumption.bind(this), { promise: true, maxAge: maxAge });
-    this.getPowerState = memoize(this.getPowerState.bind(this), { promise: true, maxAge: maxAge });
-    this.getLedState = memoize(this.getLedState.bind(this), { promise: true, maxAge: maxAge });
-    this.getConsumption = memoize(this.getConsumption.bind(this), { promise: true, maxAge: maxAge });
-
-    // Invalidate cache on change
-    const wrap = require('lodash.wrap');
-    this.setPowerState = wrap(this.setPowerState, (fn, ...args) => {
-      this.log.debug('[%s] plug.memoize setPowerState clearing cache', this.name);
-      this.getPowerState.clear();
-      this.getSysInfo.clear();
-      return fn.bind(this)(...args);
-    });
-    this.setLedState = wrap(this.setLedState, (fn, ...args) => {
-      this.log.debug('[%s] plug.memoize setLedState clearing cache', this.name);
-      this.getLedState.clear();
-      this.getSysInfo.clear();
-      return fn.bind(this)(...args);
-    });
   }
 
   get sysInfo () {
@@ -78,10 +57,9 @@ class Plug extends Device {
     if (this.supportsConsumption) {
       let consumption = await this.getConsumption();
       return (consumption.power > this.inUseThreshold);
-    } else {
-      let si = await this.getSysInfo();
-      return (si.relay_state === 1);
     }
+    let si = await this.getSysInfo();
+    return (si.relay_state === 1);
   }
 
   emitEvents () {
@@ -128,52 +106,10 @@ class Plug extends Device {
   }
 
   async getSysInfoAndConsumption () {
-    let data = await this.send('{"emeter":{"get_realtime":{}},"system":{"get_sysinfo":{}}}');
+    let data = await this.sendCommand('{"emeter":{"get_realtime":{}},"system":{"get_sysinfo":{}}}');
     this.sysInfo = data.system.get_sysinfo;
     this.consumption = data.emeter.get_realtime;
     return {sysInfo: this.sysInfo, consumption: this.consumption};
-  }
-
-  async getCloudInfo () {
-    let data = await this.send('{"cnCloud":{"get_info":{}}}');
-    this.cloudInfo = data.cnCloud.get_info;
-    return this.cloudInfo;
-  }
-
-  async getScheduleNextAction () {
-    let data = await this.send('{"schedule":{"get_next_action":{}}}');
-    return data.schedule.get_next_action;
-  }
-
-  async getScheduleRules () {
-    let data = await this.send('{"schedule":{"get_rules":{}}}');
-    return data.schedule.get_rules;
-  }
-
-  async getAwayRules () {
-    let data = await this.send('{"anti_theft":{"get_rules":{}}}');
-    return data.anti_theft.get_rules;
-  }
-
-  async getTimerRules () {
-    let data = await this.send('{"count_down":{"get_rules":{}}}');
-    return data.count_down.get_rules;
-  }
-
-  async getTime () {
-    let data = await this.send('{"time":{"get_time":{}}}');
-    return data.time.get_time;
-  }
-
-  async getTimeZone () {
-    let data = await this.send('{"time":{"get_timezone":{}}}');
-    return data.time.get_timezone;
-  }
-
-  async getScanInfo (refresh = false, timeoutInSeconds = 10) {
-    let timeout = (timeoutInSeconds * 1000) + this.timeout; // add original timeout to wait for response
-    let data = await this.send(`{"netif":{"get_scaninfo":{"refresh":${(refresh ? 1 : 0)},"timeout":${timeoutInSeconds}}}}`, timeout);
-    return data.netif.get_scaninfo;
   }
 
   async getPowerState () {
@@ -183,15 +119,18 @@ class Plug extends Device {
 
   async setPowerState (value) {
     this.log.debug('[%s] plug.setPowerState(%s)', this.name, value);
-    let data = await this.send(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`);
-    let errCode;
-    try {
-      errCode = data.system.set_relay_state.err_code;
-      if (errCode === 0) { this.sysInfo.relay_state = (value ? 1 : 0); }
-      this.emitEvents();
-      return (errCode === 0);
-    } catch (e) {}
-    if (errCode !== 0) { throw data; }
+    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`);
+    this.sysInfo.relay_state = (value ? 1 : 0);
+    this.emitEvents();
+    return true;
+  }
+
+  async getAwayRules () {
+    return this.sendCommand(`{"anti_theft":{"get_rules":{}}}`);
+  }
+
+  async getTimerRules () {
+    return this.sendCommand(`{"count_down":{"get_rules":{}}}`);
   }
 
   async getLedState () {
@@ -200,31 +139,9 @@ class Plug extends Device {
   }
 
   async setLedState (value) {
-    let data = await this.send(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`);
-    let errCode;
-    try {
-      errCode = data.system.set_led_off.err_code;
-      if (errCode === 0) { this.sysInfo.set_led_off = (value ? 0 : 1); }
-      return (errCode === 0);
-    } catch (e) {}
-    if (errCode !== 0) { throw data; }
-  }
-
-  async getConsumption () {
-    let data = await this.send('{"emeter":{"get_realtime":{}}}');
-    this.consumption = data.emeter.get_realtime;
-    return this.consumption;
-  }
-
-  async setAlias (value) {
-    let data = await this.send(`{"system":{"set_dev_alias":{"alias":"${(value)}"}}}`);
-    let errCode;
-    try {
-      errCode = data.system.set_dev_alias.err_code;
-      if (errCode === 0) { this.sysInfo.alias = value; }
-      return (errCode === 0);
-    } catch (e) {}
-    if (errCode !== 0) { throw data; }
+    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`);
+    this.sysInfo.set_led_off = (value ? 0 : 1);
+    return true;
   }
 
   async blink (times = 5, rate = 1000) {

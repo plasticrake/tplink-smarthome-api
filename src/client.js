@@ -37,9 +37,9 @@ class Client extends EventEmitter {
       if (timeout > 0) {
         socket.setTimeout(timeout);
         timer = setTimeout(() => {
-          this.log.debug('client.send: timeout');
+          this.log.debug('client.send: timeout(%s)', timeout);
           socket.end();
-          socket.destroy(new Error('client.send: timeout'));
+          socket.destroy(new Error(`client.send: timeout ${timeout}`));
         }, timeout);
       }
 
@@ -75,9 +75,9 @@ class Client extends EventEmitter {
       });
 
       socket.on('timeout', () => {
-        this.log.debug('client.send: socket on timeout');
+        this.log.debug('client.send: socket on timeout %s', timeout);
         if (timer) { clearTimeout(timer); }
-        socket.destroy(new Error('client.send: socket on timeout'));
+        socket.destroy(new Error(`client.send: socket on timeout ${timeout}`));
       });
 
       socket.on('error', (err) => {
@@ -131,6 +131,17 @@ class Client extends EventEmitter {
     return this.getDeviceFromSysInfo(sysInfo, options);
   }
 
+  getDeviceFromType (typeName, options) {
+    if (typeof typeName === 'function') {
+      typeName = typeName.name;
+    }
+    switch (typeName.toLowerCase()) {
+      case 'plug': return this.getPlug(options);
+      case 'bulb': return this.getBulb(options);
+      default: return this.getPlug(options);
+    }
+  }
+
   getDeviceFromSysInfo (sysInfo, options) {
     options = Object.assign({}, options, {sysInfo: sysInfo});
     const deviceType = sysInfo.type || sysInfo.mic_type;
@@ -150,112 +161,134 @@ class Client extends EventEmitter {
     }
   }
 
-  startDiscovery ({address, port, broadcast = '255.255.255.255', discoveryInterval = 10000, discoveryTimeout = 0, offlineTolerance = 3, deviceTypes, deviceOptions, devices} = {}) {
+  startDiscovery ({address, port, broadcast = '255.255.255.255', discoveryInterval = 10000, discoveryTimeout = 0, offlineTolerance = 3, deviceTypes, deviceOptions = {}, devices} = {}) {
     this.log.debug('client.startDiscovery(%j)', arguments[0]);
-    this.socket = dgram.createSocket('udp4');
 
-    this.socket.on('error', (err) => {
-      this.isSocketBound = false;
-      this.log.error('client.startDiscovery: UDP Error: %s', err);
-      this.socket.close();
-      this.emit('error', err);
+    try {
+      this.socket = dgram.createSocket('udp4');
+
+      this.socket.on('error', (err) => {
+        this.log.error('client.startDiscovery: UDP Error: %s', err);
+        this.stopDiscovery();
+        this.emit('error', err);
       // TODO
-    });
+      });
 
-    this.socket.on('message', (msg, rinfo) => {
-      const decryptedMsg = decrypt(msg).toString('ascii');
+      this.socket.on('message', (msg, rinfo) => {
+        const decryptedMsg = decrypt(msg).toString('ascii');
 
-      this.log.debug('client.startDiscovery(): from: %s message: %s', decryptedMsg, rinfo.address);
+        this.log.debug('client.startDiscovery(): socket from: %s message: %s', decryptedMsg, rinfo.address);
 
-      let jsonMsg;
-      try {
-        jsonMsg = JSON.parse(decryptedMsg);
-      } catch (err) {
-        this.log.error('client.startDiscovery(): Error parsing JSON: %s\nFrom: [%s] Original: [%s] Decrypted: [%s]', err, rinfo.address, msg, decryptedMsg);
-        return;
-      }
-
-      const sysInfo = jsonMsg.system.get_sysinfo;
-
-      if (deviceTypes) {
-        const deviceType = this.getTypeFromSysInfo(sysInfo);
-        if (!deviceTypes.includes(deviceType)) {
-          this.log.debug('client.startDiscovery(): Filtered out: %s (%s), allowed device types: (%j)', sysInfo.alias, deviceType, deviceTypes);
+        let jsonMsg;
+        let sysInfo;
+        try {
+          jsonMsg = JSON.parse(decryptedMsg);
+          sysInfo = jsonMsg.system.get_sysinfo;
+        } catch (err) {
+          this.log.error('client.startDiscovery(): Error parsing JSON: %s\nFrom: [%s] Original: [%s] Decrypted: [%s]', err, rinfo.address, msg, decryptedMsg);
           return;
         }
-      }
 
-      if (this.devices.has(sysInfo.deviceId)) {
-        const device = this.devices.get(sysInfo.deviceId);
-        device.host = rinfo.address;
-        device.port = rinfo.port;
-        device.sysInfo = sysInfo;
-        device.status = 'online';
-        device.seenOnDiscovery = this.discoveryPacketSequence;
-        this.emit('online', device);
-      } else {
-        deviceOptions = Object.assign({},
-          deviceOptions,
-          {client: this, deviceId: sysInfo.deviceId, host: rinfo.address, port: rinfo.port, seenOnDiscovery: this.discoveryPacketSequence});
-        const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
-        device.sysInfo = sysInfo;
-        device.status = 'online';
-        this.devices.set(device.deviceId, device);
-        this.emit('new', device);
-      }
-    });
+        if (deviceTypes) {
+          const deviceType = this.getTypeFromSysInfo(sysInfo);
+          if (!deviceTypes.includes(deviceType)) {
+            this.log.debug('client.startDiscovery(): Filtered out: %s (%s), allowed device types: (%j)', sysInfo.alias, deviceType, deviceTypes);
+            return;
+          }
+        }
 
-    this.socket.bind(port, address, () => {
-      const address = this.socket.address();
-      this.log.debug(`client.socket: UDP ${address.family} listening on ${address.address}:${address.port}`);
-      this.socket.setBroadcast(true);
-    });
+        if (this.devices.has(sysInfo.deviceId)) {
+          const device = this.devices.get(sysInfo.deviceId);
+          device.host = rinfo.address;
+          device.port = rinfo.port;
+          device.sysInfo = sysInfo;
+          device.status = 'online';
+          device.seenOnDiscovery = this.discoveryPacketSequence;
+          this.emit('online', device);
+        } else {
+          Object.assign(deviceOptions, {client: this, deviceId: sysInfo.deviceId, host: rinfo.address, port: rinfo.port, seenOnDiscovery: this.discoveryPacketSequence});
+          const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
+          device.sysInfo = sysInfo;
+          device.status = 'online';
+          this.devices.set(device.deviceId, device);
+          this.emit('new', device);
+        }
+      });
 
-    this.discoveryTimer = setInterval(() => {
-      this.sendDiscovery(broadcast, devices, offlineTolerance);
-    }, discoveryInterval);
+      this.socket.bind(port, address, () => {
+        this.isSocketBound = true;
+        const address = this.socket.address();
+        this.log.debug(`client.socket: UDP ${address.family} listening on ${address.address}:${address.port}`);
+        this.socket.setBroadcast(true);
 
-    if (discoveryTimeout > 0) {
-      setTimeout(() => {
-        this.stopDiscovery();
-      }, discoveryTimeout);
+        this.discoveryTimer = setInterval(() => {
+          this.sendDiscovery(broadcast, devices, offlineTolerance);
+        }, discoveryInterval);
+
+        this.sendDiscovery(broadcast, devices, offlineTolerance);
+        if (discoveryTimeout > 0) {
+          setTimeout(() => {
+            this.log.debug('client.startDiscovery: discoveryTimeout reached, stopping discovery');
+            this.stopDiscovery();
+          }, discoveryTimeout);
+        }
+      });
+    } catch (err) {
+      this.log.error('client.startDiscovery: %s', err);
+      this.emit('error', err);
     }
 
-    return this.sendDiscovery(broadcast, devices, offlineTolerance);
+    return this;
   }
 
   stopDiscovery () {
+    this.log.debug('client.stopDiscovery()');
     if (this.discoveryTimer) {
       clearInterval(this.discoveryTimer);
       this.discoveryTimer = null;
+    }
+    if (this.isSocketBound) {
+      this.isSocketBound = false;
       this.socket.close();
     }
   }
 
   sendDiscovery (address, devices, offlineTolerance) {
-    devices = devices || [];
+    this.log.debug('client.sendDiscovery(%j)', arguments[0]);
+    try {
+      devices = devices || [];
 
-    this.devices.forEach((device) => {
-      if (device.status !== 'offline') {
-        let diff = this.discoveryPacketSequence - device.seenOnDiscovery;
-        if (diff >= offlineTolerance) {
-          device.status = 'offline';
-          this.emit('offline', device);
+      this.devices.forEach((device) => {
+        if (device.status !== 'offline') {
+          let diff = this.discoveryPacketSequence - device.seenOnDiscovery;
+          if (diff >= offlineTolerance) {
+            device.status = 'offline';
+            this.emit('offline', device);
+          }
         }
+      });
+
+      const msgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
+
+      // sometimes there is a race condition with setInterval where this is called after it was cleared
+      // check and exit
+      if (!this.isSocketBound) {
+        return;
       }
-    });
+      this.socket.send(msgBuf, 0, msgBuf.length, 9999, address);
 
-    let msgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
-    this.socket.send(msgBuf, 0, msgBuf.length, 9999, address);
+      devices.forEach((d) => {
+        this.socket.send(msgBuf, 0, msgBuf.length, d.port || 9999, d.host);
+      });
 
-    devices.forEach((d) => {
-      this.socket.send(msgBuf, 0, msgBuf.length, d.port || 9999, d.host);
-    });
-
-    if (this.discoveryPacketSequence >= Number.MAX_VALUE) {
-      this.discoveryPacketSequence = 0;
-    } else {
-      this.discoveryPacketSequence += 1;
+      if (this.discoveryPacketSequence >= Number.MAX_VALUE) {
+        this.discoveryPacketSequence = 0;
+      } else {
+        this.discoveryPacketSequence += 1;
+      }
+    } catch (err) {
+      this.log.error('client.sendDiscovery: %s', err);
+      this.emit('error', err);
     }
 
     return this;

@@ -7,7 +7,18 @@ class Bulb extends Device {
     super(options);
     if (typeof options === 'undefined') options = {};
 
-    this.log.warn('Bulb support is not tested');
+    this.supportsConsumption = true;
+
+    this.apiModuleNamespace = {
+      'system': 'smartlife.iot.common.system',
+      'cloud': 'smartlife.iot.common.cloud',
+      'schedule': 'smartlife.iot.common.schedule',
+      'timesetting': 'smartlife.iot.common.timesetting',
+      'emeter': 'smartlife.iot.common.emeter',
+      'netif': 'netif'
+    };
+
+    this.lightState = {};
 
     this.lastState = Object.assign(this.lastState, { powerOn: null, inUse: null });
   }
@@ -18,25 +29,11 @@ class Bulb extends Device {
 
   set sysInfo (sysInfo) {
     super.sysInfo = sysInfo;
-    try {
-      this.supportsConsumption = (sysInfo.feature.includes('ENE'));
-    } catch (e) {
-      this.supportsConsumption = false;
-    }
     this.emitEvents();
   }
 
-  get consumption () { return this._consumption; }
-
-  set consumption (consumption) {
-    this._consumption = consumption;
-    if (this.supportsConsumption) {
-      this.emitEvents();
-    }
-  }
-
   emitEvents () {
-    super.emitEvents();
+    if (!this.lightState) return;
     let powerOn = (this.lightState.on_off === 1);
 
     this.log.debug('emitEvents() powerOn: %s lastState: %j', powerOn, this.lastState);
@@ -59,40 +56,22 @@ class Bulb extends Device {
     }
   }
 
-  async getInfo () {
-    let infoPayload = '{"system":{"get_sysinfo":{}}}';
-    let data = await this.send(infoPayload);
-    this.sysInfo = data.system.get_sysinfo;
-    // this.cloudInfo = data.cnCloud.get_info;
-    // this.consumption = data.emeter;
-    // this.scheduleNextAction = data.schedule.get_next_action;
-    // return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, consumption: this.consumption, scheduleNextAction: this.scheduleNextAction};
-    return {sysInfo: this.sysInfo};
-  }
-
   async getLightState () {
-    let errCode;
-    let data = await this.send("{'smartlife.iot.smartbulb.lightingservice': {'get_light_details': {}}}");
-    try {
-      let lightState = data['smartlife.iot.smartbulb.lightingservice'].get_light_details;
-      errCode = lightState.err_code;
-      if (errCode === 0) { this.lightState = lightState; }
-      this.emitEvents();
-      return (errCode === 0);
-    } catch (e) {}
-    if (errCode !== 0) { throw data; }
+    this.lightState = await this.sendCommand('{"smartlife.iot.smartbulb.lightingservice":{"get_light_state":{}}}');
+    this.emitEvents();
+    return this.lightState;
   }
 
   async setLightState (options) {
     let state = {};
     state.ignore_default = options.ignore_default || 1;
-    state.on_off = options.on_off;
     state.transition_period = options.transition_period || 0;
-    state.mode = options.mode;
-    state.hue = options.hue;// hue: 0-360
-    state.saturation = options.saturation; // saturation: 0-100
-    state.brightness = options.brightness; // brightness: 0-100
-    state.color_temp = options.colorTemp;
+    if (options.on_off !== undefined) state.on_off = options.on_off;
+    if (options.mode !== undefined) state.mode = options.mode;
+    if (options.hue !== undefined) state.hue = options.hue; // hue: 0-360
+    if (options.saturation !== undefined) state.saturation = options.saturation; // saturation: 0-100
+    if (options.brightness !== undefined) state.brightness = options.brightness; // brightness: 0-100
+    if (options.color_temp !== undefined) state.color_temp = options.colorTemp; // temperture: 0-7000
 
     const payload = {
       'smartlife.iot.smartbulb.lightingservice': {
@@ -100,27 +79,9 @@ class Bulb extends Device {
       }
     };
 
-    let errCode;
-    let data = await this.send(payload);
-    try {
-      let lightState = data['smartlife.iot.smartbulb.lightingservice'].transition_light_state;
-      errCode = lightState.err_code;
-      if (errCode === 0) { this.lightState = lightState; }
-      this.emitEvents();
-      return (errCode === 0);
-    } catch (e) {}
-    if (errCode !== 0) { throw data; }
-  }
-
-  async getScheduleRules () {
-    let data = await this.send("{'smartlife.iot.common.schedule': {'get_rules': {}}}");
-    return data['smartlife.iot.common.schedule'].get_rules;
-  }
-
-  async getCloudInfo () {
-    let data = await this.send("{'smartlife.iot.common.cloud': {'get_info': {}}}");
-    this.cloudInfo = data['smartlife.iot.common.cloud'].get_info;
-    return this.cloudInfo;
+    this.lightState = await this.sendCommand(payload);
+    this.emitEvents();
+    return true;
   }
 
   async getPowerState () {
@@ -129,7 +90,7 @@ class Bulb extends Device {
   }
 
   async setPowerState (value) {
-    return this.setLightState({on_off: value});
+    return this.setLightState({on_off: (value ? 1 : 0)});
   }
 }
 

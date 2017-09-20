@@ -6,5 +6,5 @@
       }
     }]
   ],
-  "plugins": ["transform-async-to-generator"]
+  "plugins": ["transform-async-to-generator", "transform-object-entries"]
 }

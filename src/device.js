@@ -2,6 +2,9 @@
 
 const EventEmitter = require('events');
 
+const util = require('./utils');
+const ResponseError = util.ResponseError;
+
 class Device extends EventEmitter {
   constructor (options) {
     super();
@@ -27,18 +30,9 @@ class Device extends EventEmitter {
     this._consumption = {};
 
     if (options.sysInfo) { this.sysInfo = options.sysInfo; }
-
-    if (options.memoize) { this.memoize(options.memoize); }
   }
 
-  memoize (maxAge = 5000) {
-    this.log.debug('[%s] device.memoize(%d)', this.name, maxAge);
-    const memoize = require('memoizee');
-    this.getSysInfo = memoize(this.getSysInfo.bind(this), { promise: true, maxAge: maxAge, length: 0 });
-    this.getModel = memoize(this.getModel.bind(this), { promise: true, maxAge: maxAge, length: 0 });
-  }
-
-  send (payload, timeout = null) {
+  async send (payload, timeout = null) {
     timeout = (timeout == null ? this.timeout : timeout);
     this.log.debug('[%s] device.send()', this.name);
     return this.client.send({host: this.host, port: this.port, payload, timeout})
@@ -49,11 +43,11 @@ class Device extends EventEmitter {
       });
   }
 
-  async getSysInfo ({timeout} = {}) {
-    this.log.debug('[%s] device.getSysInfo()', this.name);
-    let data = await this.send('{"system":{"get_sysinfo":{}}}', timeout);
-    this.sysInfo = data.system.get_sysinfo;
-    return this.sysInfo;
+  async sendCommand (command, timeout) {
+    let commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
+    let response = await this.send(commandObj, timeout);
+    let results = processResponse(commandObj, response);
+    return results;
   }
 
   get sysInfo () {
@@ -111,9 +105,105 @@ class Device extends EventEmitter {
     this.pollingTimer = null;
   }
 
+  async getSysInfo ({timeout} = {}) {
+    this.log.debug('[%s] device.getSysInfo()', this.name);
+    this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', timeout);
+    return this.sysInfo;
+  }
+
   async getModel () {
     let sysInfo = await this.getSysInfo();
     return sysInfo.model;
+  }
+
+  async getCloudInfo () {
+    this.cloudInfo = await this.sendCommand({ [this.apiModuleNamespace.cloud]: {get_info: {}} });
+    return this.cloudInfo;
+  }
+
+  async setAlias (value) {
+    await this.sendCommand({ [this.apiModuleNamespace.system]: {set_dev_alias: {alias: value}} });
+    this.sysInfo.alias = value;
+    return true;
+  }
+
+  async getScheduleNextAction () {
+    return this.sendCommand(`{"${this.apiModuleNamespace.schedule}":{"get_next_action":{}}}`);
+  }
+
+  async getScheduleRules () {
+    return this.sendCommand(`{"${this.apiModuleNamespace.schedule}":{"get_rules":{}}}`);
+  }
+
+  async getTime () {
+    return this.sendCommand(`{"${this.apiModuleNamespace.timesetting}":{"get_time":{}}}`);
+  }
+
+  async getTimeZone () {
+    return this.sendCommand(`{"${this.apiModuleNamespace.timesetting}":{"get_timezone":{}}}`);
+  }
+
+  async getScanInfo (refresh = false, timeoutInSeconds = 10) {
+    let timeout = ((timeoutInSeconds * 1000) * 2) + this.timeout; // add original timeout to wait for response
+    let command = `{"${this.apiModuleNamespace.netif}":{"get_scaninfo":{"refresh":${(refresh ? 1 : 0)},"timeout":${timeoutInSeconds}}}}`;
+    return this.sendCommand(command, timeout);
+  }
+
+  async getConsumption () {
+    let response = await this.sendCommand(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}}}`);
+    if (response) {
+      this.consumption = response;
+      return this.consumption;
+    }
+    throw new Error('Error parsing getConsumption results', response);
+  }
+}
+
+// { emeter: { get_realtime: {} } }
+// { emeter: { err_code: -1, err_msg: 'module not support' } }
+
+// { netif: { get_scaninfo: { refresh: 1, timeout: 3 } } }
+// { netif: { get_scaninfo: { ap_list: [Object], err_code: 0 } } }
+
+function processResponse (command, response) {
+  let commandResponses = recur(command, response);
+
+  let errors = [];
+  commandResponses.forEach((r) => {
+    if (r.err_code !== 0) {
+      errors.push(r);
+    }
+  });
+
+  if (errors.length === 1) {
+    throw new ResponseError('', errors[0]);
+  } else if (errors.length > 1) {
+    throw new ResponseError('', errors);
+  }
+
+  if (commandResponses.length === 1) {
+    return commandResponses[0];
+  }
+  return response;
+
+  function recur (command, response, depth = 0, results = []) {
+    let keys = Object.keys(command);
+    if (keys.length === 0) { results.push(response); }
+    for (var i = 0; i < keys.length; i++) {
+      let key = keys[i];
+      if (depth === 1) {
+        if (response[key]) {
+          results.push(response[key]);
+        } else {
+          return results.push(response);
+        }
+      } else if (depth < 1) {
+        if (response[key] !== undefined) {
+          recur(command[key], response[key], depth + 1, results);
+        }
+      }
+    }
+    return results;
   }
 }
 
