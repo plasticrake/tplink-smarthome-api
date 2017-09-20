@@ -14,13 +14,21 @@ function getTestClient () {
   return client;
 }
 
+function envIsTrue (value) {
+  return !(value == null || value === 0 || value === 'false');
+}
+
 async function getTestDevices () {
-  let testDiscovery = defaultTo(process.env.TEST_DISCOVERY, true);
-  if (testDiscovery === 0 || testDiscovery === 'false') {
-    return getStaticTestDevices();
-  } else {
+  let useSimulator = envIsTrue(defaultTo(process.env.TEST_SIMULATOR, true));
+  let useDiscovery = envIsTrue(defaultTo(process.env.TEST_DISCOVERY, true));
+
+  if (useSimulator) {
+    return getSimulatedTestDevices();
+  }
+  if (useDiscovery) {
     return getDynamicTestDevices();
   }
+  return getStaticTestDevices();
 }
 
 async function getStaticTestDevices () {
@@ -64,6 +72,9 @@ async function getDynamicTestDevices () {
       return resolve(dynamicTestDevices);
     }, discoveryTimeout);
   });
+}
+
+async function getSimulatedTestDevices () {
 }
 
 global.getTestClient = getTestClient;
