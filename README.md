@@ -80,17 +80,17 @@ Previously seen device is not heard from after `offlineTolerance` number of disc
 #### `#stopDiscovery()`
 Stops discovery process.
 
-#### `#getDevice({host, port = 9999, timeout = 3000, memoize})` _(promise)_
-Returns a specific Device object (Plug or Bulb) after querying the device to determine the type. If `memoized` has a value some get functions are cached (with the max cache age in ms) and may return a cached value.
+#### `#getDevice({host, port = 9999, timeout = 3000})` _(promise)_
+Returns a specific Device object (Plug or Bulb) after querying the device to determine the type.
 
-#### `#getGeneralDevice({host, port = 9999, timeout = 3000, memoize})`
-Returns a generic TP Link Device object. If `memoized` has a value some get functions are cached (with the max cache age in ms) and may return a cached value.
+#### `#getGeneralDevice({host, port = 9999, timeout = 3000})`
+Returns a generic TP Link Device object.
 
-#### `#getPlug({host, port = 9999, timeout = 3000, inUseThreshold = 0, memoize})`
-Returns a Plug object.  If `memoized` has a value some get functions are cached (with the max cache age in ms) and may return a cached value.
+#### `#getPlug({host, port = 9999, timeout = 3000, inUseThreshold = 0})`
+Returns a Plug object.
 
-#### `#getBulb({host, port = 9999, timeout = 3000, memoize})`
-Returns a Bulb object.  If `memoized` has a value some get functions are cached (with the max cache age in ms) and may return a cached value.
+#### `#getBulb({host, port = 9999, timeout = 3000})`
+Returns a Bulb object.
 
 ### Device
 
