@@ -18,7 +18,7 @@ client.on('device-new', (device) => {
   device.on('not-in-use', (device) => { logEvent('not-in-use', device); });
   device.on('in-use-update', (device, inUse) => { logEvent('in-use-update', device, inUse); });
 
-  device.on('consumption-update', (device, consumption) => { logEvent('consumption-update', device, String(consumption.power) ); });
+  device.on('consumption-update', (device, consumption) => { logEvent('consumption-update', device, String(consumption.power)); });
 });
 client.on('device-online', (device) => { logEvent('device-online', device); });
 client.on('device-offline', (device) => { logEvent('device-offline', device); });
