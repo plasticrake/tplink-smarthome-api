@@ -144,21 +144,21 @@ class Client extends EventEmitter {
 
   getDeviceFromSysInfo (sysInfo, options) {
     options = Object.assign({}, options, {sysInfo: sysInfo});
-    const deviceType = sysInfo.type || sysInfo.mic_type;
-    switch (deviceType) {
-      case 'IOT.SMARTPLUGSWITCH': return this.getPlug(options);
-      case 'IOT.SMARTBULB': return this.getBulb(options);
+    switch (this.getTypeFromSysInfo(sysInfo)) {
+      case 'plug': return this.getPlug(options);
+      case 'bulb': return this.getBulb(options);
       default: return this.getPlug(options);
     }
   }
 
   getTypeFromSysInfo (sysInfo) {
-    const deviceType = sysInfo.type || sysInfo.mic_type;
-    switch (deviceType) {
-      case 'IOT.SMARTPLUGSWITCH': return 'plug';
-      case 'IOT.SMARTBULB': return 'bulb';
-      default: return 'device';
+    const deviceType = (sysInfo.type || sysInfo.mic_type || '').toLowerCase();
+    if (deviceType.includes('plug')) {
+      return 'plug';
+    } else if (deviceType.includes('bulb')) {
+      return 'bulb';
     }
+    return 'device';
   }
 
   startDiscovery ({address, port, broadcast = '255.255.255.255', discoveryInterval = 10000, discoveryTimeout = 0, offlineTolerance = 3, deviceTypes, deviceOptions = {}, devices} = {}) {
