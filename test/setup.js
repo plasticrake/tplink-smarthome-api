@@ -4,6 +4,7 @@
 const groupBy = require('lodash.groupby');
 const defaultTo = require('lodash.defaultto');
 require('dotenv').config();
+const simulator = require('tplink-smarthome-simulator');
 
 const Client = require('../src').Client;
 
@@ -75,6 +76,27 @@ async function getDynamicTestDevices () {
 }
 
 async function getSimulatedTestDevices () {
+  let client = getTestClient();
+
+  let simulatedDevices = [];
+  simulatedDevices.push(new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100' } }));
+  simulatedDevices.push(new simulator.Device({ model: 'hs105', data: { alias: 'Mock HS105' } }));
+  simulatedDevices.push(new simulator.Device({ model: 'hs110', data: { alias: 'Mock HS110' } }));
+  simulatedDevices.push(new simulator.Device({ model: 'hs200', data: { alias: 'Mock HS200' } }));
+  simulatedDevices.push(new simulator.Device({ model: 'lb100', data: { alias: 'Mock LB100' } }));
+  simulatedDevices.push(new simulator.Device({ model: 'lb120', data: { alias: 'Mock LB120' } }));
+  simulatedDevices.push(new simulator.Device({ model: 'lb130', data: { alias: 'Mock LB130' } }));
+
+  let testDevices = [];
+  for (var i = 0; i < simulatedDevices.length; i++) {
+    let d = simulatedDevices[i];
+    await d.start();
+    testDevices.push(client.getDevice({host: d.address, port: d.port}));
+  }
+
+  await simulator.UdpServer.start();
+
+  return Promise.all(testDevices);
 }
 
 global.getTestClient = getTestClient;

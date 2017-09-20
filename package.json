@@ -54,7 +54,8 @@
     "mocha": "^3.5.3",
     "nyc": "^11.2.1",
     "rewire": "^2.5.2",
-    "semistandard": "^11.0.0"
+    "semistandard": "^11.0.0",
+    "tplink-smarthome-simulator": "^1.0.0"
   },
   "scripts": {
     "preversion": "npm test",
