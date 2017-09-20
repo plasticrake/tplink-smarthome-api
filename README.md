@@ -112,6 +112,13 @@ Get device model.
 #### `#type`
 Get device type ('plug', 'bulb'). Returns 'device' if unknown or device has not been queried yet.
 
+#### `#getScheduleNextAction()` _(promise)_
+#### `#getScheduleRules()` _(promise)_
+#### `#getTime()` _(promise)_
+#### `#getTimeZone()` _(promise)_
+#### `#getScanInfo([refresh = false] [, timeout = 17])` _(promise)_
+Get list of networks.
+
 ### Plug
 Derives from Device and includes Device functions above.
 
@@ -134,27 +141,17 @@ Turns the device on or off.
 #### `#setAlias(value)` _(promise)_
 #### `#blink([times = 5] [, rate = 1000])` _(promise)_
 Turn LED on and off `times` every `rate`. Sets LED back to original state when complete.
-#### `#getScheduleNextAction()` _(promise)_
-#### `#getScheduleRules()` _(promise)_
 #### `#getAwayRules()` _(promise)_
 #### `#getTimerRules()` _(promise)_
-#### `#getTime()` _(promise)_
-#### `#getTimeZone()` _(promise)_
-#### `#getScanInfo([refresh = false] [, timeout = 17])` _(promise)_
-Get list of networks.
 #### `#inUseThreshold`
 Threshold for `in-use` event.
 
 ### Bulb
 Derives from Device and includes Device functions above.
-#### `#getInfo()` _(promise)_
 #### `#getLightState()` _(promise)_
 #### `#setLightState()` _(promise)_
 #### `#getPowerState()` _(promise)_
 #### `#setPowerState(value)` _(promise)_
-#### `#getScheduleRules()` _(promise)_
-#### `#getCloudInfo()` _(promise)_
-Get TP-Link Cloud information.
 
 ## Credits
 Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.
