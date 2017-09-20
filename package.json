@@ -62,7 +62,7 @@
     "test": "semistandard && nyc mocha",
     "coverage": "nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "./node_modules/.bin/babel src -d lib",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "bin": {
     "hs100-api": "lib/cli.js"
