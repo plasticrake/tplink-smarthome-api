@@ -71,7 +71,7 @@ class Bulb extends Device {
     if (options.hue !== undefined) state.hue = options.hue; // hue: 0-360
     if (options.saturation !== undefined) state.saturation = options.saturation; // saturation: 0-100
     if (options.brightness !== undefined) state.brightness = options.brightness; // brightness: 0-100
-    if (options.color_temp !== undefined) state.color_temp = options.colorTemp; // temperture: 0-7000
+    if (options.color_temp !== undefined) state.color_temp = options.color_temp; // temperture: 0-7000
 
     const payload = {
       'smartlife.iot.smartbulb.lightingservice': {
