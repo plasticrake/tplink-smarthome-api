@@ -1,6 +1,7 @@
 # hs100-api
 [![NPM Version](https://img.shields.io/npm/v/hs100-api.svg)](https://www.npmjs.com/package/hs100-api)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+[![Build Status](https://travis-ci.org/plasticrake/hs100-api.svg?branch=master)](https://travis-ci.org/plasticrake/hs100-api)
 [![codecov](https://codecov.io/gh/plasticrake/hs100-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/hs100-api)
 
 TPLink Smart Home API
