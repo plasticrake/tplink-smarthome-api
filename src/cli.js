@@ -12,7 +12,7 @@ let search = function (sysInfo, timeout) {
   if (logLevel) client.log.setLevel(logLevel);
   client.startDiscovery({discoveryInterval: 2500, discoveryTimeout: timeout})
     .on('device-new', (device) => {
-      console.log(`${device.model} ${device.type} ${device.host} ${device.deviceId}`);
+      console.log(`${device.model} ${device.type} ${device.host} ${device.port} ${device.deviceId} ${device.name}`);
       if (sysInfo) {
         console.dir(device.sysInfo, {colors: program.color === 'on', depth: 10});
       }
@@ -54,6 +54,10 @@ let blink = function (host, port, times, rate, timeout) {
   });
 };
 
+let toInt = (s) => {
+  return parseInt(s);
+};
+
 program
   .option('-D, --debug', 'turn on debug level logging', () => { logLevel = 'debug'; })
   .option('-c, --color [on]', 'output will be styled with ANSI color codes', 'on');
@@ -61,14 +65,14 @@ program
 program
   .command('search')
   .option('-s, --sysinfo', 'output sysInfo')
-  .option('-t, --timeout [timeout]', 'timeout (ms)', 5000)
+  .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 5000)
   .action(function (options) {
     search(options.sysinfo, options.timeout);
   });
 
 program
   .command('send <host> <payload>')
-  .option('-t, --timeout [timeout]', 'timeout (ms)', 5000)
+  .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 5000)
   .action(function (host, payload, options) {
     let [hostOnly, port] = host.split(':');
     send(hostOnly, port, payload, options.timeout);
@@ -76,7 +80,7 @@ program
 
 program
   .command('details <host>')
-  .option('-t, --timeout [timeout]', 'timeout (ms)', 5000)
+  .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 5000)
   .action(function (host, options) {
     let [hostOnly, port] = host.split(':');
     details(hostOnly, port, options.timeout);
@@ -84,7 +88,7 @@ program
 
 program
   .command('blink <host> [times] [rate]')
-  .option('-t, --timeout [timeout]', 'timeout (ms)', 5000)
+  .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 5000)
   .action(function (host, times = 5, rate = 500, options) {
     let [hostOnly, port] = host.split(':');
     blink(hostOnly, port, times, rate, options.timeout);
