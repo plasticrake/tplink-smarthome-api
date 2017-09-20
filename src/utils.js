@@ -4,6 +4,7 @@ class ResponseError extends Error {
   constructor (message, response) {
     super(message);
     this.name = 'ResponseError';
+    this.message = `${message} ${JSON.stringify(response)}`;
     this.response = response;
     Error.captureStackTrace(this, this.constructor);
   }
