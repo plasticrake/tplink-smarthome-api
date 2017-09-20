@@ -2,6 +2,7 @@
 'use strict';
 
 const groupBy = require('lodash.groupby');
+const defaultTo = require('lodash.defaultto');
 require('dotenv').config();
 
 const Client = require('../src').Client;
@@ -14,28 +15,29 @@ function getTestClient () {
 }
 
 async function getTestDevices () {
-  let testDevices;
-  if (process.env.TEST_DISCOVERY != null && !process.env.TEST_DISCOVERY) {
-    testDevices = getStaticTestDevices();
+  let testDiscovery = defaultTo(process.env.TEST_DISCOVERY, true);
+  if (testDiscovery === 0 || testDiscovery === 'false') {
+    return getStaticTestDevices();
   } else {
-    testDevices = await getDynamicTestDevices();
+    return getDynamicTestDevices();
   }
-  return Promise.resolve(testDevices);
 }
 
-function getStaticTestDevices () {
+async function getStaticTestDevices () {
   let client = getTestClient();
-
   let staticTestDevices = [];
+  let hosts = [
+    process.env.TEST_HS100_HOST,
+    process.env.TEST_HS105_HOST,
+    process.env.TEST_HS110_HOST];
 
-  [{type: 'plug', host: process.env.TEST_PLUG_HOST},
-  {type: 'bulb', host: process.env.TEST_BULB_HOST}].forEach((o) => {
-    if (o.host) {
-      let [host, port] = o.host.split(':');
-      staticTestDevices.push(client.getDeviceFromType(o.type, {host, port}));
+  for (var i = 0; i < hosts.length; i++) {
+    if (hosts[i]) {
+      let [host, port] = hosts[i].split(':');
+      staticTestDevices.push(client.getDevice({host, port}));
     }
-  });
-  return staticTestDevices;
+  }
+  return Promise.all(staticTestDevices);
 }
 
 async function getDynamicTestDevices () {
@@ -45,7 +47,7 @@ async function getDynamicTestDevices () {
     let client = getTestClient();
     client.startDiscovery({discoveryTimeout: discoveryTimeout});
 
-    let deviceWhitelist = process.env.TEST_DEVICE_IP_WHITELIST || [];
+    let deviceWhitelist = process.env.TEST_DISCOVERY_IP_WHITELIST || [];
     if (deviceWhitelist) {
       deviceWhitelist = deviceWhitelist.split(',');
     }
@@ -82,9 +84,9 @@ Object.entries(groupBy(global.testDevices, 'model')).forEach(([key, value]) => {
   global.testDevices[key] = value;
 });
 
-global.testDevices['anyplug'] = { name: 'Plug' };
-global.testDevices['anybulb'] = { name: 'Bulb' };
-global.testDevices['anydevice'] = { name: 'Device' };
+global.testDevices['anydevice'] = { name: 'Device', type: 'device' };
+global.testDevices['anyplug'] = { name: 'Plug', type: 'plug' };
+global.testDevices['anybulb'] = { name: 'Bulb', type: 'bulb' };
 global.testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, timeout: 100 } };
 
 (async () => {
@@ -106,6 +108,17 @@ global.testDevices['unreachable'] = { name: 'Unreachable Device', options: { hos
       if (testDevice.type === 'plug' && !testDevices['anyplug'].device) { addDevice(testDevices['anyplug'], device); }
       if (testDevice.type === 'bulb' && !testDevices['anybulb'].device) { addDevice(testDevices['anybulb'], device); }
     }
+  });
+
+  global.testDevices.forEach((td) => {
+    let device = td.device || {};
+    console.log(td.model, td.type, td.name, device.host, device.port);
+  });
+
+  ['anydevice', 'anyplug', 'anybulb', 'unreachable'].forEach((key) => {
+    let td = global.testDevices[key];
+    let device = td.device || {};
+    console.log(key, td.type, td.name, device.host, device.port);
   });
 
   run();
