@@ -1,250 +1,125 @@
 /* eslint-env mocha */
+/* global testDevices */
 /* eslint no-unused-expressions: ["off"] */
 
 'use strict';
 
 const chai = require('chai');
-chai.should();
+const expect = chai.expect;
 chai.use(require('chai-as-promised'));
 
-const config = require('./lib/config');
-const Hs100Api = require('../src');
+describe('Plug', function () {
+  before(function () {
+    this.timeout(4000);
+    this.slow(2000);
+  });
 
-const configPlug = Object.assign({}, config.plug);
-const configPlugMemoized = Object.assign({}, config.plug);
-configPlugMemoized.memoize = 1000;
-
-// const delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
-
-const testConfigs = [
-  {name: 'plug', config: configPlug},
-  {name: 'plug resetBeforeEach', config: configPlug, resetBeforeEach: true},
-  {name: 'plug memoized', config: configPlugMemoized}
-];
-
-testConfigs.forEach((test) => {
-  describe(`Plug [${test.name}]`, function () {
-    let client;
+  testDevices['plug'].forEach((testPlug) => {
     let plug;
-
-    before(function () {
-      client = new Hs100Api.Client({deviceConfig: test.config});
-      plug = client.getPlug(test.config);
-    });
-
-    beforeEach(function () {
-      if (test.resetBeforeEach) {
-        client = new Hs100Api.Client();
-        plug = client.getPlug(test.config);
-      }
-    });
-
-    describe('#setPowerState()', function () {
-      it('should turn on', function () {
-        return plug.setPowerState(true).should.eventually.be.true;
+    context(testPlug.name, function () {
+      beforeEach(function () {
+        if (!testPlug.device) {
+          this.skip();
+        }
+        plug = testPlug.device;
       });
 
-      it('should turn off', function () {
-        return plug.setPowerState(false).should.eventually.be.true;
-      });
+      describe('#setPowerState()', function () {
+        it('should turn on', function () {
+          return expect(plug.setPowerState(true)).to.eventually.be.true;
+        });
 
-      it('should emit power-on', function (done) {
-        plug.once('power-on', (plug) => {
-          plug.should.exist;
-          done();
+        it('should turn off', function () {
+          return expect(plug.setPowerState(false)).to.eventually.be.true;
         });
-        plug.setPowerState(false).then(() => {
-          plug.setPowerState(true);
-        }).catch((reason) => {
-          done(reason);
-        });
-      });
 
-      it('should emit power-off', function (done) {
-        plug.once('power-off', (plug) => {
-          plug.should.exist;
-          done();
+        it('should emit power-on', function (done) {
+          plug.once('power-on', (plug) => {
+            expect(plug).to.exist;
+            done();
+          });
+          (async () => {
+            try {
+              await plug.setPowerState(false);
+              await plug.setPowerState(true);
+            } catch (err) { done(err); }
+          })();
         });
-        plug.setPowerState(true).then(() => {
-          plug.setPowerState(false);
-        }).catch((reason) => {
-          done(reason);
+
+        it('should emit power-off', function (done) {
+          plug.once('power-off', (plug) => {
+            expect(plug).to.exist;
+            done();
+          });
+          (async () => {
+            try {
+              await plug.setPowerState(true);
+              await plug.setPowerState(false);
+            } catch (err) { done(err); }
+          })();
         });
       });
-    });
 
-    describe('#getPowerState()', function () {
-      this.timeout(2000);
-      this.slow(1000);
-      it('should return power state when on', function () {
-        return plug.setPowerState(true)
-          .then(() => { return plug.getPowerState().should.eventually.be.true; });
-      });
-
-      it('should return power state when off', function () {
-        return plug.setPowerState(false)
-          .then(() => { return plug.getPowerState().should.eventually.be.false; });
-      });
-
-      if (test.config.memoize) {
-        it.skip('should return memoized power state', function () {
-          return plug.setPowerState(true)
-            .then(() => { return plug.getPowerState().should.eventually.be.true; })
-            .then(() => { return plug.getPowerState().should.eventually.be.true; })
-            .then(() => { return plug.getPowerState().should.eventually.be.true; })
-            .then(() => { return plug.getPowerState().should.eventually.be.true; })
-            .then(() => { return plug.getPowerState().should.eventually.be.true; })
-            .then(() => {
-              // TODO
-            });
-        });
-      }
-    });
-
-    describe('#setLedState()', function () {
-      this.slow(1000);
-      it('should turn LED off', function () {
-        return plug.setLedState(false).should.eventually.be.true;
-      });
-
-      it('should turn LED on', function () {
-        return plug.setLedState(true).should.eventually.be.true;
-      });
-    });
-
-    describe('#getLedState()', function () {
-      this.timeout(2000);
-      this.slow(1000);
-
-      it('should return LED state when off', function () {
-        return plug.setLedState(false)
-          // .then(() => { return delay(test.config.memoize * 1.3); })
-          .then(() => { return plug.getLedState().should.eventually.be.false; });
-      });
-
-      it('should return LED state when on', function () {
-        return plug.setLedState(true)
-          // .then(() => { return delay(test.config.memoize * 1.3); })
-          .then(() => { return plug.getLedState().should.eventually.be.true; });
-      });
-    });
-
-    describe('#setAlias()', function () {
-      this.slow(1000);
-      it('should change the alias', function () {
-        let origAlias = 'Test Plug'; // Default
-        let testAlias = `Testing ${(new Date()).toISOString()}`;
-
-        return plug.getSysInfo()
-        .then((si) => {
-          origAlias = si.alias;
-          return plug.setAlias(testAlias).should.eventually.be.true;
-        })
-        .then(() => {
-          return plug.getSysInfo();
-        })
-        .then((si) => {
-          return si.alias.should.equal(testAlias);
-        })
-        .then(() => {
-          return plug.setAlias(origAlias).should.eventually.be.true;
-        })
-        .then(() => {
-          return plug.getSysInfo();
-        })
-        .then((si) => {
-          return si.alias.should.equal(origAlias);
-        }).should.eventually.be.fulfilled;
-      });
-    });
-
-    describe('#blink()', function () {
-      this.slow(2500);
-      this.timeout(4000);
-      it('should blink LED', function () {
-        return plug.blink(3, 100).should.eventually.be.true;
-      });
-    });
-
-    describe('#getConsumption()', function () {
-      it('should return consumption', function () {
-        return plug.getSysInfo().then((si) => {
-          return plug.getConsumption().should.eventually.have.property('err_code', (plug.supportsConsumption ? 0 : -1));
-        }).should.eventually.be.fulfilled;
-      });
-    });
-
-    describe('#getInfo()', function () {
-      it('should return info', function () {
-        return plug.getInfo().should.eventually.have.property('sysInfo');
-      });
-    });
-
-    describe('#getSysInfo()', function () {
-      it('should return info', function () {
-        return plug.getSysInfo().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getModel()', function () {
-      it('should return model', function () {
-        return plug.getModel().should.eventually.match(/^HS1[01]0/);
-      });
-    });
-
-    describe('#getCloudInfo()', function () {
-      it('should return cloud info', function () {
-        return plug.getCloudInfo().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getScheduleNextAction()', function () {
-      it('should return schedule next action', function () {
-        return plug.getScheduleNextAction().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getScheduleRules()', function () {
-      it('should return schedule rules', function () {
-        return plug.getScheduleRules().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getAwayRules()', function () {
-      it('should return away rules', function () {
-        return plug.getAwayRules().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getTimerRules()', function () {
-      it('should return timer rules', function () {
-        return plug.getTimerRules().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getTime()', function () {
-      it('should return time', function () {
-        return plug.getTime().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getTimeZone()', function () {
-      it('should return get time zone', function () {
-        return plug.getTimeZone().should.eventually.have.property('err_code', 0);
-      });
-    });
-
-    describe('#getScanInfo()', function () {
-      it('should return get scan info', function () {
-        this.timeout(8000);
-        this.slow(6000);
-        plug.timeout = 3000;
-        return plug.getScanInfo(true, 3).should.eventually.have.property('err_code', 0);
-      });
-
-      it('should return get cached scan info', function () {
+      describe('#getPowerState()', function () {
+        this.timeout(2000);
         this.slow(1000);
-        return plug.getScanInfo(false).should.eventually.have.property('err_code', 0);
+        it('should return power state when on', async function () {
+          await plug.setPowerState(true);
+          return expect(plug.getPowerState()).to.eventually.be.true;
+        });
+
+        it('should return power state when off', async function () {
+          await plug.setPowerState(false);
+          return expect(plug.getPowerState()).to.eventually.be.false;
+        });
+      });
+
+      describe('#getAwayRules()', function () {
+        it('should return away rules', function () {
+          return expect(plug.getAwayRules()).to.eventually.have.property('err_code', 0);
+        });
+      });
+
+      describe('#getTimerRules()', function () {
+        it('should return timer rules', function () {
+          return expect(plug.getTimerRules()).to.eventually.have.property('err_code', 0);
+        });
+      });
+
+      describe('#setLedState()', function () {
+        it('should turn LED off', function () {
+          return expect(plug.setLedState(false)).to.eventually.be.true;
+        });
+
+        it('should turn LED on', function () {
+          return expect(plug.setLedState(true)).to.eventually.be.true;
+        });
+      });
+
+      describe('#getLedState()', function () {
+        it('should return LED state when off', async function () {
+          await plug.setLedState(false);
+          return expect(plug.getLedState()).to.eventually.be.false;
+        });
+
+        it('should return LED state when on', async function () {
+          await plug.setLedState(true);
+          return expect(plug.getLedState()).to.eventually.be.true;
+        });
+      });
+
+      describe('#blink()', function () {
+        this.timeout(5000);
+        this.slow(300);
+        it('should blink LED', function () {
+          return expect(plug.blink(2, 100)).to.eventually.be.true;
+        });
+      });
+
+      describe('#getInfo()', function () {
+        it('should return info', function () {
+          return expect(plug.getInfo()).to.eventually.have.property('sysInfo');
+        });
       });
     });
   });

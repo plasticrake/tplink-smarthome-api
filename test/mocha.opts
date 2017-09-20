@@ -1,0 +1,4 @@
+--require babel-register
+--require source-map-support
+--require ./test/setup.js
+--delay

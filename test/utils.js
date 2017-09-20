@@ -3,7 +3,7 @@
 'use strict';
 
 const chai = require('chai');
-chai.should();
+const expect = chai.expect;
 
 const encrypt = require('../src/utils').encrypt;
 const encryptWithHeader = require('../src/utils').encryptWithHeader;
@@ -38,28 +38,28 @@ describe('utils', () => {
     describe('#decrypt', () => {
       it(`should decrypt ${plKey} payload`, () => {
         let buf = Buffer.from(payloads[plKey].encrypted, 'base64');
-        decrypt(buf).toString('ascii').should.eql(payloads[plKey].plain);
+        expect(decrypt(buf).toString('ascii')).to.eql(payloads[plKey].plain);
       });
     });
 
     describe('#decryptWithHeader', () => {
       it(`should decrypt ${plKey} payload`, () => {
         let buf = Buffer.from(payloads[plKey].encryptedWithHeader, 'base64');
-        decryptWithHeader(buf).toString('ascii').should.eql(payloads[plKey].plain);
+        expect(decryptWithHeader(buf).toString('ascii')).to.eql(payloads[plKey].plain);
       });
     });
 
     describe('#encrypt', () => {
       it(`should encrypt ${plKey} payload`, () => {
         let buf = encrypt(payloads[plKey].plain);
-        buf.toString('base64').should.eql(payloads[plKey].encrypted);
+        expect(buf.toString('base64')).to.eql(payloads[plKey].encrypted);
       });
     });
 
     describe('#encryptWithHeader', () => {
       it(`should encrypt ${plKey} payload`, () => {
         let buf = encryptWithHeader(payloads[plKey].plain);
-        buf.toString('base64').should.eql(payloads[plKey].encryptedWithHeader);
+        expect(buf.toString('base64')).to.eql(payloads[plKey].encryptedWithHeader);
       });
     });
   });
