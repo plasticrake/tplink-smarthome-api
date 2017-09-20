@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "commander": "^2.11.0",
+    "lodash.defaultto": "^4.14.0",
     "lodash.groupby": "^4.6.0",
     "lodash.wrap": "^4.1.1",
     "loglevel": "^1.5.0",
@@ -42,6 +43,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-object-entries": "^1.0.0",
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
