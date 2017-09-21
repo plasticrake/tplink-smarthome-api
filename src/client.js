@@ -87,8 +87,6 @@ class Client extends EventEmitter {
         socket.destroy();
         reject(err);
       });
-
-      return socket;
     });
   }
 
