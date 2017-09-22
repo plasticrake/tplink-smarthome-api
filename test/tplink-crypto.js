@@ -5,10 +5,11 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const encrypt = require('../src/utils').encrypt;
-const encryptWithHeader = require('../src/utils').encryptWithHeader;
-const decrypt = require('../src/utils').decrypt;
-const decryptWithHeader = require('../src/utils').decryptWithHeader;
+const tplinkCrypto = require('../src/tplink-crypto');
+const encrypt = tplinkCrypto.encrypt;
+const encryptWithHeader = tplinkCrypto.encryptWithHeader;
+const decrypt = tplinkCrypto.decrypt;
+const decryptWithHeader = tplinkCrypto.decryptWithHeader;
 
 var payloads = {
   setPowerStateOn: {
@@ -33,7 +34,7 @@ var payloads = {
   }
 };
 
-describe('utils', () => {
+describe('tplink-crypto', () => {
   Object.keys(payloads).forEach((plKey) => {
     describe('#decrypt', () => {
       it(`should decrypt ${plKey} payload`, () => {

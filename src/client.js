@@ -8,10 +8,9 @@ const util = require('util');
 const Device = require('./device');
 const Plug = require('./plug');
 const Bulb = require('./bulb');
-
-const encryptWithHeader = require('./utils').encryptWithHeader;
-const encrypt = require('./utils').encrypt;
-const decrypt = require('./utils').decrypt;
+const encryptWithHeader = require('./tplink-crypto').encryptWithHeader;
+const encrypt = require('./tplink-crypto').encrypt;
+const decrypt = require('./tplink-crypto').decrypt;
 
 class Client extends EventEmitter {
   constructor ({timeout = 5000, logLevel, logger} = {}) {

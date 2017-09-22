@@ -2,5 +2,5 @@
 
 module.exports = {
   Client: require('./client'),
-  utils: require('./utils')
+  TplinkCrypto: require('./tplink-crypto')
 };
