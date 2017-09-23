@@ -156,15 +156,17 @@ function processResponse (command, response) {
 
   let errors = [];
   commandResponses.forEach((r) => {
-    if (r.err_code !== 0) {
-      errors.push(r);
+    if (r.err_code == null) {
+      errors.push({msg: 'err_code missing', response: r});
+    } else if (r.err_code !== 0) {
+      errors.push({msg: 'err_code not zero', response: r});
     }
   });
 
   if (errors.length === 1) {
-    throw new ResponseError('', errors[0]);
+    throw new ResponseError(errors[0].msg, errors[0].response);
   } else if (errors.length > 1) {
-    throw new ResponseError('', errors);
+    throw new ResponseError('err_code', errors.map(e => e[response]));
   }
 
   if (commandResponses.length === 1) {
