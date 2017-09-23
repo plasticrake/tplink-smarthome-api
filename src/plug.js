@@ -105,13 +105,6 @@ class Plug extends Device {
     return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, consumption: this.consumption, scheduleNextAction: this.scheduleNextAction};
   }
 
-  async getSysInfoAndConsumption () {
-    let data = await this.sendCommand('{"emeter":{"get_realtime":{}},"system":{"get_sysinfo":{}}}');
-    this.sysInfo = data.system.get_sysinfo;
-    this.consumption = data.emeter.get_realtime;
-    return {sysInfo: this.sysInfo, consumption: this.consumption};
-  }
-
   async getPowerState () {
     let sysInfo = await this.getSysInfo();
     return (sysInfo.relay_state === 1);
