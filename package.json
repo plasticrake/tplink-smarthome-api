@@ -63,7 +63,7 @@
     "coverage": "nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "./node_modules/.bin/babel src -d lib",
     "prepare": "npm run build",
-    "docs": "jsdoc2md -t jsdoc2md/README.hbs src/**.js > README.md"
+    "docs": "jsdoc2md --template=jsdoc2md/README.hbs --heading-depth=3 src/**.js > README.md"
   },
   "bin": {
     "hs100-api": "lib/cli.js"
