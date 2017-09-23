@@ -156,7 +156,7 @@ The API is not stable (but it's getting close!) and there may be breaking change
 
 <a name="Client"></a>
 
-### Client ⇐ <code>EventEmitter</code>
+## Client ⇐ <code>EventEmitter</code>
 Client that sends commands to specified devices or discover devices on the local subnet.
 - Contains factory methods to create devices.
 - Events are emitted after [#startDiscovery](#startDiscovery) is called.
@@ -189,7 +189,7 @@ Client that sends commands to specified devices or discover devices on the local
 
 <a name="new_Client_new"></a>
 
-#### new Client(options)
+### new Client(options)
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -199,7 +199,7 @@ Client that sends commands to specified devices or discover devices on the local
 
 <a name="Client+send"></a>
 
-#### client.send(options) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
+### client.send(options) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
 [Encrypts](#module_tplink-crypto) `payload` and sends (via TCP) to device.
 - If `payload` is not a string, it is `JSON.stringify`'d.
 - Promise fulfills with parsed JSON response.
@@ -230,7 +230,7 @@ All responses contain an `err_code` (`0` is success).
 
 <a name="Client+getSysInfo"></a>
 
-#### client.getSysInfo(options) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
+### client.getSysInfo(options) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
 Requests `{system:{get_sysinfo:{}}}` from device.
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
@@ -245,7 +245,7 @@ Requests `{system:{get_sysinfo:{}}}` from device.
 
 <a name="Client+getGeneralDevice"></a>
 
-#### client.getGeneralDevice(options) ⇒ [<code>Device</code>](#Device)
+### client.getGeneralDevice(options) ⇒ [<code>Device</code>](#Device)
 Create [Device](#Device) object.
 - Device object only supports common Device methods.
 - See [Device#constructor](Device#constructor) for valid options.
@@ -259,7 +259,7 @@ Create [Device](#Device) object.
 
 <a name="Client+getPlug"></a>
 
-#### client.getPlug(options) ⇒ [<code>Plug</code>](#Plug)
+### client.getPlug(options) ⇒ [<code>Plug</code>](#Plug)
 Creates [Plug](#Plug) object.
 
 See [Device#constructor](Device#constructor) and [Plug#constructor](Plug#constructor) for valid options.
@@ -272,7 +272,7 @@ See [Device#constructor](Device#constructor) and [Plug#constructor](Plug#constru
 
 <a name="Client+getBulb"></a>
 
-#### client.getBulb(options) ⇒ [<code>Bulb</code>](#Bulb)
+### client.getBulb(options) ⇒ [<code>Bulb</code>](#Bulb)
 Creates Bulb object.
 
 See [Device#constructor](Device#constructor) and [Bulb#constructor](Bulb#constructor) for valid options.
@@ -285,7 +285,7 @@ See [Device#constructor](Device#constructor) and [Bulb#constructor](Bulb#constru
 
 <a name="Client+getDevice"></a>
 
-#### client.getDevice(options) ⇒ <code>Promise.&lt;(Plug\|Bulb), Error&gt;</code>
+### client.getDevice(options) ⇒ <code>Promise.&lt;(Plug\|Bulb), Error&gt;</code>
 Creates a [Plug](#Plug) or [Bulb](#Bulb) after querying device to determine type.
 
 See [Device#constructor](Device#constructor), [Bulb#constructor](Bulb#constructor), [Plug#constructor](Plug#constructor) for valid options.
@@ -298,7 +298,7 @@ See [Device#constructor](Device#constructor), [Bulb#constructor](Bulb#constructo
 
 <a name="Client+getDeviceFromSysInfo"></a>
 
-#### client.getDeviceFromSysInfo(sysInfo, options) ⇒ [<code>Plug</code>](#Plug) \| [<code>Bulb</code>](#Bulb)
+### client.getDeviceFromSysInfo(sysInfo, options) ⇒ [<code>Plug</code>](#Plug) \| [<code>Bulb</code>](#Bulb)
 Creates device corresponding to the provided `sysInfo`.
 
 See [Device#constructor](Device#constructor), [Bulb#constructor](Bulb#constructor), [Plug#constructor](Plug#constructor) for valid options
@@ -312,7 +312,7 @@ See [Device#constructor](Device#constructor), [Bulb#constructor](Bulb#constructo
 
 <a name="Client+getTypeFromSysInfo"></a>
 
-#### client.getTypeFromSysInfo(sysInfo) ⇒ <code>string</code>
+### client.getTypeFromSysInfo(sysInfo) ⇒ <code>string</code>
 Guess the device type from provided `sysInfo`.
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
@@ -324,7 +324,7 @@ Guess the device type from provided `sysInfo`.
 
 <a name="Client+startDiscovery"></a>
 
-#### client.startDiscovery(options) ⇒ [<code>Client</code>](#Client)
+### client.startDiscovery(options) ⇒ [<code>Client</code>](#Client)
 Discover TP-Link Smarthome devices on the network.
 
 - Sends a discovery packet (via UDP) to the `broadcast` address every `discoveryInterval`(ms).
@@ -353,13 +353,13 @@ Discover TP-Link Smarthome devices on the network.
 
 <a name="Client+stopDiscovery"></a>
 
-#### client.stopDiscovery()
+### client.stopDiscovery()
 Stops discovery and closes UDP socket.
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 <a name="Client+event_error"></a>
 
-#### "error"
+### "error"
 Error during discovery.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -371,7 +371,7 @@ Error during discovery.
 
 <a name="Client+event_device-new"></a>
 
-#### "device-new"
+### "device-new"
 First response from device.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -383,7 +383,7 @@ First response from device.
 
 <a name="Client+event_device-online"></a>
 
-#### "device-online"
+### "device-online"
 Follow up response from device.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -395,7 +395,7 @@ Follow up response from device.
 
 <a name="Client+event_device-offline"></a>
 
-#### "device-offline"
+### "device-offline"
 No response from device.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -407,7 +407,7 @@ No response from device.
 
 <a name="Client+event_bulb-new"></a>
 
-#### "bulb-new"
+### "bulb-new"
 First response from Bulb.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -419,7 +419,7 @@ First response from Bulb.
 
 <a name="Client+event_bulb-online"></a>
 
-#### "bulb-online"
+### "bulb-online"
 Follow up response from Bulb.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -431,7 +431,7 @@ Follow up response from Bulb.
 
 <a name="Client+event_bulb-offline"></a>
 
-#### "bulb-offline"
+### "bulb-offline"
 No response from Bulb.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -443,7 +443,7 @@ No response from Bulb.
 
 <a name="Client+event_plug-new"></a>
 
-#### "plug-new"
+### "plug-new"
 First response from Plug.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -455,7 +455,7 @@ First response from Plug.
 
 <a name="Client+event_plug-online"></a>
 
-#### "plug-online"
+### "plug-online"
 Follow up response from Plug.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -467,7 +467,7 @@ Follow up response from Plug.
 
 <a name="Client+event_plug-offline"></a>
 
-#### "plug-offline"
+### "plug-offline"
 No response from Plug.
 
 **Kind**: event emitted by [<code>Client</code>](#Client)  
@@ -480,7 +480,7 @@ No response from Plug.
 
 <a name="Device"></a>
 
-### Device ⇐ <code>EventEmitter</code>
+## Device ⇐ <code>EventEmitter</code>
 TP-Link Device.
 
 Shared behavior for [Plug](#Plug) and [Bulb](#Bulb).
@@ -508,7 +508,7 @@ Shared behavior for [Plug](#Plug) and [Bulb](#Bulb).
 
 <a name="new_Device_new"></a>
 
-#### new Device(options)
+### new Device(options)
 Created by [getGeneralDevice](#Client+getGeneralDevice) - Do not instantiate directly
 
 
@@ -525,14 +525,14 @@ Created by [getGeneralDevice](#Client+getGeneralDevice) - Do not instantiate dir
 
 <a name="Device+sysInfo"></a>
 
-#### device.sysInfo ⇒ <code>Object</code>
+### device.sysInfo ⇒ <code>Object</code>
 Returns cached results from last retrieval of `system.sys_info`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 **Returns**: <code>Object</code> - system.sys_info  
 <a name="Device+send"></a>
 
-#### device.send(payload, [timeout]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
+### device.send(payload, [timeout]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
 Sends `payload` to device (using [send](#Client+send))
 
 **Kind**: instance method of [<code>Device</code>](#Device)  
@@ -545,7 +545,7 @@ Sends `payload` to device (using [send](#Client+send))
 
 <a name="Device+sendCommand"></a>
 
-#### device.sendCommand(command, [timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.sendCommand(command, [timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Sends command(s) to device.
 
 Calls [#send](#send) and processes the response.
@@ -570,7 +570,7 @@ Also, the response's `err_code`(s) are checked, if any are missing or != `0` the
 
 <a name="Device+startPolling"></a>
 
-#### device.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
+### device.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
 Polls the device every `interval`.
 
 Returns `this` (for chaining) that emits events based on state changes.
@@ -585,13 +585,13 @@ Refer to specific device sections for event details.
 
 <a name="Device+stopPolling"></a>
 
-#### device.stopPolling()
+### device.stopPolling()
 Stops device polling.
 
 **Kind**: instance method of [<code>Device</code>](#Device)  
 <a name="Device+getSysInfo"></a>
 
-#### device.getSysInfo([timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getSysInfo([timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's SysInfo.
 
 Requests `system.sys_info` from device.
@@ -605,7 +605,7 @@ Requests `system.sys_info` from device.
 
 <a name="Device+getModel"></a>
 
-#### device.getModel() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getModel() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's model.
 
 Requests `system.sys_info` and returns model name.
@@ -614,7 +614,7 @@ Requests `system.sys_info` and returns model name.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getCloudInfo"></a>
 
-#### device.getCloudInfo() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getCloudInfo() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's TP-Link Cloud info.
 
 Requests `cloud.get_info`.
@@ -623,7 +623,7 @@ Requests `cloud.get_info`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+setAlias"></a>
 
-#### device.setAlias(alias) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.setAlias(alias) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Change device's alias (name).
 
 Sends `system.set_dev_alias` command.
@@ -637,7 +637,7 @@ Sends `system.set_dev_alias` command.
 
 <a name="Device+getScheduleNextAction"></a>
 
-#### device.getScheduleNextAction() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getScheduleNextAction() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Next Schedule Rule Action.
 
 Requests `schedule.get_next_action`.
@@ -646,7 +646,7 @@ Requests `schedule.get_next_action`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getScheduleRules"></a>
 
-#### device.getScheduleRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getScheduleRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Schedule Rules.
 
 Requests `schedule.get_rules`.
@@ -655,7 +655,7 @@ Requests `schedule.get_rules`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getTime"></a>
 
-#### device.getTime() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getTime() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's time.
 
 Requests `timesetting.get_time`.
@@ -664,7 +664,7 @@ Requests `timesetting.get_time`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getTimeZone"></a>
 
-#### device.getTimeZone() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getTimeZone() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's timezone.
 
 Requests `timesetting.get_timezone`.
@@ -673,7 +673,7 @@ Requests `timesetting.get_timezone`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getScanInfo"></a>
 
-#### device.getScanInfo([refresh], [timeoutInSeconds]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getScanInfo([refresh], [timeoutInSeconds]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Requests `netif.get_scaninfo` (list of WiFi networks).
 
 Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
@@ -690,7 +690,7 @@ default network timeout to the request timeout.
 
 <a name="Device+getConsumption"></a>
 
-#### device.getConsumption() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### device.getConsumption() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets devie's current Energy Monitoring Stats.
 
 Requests `emeter.get_realtime`.
@@ -700,7 +700,7 @@ Requests `emeter.get_realtime`.
 
 <a name="Bulb"></a>
 
-### Bulb ⇐ [<code>Device</code>](#Device)
+## Bulb ⇐ [<code>Device</code>](#Device)
 Bulb Device.
 
 TP-Link models: LB100, LB110, LB120.
@@ -731,7 +731,7 @@ TP-Link models: LB100, LB110, LB120.
 
 <a name="new_Bulb_new"></a>
 
-#### new Bulb(options)
+### new Bulb(options)
 Created by [Client](#Client) - Do not instantiate directly.
 
 See [Device#constructor](Device#constructor) for common options.
@@ -743,7 +743,7 @@ See [Device#constructor](Device#constructor) for common options.
 
 <a name="Bulb+getLightState"></a>
 
-#### bulb.getLightState() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getLightState() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Bulb light state.
 
 Requests `lightingservice.get_light_state`.
@@ -752,7 +752,7 @@ Requests `lightingservice.get_light_state`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Bulb+setLightState"></a>
 
-#### bulb.setLightState(options) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### bulb.setLightState(options) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Sets Bulb light state (on/off, brightness, color, etc).
 
 Sends `lightingservice.transition_light_state` command.
@@ -773,7 +773,7 @@ Sends `lightingservice.transition_light_state` command.
 
 <a name="Bulb+getPowerState"></a>
 
-#### bulb.getPowerState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### bulb.getPowerState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Gets on/off state of Bulb.
 
 Requests `lightingservice.get_light_state` and returns true if `on_off === 1`.
@@ -781,7 +781,7 @@ Requests `lightingservice.get_light_state` and returns true if `on_off === 1`.
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 <a name="Bulb+setPowerState"></a>
 
-#### bulb.setPowerState(value) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### bulb.setPowerState(value) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Sets on/off state of Bulb.
 
 Sends `lightingservice.transition_light_state` command with on_off `value`.
@@ -794,7 +794,7 @@ Sends `lightingservice.transition_light_state` command with on_off `value`.
 
 <a name="Device+send"></a>
 
-#### bulb.send(payload, [timeout]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
+### bulb.send(payload, [timeout]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
 Sends `payload` to device (using [send](#Client+send))
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
@@ -807,7 +807,7 @@ Sends `payload` to device (using [send](#Client+send))
 
 <a name="Device+sendCommand"></a>
 
-#### bulb.sendCommand(command, [timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.sendCommand(command, [timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Sends command(s) to device.
 
 Calls [#send](#send) and processes the response.
@@ -832,7 +832,7 @@ Also, the response's `err_code`(s) are checked, if any are missing or != `0` the
 
 <a name="Device+startPolling"></a>
 
-#### bulb.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
+### bulb.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
 Polls the device every `interval`.
 
 Returns `this` (for chaining) that emits events based on state changes.
@@ -847,13 +847,13 @@ Refer to specific device sections for event details.
 
 <a name="Device+stopPolling"></a>
 
-#### bulb.stopPolling()
+### bulb.stopPolling()
 Stops device polling.
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 <a name="Device+getSysInfo"></a>
 
-#### bulb.getSysInfo([timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getSysInfo([timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's SysInfo.
 
 Requests `system.sys_info` from device.
@@ -867,7 +867,7 @@ Requests `system.sys_info` from device.
 
 <a name="Device+getModel"></a>
 
-#### bulb.getModel() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getModel() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's model.
 
 Requests `system.sys_info` and returns model name.
@@ -876,7 +876,7 @@ Requests `system.sys_info` and returns model name.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getCloudInfo"></a>
 
-#### bulb.getCloudInfo() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getCloudInfo() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's TP-Link Cloud info.
 
 Requests `cloud.get_info`.
@@ -885,7 +885,7 @@ Requests `cloud.get_info`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+setAlias"></a>
 
-#### bulb.setAlias(alias) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.setAlias(alias) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Change device's alias (name).
 
 Sends `system.set_dev_alias` command.
@@ -899,7 +899,7 @@ Sends `system.set_dev_alias` command.
 
 <a name="Device+getScheduleNextAction"></a>
 
-#### bulb.getScheduleNextAction() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getScheduleNextAction() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Next Schedule Rule Action.
 
 Requests `schedule.get_next_action`.
@@ -908,7 +908,7 @@ Requests `schedule.get_next_action`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getScheduleRules"></a>
 
-#### bulb.getScheduleRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getScheduleRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Schedule Rules.
 
 Requests `schedule.get_rules`.
@@ -917,7 +917,7 @@ Requests `schedule.get_rules`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getTime"></a>
 
-#### bulb.getTime() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getTime() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's time.
 
 Requests `timesetting.get_time`.
@@ -926,7 +926,7 @@ Requests `timesetting.get_time`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getTimeZone"></a>
 
-#### bulb.getTimeZone() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getTimeZone() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's timezone.
 
 Requests `timesetting.get_timezone`.
@@ -935,7 +935,7 @@ Requests `timesetting.get_timezone`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getScanInfo"></a>
 
-#### bulb.getScanInfo([refresh], [timeoutInSeconds]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getScanInfo([refresh], [timeoutInSeconds]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Requests `netif.get_scaninfo` (list of WiFi networks).
 
 Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
@@ -952,7 +952,7 @@ default network timeout to the request timeout.
 
 <a name="Device+getConsumption"></a>
 
-#### bulb.getConsumption() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.getConsumption() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets devie's current Energy Monitoring Stats.
 
 Requests `emeter.get_realtime`.
@@ -962,7 +962,7 @@ Requests `emeter.get_realtime`.
 
 <a name="Plug"></a>
 
-### Plug ⇐ [<code>Device</code>](#Device)
+## Plug ⇐ [<code>Device</code>](#Device)
 Plug Device.
 
 TP-Link models: HS100, HS105, HS110, HS200.
@@ -1010,7 +1010,7 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
 
 <a name="new_Plug_new"></a>
 
-#### new Plug(options)
+### new Plug(options)
 Created by [Client](#Client) - Do not instantiate directly.
 
 See [Device#constructor](Device#constructor) for common options.
@@ -1023,14 +1023,14 @@ See [Device#constructor](Device#constructor) for common options.
 
 <a name="Plug+consumption"></a>
 
-#### plug.consumption ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.consumption ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Returns cached results from last retrieval of `emeter.get_realtime`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Plug+inUse"></a>
 
-#### plug.inUse ⇒ <code>boolean</code>
+### plug.inUse ⇒ <code>boolean</code>
 Determines if device is in use based on cached `emeter.get_realtime` results.
 
 If device supports energy monitoring (HS110): `power > inUseThreshold`
@@ -1040,13 +1040,13 @@ Otherwise fallback on relay state:  `relay_state === 1`
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Plug+getInUse"></a>
 
-#### plug.getInUse() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### plug.getInUse() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Same as [#inUse](#inUse), but requests current `emeter.get_realtime`.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 <a name="Plug+getInfo"></a>
 
-#### plug.getInfo() ⇒ <code>Promise.&lt;Object, Error&gt;</code>
+### plug.getInfo() ⇒ <code>Promise.&lt;Object, Error&gt;</code>
 Requests common Plug status details in a single request.
 - `system.get_sysinfo`
 - `cloud.get_sysinfo`
@@ -1057,7 +1057,7 @@ Requests common Plug status details in a single request.
 **Returns**: <code>Promise.&lt;Object, Error&gt;</code> - parsed JSON response  
 <a name="Plug+getPowerState"></a>
 
-#### plug.getPowerState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### plug.getPowerState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Get Plug relay state (on/off).
 
 Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
@@ -1065,7 +1065,7 @@ Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 <a name="Plug+setPowerState"></a>
 
-#### plug.setPowerState(value) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### plug.setPowerState(value) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Turns Plug relay on/off.
 
 Sends `system.set_relay_state` command.
@@ -1078,7 +1078,7 @@ Sends `system.set_relay_state` command.
 
 <a name="Plug+getAwayRules"></a>
 
-#### plug.getAwayRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getAwayRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Away Rules.
 
 Requests `anti_theft.get_rules`.
@@ -1087,7 +1087,7 @@ Requests `anti_theft.get_rules`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Plug+getTimerRules"></a>
 
-#### plug.getTimerRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getTimerRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Timer Rules.
 
 Requests `count_down.get_rules`.
@@ -1096,7 +1096,7 @@ Requests `count_down.get_rules`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Plug+getLedState"></a>
 
-#### plug.getLedState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### plug.getLedState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Get Plug LED state (night mode).
 
 Requests `system.sys_info` and returns true if `led_off === 0`.
@@ -1105,7 +1105,7 @@ Requests `system.sys_info` and returns true if `led_off === 0`.
 **Returns**: <code>Promise.&lt;boolean, ResponseError&gt;</code> - LED State, true === on  
 <a name="Plug+setLedState"></a>
 
-#### plug.setLedState(value) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### plug.setLedState(value) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Turn Plug LED on/off (night mode).
 
 Sends `system.set_led_off` command.
@@ -1118,7 +1118,7 @@ Sends `system.set_led_off` command.
 
 <a name="Plug+blink"></a>
 
-#### plug.blink([times], [rate]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### plug.blink([times], [rate]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Blink Plug LED.
 
 Sends `system.set_led_off` command alternating on and off number of `times` at `rate`,
@@ -1135,7 +1135,7 @@ Note: `system.set_led_off` is particulally slow, so blink rate is not guaranteed
 
 <a name="Device+send"></a>
 
-#### plug.send(payload, [timeout]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
+### plug.send(payload, [timeout]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
 Sends `payload` to device (using [send](#Client+send))
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
@@ -1148,7 +1148,7 @@ Sends `payload` to device (using [send](#Client+send))
 
 <a name="Device+sendCommand"></a>
 
-#### plug.sendCommand(command, [timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.sendCommand(command, [timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Sends command(s) to device.
 
 Calls [#send](#send) and processes the response.
@@ -1173,7 +1173,7 @@ Also, the response's `err_code`(s) are checked, if any are missing or != `0` the
 
 <a name="Device+startPolling"></a>
 
-#### plug.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
+### plug.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
 Polls the device every `interval`.
 
 Returns `this` (for chaining) that emits events based on state changes.
@@ -1188,13 +1188,13 @@ Refer to specific device sections for event details.
 
 <a name="Device+stopPolling"></a>
 
-#### plug.stopPolling()
+### plug.stopPolling()
 Stops device polling.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 <a name="Device+getSysInfo"></a>
 
-#### plug.getSysInfo([timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getSysInfo([timeout]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's SysInfo.
 
 Requests `system.sys_info` from device.
@@ -1208,7 +1208,7 @@ Requests `system.sys_info` from device.
 
 <a name="Device+getModel"></a>
 
-#### plug.getModel() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getModel() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's model.
 
 Requests `system.sys_info` and returns model name.
@@ -1217,7 +1217,7 @@ Requests `system.sys_info` and returns model name.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getCloudInfo"></a>
 
-#### plug.getCloudInfo() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getCloudInfo() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's TP-Link Cloud info.
 
 Requests `cloud.get_info`.
@@ -1226,7 +1226,7 @@ Requests `cloud.get_info`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+setAlias"></a>
 
-#### plug.setAlias(alias) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.setAlias(alias) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Change device's alias (name).
 
 Sends `system.set_dev_alias` command.
@@ -1240,7 +1240,7 @@ Sends `system.set_dev_alias` command.
 
 <a name="Device+getScheduleNextAction"></a>
 
-#### plug.getScheduleNextAction() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getScheduleNextAction() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Next Schedule Rule Action.
 
 Requests `schedule.get_next_action`.
@@ -1249,7 +1249,7 @@ Requests `schedule.get_next_action`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getScheduleRules"></a>
 
-#### plug.getScheduleRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getScheduleRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Schedule Rules.
 
 Requests `schedule.get_rules`.
@@ -1258,7 +1258,7 @@ Requests `schedule.get_rules`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getTime"></a>
 
-#### plug.getTime() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getTime() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's time.
 
 Requests `timesetting.get_time`.
@@ -1267,7 +1267,7 @@ Requests `timesetting.get_time`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getTimeZone"></a>
 
-#### plug.getTimeZone() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getTimeZone() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's timezone.
 
 Requests `timesetting.get_timezone`.
@@ -1276,7 +1276,7 @@ Requests `timesetting.get_timezone`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Device+getScanInfo"></a>
 
-#### plug.getScanInfo([refresh], [timeoutInSeconds]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getScanInfo([refresh], [timeoutInSeconds]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Requests `netif.get_scaninfo` (list of WiFi networks).
 
 Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
@@ -1293,7 +1293,7 @@ default network timeout to the request timeout.
 
 <a name="Device+getConsumption"></a>
 
-#### plug.getConsumption() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.getConsumption() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets devie's current Energy Monitoring Stats.
 
 Requests `emeter.get_realtime`.
@@ -1302,7 +1302,7 @@ Requests `emeter.get_realtime`.
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 <a name="Plug+event_power-on"></a>
 
-#### "power-on"
+### "power-on"
 Plug's relay was turned on.
 
 **Kind**: event emitted by [<code>Plug</code>](#Plug)  
@@ -1314,7 +1314,7 @@ Plug's relay was turned on.
 
 <a name="Plug+event_power-off"></a>
 
-#### "power-off"
+### "power-off"
 Plug's relay was turned off.
 
 **Kind**: event emitted by [<code>Plug</code>](#Plug)  
@@ -1326,7 +1326,7 @@ Plug's relay was turned off.
 
 <a name="Plug+event_power-update"></a>
 
-#### "power-update"
+### "power-update"
 Plug's relay state was updated from device. Fired regardless if status was changed.
 
 **Kind**: event emitted by [<code>Plug</code>](#Plug)  
@@ -1338,7 +1338,7 @@ Plug's relay state was updated from device. Fired regardless if status was chang
 
 <a name="Plug+event_in-use"></a>
 
-#### "in-use"
+### "in-use"
 Plug's relay was turned on _or_ power draw exceeded `inUseThreshold` for HS110
 
 **Kind**: event emitted by [<code>Plug</code>](#Plug)  
@@ -1350,7 +1350,7 @@ Plug's relay was turned on _or_ power draw exceeded `inUseThreshold` for HS110
 
 <a name="Plug+event_not-in-use"></a>
 
-#### "not-in-use"
+### "not-in-use"
 Plug's relay was turned off _or_ power draw fell below `inUseThreshold` for HS110
 
 **Kind**: event emitted by [<code>Plug</code>](#Plug)  
@@ -1362,7 +1362,7 @@ Plug's relay was turned off _or_ power draw fell below `inUseThreshold` for HS11
 
 <a name="Plug+event_in-use-update"></a>
 
-#### "in-use-update"
+### "in-use-update"
 Plug's in-use state was updated from device. Fired regardless if status was changed.
 
 **Kind**: event emitted by [<code>Plug</code>](#Plug)  
@@ -1374,7 +1374,7 @@ Plug's in-use state was updated from device. Fired regardless if status was chan
 
 <a name="Plug+event_consumption-update"></a>
 
-#### "consumption-update"
+### "consumption-update"
 Plug's Energy Monitoring Status was updated from device. Fired regardless if status was changed.
 
 **Kind**: event emitted by [<code>Plug</code>](#Plug)  
@@ -1387,7 +1387,7 @@ Plug's Energy Monitoring Status was updated from device. Fired regardless if sta
 
 <a name="module_tplink-crypto"></a>
 
-### tplink-crypto
+## tplink-crypto
 TP-Link device crypto.
 
 TCP communication includes a 4 byte header, UDP does not.
@@ -1401,7 +1401,7 @@ TCP communication includes a 4 byte header, UDP does not.
 
 <a name="module_tplink-crypto.encrypt"></a>
 
-#### tplink-crypto.encrypt(input, [firstKey]) ⇒ <code>Buffer</code>
+### tplink-crypto.encrypt(input, [firstKey]) ⇒ <code>Buffer</code>
 Encrypts input where each byte is XOR'd with the previous encrypted byte.
 
 **Kind**: static method of [<code>tplink-crypto</code>](#module_tplink-crypto)  
@@ -1414,7 +1414,7 @@ Encrypts input where each byte is XOR'd with the previous encrypted byte.
 
 <a name="module_tplink-crypto.encryptWithHeader"></a>
 
-#### tplink-crypto.encryptWithHeader(input, [firstKey]) ⇒ <code>Buffer</code>
+### tplink-crypto.encryptWithHeader(input, [firstKey]) ⇒ <code>Buffer</code>
 Encrypts input that has a 4 byte big-endian length header;
 each byte is XOR'd with the previous encrypted byte.
 
@@ -1428,7 +1428,7 @@ each byte is XOR'd with the previous encrypted byte.
 
 <a name="module_tplink-crypto.decrypt"></a>
 
-#### tplink-crypto.decrypt(input, [firstKey]) ⇒ <code>Buffer</code>
+### tplink-crypto.decrypt(input, [firstKey]) ⇒ <code>Buffer</code>
 Decrypts input where each byte is XOR'd with the previous encrypted byte.
 
 **Kind**: static method of [<code>tplink-crypto</code>](#module_tplink-crypto)  
@@ -1441,7 +1441,7 @@ Decrypts input where each byte is XOR'd with the previous encrypted byte.
 
 <a name="module_tplink-crypto.decryptWithHeader"></a>
 
-#### tplink-crypto.decryptWithHeader(input, [firstKey]) ⇒ <code>Buffer</code>
+### tplink-crypto.decryptWithHeader(input, [firstKey]) ⇒ <code>Buffer</code>
 Decrypts input that has a 4 bype big-endian length header;
 each byte is XOR'd with the previous encrypted byte
 
