@@ -36,3 +36,5 @@ node_modules
 .env
 
 /lib
+
+/docs

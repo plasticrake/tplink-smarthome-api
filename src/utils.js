@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Represents an error result received from a TP-Link device.
+ *
+ * Where response err_code != 0.
+ * @extends Error
+ */
 class ResponseError extends Error {
   constructor (message, response) {
     super(message);

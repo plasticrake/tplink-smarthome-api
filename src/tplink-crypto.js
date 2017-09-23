@@ -1,12 +1,13 @@
 /**
- * TP-Link device crypto
- * TCP communication includes a 4 byte header
- * UDP does not
+ * TP-Link device crypto.
+ *
+ * TCP communication includes a 4 byte header, UDP does not.
  * @module tplink-crypto
  */
 
 /**
- * Encrypts input where each byte is XOR'd with the previous encrypted byte
+ * Encrypts input where each byte is XOR'd with the previous encrypted byte.
+ * @alias  module:tplink-crypto.encrypt
  * @param  {string} input           string to encrypt
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 encrypted buffer
@@ -22,8 +23,9 @@ function encrypt (input, firstKey = 0xAB) {
 }
 
 /**
- * Encrypts input that has a 4 byte big-endian length header
- * where each byte is XOR'd with the previous encrypted byte
+ * Encrypts input that has a 4 byte big-endian length header;
+ * each byte is XOR'd with the previous encrypted byte.
+ * @alias  module:tplink-crypto.encryptWithHeader
  * @param  {string} input           string to encrypt
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 encrypted buffer with header
@@ -36,7 +38,8 @@ function encryptWithHeader (input, firstKey = 0xAB) {
 }
 
 /**
- * Decrypts input where each byte is XOR'd with the previous encrypted byte
+ * Decrypts input where each byte is XOR'd with the previous encrypted byte.
+ * @alias  module:tplink-crypto.decrypt
  * @param  {string} input           encrypted string
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 decrypted buffer
@@ -54,8 +57,9 @@ function decrypt (input, firstKey = 0xAB) {
 }
 
 /**
- * Decrypts input that has a 4 bype big-endian length header
- * where each byte is XOR'd with the previous encrypted byte
+ * Decrypts input that has a 4 bype big-endian length header;
+ * each byte is XOR'd with the previous encrypted byte
+ * @alias  module:tplink-crypto.decryptWithHeader
  * @param  {string} input           encrypted string with header
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 decrypted buffer

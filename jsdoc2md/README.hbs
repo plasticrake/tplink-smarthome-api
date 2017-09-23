@@ -1,0 +1,54 @@
+# hs100-api
+[![NPM Version](https://img.shields.io/npm/v/hs100-api.svg)](https://www.npmjs.com/package/hs100-api)
+[![Build Status](https://travis-ci.org/plasticrake/hs100-api.svg?branch=master)](https://travis-ci.org/plasticrake/hs100-api)
+[![codecov](https://codecov.io/gh/plasticrake/hs100-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/hs100-api)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+
+TP-Link Smart Home API
+
+## Supported Devices
+
+| Model                      | Type |
+|----------------------------|------|
+| HS100, HS105, HS110, HS200 | Plug |
+| LB100, LB110, LB120        | Bulb |
+
+I only have HS100, HS105 and HS110 (plugs), so I am unable to test Bulb support. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
+
+I have written a [TP-Link device simulator](https://github.com/plasticrake/tplink-smarthome-simulator) for automated testing that includes Bulbs. So while I don't have a physical Bulb to test with, I do have virtual ones!
+
+## Example
+```javascript
+const Hs100Api = require('hs100-api');
+
+const client = new Hs100Api.Client();
+const plug = client.getDevice({host: '10.0.1.2'}).then((device)=>{
+  device.getSysInfo().then(console.log);
+  device.setPowerState(true);
+});
+
+// Look for devices, log to console, and turn them on
+client.startDiscovery().on('device-new', (device) => {
+  device.getSysInfo().then(console.log);
+  device.setPowerState(true);
+});
+```
+
+## CLI
+Install the command line utility with `npm install -g hs100-api`. Run `hs100-api --help` for help.
+
+## API
+The API is not stable (but it's getting close!) and there may be breaking changes.
+
+{{#class name="Client"}}{{>docs}}{{/class}}
+{{#class name="Device"}}{{>docs}}{{/class}}
+{{#class name="Bulb"}}{{>docs}}{{/class}}
+{{#class name="Plug"}}{{>docs}}{{/class}}
+{{#module name="tplink-crypto"}}{{>docs}}{{/module}}
+
+
+## Credits
+Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.
+https://georgovassilis.blogspot.com/2016/05/controlling-tp-link-hs100-wi-fi-smart.html
+
+Some design cues for Client based on https://github.com/MariusRumpf/node-lifx/

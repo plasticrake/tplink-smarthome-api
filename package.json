@@ -36,9 +36,7 @@
     "commander": "^2.11.0",
     "lodash.defaultto": "^4.14.0",
     "lodash.groupby": "^4.6.0",
-    "lodash.wrap": "^4.1.1",
-    "loglevel": "^1.5.0",
-    "memoizee": "^0.4.11"
+    "loglevel": "^1.5.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -51,11 +49,12 @@
     "chai-things": "^0.2.0",
     "codecov": "^2.3.0",
     "dotenv": "^4.0.0",
+    "jsdoc-to-markdown": "^3.1.0-0",
     "mocha": "^3.5.3",
     "nyc": "^11.2.1",
     "rewire": "^2.5.2",
     "semistandard": "^11.0.0",
-    "tplink-smarthome-simulator": "^1.0.0"
+    "tplink-smarthome-simulator": "^1.1.0"
   },
   "scripts": {
     "preversion": "npm test",
@@ -63,12 +62,18 @@
     "test": "semistandard && nyc mocha",
     "coverage": "nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "./node_modules/.bin/babel src -d lib",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "docs": "jsdoc2md -t jsdoc2md/README.hbs src/**.js > README.md"
   },
   "bin": {
     "hs100-api": "lib/cli.js"
   },
   "files": [
     "lib"
-  ]
+  ],
+  "semistandard": {
+    "ignore": [
+      "/docs"
+    ]
+  }
 }
