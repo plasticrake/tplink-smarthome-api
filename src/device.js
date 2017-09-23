@@ -2,23 +2,20 @@
 
 const EventEmitter = require('events');
 
-const util = require('./utils');
-const ResponseError = util.ResponseError;
-
 class Device extends EventEmitter {
   constructor (options) {
     super();
     if (typeof options === 'undefined') options = {};
 
     this.client = options.client;
-    this.log = options.logger || this.client.log;
-    this.log.debug('device.constructor(%j)', Object.assign({}, options, {client: 'not shown'}));
-
-    this.deviceId = options.deviceId;
     this.host = options.host;
     this.port = options.port || 9999;
+
+    this.deviceId = options.deviceId;
     this.seenOnDiscovery = options.seenOnDiscovery || null;
     this.timeout = options.timeout || this.client.timeout || 5000;
+    this.log = options.logger || this.client.log;
+    this.log.debug('device.constructor(%j)', Object.assign({}, options, {client: 'not shown'}));
 
     this.name = this.deviceId || this.host; // Overwritten by alias later
     this.model = null;
@@ -65,11 +62,6 @@ class Device extends EventEmitter {
     this.softwareVersion = sysInfo.sw_ver;
     this.hardwareVersion = sysInfo.hw_ver;
     this.mac = sysInfo.mac;
-    try {
-      this.supportsConsumption = (sysInfo.feature.includes('ENE'));
-    } catch (e) {
-      this.supportsConsumption = false;
-    }
   }
 
   get type () {
@@ -158,12 +150,6 @@ class Device extends EventEmitter {
     throw new Error('Error parsing getConsumption results', response);
   }
 }
-
-// { emeter: { get_realtime: {} } }
-// { emeter: { err_code: -1, err_msg: 'module not support' } }
-
-// { netif: { get_scaninfo: { refresh: 1, timeout: 3 } } }
-// { netif: { get_scaninfo: { ap_list: [Object], err_code: 0 } } }
 
 function processResponse (command, response) {
   let commandResponses = recur(command, response);
