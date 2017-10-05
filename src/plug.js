@@ -234,6 +234,31 @@ class Plug extends Device {
     return true;
   }
   /**
+   * Turns Plug relay on/off after given countdown.
+   * Removes existing countdowns.
+   *
+   * Sends `count_down.delete_all_rules` command and `count_down.add_rule` command.
+   * @param  {boolean}  value
+   * @param  {int}  countdown
+   * @return {Promise<boolean, ResponseError>}
+   */
+  async setPowerStateAfterCountdown (value, countdown) {
+    this.log.debug('[%s] plug.setPowerStateAfterCountdown(%s) (%s)', this.name, value, countdown);
+    await this.sendCommand({"count_down": {"delete_all_rules": null}});
+    await this.sendCommand({
+		"count_down": {
+			"add_rule": {
+				"enable": 1,
+				"delay": countdown,
+				"act": value,
+				"name": value ? "Turn On" : "Turn Off"
+			}
+		}
+	});
+    this.emitEvents();
+    return true;
+  }
+  /**
    * Get Away Rules.
    *
    * Requests `anti_theft.get_rules`.
