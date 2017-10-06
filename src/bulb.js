@@ -21,7 +21,7 @@ class Bulb extends Device {
     super(options);
     if (typeof options === 'undefined') options = {};
 
-    this.supportsConsumption = true;
+    this.supportsEmeter = true;
 
     this.apiModuleNamespace = {
       'system': 'smartlife.iot.common.system',

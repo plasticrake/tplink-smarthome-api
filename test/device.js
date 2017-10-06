@@ -145,13 +145,13 @@ describe('Device', function () {
         });
       });
 
-      describe('#getConsumption()', function () {
-        it('should return consumption if supported or throw error', async function () {
+      describe('#getEmeterRealtime()', function () {
+        it('should return EmeterRealtime if supported or throw error', async function () {
           await device.getSysInfo();
-          if (device.supportsConsumption) {
-            return expect(device.getConsumption()).to.eventually.have.property('err_code', 0);
+          if (device.supportsEmeter) {
+            return expect(device.getEmeterRealtime()).to.eventually.have.property('err_code', 0);
           } else {
-            return expect(device.getConsumption()).to.eventually.be.rejectedWith();
+            return expect(device.getEmeterRealtime()).to.eventually.be.rejectedWith(ResponseError);
           }
         });
       });

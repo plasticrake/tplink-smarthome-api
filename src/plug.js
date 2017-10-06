@@ -7,7 +7,7 @@ const Device = require('./device');
  *
  * TP-Link models: HS100, HS105, HS110, HS200.
  *
- * Emits events after device status is queried, such as {@link #getSysInfo} and {@link #getConsumption}.
+ * Emits events after device status is queried, such as {@link #getSysInfo} and {@link #getEmeterRealtime}.
  * @extends Device
  * @extends EventEmitter
  * @emits  Plug#power-on
@@ -16,7 +16,7 @@ const Device = require('./device');
  * @emits  Plug#in-use
  * @emits  Plug#not-in-use
  * @emits  Plug#in-use-update
- * @emits  Plug#consumption-update
+ * @emits  Plug#emeter-realtime-update
  */
 class Plug extends Device {
   /**
@@ -58,26 +58,24 @@ class Plug extends Device {
   set sysInfo (sysInfo) {
     super.sysInfo = sysInfo;
     try {
-      this.supportsConsumption = (sysInfo.feature.includes('ENE'));
+      this.supportsEmeter = (sysInfo.feature.includes('ENE'));
     } catch (e) {
-      this.supportsConsumption = false;
+      this.supportsEmeter = false;
     }
     this.log.debug('[%s] plug sysInfo set', this.name);
     this.emitEvents();
   }
 
-  /**
-   * Returns cached results from last retrieval of `emeter.get_realtime`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  get consumption () { return this._consumption; }
+  get emeterRealtime () {
+    return super.emeterRealtime;
+  }
   /**
    * @private
    */
-  set consumption (consumption) {
-    this.log.debug('[%s] plug consumption set', this.name);
-    this._consumption = consumption;
-    if (this.supportsConsumption) {
+  set emeterRealtime (emeterRealtime) {
+    this.log.debug('[%s] plug emeterRealtime set', this.alias);
+    this._emeterRealtime = emeterRealtime;
+    if (this.supportsEmeter) {
       this.emitEvents();
     }
   }
@@ -90,11 +88,10 @@ class Plug extends Device {
    * @return {boolean}
    */
   get inUse () {
-    if (this.supportsConsumption) {
-      return (this.consumption.power > this.inUseThreshold);
-    } else {
-      return (this.sysInfo.relay_state === 1);
+    if (this.supportsEmeter) {
+      return (this.emeterRealtime.power > this.inUseThreshold);
     }
+    return (this.sysInfo.relay_state === 1);
   }
 
   /**
@@ -102,13 +99,12 @@ class Plug extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async getInUse () {
-    // TODO optimize for only one operation
-    if (this.supportsConsumption) {
-      let consumption = await this.getConsumption();
-      return (consumption.power > this.inUseThreshold);
+    if (this.supportsEmeter) {
+      await this.getEmeterRealtime();
+    } else {
+      await this.getSysInfo();
     }
-    let si = await this.getSysInfo();
-    return (si.relay_state === 1);
+    return this.isUse;
   }
 
   /**
@@ -148,9 +144,9 @@ class Plug extends Device {
    */
 
   /**
-   * Plug's Energy Monitoring Status was updated from device. Fired regardless if status was changed.
-   * @event Plug#consumption-update
-   * @property {Object} value Energy Monitoring Status
+   * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+   * @event Plug#emeter-realtime-update
+   * @property {Object} value Energy Monitoring Details
    */
 
   /**
@@ -185,8 +181,8 @@ class Plug extends Device {
       this.emit('power-update', this, powerOn);
     }
 
-    if (this.supportsConsumption) {
-      this.emit('consumption-update', this, this.consumption);
+    if (this.supportsEmeter) {
+      this.emit('emeter-realtime-update', this, this.emeterRealtime);
     }
   }
 
@@ -203,9 +199,9 @@ class Plug extends Device {
     let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}');
     this.sysInfo = data.system.get_sysinfo;
     this.cloudInfo = data.cnCloud.get_info;
-    this.consumption = data.emeter.get_realtime;
+    this.emeterRealtime = data.emeter.get_realtime;
     this.scheduleNextAction = data.schedule.get_next_action;
-    return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, consumption: this.consumption, scheduleNextAction: this.scheduleNextAction};
+    return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, emeterRealtime: this.emeterRealtime, scheduleNextAction: this.scheduleNextAction};
   }
 
   /**

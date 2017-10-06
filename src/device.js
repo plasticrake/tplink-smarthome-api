@@ -43,7 +43,7 @@ class Device extends EventEmitter {
     this.lastState = {};
 
     this._sysInfo = {};
-    this._consumption = {};
+    this._emeterRealtime = {};
 
     if (options.sysInfo) { this.sysInfo = options.sysInfo; }
   }
@@ -113,10 +113,17 @@ class Device extends EventEmitter {
     this.hardwareVersion = sysInfo.hw_ver;
     this.mac = sysInfo.mac;
   }
-
+  /**
+   * Returns cached results from last retrieval of `emeter.get_realtime`.
+   * @return {Object}
+   */
+  get emeterRealtime () { return this._emeterRealtime; }
   /**
    * @private
    */
+  set emeterRealtime (emeterRealtime) {
+    this._emeterRealtime = emeterRealtime;
+  }
   get type () {
     return this._type;
   }
@@ -208,6 +215,14 @@ class Device extends EventEmitter {
     await this.sendCommand({ [this.apiModuleNamespace.system]: {set_dev_alias: {alias: alias}} });
     this.sysInfo.alias = alias;
     return true;
+  async getEmeterRealtime () {
+    let response = await this.sendCommand(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}}}`);
+    if (response) {
+      this.emeterRealtime = response;
+      return this.emeterRealtime;
+    }
+    throw new Error('Error parsing getEmeterRealtime results', response);
+  }
   }
   /**
    * Gets Next Schedule Rule Action.
@@ -259,21 +274,6 @@ class Device extends EventEmitter {
     let timeout = ((timeoutInSeconds * 1000) * 2) + this.timeout; // add original timeout to wait for response
     let command = `{"${this.apiModuleNamespace.netif}":{"get_scaninfo":{"refresh":${(refresh ? 1 : 0)},"timeout":${timeoutInSeconds}}}}`;
     return this.sendCommand(command, timeout);
-  }
-
-  /**
-   * Gets devie's current Energy Monitoring Stats.
-   *
-   * Requests `emeter.get_realtime`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getConsumption () {
-    let response = await this.sendCommand(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}}}`);
-    if (response) {
-      this.consumption = response;
-      return this.consumption;
-    }
-    throw new Error('Error parsing getConsumption results', response);
   }
 }
 
