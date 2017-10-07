@@ -5,6 +5,7 @@ const program = require('commander');
 const Hs100Api = require('.');
 const Client = Hs100Api.Client;
 const { ResponseError } = require('./utils');
+const tplinkCrypto = require('./tplink-crypto');
 
 let logLevel;
 let client;
@@ -194,6 +195,33 @@ program
       sendCommandDynamic(hostOnly, port, command, params);
     });
 });
+
+program
+  .command('encrypt <outputEncoding> <input> [firstKey=0xAB]')
+  .action(function (outputEncoding, input, firstKey = 0xAB) {
+    let outputBuf = tplinkCrypto.encrypt(input, firstKey);
+    console.log(outputBuf.toString(outputEncoding));
+  });
+program
+  .command('encryptWithHeader <outputEncoding> <input> [firstKey=0xAB]')
+  .action(function (outputEncoding, input, firstKey = 0xAB) {
+    let outputBuf = tplinkCrypto.encryptWithHeader(input, firstKey);
+    console.log(outputBuf.toString(outputEncoding));
+  });
+program
+  .command('decrypt <inputEncoding> <input> [firstKey=0xAB]')
+  .action(function (inputEncoding, input, firstKey = 0xAB) {
+    let inputBuf = Buffer.from(input, inputEncoding);
+    let outputBuf = tplinkCrypto.decrypt(inputBuf, firstKey);
+    console.log(outputBuf.toString());
+  });
+program
+  .command('decryptWithHeader <inputEncoding> <input> [firstKey=0xAB]')
+  .action(function (inputEncoding, input, firstKey = 0xAB) {
+    let inputBuf = Buffer.from(input, inputEncoding);
+    let outputBuf = tplinkCrypto.decryptWithHeader(inputBuf, firstKey);
+    console.log(outputBuf.toString());
+  });
 
 program.parse(process.argv);
 
