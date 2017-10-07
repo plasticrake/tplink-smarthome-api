@@ -1,4 +1,5 @@
 'use strict';
+
 const isEqual = require('lodash.isequal');
 
 const Device = require('./device');
@@ -43,7 +44,10 @@ class Bulb extends Device {
 
     this.lastState = Object.assign(this.lastState, { powerOn: null, inUse: null });
   }
-
+  /**
+   * Returns cached results from last retrieval of `system.sys_info`.
+   * @return {Object} system.sys_info
+   */
   get sysInfo () {
     return super.sysInfo;
   }
@@ -68,56 +72,6 @@ class Bulb extends Device {
     this.log.debug('[%s] bulb lightState set', this.alias);
     this._lightState = lightState;
     this.emitEvents();
-  }
-  /**
-   * Bulb was turned on (`lightstate.on_off`).
-   * @event Bulb#lightstate-on
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb was turned off (`lightstate.on_off`).
-   * @event Bulb#lightstate-off
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's lightstate was changed.
-   * @event Bulb#lightstate-change
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
-   * @event Bulb#lightstate-update
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
-   * @event Bulb#emeter-realtime-update
-   * @property {Object} value emeterRealtime
-   */
-
-  /**
-   * @private
-   */
-  emitEvents () {
-    if (!this.lightState) return;
-    let powerOn = (this.lightState.on_off === 1);
-
-    this.log.debug('emitEvents() powerOn: %s lastState: %j', powerOn, this.lastState);
-
-    if (this.lastState.powerOn !== powerOn) {
-      this.lastState.powerOn = powerOn;
-      if (powerOn) {
-        this.emit('lightstate-on', this.lightState);
-      } else {
-        this.emit('lightstate-off', this.lightState);
-      }
-    }
-
-    if (!isEqual(this.lastState.lightState, this.lightState)) {
-      this.lastState.lightState = this.lightState;
-      this.emit('lightstate-change', this.lightState);
-    }
-    this.emit('lightstate-update', this.lightState);
   }
   /**
    * Requests common Bulb status details in a single request.
@@ -201,6 +155,55 @@ class Bulb extends Device {
    */
   async setPowerState (value) {
     return this.setLightState({on_off: (value ? 1 : 0)});
+  }
+  /**
+   * Bulb was turned on (`lightstate.on_off`).
+   * @event Bulb#lightstate-on
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb was turned off (`lightstate.on_off`).
+   * @event Bulb#lightstate-off
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's lightstate was changed.
+   * @event Bulb#lightstate-change
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+   * @event Bulb#lightstate-update
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+   * @event Bulb#emeter-realtime-update
+   * @property {Object} value emeterRealtime
+   */
+  /**
+   * @private
+   */
+  emitEvents () {
+    if (!this.lightState) return;
+    let powerOn = (this.lightState.on_off === 1);
+
+    this.log.debug('emitEvents() powerOn: %s lastState: %j', powerOn, this.lastState);
+
+    if (this.lastState.powerOn !== powerOn) {
+      this.lastState.powerOn = powerOn;
+      if (powerOn) {
+        this.emit('lightstate-on', this.lightState);
+      } else {
+        this.emit('lightstate-off', this.lightState);
+      }
+    }
+
+    if (!isEqual(this.lastState.lightState, this.lightState)) {
+      this.lastState.lightState = this.lightState;
+      this.emit('lightstate-change', this.lightState);
+    }
+    this.emit('lightstate-update', this.lightState);
   }
 }
 

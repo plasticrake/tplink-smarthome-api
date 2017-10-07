@@ -153,15 +153,15 @@ class Client extends EventEmitter {
     }
   }
   /**
-   * Create {@link Device} object.
-   * - Device object only supports common Device methods.
-   * - See {@link Device#constructor} for valid options.
-   * - Instead use {@link #getDevice} to create a fully featured object.
-   * @param  {Object} options passed to {@link Device#constructor}
-   * @return {Device}
+   * Creates Bulb object.
+   *
+   * See {@link Device#constructor} and {@link Bulb#constructor} for valid options.
+   * @param  {Object} options passed to {@link Bulb#constructor}
+   * @return {Bulb}
    */
+  getBulb (options) {
     options = Object.assign({}, options, {client: this});
-    return new Device(options);
+    return new Bulb(options);
   }
   /**
    * Creates {@link Plug} object.
@@ -174,19 +174,6 @@ class Client extends EventEmitter {
     options = Object.assign({}, options, {client: this});
     return new Plug(options);
   }
-
-  /**
-   * Creates Bulb object.
-   *
-   * See {@link Device#constructor} and {@link Bulb#constructor} for valid options.
-   * @param  {Object} options passed to {@link Bulb#constructor}
-   * @return {Bulb}
-   */
-  getBulb (options) {
-    options = Object.assign({}, options, {client: this});
-    return new Bulb(options);
-  }
-
   /**
    * Creates a {@link Plug} or {@link Bulb} after querying device to determine type.
    *
@@ -199,7 +186,6 @@ class Client extends EventEmitter {
     let sysInfo = await this.getSysInfo(options);
     return this.getDeviceFromSysInfo(sysInfo, options);
   }
-
   /**
    * Create {@link Device} object.
    * - Device object only supports common Device methods.
@@ -225,7 +211,6 @@ class Client extends EventEmitter {
       default: return this.getPlug(options);
     }
   }
-
   /**
    * Creates device corresponding to the provided `sysInfo`.
    *
@@ -242,7 +227,6 @@ class Client extends EventEmitter {
       default: return this.getPlug(options);
     }
   }
-
   /**
    * Guess the device type from provided `sysInfo`.
    *
@@ -258,68 +242,57 @@ class Client extends EventEmitter {
       default: return 'device';
     }
   }
-
   /**
    * Error during discovery.
    * @event Client#error
    * @type {Object}
    * @property {Error}
    */
-
   /**
    * First response from device.
    * @event Client#device-new
    * @property {Device|Bulb|Plug}
    */
-
   /**
    * Follow up response from device.
    * @event Client#device-online
    * @property {Device|Bulb|Plug}
    */
-
   /**
    * No response from device.
    * @event Client#device-offline
    * @property {Device|Bulb|Plug}
    */
-
   /**
    * First response from Bulb.
    * @event Client#bulb-new
    * @property {Bulb}
    */
-
   /**
    * Follow up response from Bulb.
    * @event Client#bulb-online
    * @property {Bulb}
    */
-
   /**
    * No response from Bulb.
    * @event Client#bulb-offline
    * @property {Bulb}
    */
-
   /**
    * First response from Plug.
    * @event Client#plug-new
    * @property {Plug}
    */
-
   /**
    * Follow up response from Plug.
    * @event Client#plug-online
    * @property {Plug}
    */
-
   /**
    * No response from Plug.
    * @event Client#plug-offline
    * @property {Plug}
    */
-
   /**
    * Discover TP-Link Smarthome devices on the network.
    *

@@ -1,10 +1,10 @@
+'use strict';
 /**
  * TP-Link device crypto.
  *
  * TCP communication includes a 4 byte header, UDP does not.
  * @module tplink-crypto
  */
-
 /**
  * Encrypts input where each byte is XOR'd with the previous encrypted byte.
  * @alias  module:tplink-crypto.encrypt
@@ -21,7 +21,6 @@ function encrypt (input, firstKey = 0xAB) {
   }
   return buf;
 }
-
 /**
  * Encrypts input that has a 4 byte big-endian length header;
  * each byte is XOR'd with the previous encrypted byte.
@@ -36,7 +35,6 @@ function encryptWithHeader (input, firstKey = 0xAB) {
   bufLength.writeUInt32BE(input.length, 0);
   return Buffer.concat([bufLength, bufMsg], input.length + 4);
 }
-
 /**
  * Decrypts input where each byte is XOR'd with the previous encrypted byte.
  * @alias  module:tplink-crypto.decrypt
@@ -55,7 +53,6 @@ function decrypt (input, firstKey = 0xAB) {
   }
   return buf;
 }
-
 /**
  * Decrypts input that has a 4 bype big-endian length header;
  * each byte is XOR'd with the previous encrypted byte

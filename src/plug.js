@@ -47,7 +47,10 @@ class Plug extends Device {
 
     this.emitEventsEnabled = true;
   }
-
+  /**
+   * Returns cached results from last retrieval of `system.sys_info`.
+   * @return {Object} system.sys_info
+   */
   get sysInfo () {
     return super.sysInfo;
   }
@@ -60,7 +63,10 @@ class Plug extends Device {
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
-
+  /**
+   * Returns cached results from last retrieval of `emeter.get_realtime`.
+   * @return {Object}
+   */
   get emeterRealtime () {
     return super.emeterRealtime;
   }
@@ -88,7 +94,32 @@ class Plug extends Device {
     }
     return (this.sysInfo.relay_state === 1);
   }
-
+  /**
+   * Requests common Plug status details in a single request.
+   * - `system.get_sysinfo`
+   * - `cloud.get_sysinfo`
+   * - `emeter.get_realtime`
+   * - `schedule.get_next_action`
+   * @return {Promise<Object, Error>} parsed JSON response
+   */
+  async getInfo () {
+    // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
+    let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}');
+    this.sysInfo = data.system.get_sysinfo;
+    this.cloudInfo = data.cnCloud.get_info;
+    this.emeterRealtime = data.emeter.get_realtime;
+    this.scheduleNextAction = data.schedule.get_next_action;
+    return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, emeterRealtime: this.emeterRealtime, scheduleNextAction: this.scheduleNextAction};
+  }
+  /**
+   * Get Away Rules.
+   *
+   * Requests `anti_theft.get_rules`.
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getAwayRules () {
+    return this.sendCommand(`{"anti_theft":{"get_rules":{}}}`);
+  }
   /**
    * Same as {@link #inUse}, but requests current `emeter.get_realtime`.
    * @return {Promise<boolean, ResponseError>}
@@ -100,6 +131,93 @@ class Plug extends Device {
       await this.getSysInfo();
     }
     return this.inUse;
+  }
+  /**
+   * Get Plug LED state (night mode).
+   *
+   * Requests `system.sys_info` and returns true if `led_off === 0`.
+   * @return {Promise<boolean, ResponseError>} LED State, true === on
+   */
+  async getLedState () {
+    let sysInfo = await this.getSysInfo();
+    return (sysInfo.led_off === 0);
+  }
+  /**
+   * Turn Plug LED on/off (night mode).
+   *
+   * Sends `system.set_led_off` command.
+   * @param  {boolean}  value LED State, true === on
+   * @return {Promise<boolean, ResponseError>}
+   */
+  async setLedState (value) {
+    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`);
+    this.sysInfo.set_led_off = (value ? 0 : 1);
+    return true;
+  }
+  /**
+   * Get Plug relay state (on/off).
+   *
+   * Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
+   * @return {Promise<boolean, ResponseError>}
+   */
+  async getPowerState () {
+    let sysInfo = await this.getSysInfo();
+    return (sysInfo.relay_state === 1);
+  }
+  /**
+   * Turns Plug relay on/off.
+   *
+   * Sends `system.set_relay_state` command.
+   * @param  {boolean}  value
+   * @return {Promise<boolean, ResponseError>}
+   */
+  async setPowerState (value) {
+    this.log.debug('[%s] plug.setPowerState(%s)', this.alias, value);
+    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`);
+    this.sysInfo.relay_state = (value ? 1 : 0);
+    this.emitEvents();
+    return true;
+  }
+  /**
+   * Get Timer Rules.
+   *
+   * Requests `count_down.get_rules`.
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getTimerRules () {
+    return this.sendCommand(`{"count_down":{"get_rules":{}}}`);
+  }
+  /**
+   * Blink Plug LED.
+   *
+   * Sends `system.set_led_off` command alternating on and off number of `times` at `rate`,
+   * then sets the led to its pre-blink state.
+   *
+   * Note: `system.set_led_off` is particulally slow, so blink rate is not guaranteed.
+   * @param  {number}  [times=5]
+   * @param  {number}  [rate=1000]
+   * @return {Promise<boolean, ResponseError>}
+   */
+  async blink (times = 5, rate = 1000) {
+    let delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
+
+    let origLedState = await this.getLedState();
+    let lastBlink = Date.now();
+
+    let currLedState = false;
+    for (var i = 0; i < times * 2; i++) {
+      currLedState = !currLedState;
+      lastBlink = Date.now();
+      await this.setLedState(currLedState);
+      let timeToWait = (rate / 2) - (Date.now() - lastBlink);
+      if (timeToWait > 0) {
+        await delay(timeToWait);
+      }
+    }
+    if (currLedState !== origLedState) {
+      await this.setLedState(origLedState);
+    }
+    return true;
   }
   /**
    * Plug's relay was turned on.
@@ -161,119 +279,6 @@ class Plug extends Device {
       }
     }
     this.emit('power-update', powerOn);
-  }
-  /**
-   * Requests common Plug status details in a single request.
-   * - `system.get_sysinfo`
-   * - `cloud.get_sysinfo`
-   * - `emeter.get_realtime`
-   * - `schedule.get_next_action`
-   * @return {Promise<Object, Error>} parsed JSON response
-   */
-  async getInfo () {
-    // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
-    let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}');
-    this.sysInfo = data.system.get_sysinfo;
-    this.cloudInfo = data.cnCloud.get_info;
-    this.emeterRealtime = data.emeter.get_realtime;
-    this.scheduleNextAction = data.schedule.get_next_action;
-    return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, emeterRealtime: this.emeterRealtime, scheduleNextAction: this.scheduleNextAction};
-  }
-  /**
-   * Get Plug relay state (on/off).
-   *
-   * Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
-   * @return {Promise<boolean, ResponseError>}
-   */
-  async getPowerState () {
-    let sysInfo = await this.getSysInfo();
-    return (sysInfo.relay_state === 1);
-  }
-  /**
-   * Turns Plug relay on/off.
-   *
-   * Sends `system.set_relay_state` command.
-   * @param  {boolean}  value
-   * @return {Promise<boolean, ResponseError>}
-   */
-  async setPowerState (value) {
-    this.log.debug('[%s] plug.setPowerState(%s)', this.alias, value);
-    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`);
-    this.sysInfo.relay_state = (value ? 1 : 0);
-    this.emitEvents();
-    return true;
-  }
-  /**
-   * Get Away Rules.
-   *
-   * Requests `anti_theft.get_rules`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getAwayRules () {
-    return this.sendCommand(`{"anti_theft":{"get_rules":{}}}`);
-  }
-  /**
-   * Get Timer Rules.
-   *
-   * Requests `count_down.get_rules`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getTimerRules () {
-    return this.sendCommand(`{"count_down":{"get_rules":{}}}`);
-  }
-  /**
-   * Get Plug LED state (night mode).
-   *
-   * Requests `system.sys_info` and returns true if `led_off === 0`.
-   * @return {Promise<boolean, ResponseError>} LED State, true === on
-   */
-  async getLedState () {
-    let sysInfo = await this.getSysInfo();
-    return (sysInfo.led_off === 0);
-  }
-  /**
-   * Turn Plug LED on/off (night mode).
-   *
-   * Sends `system.set_led_off` command.
-   * @param  {boolean}  value LED State, true === on
-   * @return {Promise<boolean, ResponseError>}
-   */
-  async setLedState (value) {
-    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`);
-    this.sysInfo.set_led_off = (value ? 0 : 1);
-    return true;
-  }
-  /**
-   * Blink Plug LED.
-   *
-   * Sends `system.set_led_off` command alternating on and off number of `times` at `rate`,
-   * then sets the led to its pre-blink state.
-   *
-   * Note: `system.set_led_off` is particulally slow, so blink rate is not guaranteed.
-   * @param  {number}  [times=5]
-   * @param  {number}  [rate=1000]
-   * @return {Promise<boolean, ResponseError>}
-   */
-  async blink (times = 5, rate = 1000) {
-    let delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
-
-    let origLedState = await this.getLedState();
-    let lastBlink = Date.now();
-
-    let currLedState = false;
-    for (var i = 0; i < times * 2; i++) {
-      currLedState = !currLedState;
-      lastBlink = Date.now();
-      await this.setLedState(currLedState);
-      let timeToWait = (rate / 2) - (Date.now() - lastBlink);
-      if (timeToWait > 0) {
-        await delay(timeToWait);
-      }
-    }
-    if (currLedState !== origLedState) {
-      await this.setLedState(origLedState);
-    }
-    return true;
   }
 }
 

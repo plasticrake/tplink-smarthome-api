@@ -43,47 +43,6 @@ class Device extends EventEmitter {
     if (options.sysInfo) { this.sysInfo = options.sysInfo; }
   }
   /**
-   * Sends `payload` to device (using {@link Client#send})
-   * @param  {Object|string}  payload
-   * @param  {number}         [timeout]
-   * @return {Promise<Object, Error>} parsed JSON response
-   */
-  async send (payload, timeout = null) {
-    timeout = (timeout == null ? this.timeout : timeout);
-    this.log.debug('[%s] device.send()', this.alias);
-    return this.client.send({host: this.host, port: this.port, payload, timeout})
-      .catch((reason) => {
-        this.log.error('[%s] device.send() %s', this.alias, reason);
-        this.log.debug(payload);
-        throw reason;
-      });
-  }
-  /**
-   * Sends command(s) to device.
-   *
-   * Calls {@link #send} and processes the response.
-   *
-   * - If only one operation was sent:
-   *   - Promise fulfills with specific parsed JSON response for comand.\
-   *     Example: `{system:{get_sysinfo:{}}}`
-   *     - resolves to: `{err_code:0,...}`\
-   *     - instead of: `{system:{get_sysinfo:{err_code:0,...}}}` (as {@link #send} would)
-   * - If more than one operation was sent:
-   *   - Promise fulfills with full parsed JSON response (same as {@link #send})
-   *
-   * Also, the response's `err_code`(s) are checked, if any are missing or != `0` the Promise is rejected with {@link ResponseError}.
-   * @param  {Object|string}  command
-   * @param  {number}  [timeout]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async sendCommand (command, timeout) {
-    // TODO allow certain err codes (particually emeter for non HS110 devices)
-    let commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
-    let response = await this.send(commandObj, timeout);
-    let results = processResponse(commandObj, response);
-    return results;
-  }
-  /**
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
    */
@@ -101,7 +60,9 @@ class Device extends EventEmitter {
    * Returns cached results from last retrieval of `emeter.get_realtime`.
    * @return {Object}
    */
-  get emeterRealtime () { return this._emeterRealtime; }
+  get emeterRealtime () {
+    return this._emeterRealtime;
+  }
   /**
    * @private
    */
@@ -178,6 +139,47 @@ class Device extends EventEmitter {
    */
   get mac () {
     return this.sysInfo.mac || this.sysInfo.ethernet_mac;
+  }
+  /**
+   * Sends `payload` to device (using {@link Client#send})
+   * @param  {Object|string}  payload
+   * @param  {number}         [timeout]
+   * @return {Promise<Object, Error>} parsed JSON response
+   */
+  async send (payload, timeout = null) {
+    timeout = (timeout == null ? this.timeout : timeout);
+    this.log.debug('[%s] device.send()', this.alias);
+    return this.client.send({host: this.host, port: this.port, payload, timeout})
+      .catch((reason) => {
+        this.log.error('[%s] device.send() %s', this.alias, reason);
+        this.log.debug(payload);
+        throw reason;
+      });
+  }
+  /**
+   * Sends command(s) to device.
+   *
+   * Calls {@link #send} and processes the response.
+   *
+   * - If only one operation was sent:
+   *   - Promise fulfills with specific parsed JSON response for comand.\
+   *     Example: `{system:{get_sysinfo:{}}}`
+   *     - resolves to: `{err_code:0,...}`\
+   *     - instead of: `{system:{get_sysinfo:{err_code:0,...}}}` (as {@link #send} would)
+   * - If more than one operation was sent:
+   *   - Promise fulfills with full parsed JSON response (same as {@link #send})
+   *
+   * Also, the response's `err_code`(s) are checked, if any are missing or != `0` the Promise is rejected with {@link ResponseError}.
+   * @param  {Object|string}  command
+   * @param  {number}  [timeout]
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async sendCommand (command, timeout) {
+    // TODO allow certain err codes (particually emeter for non HS110 devices)
+    let commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
+    let response = await this.send(commandObj, timeout);
+    let results = processResponse(commandObj, response);
+    return results;
   }
   /**
    * Polls the device every `interval`.

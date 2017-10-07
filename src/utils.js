@@ -1,5 +1,4 @@
 'use strict';
-
 /**
  * Represents an error result received from a TP-Link device.
  *
