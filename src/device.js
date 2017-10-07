@@ -9,6 +9,7 @@ const ResponseError = require('./utils').ResponseError;
  *
  * Shared behavior for {@link Plug} and {@link Bulb}.
  * @extends EventEmitter
+ * @emits  Device#emeter-realtime-update
  */
 class Device extends EventEmitter {
   /**
@@ -177,31 +178,6 @@ class Device extends EventEmitter {
   get mac () {
     return this.sysInfo.mac || this.sysInfo.ethernet_mac;
   }
-
-  // /**
-  //  * @private
-  //  */
-  // get deviceType () {
-  //   return this._deviceType;
-  // }
-  //
-  // /**
-  //  * @private
-  //  */
-  // set deviceType (deviceType) {
-  //   switch (true) {
-  //     case (/plug/i).test(deviceType):
-  //       this._deviceType = 'plug';
-  //       break;
-  //     case (/bulb/i).test(deviceType):
-  //       this._deviceType = 'bulb';
-  //       break;
-  //     default:
-  //       this._deviceType = 'device';
-  //       break;
-  //   }
-  // }
-
   /**
    * Polls the device every `interval`.
    *
@@ -217,7 +193,6 @@ class Device extends EventEmitter {
     }, interval);
     return this;
   }
-
   /**
    * Stops device polling.
    */
@@ -225,7 +200,6 @@ class Device extends EventEmitter {
     clearInterval(this.pollingTimer);
     this.pollingTimer = null;
   }
-
   /**
    * Gets device's SysInfo.
    *
@@ -270,6 +244,7 @@ class Device extends EventEmitter {
     let response = await this.sendCommand(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}}}`);
     if (response) {
       this.emeterRealtime = response;
+      this.emit('emeter-realtime-update', this.emeterRealtime);
       return this.emeterRealtime;
     }
     throw new Error('Error parsing getEmeterRealtime results', response);
