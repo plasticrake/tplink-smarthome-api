@@ -236,11 +236,11 @@ describe('Device', function () {
 
       describe('#deviceType get', function () {
         it('should return type of "device" before querying device', function () {
-          let generalDevice = client.getGeneralDevice(options);
+          let generalDevice = client.getCommonDevice(options);
           expect(generalDevice.deviceType).to.equal('device');
         });
         it('should return actual type after querying device', async function () {
-          let generalDevice = client.getGeneralDevice(options);
+          let generalDevice = client.getCommonDevice(options);
           await generalDevice.getSysInfo();
           expect(generalDevice.deviceType).to.eql(deviceType);
         });
