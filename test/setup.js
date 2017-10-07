@@ -3,82 +3,66 @@
 
 const groupBy = require('lodash.groupby');
 const defaultTo = require('lodash.defaultto');
-require('dotenv').config();
-const simulator = require('tplink-smarthome-simulator');
+const dotenv = require('dotenv');
 
+const simulator = require('tplink-smarthome-simulator');
 const Client = require('../src').Client;
 
+dotenv.config();
 const clientOptions = { logLevel: process.env.TEST_CLIENT_LOGLEVEL };
-
-function getTestClient () {
-  let client = new Client(clientOptions);
-  return client;
-}
+const useSimulator = envIsTrue(defaultTo(process.env.TEST_SIMULATOR, true));
+const discoveryTimeout = process.env.TEST_DISCOVERY_TIMEOUT || 2000;
+const discoveryIpWhitelist = (() => {
+  let list = process.env.TEST_DISCOVERY_IP_WHITELIST;
+  if (list) return list.split(',');
+  return [];
+})();
 
 function envIsTrue (value) {
   return !(value == null || value === 0 || value === 'false');
 }
 
-async function getTestDevices () {
-  let useSimulator = envIsTrue(defaultTo(process.env.TEST_SIMULATOR, true));
-  let useDiscovery = envIsTrue(defaultTo(process.env.TEST_DISCOVERY, true));
+function getTestClient (options = {}) {
+  return new Client(Object.assign({}, clientOptions, options));
+}
 
+async function getTestDevices () {
   if (useSimulator) {
     return getSimulatedTestDevices();
   }
-  if (useDiscovery) {
-    return getDynamicTestDevices();
-  }
-  return getStaticTestDevices();
+  return getDiscoveryTestDevices();
 }
 
-async function getStaticTestDevices () {
-  let client = getTestClient();
-  let staticTestDevices = [];
-  let hosts = [
-    process.env.TEST_HS100_HOST,
-    process.env.TEST_HS105_HOST,
-    process.env.TEST_HS110_HOST];
-
-  for (var i = 0; i < hosts.length; i++) {
-    if (hosts[i]) {
-      let [host, port] = hosts[i].split(':');
-      staticTestDevices.push(client.getDevice({host, port}));
-    }
-  }
-  return Promise.all(staticTestDevices);
-}
-
-async function getDynamicTestDevices () {
+async function getDiscoveryTestDevices () {
   return new Promise((resolve, reject) => {
-    let dynamicTestDevices = [];
-    let discoveryTimeout = process.env.TEST_DISCOVERY_TIMEOUT || 2000;
+    let discoveredTestDevices = [];
     let client = getTestClient();
     client.startDiscovery({discoveryTimeout: discoveryTimeout});
-
-    let deviceWhitelist = process.env.TEST_DISCOVERY_IP_WHITELIST || [];
-    if (deviceWhitelist) {
-      deviceWhitelist = deviceWhitelist.split(',');
-    }
 
     setTimeout(() => {
       client.stopDiscovery();
       for (let device of client.devices.values()) {
-        if (deviceWhitelist.length === 0 || deviceWhitelist.includes(device.host)) {
-          dynamicTestDevices.push(device);
+        if (discoveryIpWhitelist.length === 0 || discoveryIpWhitelist.includes(device.host)) {
+          discoveredTestDevices.push({
+            model: device.model,
+            options: { host: device.host, port: device.port },
+            getDevice: (options) => client.getDevice(Object.assign({host: device.host, port: device.port}, options))
+          });
         } else {
-          // console.log(`Excluding ${device.host} from test`);
+          console.log(`Excluding ${device.host}:${device.port} from test, not in whitelist`);
         }
       }
-      return resolve(dynamicTestDevices);
+      return resolve(discoveredTestDevices);
     }, discoveryTimeout);
   });
 }
 
+const simulatedDevices = [];
+let simulatedUdpServer;
+
 async function getSimulatedTestDevices () {
   let client = getTestClient();
 
-  let simulatedDevices = [];
   simulatedDevices.push(new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100' } }));
   simulatedDevices.push(new simulator.Device({ model: 'hs105', data: { alias: 'Mock HS105' } }));
   simulatedDevices.push(new simulator.Device({ model: 'hs110', data: { alias: 'Mock HS110' } }));
@@ -91,45 +75,54 @@ async function getSimulatedTestDevices () {
   for (var i = 0; i < simulatedDevices.length; i++) {
     let d = simulatedDevices[i];
     await d.start();
-    testDevices.push(client.getDevice({host: d.address, port: d.port}));
+    testDevices.push({
+      model: d.model,
+      options: { host: d.address, port: d.port },
+      getDevice: (options) => client.getDevice(Object.assign({host: d.address, port: d.port}, options))
+    });
   }
 
-  await simulator.UdpServer.start();
+  simulatedUdpServer = await simulator.UdpServer.start();
 
-  return Promise.all(testDevices);
+  return testDevices;
 }
 
-global.getTestClient = getTestClient;
+function testDeviceCleanup () {
+  simulatedDevices.forEach((device) => {
+    device.stop();
+  });
+  if (simulatedUdpServer) {
+    simulatedUdpServer.stop();
+  }
+}
 
-global.testDevices = [
-  { model: 'hs100', type: 'plug', name: 'HS100(plug)' },
-  { model: 'hs105', type: 'plug', name: 'HS105(plug)' },
-  { model: 'hs110', type: 'plug', name: 'HS110(plug)' },
-  { model: 'hs200', type: 'plug', name: 'HS200(plug)' },
-  { model: 'lb100', type: 'bulb', name: 'LB100(bulb)' },
-  { model: 'lb120', type: 'bulb', name: 'LB120(bulb)' },
-  { model: 'lb130', type: 'bulb', name: 'LB130(bulb)' }];
+const testDevices = [
+  { model: 'hs100', deviceType: 'plug', name: 'HS100(plug)' },
+  { model: 'hs105', deviceType: 'plug', name: 'HS105(plug)' },
+  { model: 'hs110', deviceType: 'plug', name: 'HS110(plug)' },
+  { model: 'hs200', deviceType: 'plug', name: 'HS200(plug)' },
+  { model: 'lb100', deviceType: 'bulb', name: 'LB100(bulb)' },
+  { model: 'lb120', deviceType: 'bulb', name: 'LB120(bulb)' },
+  { model: 'lb130', deviceType: 'bulb', name: 'LB130(bulb)' }];
 
-Object.entries(groupBy(global.testDevices, 'type')).forEach(([key, value]) => {
-  global.testDevices[key] = value;
+Object.entries(groupBy(testDevices, 'deviceType')).forEach(([key, value]) => {
+  testDevices[key] = value;
 });
-Object.entries(groupBy(global.testDevices, 'model')).forEach(([key, value]) => {
-  global.testDevices[key] = value;
+Object.entries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
+  testDevices[key] = value;
 });
 
-global.testDevices['anydevice'] = { name: 'Device', type: 'device' };
-global.testDevices['anyplug'] = { name: 'Plug', type: 'plug' };
-global.testDevices['anybulb'] = { name: 'Bulb', type: 'bulb' };
-global.testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, timeout: 100 } };
+testDevices['anydevice'] = { name: 'Device', deviceType: 'device' };
+testDevices['anyplug'] = { name: 'Plug', deviceType: 'plug' };
+testDevices['anybulb'] = { name: 'Bulb', deviceType: 'bulb' };
+testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, timeout: 100 } };
 
 (async () => {
   const realTestDevices = await getTestDevices();
 
-  let testDevices = global.testDevices;
-
   const addDevice = (target, device) => {
-    target.device = device;
-    target.options = { host: device.host, port: device.port };
+    target.options = device.options;
+    target.getDevice = device.getDevice;
   };
 
   testDevices.forEach((testDevice) => {
@@ -138,21 +131,27 @@ global.testDevices['unreachable'] = { name: 'Unreachable Device', options: { hos
     if (device) {
       addDevice(testDevice, device);
       if (!testDevices['anydevice'].device) { addDevice(testDevices['anydevice'], device); }
-      if (testDevice.type === 'plug' && !testDevices['anyplug'].device) { addDevice(testDevices['anyplug'], device); }
-      if (testDevice.type === 'bulb' && !testDevices['anybulb'].device) { addDevice(testDevices['anybulb'], device); }
+      if (testDevice.deviceType === 'plug' && !testDevices['anyplug'].device) { addDevice(testDevices['anyplug'], device); }
+      if (testDevice.deviceType === 'bulb' && !testDevices['anybulb'].device) { addDevice(testDevices['anybulb'], device); }
     }
   });
 
-  global.testDevices.forEach((td) => {
-    let device = td.device || {};
-    console.log(td.model, td.type, td.name, device.host, device.port);
+  testDevices.forEach((td) => {
+    let options = td.options || {};
+    console.log(td.model, td.deviceType, td.name, options.host, options.port);
   });
 
   ['anydevice', 'anyplug', 'anybulb', 'unreachable'].forEach((key) => {
-    let td = global.testDevices[key];
-    let device = td.device || {};
-    console.log(key, td.type, td.name, device.host, device.port);
+    let td = testDevices[key];
+    let options = td.options || {};
+    console.log(key, td.deviceType, td.name, options.host, options.port);
   });
 
   run();
 })();
+
+module.exports = {
+  getTestClient,
+  testDevices,
+  testDeviceCleanup
+};

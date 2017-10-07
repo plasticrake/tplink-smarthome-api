@@ -1,5 +1,4 @@
 /* eslint-env mocha */
-/* global testDevices */
 /* eslint no-unused-expressions: ["off"] */
 
 'use strict';
@@ -7,6 +6,8 @@
 const chai = require('chai');
 const expect = chai.expect;
 chai.use(require('chai-as-promised'));
+
+const { testDevices } = require('./setup');
 
 describe('Plug', function () {
   before(function () {
@@ -17,11 +18,48 @@ describe('Plug', function () {
   testDevices['plug'].forEach((testPlug) => {
     let plug;
     context(testPlug.name, function () {
-      beforeEach(function () {
-        if (!testPlug.device) {
+      beforeEach(async function () {
+        if (!testPlug.getDevice) {
           this.skip();
         }
-        plug = testPlug.device;
+        plug = await testPlug.getDevice();
+      });
+
+      describe('#inUse get', function () {
+        it('should return status based on Emeter if supported', function () {
+          if (!plug.supportsEmeter) return;
+
+          plug.inUseThreshold = 0;
+          plug.emeterRealtime = {power: 0};
+          expect(plug.inUse).to.be.false;
+
+          plug.inUseThreshold = 10;
+          plug.emeterRealtime = {power: 10};
+          expect(plug.inUse).to.be.false;
+
+          plug.inUseThreshold = 0;
+          plug.emeterRealtime = {power: 0.1};
+          expect(plug.inUse).to.be.true;
+
+          plug.inUseThreshold = 10;
+          plug.emeterRealtime = {power: 11};
+          expect(plug.inUse).to.be.true;
+        });
+        it('should return status based on relay_state if Emeter not supported', function () {
+          if (plug.supportsEmeter) return;
+
+          plug.sysInfo.relay_state = 0;
+          expect(plug.inUse).to.be.false;
+
+          plug.sysInfo.relay_state = 1;
+          expect(plug.inUse).to.be.true;
+        });
+      });
+
+      describe('#getInUse', function () {
+        it('should resolve', function () {
+          return expect(plug.getInUse()).to.eventually.be.fulfilled;
+        });
       });
 
       describe('#setPowerState()', function () {

@@ -1,5 +1,4 @@
 /* eslint-env mocha */
-/* global testDevices */
 /* eslint no-unused-expressions: ["off"] */
 
 'use strict';
@@ -7,6 +6,8 @@
 const chai = require('chai');
 const expect = chai.expect;
 chai.use(require('chai-as-promised'));
+
+const { testDevices } = require('./setup');
 
 describe('Bulb', function () {
   before(function () {
@@ -17,11 +18,11 @@ describe('Bulb', function () {
   testDevices['bulb'].forEach((testBulb) => {
     let bulb;
     context(testBulb.name, function () {
-      beforeEach(function () {
-        if (!testBulb.device) {
+      beforeEach(async function () {
+        if (!testBulb.getDevice) {
           this.skip();
         }
-        bulb = testBulb.device;
+        bulb = await testBulb.getDevice();
       });
       describe('#setLightState()', function () {
         it('should turn on', function () {

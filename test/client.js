@@ -1,5 +1,4 @@
 /* eslint-env mocha */
-/* global testDevices getTestClient */
 /* eslint no-unused-expressions: ["off"] */
 
 'use strict';
@@ -8,6 +7,7 @@ const chai = require('chai');
 const expect = chai.expect;
 chai.use(require('chai-as-promised'));
 
+const { getTestClient, testDevices } = require('./setup');
 const Device = require('../src/device.js');
 const Plug = require('../src/plug.js');
 const Bulb = require('../src/bulb.js');
@@ -44,7 +44,7 @@ describe('Client', function () {
 
     it('should ONLY emit device-new for specified deviceTypes', function (done) {
       client.startDiscovery({ discoveryInterval: 250, deviceTypes: ['plug'] }).on('device-new', (device) => {
-        expect(device.type).to.eql('plug');
+        expect(device.deviceType).to.eql('plug');
       });
       setTimeout(done, 1000);
     });
@@ -76,7 +76,7 @@ describe('Client', function () {
         if (et.event === 'offline') {
           let invalidDevice = client.getDeviceFromType(et.typeName);
           invalidDevice.status = 'online';
-          invalidDevice.type = et.typeName;
+          invalidDevice.sysInfo.type = et.typeName;
           client.devices.set(invalidDevice.deviceId, invalidDevice);
         }
 
