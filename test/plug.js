@@ -30,7 +30,7 @@ describe('Plug', function () {
         plug = await testPlug.getDevice();
       });
 
-      describe.only('#supportsEmeter', function () {
+      describe('#supportsEmeter', function () {
         it('should be true for hs110 and false for other plugs', function () {
           if (plug.model.match(/^HS110/)) {
             expect(plug.supportsEmeter).to.be.true;
