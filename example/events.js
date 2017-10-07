@@ -1,24 +1,35 @@
-const Hs100Api = require('../../hs100-api');
+const util = require('util');
 
+const Hs100Api = require('..');
 const client = new Hs100Api.Client();
 
-var logEvent = function (eventName, device, state = '') {
-  console.log(`${(new Date()).toISOString()} ${eventName} ${device.model} ${device.host} ${device.deviceId} ${state}`);
+var logEvent = function (eventName, device, state) {
+  let stateString = (state != null ? util.inspect(state) : '');
+  console.log(`${(new Date()).toISOString()} ${eventName} ${device.model} ${device.host}:${device.port} ${stateString}`);
 };
 
+// Client events `device-*` also have `bulb-*` and `plug-*` counterparts.
+// Use those if you want only events for those types and not all devices.
 client.on('device-new', (device) => {
   logEvent('device-new', device);
   device.startPolling(5000);
 
-  device.on('power-on', (device) => { logEvent('power-on', device); });
-  device.on('power-off', (device) => { logEvent('power-off', device); });
-  device.on('power-update', (device, powerOn) => { logEvent('power-update', device, powerOn); });
+  // Device (Common) Events
+  device.on('emeter-realtime-update', (emeterRealtime) => { logEvent('emeter-realtime-update', device, emeterRealtime); });
 
-  device.on('in-use', (device) => { logEvent('in-use', device); });
-  device.on('not-in-use', (device) => { logEvent('not-in-use', device); });
-  device.on('in-use-update', (device, inUse) => { logEvent('in-use-update', device, inUse); });
+  // Plug Events
+  device.on('power-on', () => { logEvent('power-on', device); });
+  device.on('power-off', () => { logEvent('power-off', device); });
+  device.on('power-update', (powerOn) => { logEvent('power-update', device, powerOn); });
+  device.on('in-use', () => { logEvent('in-use', device); });
+  device.on('not-in-use', () => { logEvent('not-in-use', device); });
+  device.on('in-use-update', (inUse) => { logEvent('in-use-update', device, inUse); });
 
-  device.on('consumption-update', (device, consumption) => { logEvent('consumption-update', device, String(consumption.power)); });
+  // Bulb Events
+  device.on('lightstate-on', (lightstate) => { logEvent('lightstate-on', device, lightstate); });
+  device.on('lightstate-off', (lightstate) => { logEvent('lightstate-off', device, lightstate); });
+  device.on('lightstate-change', (lightstate) => { logEvent('lightstate-change', device, lightstate); });
+  device.on('lightstate-update', (lightstate) => { logEvent('lightstate-update', device, lightstate); });
 });
 client.on('device-online', (device) => { logEvent('device-online', device); });
 client.on('device-offline', (device) => { logEvent('device-offline', device); });
