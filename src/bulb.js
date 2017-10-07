@@ -74,6 +74,23 @@ class Bulb extends Device {
       this.lastState.lightState = this.lightState;
       this.emit('bulb-change');
     }
+  /**
+   * Requests common Bulb status details in a single request.
+   * - `system.get_sysinfo`
+   * - `cloud.get_sysinfo`
+   * - `emeter.get_realtime`
+   * - `schedule.get_next_action`
+   * @return {Promise<Object, Error>} parsed JSON response
+   */
+  async getInfo () {
+    // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
+    let data = await this.send(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}},"${this.apiModuleNamespace.lightingservice}":{"get_light_state":{}},"${this.apiModuleNamespace.schedule}":{"get_next_action":{}},"${this.apiModuleNamespace.system}":{"get_sysinfo":{}},"${this.apiModuleNamespace.cloud}":{"get_info":{}}}`);
+    this.sysInfo = data[this.apiModuleNamespace.system].get_sysinfo;
+    this.cloudInfo = data[this.apiModuleNamespace.cloud].get_info;
+    this.emeterRealtime = data[this.apiModuleNamespace.emeter].get_realtime;
+    this.scheduleNextAction = data[this.apiModuleNamespace.schedule].get_next_action;
+    this.lightState = data[this.apiModuleNamespace.lightingservice].get_light_state;
+    return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, emeterRealtime: this.emeterRealtime, scheduleNextAction: this.scheduleNextAction, lightState: this.lightState};
   }
   /**
    * Get Bulb light state.
