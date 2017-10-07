@@ -160,7 +160,6 @@ class Client extends EventEmitter {
    * @param  {Object} options passed to {@link Device#constructor}
    * @return {Device}
    */
-  getGeneralDevice (options) {
     options = Object.assign({}, options, {client: this});
     return new Device(options);
   }
@@ -201,6 +200,18 @@ class Client extends EventEmitter {
     return this.getDeviceFromSysInfo(sysInfo, options);
   }
 
+  /**
+   * Create {@link Device} object.
+   * - Device object only supports common Device methods.
+   * - See {@link Device#constructor} for valid options.
+   * - Instead use {@link #getDevice} to create a fully featured object.
+   * @param  {Object} options passed to {@link Device#constructor}
+   * @return {Device}
+   */
+  getCommonDevice (options) {
+    options = Object.assign({}, options, {client: this});
+    return new Device(options);
+  }
   /**
    * @private
    */
