@@ -56,11 +56,7 @@ class Plug extends Device {
    */
   set sysInfo (sysInfo) {
     super.sysInfo = sysInfo;
-    try {
-      this.supportsEmeter = (sysInfo.feature.includes('ENE'));
-    } catch (e) {
-      this.supportsEmeter = false;
-    }
+    this.supportsEmeter = (sysInfo.feature && typeof sysInfo.feature === 'string' ? sysInfo.feature.includes('ENE') : false);
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
@@ -103,51 +99,39 @@ class Plug extends Device {
     } else {
       await this.getSysInfo();
     }
-    return this.isUse;
+    return this.inUse;
   }
-
   /**
    * Plug's relay was turned on.
    * @event Plug#power-on
-   * @property {boolean} value Relay State (`true`)
    */
-
   /**
    * Plug's relay was turned off.
    * @event Plug#power-off
-   * @property {boolean} value Relay State (`false`)
    */
-
   /**
    * Plug's relay state was updated from device. Fired regardless if status was changed.
    * @event Plug#power-update
    * @property {boolean} value Relay State
    */
-
   /**
    * Plug's relay was turned on _or_ power draw exceeded `inUseThreshold` for HS110
    * @event Plug#in-use
-   * @property {boolean} value In Use State (`true`)
    */
-
   /**
    * Plug's relay was turned off _or_ power draw fell below `inUseThreshold` for HS110
    * @event Plug#not-in-use
-   * @property {boolean} value In Use State (`false`)
    */
-
-   /**
+  /**
    * Plug's in-use state was updated from device. Fired regardless if status was changed.
    * @event Plug#in-use-update
    * @property {boolean} value In Use State
    */
-
   /**
    * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
    * @event Plug#emeter-realtime-update
-   * @property {Object} value Energy Monitoring Details
+   * @property {Object} value emeterRealtime
    */
-
   /**
    * @private
    */
@@ -161,30 +145,27 @@ class Plug extends Device {
     if (this.lastState.inUse !== inUse) {
       this.lastState.inUse = inUse;
       if (inUse) {
-        this.emit('in-use', this, inUse);
+        this.emit('in-use');
       } else {
-        this.emit('not-in-use', this, inUse);
+        this.emit('not-in-use');
       }
-    } else {
-      this.emit('in-use-update', this, inUse);
     }
+    this.emit('in-use-update', inUse);
 
     if (this.lastState.powerOn !== powerOn) {
       this.lastState.powerOn = powerOn;
       if (powerOn) {
-        this.emit('power-on', this, powerOn);
+        this.emit('power-on');
       } else {
-        this.emit('power-off', this, powerOn);
+        this.emit('power-off');
       }
-    } else {
-      this.emit('power-update', this, powerOn);
     }
+    this.emit('power-update', powerOn);
 
-    if (this.supportsEmeter) {
-      this.emit('emeter-realtime-update', this, this.emeterRealtime);
-    }
+    // if (this.supportsEmeter) {
+    //   this.emit('emeter-realtime-update', this.emeterRealtime);
+    // }
   }
-
   /**
    * Requests common Plug status details in a single request.
    * - `system.get_sysinfo`
@@ -202,7 +183,6 @@ class Plug extends Device {
     this.scheduleNextAction = data.schedule.get_next_action;
     return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, emeterRealtime: this.emeterRealtime, scheduleNextAction: this.scheduleNextAction};
   }
-
   /**
    * Get Plug relay state (on/off).
    *
@@ -213,7 +193,6 @@ class Plug extends Device {
     let sysInfo = await this.getSysInfo();
     return (sysInfo.relay_state === 1);
   }
-
   /**
    * Turns Plug relay on/off.
    *
