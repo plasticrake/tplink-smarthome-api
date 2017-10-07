@@ -4,8 +4,13 @@
 'use strict';
 
 const chai = require('chai');
+const sinon = require('sinon');
+const chaiAsPromised = require('chai-as-promised');
+const sinonChai = require('sinon-chai');
+
 const expect = chai.expect;
-chai.use(require('chai-as-promised'));
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
 const rewire = require('rewire');
 
@@ -310,6 +315,19 @@ describe('Device', function () {
           } else {
             return expect(device.getEmeterRealtime()).to.eventually.be.rejectedWith(ResponseError);
           }
+        });
+        it('should emit emeter-realtime-update if supported', async function () {
+          await device.getSysInfo();
+          if (!device.supportsEmeter) return;
+
+          let spy = sinon.spy();
+
+          device.on('emeter-realtime-update', spy);
+          await device.getEmeterRealtime();
+          await device.getEmeterRealtime();
+
+          expect(spy).to.be.calledTwice;
+          expect(spy).to.be.calledWithMatch({err_code: 0});
         });
       });
 

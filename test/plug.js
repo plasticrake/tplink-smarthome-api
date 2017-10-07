@@ -4,8 +4,13 @@
 'use strict';
 
 const chai = require('chai');
+const sinon = require('sinon');
+const chaiAsPromised = require('chai-as-promised');
+const sinonChai = require('sinon-chai');
+
 const expect = chai.expect;
-chai.use(require('chai-as-promised'));
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
 const { testDevices } = require('./setup');
 
@@ -58,43 +63,76 @@ describe('Plug', function () {
 
       describe('#getInUse', function () {
         it('should resolve', function () {
-          return expect(plug.getInUse()).to.eventually.be.fulfilled;
+          return expect(plug.getInUse()).to.eventually.be.a('boolean');
+        });
+      });
+
+      describe('#getInfo()', function () {
+        it('should return info', async function () {
+          let results = await plug.getInfo();
+          expect(results).to.have.property('sysInfo');
+          expect(results).to.have.property('cloudInfo');
+          expect(results).to.have.property('emeterRealtime');
+          expect(results).to.have.property('scheduleNextAction');
         });
       });
 
       describe('#setPowerState()', function () {
-        it('should turn on', function () {
-          return expect(plug.setPowerState(true)).to.eventually.be.true;
+        it('should turn on', async function () {
+          expect(await plug.setPowerState(true)).to.be.true;
+          expect(await plug.getPowerState()).to.be.true;
         });
 
-        it('should turn off', function () {
-          return expect(plug.setPowerState(false)).to.eventually.be.true;
+        it('should turn off', async function () {
+          expect(await plug.setPowerState(false)).to.be.true;
+          expect(await plug.getPowerState()).to.be.false;
         });
 
-        it('should emit power-on', function (done) {
-          plug.once('power-on', (plug) => {
-            expect(plug).to.exist;
-            done();
-          });
-          (async () => {
-            try {
-              await plug.setPowerState(false);
-              await plug.setPowerState(true);
-            } catch (err) { done(err); }
-          })();
+        it('should emit power-on / power-update', async function () {
+          let spy = sinon.spy();
+          let spyPowerUpdate = sinon.spy();
+
+          plug.on('power-on', spy);
+          plug.on('power-update', spyPowerUpdate);
+          await plug.setPowerState(false);
+          await plug.setPowerState(true);
+
+          expect(spy).to.be.calledOnce;
+          expect(spyPowerUpdate).to.be.calledTwice;
+          expect(spyPowerUpdate).to.be.always.calledWithMatch(sinon.match.bool);
         });
 
-        it('should emit power-off', function (done) {
-          plug.once('power-off', (plug) => {
-            expect(plug).to.exist;
-            done();
-          });
-          (async () => {
-            try {
-              await plug.setPowerState(true);
-              await plug.setPowerState(false);
-            } catch (err) { done(err); }
-          })();
+        it('should emit lightstate-off / power-update', async function () {
+          let spy = sinon.spy();
+          let spyPowerUpdate = sinon.spy();
+
+          plug.on('power-off', spy);
+          plug.on('power-update', spyPowerUpdate);
+          await plug.setPowerState(true);
+          await plug.setPowerState(false);
+
+          expect(spy).to.be.calledOnce;
+          expect(spyPowerUpdate).to.be.calledTwice;
+          expect(spyPowerUpdate).to.be.always.calledWithMatch(sinon.match.bool);
+        });
+
+        it('should emit in-use / not-in-use / in-use-update for plugs without Emeter support', async function () {
+          if (plug.supportsEmeter) return;
+          let spyInUse = sinon.spy();
+          let spyNotInUse = sinon.spy();
+          let spyInUseUpdate = sinon.spy();
+
+          plug.on('in-use', spyInUse);
+          plug.on('not-in-use', spyNotInUse);
+          plug.on('in-use-update', spyInUseUpdate);
+
+          await plug.setPowerState(false);
+          await plug.setPowerState(true);
+
+          expect(spyInUse).to.be.calledOnce;
+          expect(spyNotInUse).to.be.calledOnce;
+          expect(spyInUseUpdate).to.be.calledTwice;
+          expect(spyInUseUpdate).to.be.always.calledWithMatch(sinon.match.bool);
         });
       });
 
@@ -102,13 +140,38 @@ describe('Plug', function () {
         this.timeout(2000);
         this.slow(1000);
         it('should return power state when on', async function () {
-          await plug.setPowerState(true);
-          return expect(plug.getPowerState()).to.eventually.be.true;
+          expect(await plug.setPowerState(true)).to.be.true;
+          expect(await plug.getPowerState()).to.be.true;
         });
 
         it('should return power state when off', async function () {
+          expect(await plug.setPowerState(false)).to.be.true;
+          expect(await plug.getPowerState()).to.be.false;
+        });
+
+        it('should emit power-update', async function () {
+          let spy = sinon.spy();
+
+          plug.on('power-update', spy);
+          await plug.getPowerState();
+          await plug.getPowerState();
+
+          expect(spy).to.be.calledTwice;
+        });
+
+        it('should emit in-use-update for plugs without Emeter support', async function () {
+          if (plug.supportsEmeter) return;
+          let spyInUseUpdate = sinon.spy();
+
           await plug.setPowerState(false);
-          return expect(plug.getPowerState()).to.eventually.be.false;
+
+          plug.on('in-use-update', spyInUseUpdate);
+
+          await plug.getPowerState();
+          await plug.getPowerState();
+
+          expect(spyInUseUpdate).to.be.calledTwice;
+          expect(spyInUseUpdate).to.be.always.calledWithMatch(sinon.match.bool);
         });
       });
 
@@ -125,38 +188,32 @@ describe('Plug', function () {
       });
 
       describe('#setLedState()', function () {
-        it('should turn LED off', function () {
-          return expect(plug.setLedState(false)).to.eventually.be.true;
+        it('should turn LED off', async function () {
+          expect(await plug.setLedState(false)).to.be.true;
         });
 
-        it('should turn LED on', function () {
-          return expect(plug.setLedState(true)).to.eventually.be.true;
+        it('should turn LED on', async function () {
+          expect(await plug.setLedState(true)).to.be.true;
         });
       });
 
       describe('#getLedState()', function () {
         it('should return LED state when off', async function () {
           await plug.setLedState(false);
-          return expect(plug.getLedState()).to.eventually.be.false;
+          expect(await plug.getLedState()).to.be.false;
         });
 
         it('should return LED state when on', async function () {
           await plug.setLedState(true);
-          return expect(plug.getLedState()).to.eventually.be.true;
+          expect(await plug.getLedState()).to.be.true;
         });
       });
 
       describe('#blink()', function () {
         this.timeout(5000);
         this.slow(300);
-        it('should blink LED', function () {
-          return expect(plug.blink(2, 100)).to.eventually.be.true;
-        });
-      });
-
-      describe('#getInfo()', function () {
-        it('should return info', function () {
-          return expect(plug.getInfo()).to.eventually.have.property('sysInfo');
+        it('should blink LED', async function () {
+          expect(await plug.blink(2, 100)).to.be.true;
         });
       });
     });
