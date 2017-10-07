@@ -107,6 +107,7 @@ class Device extends EventEmitter {
    */
   set emeterRealtime (emeterRealtime) {
     this._emeterRealtime = emeterRealtime;
+    this.emit('emeter-realtime-update', this._emeterRealtime);
   }
   /**
    * sys_info.alias
@@ -244,7 +245,6 @@ class Device extends EventEmitter {
     let response = await this.sendCommand(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}}}`);
     if (response) {
       this.emeterRealtime = response;
-      this.emit('emeter-realtime-update', this.emeterRealtime);
       return this.emeterRealtime;
     }
     throw new Error('Error parsing getEmeterRealtime results', response);

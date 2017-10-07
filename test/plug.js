@@ -30,6 +30,16 @@ describe('Plug', function () {
         plug = await testPlug.getDevice();
       });
 
+      describe.only('#supportsEmeter', function () {
+        it('should be true for hs110 and false for other plugs', function () {
+          if (plug.model.match(/^HS110/)) {
+            expect(plug.supportsEmeter).to.be.true;
+          } else {
+            expect(plug.supportsEmeter).to.be.false;
+          }
+        });
+      });
+
       describe('#inUse get', function () {
         it('should return status based on Emeter if supported', function () {
           if (!plug.supportsEmeter) return;

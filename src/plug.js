@@ -68,9 +68,9 @@ class Plug extends Device {
    * @private
    */
   set emeterRealtime (emeterRealtime) {
-    this.log.debug('[%s] plug emeterRealtime set', this.alias);
-    this._emeterRealtime = emeterRealtime;
+    this.log.debug('[%s] plug emeterRealtime set, supportsEmeter: %s', this.alias, this.supportsEmeter);
     if (this.supportsEmeter) {
+      super.emeterRealtime = emeterRealtime;
       this.emitEvents();
     }
   }
@@ -161,10 +161,6 @@ class Plug extends Device {
       }
     }
     this.emit('power-update', powerOn);
-
-    // if (this.supportsEmeter) {
-    //   this.emit('emeter-realtime-update', this.emeterRealtime);
-    // }
   }
   /**
    * Requests common Plug status details in a single request.
