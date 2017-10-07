@@ -51,7 +51,6 @@ class Plug extends Device {
   get sysInfo () {
     return super.sysInfo;
   }
-
   /**
    * @private
    */
@@ -62,7 +61,7 @@ class Plug extends Device {
     } catch (e) {
       this.supportsEmeter = false;
     }
-    this.log.debug('[%s] plug sysInfo set', this.name);
+    this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
 
@@ -158,7 +157,7 @@ class Plug extends Device {
     const inUse = this.inUse;
     const powerOn = (this.sysInfo.relay_state === 1);
 
-    this.log.debug('[%s] plug.emitEvents() inUse: %s powerOn: %s lastState: %j', this.name, inUse, powerOn, this.lastState);
+    this.log.debug('[%s] plug.emitEvents() inUse: %s powerOn: %s lastState: %j', this.alias, inUse, powerOn, this.lastState);
     if (this.lastState.inUse !== inUse) {
       this.lastState.inUse = inUse;
       if (inUse) {
@@ -223,7 +222,7 @@ class Plug extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async setPowerState (value) {
-    this.log.debug('[%s] plug.setPowerState(%s)', this.name, value);
+    this.log.debug('[%s] plug.setPowerState(%s)', this.alias, value);
     await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`);
     this.sysInfo.relay_state = (value ? 1 : 0);
     this.emitEvents();

@@ -17,7 +17,6 @@ class Device extends EventEmitter {
    * @param  {Client} options.client
    * @param  {string} options.host
    * @param  {number} [options.port=9999]
-   * @param  {string} [options.deviceId]
    * @param  {number} [options.seenOnDiscovery]
    * @param  {number} [options.timeout]
    * @param  {Object} [options.logger]
@@ -30,15 +29,10 @@ class Device extends EventEmitter {
     this.host = options.host;
     this.port = options.port || 9999;
 
-    this.deviceId = options.deviceId;
     this.seenOnDiscovery = options.seenOnDiscovery || null;
     this.timeout = options.timeout || this.client.timeout || 5000;
     this.log = options.logger || this.client.log;
     this.log.debug('device.constructor(%j)', Object.assign({}, options, {client: 'not shown'}));
-
-    this.name = this.deviceId || this.host; // Overwritten by alias later
-    this.model = null;
-    this.type = null;
 
     this.lastState = {};
 
@@ -55,15 +49,14 @@ class Device extends EventEmitter {
    */
   async send (payload, timeout = null) {
     timeout = (timeout == null ? this.timeout : timeout);
-    this.log.debug('[%s] device.send()', this.name);
+    this.log.debug('[%s] device.send()', this.alias);
     return this.client.send({host: this.host, port: this.port, payload, timeout})
       .catch((reason) => {
-        this.log.error('[%s] device.send() %s', this.name, reason);
+        this.log.error('[%s] device.send() %s', this.alias, reason);
         this.log.debug(payload);
         throw reason;
       });
   }
-
   /**
    * Sends command(s) to device.
    *
@@ -89,7 +82,6 @@ class Device extends EventEmitter {
     let results = processResponse(commandObj, response);
     return results;
   }
-
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
@@ -97,21 +89,12 @@ class Device extends EventEmitter {
   get sysInfo () {
     return this._sysInfo;
   }
-
   /**
    * @private
    */
   set sysInfo (sysInfo) {
-    this.log.debug('[%s] device sysInfo set', (sysInfo.alias || this.name));
+    this.log.debug('[%s] device sysInfo set', (sysInfo.alias || this.alias));
     this._sysInfo = sysInfo;
-    this.name = sysInfo.alias;
-    this.deviceId = sysInfo.deviceId;
-    this.deviceName = sysInfo.dev_name;
-    this.model = sysInfo.model;
-    this.type = sysInfo.type || sysInfo.mic_type;
-    this.softwareVersion = sysInfo.sw_ver;
-    this.hardwareVersion = sysInfo.hw_ver;
-    this.mac = sysInfo.mac;
   }
   /**
    * Returns cached results from last retrieval of `emeter.get_realtime`.
@@ -123,6 +106,34 @@ class Device extends EventEmitter {
    */
   set emeterRealtime (emeterRealtime) {
     this._emeterRealtime = emeterRealtime;
+  }
+  /**
+   * sys_info.alias
+   * @return {string}
+   */
+  get alias () {
+    return this.sysInfo.alias;
+  }
+  /**
+   * sys_info.deviceId
+   * @return {string}
+   */
+  get deviceId () {
+    return this.sysInfo.deviceId;
+  }
+  /**
+   * sys_info.dev_name
+   * @return {string}
+   */
+  get deviceName () {
+    return this.sysInfo.dev_name;
+  }
+  /**
+   * sys_info.model
+   * @return {string}
+   */
+  get model () {
+    return this.sysInfo.model;
   }
   /**
    * sys_info.[type|mic_type]
@@ -145,6 +156,51 @@ class Device extends EventEmitter {
       default: return 'device';
     }
   }
+  /**
+   * sys_info.sw_ver
+   * @return {string}
+   */
+  get softwareVersion () {
+    return this.sysInfo.sw_ver;
+  }
+  /**
+   * sys_info.hw_ver
+   * @return {string}
+   */
+  get hardwareVersion () {
+    return this.sysInfo.hw_ver;
+  }
+  /**
+   * sys_info.[mac|ethernet_mac]
+   * @return {string}
+   */
+  get mac () {
+    return this.sysInfo.mac || this.sysInfo.ethernet_mac;
+  }
+
+  // /**
+  //  * @private
+  //  */
+  // get deviceType () {
+  //   return this._deviceType;
+  // }
+  //
+  // /**
+  //  * @private
+  //  */
+  // set deviceType (deviceType) {
+  //   switch (true) {
+  //     case (/plug/i).test(deviceType):
+  //       this._deviceType = 'plug';
+  //       break;
+  //     case (/bulb/i).test(deviceType):
+  //       this._deviceType = 'bulb';
+  //       break;
+  //     default:
+  //       this._deviceType = 'device';
+  //       break;
+  //   }
+  // }
 
   /**
    * Polls the device every `interval`.
@@ -178,29 +234,9 @@ class Device extends EventEmitter {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getSysInfo ({timeout} = {}) {
-    this.log.debug('[%s] device.getSysInfo()', this.name);
+    this.log.debug('[%s] device.getSysInfo()', this.alias);
     this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', timeout);
     return this.sysInfo;
-  }
-  /**
-   * Gets device's model.
-   *
-   * Requests `system.sys_info` and returns model name.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getModel () {
-    let sysInfo = await this.getSysInfo();
-    return sysInfo.model;
-  }
-  /**
-   * Gets device's TP-Link Cloud info.
-   *
-   * Requests `cloud.get_info`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getCloudInfo () {
-    this.cloudInfo = await this.sendCommand({ [this.apiModuleNamespace.cloud]: {get_info: {}} });
-    return this.cloudInfo;
   }
   /**
    * Change device's alias (name).
@@ -213,6 +249,23 @@ class Device extends EventEmitter {
     await this.sendCommand({ [this.apiModuleNamespace.system]: {set_dev_alias: {alias: alias}} });
     this.sysInfo.alias = alias;
     return true;
+  }
+  /**
+   * Gets device's TP-Link Cloud info.
+   *
+   * Requests `cloud.get_info`.
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getCloudInfo () {
+    this.cloudInfo = await this.sendCommand({ [this.apiModuleNamespace.cloud]: {get_info: {}} });
+    return this.cloudInfo;
+  }
+  /**
+   * Gets device's current energy stats.
+   *
+   * Requests `emeter.get_realtime`.
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
   async getEmeterRealtime () {
     let response = await this.sendCommand(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}}}`);
     if (response) {
@@ -221,6 +274,30 @@ class Device extends EventEmitter {
     }
     throw new Error('Error parsing getEmeterRealtime results', response);
   }
+  /**
+   * Gets device's model.
+   *
+   * Requests `system.sys_info` and returns model name.
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getModel () {
+    let sysInfo = await this.getSysInfo();
+    return sysInfo.model;
+  }
+  /**
+   * Requests `netif.get_scaninfo` (list of WiFi networks).
+   *
+   * Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
+   * The network timeout for the request is calculated by adding the
+   * default network timeout to the request timeout.
+   * @param  {Boolean} [refresh=false]       request device's cached results
+   * @param  {number}  [timeoutInSeconds=10] timeout for scan in seconds
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getScanInfo (refresh = false, timeoutInSeconds = 10) {
+    let timeout = ((timeoutInSeconds * 1000) * 2) + this.timeout; // add original timeout to wait for response
+    let command = `{"${this.apiModuleNamespace.netif}":{"get_scaninfo":{"refresh":${(refresh ? 1 : 0)},"timeout":${timeoutInSeconds}}}}`;
+    return this.sendCommand(command, timeout);
   }
   /**
    * Gets Next Schedule Rule Action.
@@ -258,21 +335,6 @@ class Device extends EventEmitter {
   async getTimeZone () {
     return this.sendCommand(`{"${this.apiModuleNamespace.timesetting}":{"get_timezone":{}}}`);
   }
-  /**
-   * Requests `netif.get_scaninfo` (list of WiFi networks).
-   *
-   * Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
-   * The network timeout for the request is calculated by adding the
-   * default network timeout to the request timeout.
-   * @param  {Boolean} [refresh=false]       request device's cached results
-   * @param  {number}  [timeoutInSeconds=10] timeout for scan in seconds
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getScanInfo (refresh = false, timeoutInSeconds = 10) {
-    let timeout = ((timeoutInSeconds * 1000) * 2) + this.timeout; // add original timeout to wait for response
-    let command = `{"${this.apiModuleNamespace.netif}":{"get_scaninfo":{"refresh":${(refresh ? 1 : 0)},"timeout":${timeoutInSeconds}}}}`;
-    return this.sendCommand(command, timeout);
-  }
 }
 
 /**
@@ -293,7 +355,7 @@ function processResponse (command, response) {
   if (errors.length === 1) {
     throw new ResponseError(errors[0].msg, errors[0].response);
   } else if (errors.length > 1) {
-    throw new ResponseError('err_code', errors.map(e => e[response]));
+    throw new ResponseError('err_code', response);
   }
 
   if (commandResponses.length === 1) {
