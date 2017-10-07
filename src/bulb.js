@@ -1,4 +1,5 @@
 'use strict';
+const isEqual = require('lodash.isequal');
 
 const Device = require('./device');
 
@@ -8,6 +9,11 @@ const Device = require('./device');
  * TP-Link models: LB100, LB110, LB120.
  * @extends Device
  * @extends EventEmitter
+ * @emits  Bulb#lightstate-on
+ * @emits  Bulb#lightstate-off
+ * @emits  Bulb#lightstate-change
+ * @emits  Bulb#lightstate-update
+ * @emits  Bulb#emeter-realtime-update
  */
 class Bulb extends Device {
   /**
@@ -29,10 +35,11 @@ class Bulb extends Device {
       'schedule': 'smartlife.iot.common.schedule',
       'timesetting': 'smartlife.iot.common.timesetting',
       'emeter': 'smartlife.iot.common.emeter',
-      'netif': 'netif'
+      'netif': 'netif',
+      'lightingservice': 'smartlife.iot.smartbulb.lightingservice'
     };
 
-    this.lightState = {};
+    this._lightState = {};
 
     this.lastState = Object.assign(this.lastState, { powerOn: null, inUse: null });
   }
@@ -40,7 +47,6 @@ class Bulb extends Device {
   get sysInfo () {
     return super.sysInfo;
   }
-
   /**
    * @private
    */
@@ -48,6 +54,46 @@ class Bulb extends Device {
     super.sysInfo = sysInfo;
     this.emitEvents();
   }
+  /**
+   * Returns cached results from last retrieval of `smartlife.iot.smartbulb.lightingservice.get_light_state`.
+   * @return {Object}
+   */
+  get lightState () {
+    return this._lightState;
+  }
+  /**
+   * @private
+   */
+  set lightState (lightState) {
+    this.log.debug('[%s] bulb lightState set', this.alias);
+    this._lightState = lightState;
+    this.emitEvents();
+  }
+  /**
+   * Bulb was turned on (`lightstate.on_off`).
+   * @event Bulb#lightstate-on
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb was turned off (`lightstate.on_off`).
+   * @event Bulb#lightstate-off
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's lightstate was changed.
+   * @event Bulb#lightstate-change
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+   * @event Bulb#lightstate-update
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+   * @event Bulb#emeter-realtime-update
+   * @property {Object} value emeterRealtime
+   */
 
   /**
    * @private
@@ -61,19 +107,18 @@ class Bulb extends Device {
     if (this.lastState.powerOn !== powerOn) {
       this.lastState.powerOn = powerOn;
       if (powerOn) {
-        this.emit('power-on', this);
-        this.emit('bulb-on', this);
+        this.emit('lightstate-on', this.lightState);
       } else {
-        this.emit('power-off', this);
-        this.emit('bulb-off', this);
+        this.emit('lightstate-off', this.lightState);
       }
     }
 
-    // using JSON.stringify for now, need device to test actual results
-    if (JSON.stringify(this.lastState.lightState) !== JSON.stringify(this.lightState)) {
+    if (!isEqual(this.lastState.lightState, this.lightState)) {
       this.lastState.lightState = this.lightState;
-      this.emit('bulb-change');
+      this.emit('lightstate-change', this.lightState);
     }
+    this.emit('lightstate-update', this.lightState);
+  }
   /**
    * Requests common Bulb status details in a single request.
    * - `system.get_sysinfo`
@@ -100,7 +145,6 @@ class Bulb extends Device {
    */
   async getLightState () {
     this.lightState = await this.sendCommand('{"smartlife.iot.smartbulb.lightingservice":{"get_light_state":{}}}');
-    this.emitEvents();
     return this.lightState;
   }
   /**
@@ -136,7 +180,6 @@ class Bulb extends Device {
     };
 
     this.lightState = await this.sendCommand(payload);
-    this.emitEvents();
     return true;
   }
   /**
