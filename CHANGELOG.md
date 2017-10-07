@@ -15,4 +15,7 @@
 - Support for older Node 4.8
 - `Bulb#getInfo()` added to mirror `Plug#getInfo()`
 - New `Bulb` events: `lightstate-on`, `lightstate-off`, `lightstate-change`, `lightstate-update`
+
+## :nut_and_bolt: Other
+
 - Updated examples
