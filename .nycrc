@@ -1,3 +1,8 @@
 {
+  "require": [
+      "babel-register"
+    ],
+  "sourceMap": false,
+  "instrument": false,
   "temp-directory": "./coverage/.nyc_output"
 }

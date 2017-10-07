@@ -2,9 +2,15 @@
   "presets": [
     ["env", {
       "targets": {
-        "node": "current"
-      }
+        "node": "4.8"
+      },
+      exclude: ["transform-es2015-classes"]
     }]
   ],
-  "plugins": ["transform-async-to-generator", "transform-object-entries"]
+  "env": {
+    "test": {
+      "plugins": [ "istanbul" ]
+    }
+  },
+  "plugins": ["transform-runtime", "transform-async-to-generator", "transform-object-entries"]
 }

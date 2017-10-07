@@ -30,37 +30,43 @@
   ],
   "main": "lib/index.js",
   "engines": {
-    "node": ">=6.5.0"
+    "node": ">=4.8.0"
   },
   "dependencies": {
     "commander": "^2.11.0",
     "lodash.defaultto": "^4.14.0",
     "lodash.groupby": "^4.6.0",
+    "lodash.isequal": "^4.5.0",
     "loglevel": "^1.5.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-plugin-istanbul": "^4.1.5",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-object-entries": "^1.0.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
     "codecov": "^2.3.0",
+    "cross-env": "^5.0.5",
     "dotenv": "^4.0.0",
     "jsdoc-to-markdown": "^3.1.0-0",
-    "mocha": "^3.5.3",
+    "mocha": "^4.0.1",
     "nyc": "^11.2.1",
     "rewire": "^2.5.2",
     "semistandard": "^11.0.0",
-    "tplink-smarthome-simulator": "^1.1.0"
+    "sinon": "^4.0.1",
+    "sinon-chai": "^2.14.0",
+    "tplink-smarthome-simulator": "^1.2.0"
   },
   "scripts": {
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
-    "test": "semistandard && nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
+    "test": "cross-env NODE_ENV=test semistandard && nyc mocha",
+    "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "./node_modules/.bin/babel src -d lib",
     "prepare": "npm run build",
     "docs": "jsdoc2md --template=jsdoc2md/README.hbs src/**.js > README.md"
