@@ -124,28 +124,26 @@ class Device extends EventEmitter {
   set emeterRealtime (emeterRealtime) {
     this._emeterRealtime = emeterRealtime;
   }
-  get type () {
-    return this._type;
-  }
-
   /**
-   * @private
+   * sys_info.[type|mic_type]
+   * @return {string}
    */
-  set type (type) {
-    switch (type) {
-      case 'IOT.SMARTPLUGSWITCH':
-      case 'plug':
-        type = 'plug';
-        break;
-      case 'IOT.SMARTBULB':
-      case 'bulb':
-        type = 'bulb';
-        break;
-      default:
-        type = 'device';
-        break;
+  get type () {
+    return this.sysInfo.type || this.sysInfo.mic_type;
+  }
+  /**
+   * Type of device (or device if unknown)
+   *
+   * Based on sys_info.[type|mic_type]
+   * @return {string} 'plub'|'bulb'|'device'
+   */
+  get deviceType () {
+    let type = this.type;
+    switch (true) {
+      case (/plug/i).test(type): return 'plug';
+      case (/bulb/i).test(type): return 'bulb';
+      default: return 'device';
     }
-    this._type = type;
   }
 
   /**

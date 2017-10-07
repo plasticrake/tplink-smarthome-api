@@ -143,8 +143,8 @@ class Client extends EventEmitter {
     // Add device- / plug- / bulb- to eventName
     if (args[0] instanceof Device) {
       super.emit('device-' + eventName, ...args);
-      if (args[0].type !== 'device') {
-        super.emit(args[0].type + '-' + eventName, ...args);
+      if (args[0].deviceType !== 'device') {
+        super.emit(args[0].deviceType + '-' + eventName, ...args);
       }
     } else {
       super.emit(eventName, ...args);
@@ -232,17 +232,18 @@ class Client extends EventEmitter {
 
   /**
    * Guess the device type from provided `sysInfo`.
+   *
+   * Based on sys_info.[type|mic_type]
    * @param  {Object} sysInfo
    * @return {string}         'plug','bulb','device'
    */
   getTypeFromSysInfo (sysInfo) {
-    const deviceType = (sysInfo.type || sysInfo.mic_type || '').toLowerCase();
-    if (deviceType.includes('plug')) {
-      return 'plug';
-    } else if (deviceType.includes('bulb')) {
-      return 'bulb';
+    const type = (sysInfo.type || sysInfo.mic_type || '');
+    switch (true) {
+      case (/plug/i).test(type): return 'plug';
+      case (/bulb/i).test(type): return 'bulb';
+      default: return 'device';
     }
-    return 'device';
   }
 
   /**
