@@ -22,12 +22,68 @@ describe('Bulb', function () {
 
   testDevices['bulb'].forEach((testBulb) => {
     let bulb;
+    let model;
     context(testBulb.name, function () {
       beforeEach(async function () {
         if (!testBulb.getDevice) {
           this.skip();
         }
         bulb = await testBulb.getDevice();
+        model = testBulb.model;
+      });
+
+      describe('#supportsBrightness get', function () {
+        it('should return is_dimmable from cached sysInfo', function () {
+          expect(bulb.supportsBrightness).to.eql(bulb.sysInfo.is_dimmable === 1);
+
+          bulb.sysInfo.is_dimmable = 0;
+          expect(bulb.supportsBrightness).to.be.false;
+          bulb.sysInfo.is_dimmable = 1;
+          expect(bulb.supportsBrightness).to.be.true;
+        });
+      });
+
+      describe('#supportsColor get', function () {
+        it('should return is_color from cached sysInfo', function () {
+          expect(bulb.supportsColor).to.eql(bulb.sysInfo.is_color === 1);
+
+          bulb.sysInfo.is_color = 0;
+          expect(bulb.supportsColor).to.be.false;
+          bulb.sysInfo.is_color = 1;
+          expect(bulb.supportsColor).to.be.true;
+        });
+      });
+
+      describe('#supportsColorTemperature get', function () {
+        it('should return is_variable_color_temp from cached sysInfo', function () {
+          expect(bulb.supportsColorTemperature).to.eql(bulb.sysInfo.is_variable_color_temp === 1);
+
+          bulb.sysInfo.is_variable_color_temp = 0;
+          expect(bulb.supportsColorTemperature).to.be.false;
+          bulb.sysInfo.is_variable_color_temp = 1;
+          expect(bulb.supportsColorTemperature).to.be.true;
+        });
+      });
+
+      describe('#getColorTemperatureRange get', function () {
+        it('should return is_variable_color_temp from cached sysInfo', function () {
+          let range = bulb.getColorTemperatureRange;
+          if (!bulb.supportsColorTemperature) {
+            expect(range).to.be.undefined;
+          } else {
+            expect(range).to.to.have.property('min').a('number').within(2500, 9000);
+            expect(range).to.to.have.property('max').a('number').within(2500, 9000);
+
+            expect(model).to.match(/lb1[23]0/);
+            if (model === 'lb120') {
+              expect(range.min).to.eql(2700);
+              expect(range.max).to.eql(6500);
+            } else if (model === 'lb130') {
+              expect(range.min).to.eql(2500);
+              expect(range.max).to.eql(9000);
+            }
+          }
+        });
       });
 
       describe('#getInfo()', function () {
@@ -50,6 +106,52 @@ describe('Bulb', function () {
         it('should turn off', async function () {
           expect(await bulb.setLightState({on_off: 0})).to.be.true;
           expect(await bulb.getLightState()).to.have.property('on_off', 0);
+        });
+
+        it('should change brightness if suported', async function () {
+          if (!bulb.supportsBrightness) return;
+
+          expect(await bulb.setLightState({on_off: 1, brightness: 20})).to.be.true;
+          let ls = await bulb.getLightState();
+          expect(ls).to.have.property('on_off', 1);
+          expect(ls).to.have.property('brightness', 20);
+
+          expect(await bulb.setLightState({on_off: 1, brightness: 60})).to.be.true;
+          ls = await bulb.getLightState();
+          expect(ls).to.have.property('on_off', 1);
+          expect(ls).to.have.property('brightness', 60);
+        });
+
+        it('should change color temperature if suported', async function () {
+          if (!bulb.supportsColorTemperature) return;
+
+          expect(await bulb.setLightState({on_off: 1, color_temp: 4000})).to.be.true;
+          let ls = await bulb.getLightState();
+          expect(ls).to.have.property('on_off', 1);
+          expect(ls).to.have.property('color_temp', 4000);
+
+          expect(await bulb.setLightState({on_off: 1, color_temp: 5000})).to.be.true;
+          ls = await bulb.getLightState();
+          expect(ls).to.have.property('on_off', 1);
+          expect(ls).to.have.property('color_temp', 5000);
+        });
+
+        it('should change color if suported', async function () {
+          if (!bulb.supportsColor) return;
+
+          expect(await bulb.setLightState({on_off: 1, hue: 100, saturation: 40, brightness: 20})).to.be.true;
+          let ls = await bulb.getLightState();
+          expect(ls).to.have.property('on_off', 1);
+          expect(ls).to.have.property('hue', 100);
+          expect(ls).to.have.property('saturation', 40);
+          expect(ls).to.have.property('brightness', 20);
+
+          expect(await bulb.setLightState({on_off: 1, hue: 200, saturation: 50, brightness: 60})).to.be.true;
+          ls = await bulb.getLightState();
+          expect(ls).to.have.property('on_off', 1);
+          expect(ls).to.have.property('hue', 200);
+          expect(ls).to.have.property('saturation', 50);
+          expect(ls).to.have.property('brightness', 60);
         });
 
         it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function () {

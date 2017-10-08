@@ -7,7 +7,7 @@ const Device = require('./device');
 /**
  * Bulb Device.
  *
- * TP-Link models: LB100, LB110, LB120.
+ * TP-Link models: LB100, LB110, LB120, LB130.
  * @extends Device
  * @extends EventEmitter
  * @emits  Bulb#lightstate-on
@@ -73,6 +73,38 @@ class Bulb extends Device {
     this.emitEvents();
   }
   /**
+   * sys_info.is_dimmable === 1
+   * @return {boolean}
+   */
+  get supportsBrightness () {
+    return (this.sysInfo.is_dimmable === 1);
+  }
+  /**
+   * sys_info.is_color === 1
+   * @return {boolean}
+   */
+  get supportsColor () {
+    return (this.sysInfo.is_color === 1);
+  }
+  /**
+   * sys_info.is_variable_color_temp === 1
+   * @return {boolean}
+   */
+  get supportsColorTemperature () {
+    return (this.sysInfo.is_variable_color_temp === 1);
+  }
+  /**
+   * Returns array with min and max supported color temperatures
+   * @return {?{min: Number, max: Number}} range
+   */
+  get getColorTemperatureRange () {
+    if (!this.supportsColorTemperature) return;
+    switch (true) {
+      case (/LB130/i).test(this.sysInfo.model): return { min: 2500, max: 9000 };
+      default: return { min: 2700, max: 6500 };
+    }
+  }
+  /**
    * Requests common Bulb status details in a single request.
    * - `system.get_sysinfo`
    * - `cloud.get_sysinfo`
@@ -112,7 +144,7 @@ class Bulb extends Device {
    * @param  {number}  options.hue               0-360
    * @param  {number}  options.saturation        0-100
    * @param  {number}  options.brightness        0-100
-   * @param  {number}  options.color_temp        0-7000 (Kelvin)
+   * @param  {number}  options.color_temp        Kelvin (LB120:2700-6500 LB130:2500-9000)
    * @return {Promise<boolean, ResponseError>}
    */
   async setLightState (options) {
