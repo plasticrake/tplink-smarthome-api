@@ -8,12 +8,11 @@ const util = require('util');
 const Device = require('./device');
 const Plug = require('./plug');
 const Bulb = require('./bulb');
+const encrypt = require('./tplink-crypto').encrypt;
 const encryptWithHeader = require('./tplink-crypto').encryptWithHeader;
 const decrypt = require('./tplink-crypto').decrypt;
 
-// encrypt('{"system":{"get_sysinfo":{}}}');
-const discoveryMsgBuf = Buffer.from([0xd0, 0xf2, 0x81, 0xf8, 0x8b, 0xff, 0x9a, 0xf7, 0xd5, 0xef, 0x94, 0xb6, 0xd1, 0xb4, 0xc0, 0x9f, 0xec, 0x95, 0xe6, 0x8f, 0xe1, 0x87, 0xe8, 0xca, 0xf0, 0x8b, 0xf6, 0x8b, 0xf6]);
-
+const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 /**
  * Client that sends commands to specified devices or discover devices on the local subnet.
  * - Contains factory methods to create devices.
@@ -354,7 +353,7 @@ class Client extends EventEmitter {
 
         if (deviceTypes) {
           const deviceType = this.getTypeFromSysInfo(sysInfo);
-          if (!deviceTypes.includes(deviceType)) {
+          if (deviceTypes.indexOf(deviceType) === -1) {
             this.log.debug('client.startDiscovery(): Filtered out: %s (%s), allowed device types: (%j)', sysInfo.alias, deviceType, deviceTypes);
             return;
           }

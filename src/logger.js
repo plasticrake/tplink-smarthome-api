@@ -5,7 +5,7 @@ module.exports = function ({level, logger}) {
   let log = require('loglevel');
 
   level = level || 'warn';
-  if (!levels.includes(level)) { console.error('invalid log level: %s', level); }
+  if (levels.indexOf(level) === -1) { console.error('invalid log level: %s', level); }
   log.setLevel(level);
   // if logger passed in, call logger functions instead of our loglevel functions
   if (logger != null) {

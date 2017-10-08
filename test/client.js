@@ -114,8 +114,14 @@ describe('Client', function () {
       return expect(device.getSysInfo()).to.eventually.have.property('err_code', 0);
     });
 
-    it('should be rejected with an invalid IP address', function () {
-      return expect(client.getDevice(testDevices['unreachable'].options)).to.eventually.be.rejected;
+    it('should be rejected with an invalid IP address', async function () {
+      let error;
+      try {
+        await client.getDevice(testDevices['unreachable'].options);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).to.be.instanceOf(Error);
     });
   });
 

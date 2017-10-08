@@ -59,7 +59,7 @@ class Plug extends Device {
    */
   set sysInfo (sysInfo) {
     super.sysInfo = sysInfo;
-    this.supportsEmeter = (sysInfo.feature && typeof sysInfo.feature === 'string' ? sysInfo.feature.includes('ENE') : false);
+    this.supportsEmeter = (sysInfo.feature && typeof sysInfo.feature === 'string' ? sysInfo.feature.indexOf('ENE') >= 0 : false);
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
