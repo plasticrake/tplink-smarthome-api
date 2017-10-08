@@ -30,7 +30,8 @@
   ],
   "main": "lib/index.js",
   "engines": {
-    "node": ">=4.8.0"
+    "node": ">=4.8.0",
+    "npm": ">=3"
   },
   "dependencies": {
     "commander": "^2.11.0",
@@ -60,7 +61,7 @@
     "semistandard": "^11.0.0",
     "sinon": "^4.0.1",
     "sinon-chai": "^2.14.0",
-    "tplink-smarthome-simulator": "^1.2.0"
+    "tplink-smarthome-simulator": "^1.2.1"
   },
   "scripts": {
     "preversion": "npm test",
