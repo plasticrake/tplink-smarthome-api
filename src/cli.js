@@ -2,7 +2,7 @@
 const util = require('util');
 const program = require('commander');
 
-const Hs100Api = require('.');
+const Hs100Api = require('./');
 const Client = Hs100Api.Client;
 const { ResponseError } = require('./utils');
 const tplinkCrypto = require('./tplink-crypto');
