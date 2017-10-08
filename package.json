@@ -65,7 +65,7 @@
   "scripts": {
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
-    "test": "cross-env NODE_ENV=test semistandard && nyc mocha",
+    "test": "semistandard && cross-env NODE_ENV=test nyc mocha",
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "./node_modules/.bin/babel src -d lib",
     "prepare": "npm run build",

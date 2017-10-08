@@ -1,7 +1,7 @@
 {
-  "require": [
-      "babel-register"
-    ],
+  "require": ["babel-register"],
+  "include": ["src/**/*.js"],
+  "all": true,
   "sourceMap": false,
   "instrument": false,
   "temp-directory": "./coverage/.nyc_output"
