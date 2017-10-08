@@ -28,7 +28,6 @@ class Plug extends Device {
    */
   constructor (options) {
     super(options);
-    if (typeof options === 'undefined') options = {};
 
     this.log.debug('plug.constructor()');
 

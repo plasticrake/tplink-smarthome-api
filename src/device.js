@@ -24,7 +24,6 @@ class Device extends EventEmitter {
    */
   constructor (options) {
     super();
-    if (typeof options === 'undefined') options = {};
 
     this.client = options.client;
     this.host = options.host;

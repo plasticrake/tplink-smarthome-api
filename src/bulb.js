@@ -26,7 +26,6 @@ class Bulb extends Device {
    */
   constructor (options) {
     super(options);
-    if (typeof options === 'undefined') options = {};
 
     this.supportsEmeter = true;
 
