@@ -157,6 +157,20 @@ describe('Bulb', function () {
           expect(await bulb.getPowerState()).to.be.false;
         });
       });
+
+      describe('#togglePowerState()', function () {
+        it('should turn on', async function () {
+          expect(await bulb.setPowerState(false)).to.be.true;
+          expect(await bulb.togglePowerState()).to.be.true;
+          expect(await bulb.getPowerState()).to.be.true;
+        });
+
+        it('should turn off', async function () {
+          expect(await bulb.setPowerState(true)).to.be.true;
+          expect(await bulb.togglePowerState()).to.be.false;
+          expect(await bulb.getPowerState()).to.be.false;
+        });
+      });
     });
   });
 });
