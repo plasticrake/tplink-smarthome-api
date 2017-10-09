@@ -37,28 +37,37 @@ var payloads = {
 describe('tplink-crypto', () => {
   Object.keys(payloads).forEach((plKey) => {
     describe('#decrypt', () => {
-      it(`should decrypt ${plKey} payload`, () => {
+      it(`should decrypt ${plKey} payload (Buffer)`, () => {
         let buf = Buffer.from(payloads[plKey].encrypted, 'base64');
         expect(decrypt(buf).toString('ascii')).to.eql(payloads[plKey].plain);
+      });
+
+      it(`should decrypt ${plKey} payload (string)`, () => {
+        let string = Buffer.from(payloads[plKey].encrypted, 'base64').toString('ascii');
+        expect(decrypt(string).toString('ascii')).to.eql(payloads[plKey].plain);
       });
     });
 
     describe('#decryptWithHeader', () => {
-      it(`should decrypt ${plKey} payload`, () => {
+      it(`should decrypt ${plKey} payload (Buffer)`, () => {
         let buf = Buffer.from(payloads[plKey].encryptedWithHeader, 'base64');
         expect(decryptWithHeader(buf).toString('ascii')).to.eql(payloads[plKey].plain);
+      });
+
+      it(`should decrypt ${plKey} payload (string)`, () => {
+        let string = Buffer.from(payloads[plKey].encryptedWithHeader, 'base64').toString('ascii');
+        expect(decryptWithHeader(string).toString('ascii')).to.eql(payloads[plKey].plain);
       });
     });
 
     describe('#encrypt', () => {
-      it(`should encrypt ${plKey} payload`, () => {
+      it(`should encrypt ${plKey} payload (string)`, () => {
         let buf = encrypt(payloads[plKey].plain);
         expect(buf.toString('base64')).to.eql(payloads[plKey].encrypted);
       });
     });
-
     describe('#encryptWithHeader', () => {
-      it(`should encrypt ${plKey} payload`, () => {
+      it(`should encrypt ${plKey} payload (string)`, () => {
         let buf = encryptWithHeader(payloads[plKey].plain);
         expect(buf.toString('base64')).to.eql(payloads[plKey].encryptedWithHeader);
       });
