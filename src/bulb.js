@@ -188,6 +188,17 @@ class Bulb extends Device {
     return this.setLightState({on_off: (value ? 1 : 0)});
   }
   /**
+   * Toggles state of Bulb.
+   *
+   * Requests `lightingservice.get_light_state` sets the power state to the opposite of `on_off === 1` and returns the new power state.
+   * @return {Promise<boolean, ResponseError>}
+   */
+  async togglePowerState () {
+    const powerState = await this.getPowerState();
+    await this.setPowerState(!powerState);
+    return !powerState;
+  }
+  /**
    * Bulb was turned on (`lightstate.on_off`).
    * @event Bulb#lightstate-on
    * @property {Object} value lightstate
