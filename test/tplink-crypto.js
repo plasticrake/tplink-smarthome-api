@@ -39,24 +39,14 @@ describe('tplink-crypto', () => {
     describe('#decrypt', () => {
       it(`should decrypt ${plKey} payload (Buffer)`, () => {
         let buf = Buffer.from(payloads[plKey].encrypted, 'base64');
-        expect(decrypt(buf).toString('ascii')).to.eql(payloads[plKey].plain);
-      });
-
-      it(`should decrypt ${plKey} payload (string)`, () => {
-        let string = Buffer.from(payloads[plKey].encrypted, 'base64').toString('ascii');
-        expect(decrypt(string).toString('ascii')).to.eql(payloads[plKey].plain);
+        expect(decrypt(buf).toString('utf8')).to.eql(payloads[plKey].plain);
       });
     });
 
     describe('#decryptWithHeader', () => {
       it(`should decrypt ${plKey} payload (Buffer)`, () => {
         let buf = Buffer.from(payloads[plKey].encryptedWithHeader, 'base64');
-        expect(decryptWithHeader(buf).toString('ascii')).to.eql(payloads[plKey].plain);
-      });
-
-      it(`should decrypt ${plKey} payload (string)`, () => {
-        let string = Buffer.from(payloads[plKey].encryptedWithHeader, 'base64').toString('ascii');
-        expect(decryptWithHeader(string).toString('ascii')).to.eql(payloads[plKey].plain);
+        expect(decryptWithHeader(buf).toString('utf8')).to.eql(payloads[plKey].plain);
       });
     });
 

@@ -1,3 +1,9 @@
+# 0.16.2 / 2017-10-10
+
+## :bug: Fixes
+
+- [plasticrake/homebridge-hs100#35]: Switch to utf8 from ascii to support special characters in Alias (thanks [@wzaatar])
+
 # 0.16.0 / 2017-10-09
 
 ## :tada: Enhancements

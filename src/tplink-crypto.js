@@ -38,7 +38,7 @@ function encryptWithHeader (input, firstKey = 0xAB) {
 /**
  * Decrypts input where each byte is XOR'd with the previous encrypted byte.
  * @alias  module:tplink-crypto.decrypt
- * @param  {(Buffer|string)} input           encrypted Buffer/string
+ * @param  {Buffer} input           encrypted Buffer
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 decrypted buffer
  */
@@ -57,7 +57,7 @@ function decrypt (input, firstKey = 0xAB) {
  * Decrypts input that has a 4 bype big-endian length header;
  * each byte is XOR'd with the previous encrypted byte
  * @alias  module:tplink-crypto.decryptWithHeader
- * @param  {(Buffer|string)} input           encrypted Buffer/string with header
+ * @param  {Buffer} input           encrypted Buffer with header
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 decrypted buffer
  */

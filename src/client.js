@@ -89,7 +89,7 @@ class Client extends EventEmitter {
 
       socket.on('data', (data) => {
         this.log.debug('[%s] client.send: socket on data', socketId, {port, host});
-        deviceData += decrypt(data.slice(4)).toString('ascii');
+        deviceData += decrypt(data.slice(4)).toString('utf8');
         socket.end();
       });
 
@@ -353,7 +353,7 @@ class Client extends EventEmitter {
       });
 
       this.socket.on('message', (msg, rinfo) => {
-        const decryptedMsg = decrypt(msg).toString('ascii');
+        const decryptedMsg = decrypt(msg).toString('utf8');
 
         this.log.debug('client.startDiscovery(): socket from: %s message: %s', decryptedMsg, rinfo.address);
 
