@@ -185,7 +185,7 @@ class Plug extends Device {
    */
   async togglePowerState () {
     const powerState = await this.getPowerState();
-    this.setPowerState(!powerState);
+    await this.setPowerState(!powerState);
     return !powerState;
   }
   /**
