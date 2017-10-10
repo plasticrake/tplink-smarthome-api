@@ -4,8 +4,13 @@
 'use strict';
 
 const chai = require('chai');
+const sinon = require('sinon');
+const chaiAsPromised = require('chai-as-promised');
+const sinonChai = require('sinon-chai');
+
 const expect = chai.expect;
-chai.use(require('chai-as-promised'));
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
 const { getTestClient, testDevices } = require('./setup');
 const Device = require('../src/device.js');
@@ -55,6 +60,20 @@ describe('Client', function () {
         expect(device).to.not.exist;
       });
       setTimeout(done, 1000);
+    });
+
+    it('should ONLY emit device-new for specified macAddresses', function (done) {
+      let spy = sinon.spy();
+      let mac = testDevices['anydevice'].mac;
+      expect(mac).to.be.a('string').and.not.empty;
+
+      client.startDiscovery({ discoveryInterval: 250, macAddresses: [mac] }).on('device-new', spy);
+
+      setTimeout(() => {
+        expect(spy, `MAC:[${mac}] not found`).to.be.called;
+        expect(spy).to.always.be.calledWithMatch({mac: mac});
+        done();
+      }, 1000);
     });
 
     let events = ['new', 'online', 'offline'];

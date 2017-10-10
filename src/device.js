@@ -98,6 +98,13 @@ class Device extends EventEmitter {
     return this.sysInfo.model;
   }
   /**
+   * sys_info.alias
+   * @return {string}
+   */
+  get name () {
+    return this.alias;
+  }
+  /**
    * sys_info.[type|mic_type]
    * @return {string}
    */
@@ -133,11 +140,11 @@ class Device extends EventEmitter {
     return this.sysInfo.hw_ver;
   }
   /**
-   * sys_info.[mac|ethernet_mac]
+   * sys_info.[mac|mic_mac|ethernet_mac]
    * @return {string}
    */
   get mac () {
-    return this.sysInfo.mac || this.sysInfo.ethernet_mac;
+    return this.sysInfo.mac || this.sysInfo.mic_mac || this.sysInfo.ethernet_mac;
   }
   /**
    * Sends `payload` to device (using {@link Client#send})

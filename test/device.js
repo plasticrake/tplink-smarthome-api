@@ -264,11 +264,17 @@ describe('Device', function () {
 
       describe('#mac get', function () {
         it('should return mac from cached sysInfo', function () {
-          expect(device.mac).to.eql(device.sysInfo.mac || device.sysInfo.ethernet_mac);
-          device.sysInfo.mac = 'My Test type';
+          expect(device.mac).to.eql(device.sysInfo.mac || device.sysInfo.mic_mac || device.sysInfo.ethernet_mac);
+          device.sysInfo.mac = 'My Test mac';
+          device.sysInfo.mic_mac = undefined;
           device.sysInfo.ethernet_mac = undefined;
           expect(device.mac).to.eql(device.sysInfo.mac);
           device.sysInfo.mac = undefined;
+          device.sysInfo.mic_mac = 'My Test mic_mac';
+          device.sysInfo.ethernet_mac = undefined;
+          expect(device.mac).to.eql(device.sysInfo.mic_mac);
+          device.sysInfo.mac = undefined;
+          device.sysInfo.mic_mac = undefined;
           device.sysInfo.ethernet_mac = 'My Test ethernet_mac';
           expect(device.mac).to.eql(device.sysInfo.ethernet_mac);
         });

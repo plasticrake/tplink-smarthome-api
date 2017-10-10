@@ -46,6 +46,7 @@ async function getDiscoveryTestDevices () {
           discoveredTestDevices.push({
             model: device.model,
             options: { host: device.host, port: device.port },
+            mac: device.mac,
             getDevice: (options) => client.getDevice(Object.assign({host: device.host, port: device.port}, options))
           });
         } else {
@@ -77,6 +78,7 @@ async function getSimulatedTestDevices () {
     await d.start();
     testDevices.push({
       model: d.model,
+      mac: d.data.system.sysinfo.mac,
       options: { host: d.address, port: d.port },
       getDevice: (options) => client.getDevice(Object.assign({host: d.address, port: d.port}, options))
     });
@@ -121,6 +123,7 @@ testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192
   const realTestDevices = await getTestDevices();
 
   const addDevice = (target, device) => {
+    target.mac = device.mac;
     target.options = device.options;
     target.getDevice = device.getDevice;
   };
@@ -138,13 +141,13 @@ testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192
 
   testDevices.forEach((td) => {
     let options = td.options || {};
-    console.log(td.model, td.deviceType, td.name, options.host, options.port);
+    console.log(td.model, td.deviceType, td.name, options.host, options.port, td.mac);
   });
 
   ['anydevice', 'anyplug', 'anybulb', 'unreachable'].forEach((key) => {
     let td = testDevices[key];
     let options = td.options || {};
-    console.log(key, td.deviceType, td.name, options.host, options.port);
+    console.log(key, td.deviceType, td.name, options.host, options.port, td.mac);
   });
 
   run();
