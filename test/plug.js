@@ -226,6 +226,20 @@ describe('Plug', function () {
           expect(await plug.blink(2, 100)).to.be.true;
         });
       });
+
+      describe('#togglePowerState()', function () {
+        it('should turn on', async function () {
+          expect(await plug.setPowerState(false)).to.be.true;
+          expect(await plug.togglePowerState()).to.be.true;
+          expect(await plug.getPowerState()).to.be.true;
+        });
+
+        it('should turn off', async function () {
+          expect(await plug.setPowerState(true)).to.be.true;
+          expect(await plug.togglePowerState()).to.be.false;
+          expect(await plug.getPowerState()).to.be.false;
+        });
+      });
     });
   });
 });

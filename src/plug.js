@@ -178,6 +178,17 @@ class Plug extends Device {
     return true;
   }
   /**
+   * Toggles Plug relay state.
+   *
+   * Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and return the new power state`.
+   * @return {Promise<boolean, ResponseError>}
+   */
+  async togglePowerState () {
+    const powerState = await this.getPowerState();
+    this.setPowerState(!powerState);
+    return !powerState;
+  }
+  /**
    * Get Timer Rules.
    *
    * Requests `count_down.get_rules`.
