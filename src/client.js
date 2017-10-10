@@ -13,6 +13,8 @@ const encryptWithHeader = require('./tplink-crypto').encryptWithHeader;
 const decrypt = require('./tplink-crypto').decrypt;
 
 const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
+let maxSocketId = 0;
+
 /**
  * Client that sends commands to specified devices or discover devices on the local subnet.
  * - Contains factory methods to create devices.
@@ -60,19 +62,24 @@ class Client extends EventEmitter {
    * @return {Promise<Object, Error>}
    */
   send ({host, port = 9999, payload, timeout = this.timeout}) {
-    this.log.debug('client.send(%j)', arguments[0]);
+    let socketId = maxSocketId += 1;
+    this.log.debug('[%s] client.send(%j)', socketId, arguments[0]);
     return new Promise((resolve, reject) => {
       let payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
 
-      this.log.debug('client.send: socket: attempting to open. host:%s, port:%s', host, port);
-      let socket = net.connect(port, host);
+      this.log.debug('[%s] client.send: socket: attempting to open. host:%s, port:%s', socketId, host, port);
+      let socket = net.createConnection({port, host}, () => {
+        this.log.debug('[%s] client.send: socket on connect', socketId, {port, host});
+        if (timer) { clearTimeout(timer); }
+        socket.write(encryptWithHeader(payloadString));
+      });
       socket.setKeepAlive(false);
 
       let timer;
       if (timeout > 0) {
         socket.setTimeout(timeout);
         timer = setTimeout(() => {
-          this.log.debug('client.send: timeout(%s)', timeout);
+          this.log.debug('[%s] client.send: timeout(%s)', socketId, timeout);
           socket.end();
           socket.destroy(new Error(`client.send: timeout ${timeout}`));
         }, timeout);
@@ -80,20 +87,14 @@ class Client extends EventEmitter {
 
       let deviceData = '';
 
-      socket.on('connect', () => {
-        this.log.debug('client.send: socket on connect');
-        if (timer) { clearTimeout(timer); }
-        socket.write(encryptWithHeader(payloadString));
-      });
-
       socket.on('data', (data) => {
-        this.log.debug('client.send: socket on data');
+        this.log.debug('[%s] client.send: socket on data', socketId, {port, host});
         deviceData += decrypt(data.slice(4)).toString('ascii');
         socket.end();
       });
 
       socket.on('end', () => {
-        this.log.debug('client.send: socket on end');
+        this.log.debug('[%s] client.send: socket on end', socketId, {port, host});
         let data;
         try {
           data = JSON.parse(deviceData);
@@ -103,20 +104,20 @@ class Client extends EventEmitter {
         if (!data.err_code || data.err_code === 0) {
           resolve(data);
         } else {
-          let errMsg = util.format('client.send: invalid response: %s', data);
+          let errMsg = util.format('[%s] client.send: invalid response: %s', socketId, data);
           this.log.error(errMsg);
           reject(new Error(errMsg));
         }
       });
 
       socket.on('timeout', () => {
-        this.log.debug('client.send: socket on timeout %s', timeout);
+        this.log.debug('[%s] client.send: socket on timeout %s', socketId, timeout);
         if (timer) { clearTimeout(timer); }
         socket.destroy(new Error(`client.send: socket on timeout ${timeout}`));
       });
 
       socket.on('error', (err) => {
-        this.log.debug('client.send: socket on error');
+        this.log.debug('[%s] client.send: socket on error', socketId, {port, host});
         this.log.error('TPLink Device TCP Error: %s', err);
         if (timer) { clearTimeout(timer); }
         socket.destroy();
