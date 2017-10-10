@@ -4,6 +4,9 @@
 
 - [plasticrake/homebridge-hs100#35]: Switch to utf8 from ascii to support special characters in Alias (thanks [@wzaatar])
 
+[plasticrake/homebridge-hs100#35]: https://github.com/plasticrake/homebridge-hs100/issues/35
+[@wzaatar]: https://github.com/wzaatar
+
 # 0.16.0 / 2017-10-09
 
 ## :tada: Enhancements
@@ -15,9 +18,12 @@
   - added `#supportsColor`
   - added `#supportsColorTemperature`
   - added `#getColorTemperatureRange`
-  - [#14] added `#togglePowerState` (thanks [@adamsandle]!)
+  - [#18] added `#togglePowerState` (thanks [@adamsandle]!)
 - `Plug`
-  - [#14] added `#togglePowerState` (thanks [@adamsandle]!)
+  - [#18] added `#togglePowerState` (thanks [@adamsandle]!)
+
+[#18]: https://github.com/plasticrake/hs100-api/pulls/18
+[@adamsandle]: https://github.com/adamsandle
 
 # 0.15.0 / 2017-10-07
 
