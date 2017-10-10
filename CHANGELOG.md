@@ -1,3 +1,18 @@
+# 0.16.0 / 2017-10-09
+
+## :tada: Enhancements
+- `Device#name` re-added as alias for `Device#alias` for backwards compatibility
+- `Client.startDiscovery` has additional parameter `macAddresses`
+  - if specified only devices matching MAC will be found
+- `Bulb`
+  - added `#supportsBrightness`
+  - added `#supportsColor`
+  - added `#supportsColorTemperature`
+  - added `#getColorTemperatureRange`
+  - [#14] added `#togglePowerState` (thanks [@adamsandle]!)
+- `Plug`
+  - [#14] added `#togglePowerState` (thanks [@adamsandle]!)
+
 # 0.15.0 / 2017-10-07
 
 ## :boom: Breaking Changes

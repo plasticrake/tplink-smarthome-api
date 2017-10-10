@@ -13,7 +13,7 @@ TP-Link Smart Home API
 | Model                      | Type |
 |----------------------------|------|
 | HS100, HS105, HS110, HS200 | Plug |
-| LB100, LB110, LB120        | Bulb |
+| LB100, LB110, LB120, LB130 | Bulb |
 
 I only have HS100, HS105 and HS110 (plugs), so I am unable to test Bulb support. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
 
@@ -78,6 +78,7 @@ The API is not stable (but it's getting close!) and there may be breaking change
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.deviceName](#Device+deviceName) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
+    * [.name](#Device+name) ⇒ <code>string</code>
     * [.type](#Device+type) ⇒ <code>string</code>
     * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
@@ -104,11 +105,16 @@ The API is not stable (but it's getting close!) and there may be breaking change
     * [new Bulb(options)](#new_Bulb_new)
     * [.sysInfo](#Bulb+sysInfo) ⇒ <code>Object</code>
     * [.lightState](#Bulb+lightState) ⇒ <code>Object</code>
+    * [.supportsBrightness](#Bulb+supportsBrightness) ⇒ <code>boolean</code>
+    * [.supportsColor](#Bulb+supportsColor) ⇒ <code>boolean</code>
+    * [.supportsColorTemperature](#Bulb+supportsColorTemperature) ⇒ <code>boolean</code>
+    * [.getColorTemperatureRange](#Bulb+getColorTemperatureRange) ⇒ <code>Object</code>
     * [.emeterRealtime](#Device+emeterRealtime) ⇒ <code>Object</code>
     * [.alias](#Device+alias) ⇒ <code>string</code>
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.deviceName](#Device+deviceName) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
+    * [.name](#Device+name) ⇒ <code>string</code>
     * [.type](#Device+type) ⇒ <code>string</code>
     * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
@@ -150,6 +156,7 @@ The API is not stable (but it's getting close!) and there may be breaking change
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.deviceName](#Device+deviceName) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
+    * [.name](#Device+name) ⇒ <code>string</code>
     * [.type](#Device+type) ⇒ <code>string</code>
     * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
@@ -375,6 +382,7 @@ Discover TP-Link Smarthome devices on the network.
 - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until [#stopDiscovery](#stopDiscovery) is called).
   - If a device does not respond after `offlineTolerance` number of attempts, [event:device-offline](event:device-offline) is emitted.
 - If `deviceTypes` are specified only matching devices are found.
+- If `macAddresses` are specified only matching device with matching MAC addresses are found.
 - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
   - `devices` are specified as an array of `[{host, [port: 9999]}]`.
 
@@ -392,6 +400,7 @@ Discover TP-Link Smarthome devices on the network.
 | [options.discoveryTimeout] | <code>number</code> | <code>0</code> | (ms) |
 | [options.offlineTolerance] | <code>number</code> | <code>3</code> |  |
 | [options.deviceTypes] | <code>Array.&lt;string&gt;</code> |  | 'plug','bulb' |
+| [options.macAddresses] | <code>Array.&lt;string&gt;</code> |  | 'plug','bulb' |
 | [options.deviceOptions] | <code>Object</code> | <code>{}</code> | passed to device constructors |
 | [options.devices] | <code>Array.&lt;Object&gt;</code> |  | known devices to query instead of relying on broadcast |
 
@@ -541,6 +550,7 @@ Shared behavior for [Plug](#Plug) and [Bulb](#Bulb).
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.deviceName](#Device+deviceName) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
+    * [.name](#Device+name) ⇒ <code>string</code>
     * [.type](#Device+type) ⇒ <code>string</code>
     * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
@@ -614,6 +624,12 @@ sys_info.dev_name
 sys_info.model
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
+<a name="Device+name"></a>
+
+### device.name ⇒ <code>string</code>
+sys_info.alias
+
+**Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+type"></a>
 
 ### device.type ⇒ <code>string</code>
@@ -644,7 +660,7 @@ sys_info.hw_ver
 <a name="Device+mac"></a>
 
 ### device.mac ⇒ <code>string</code>
-sys_info.[mac|ethernet_mac]
+sys_info.[mac|mic_mac|ethernet_mac]
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+send"></a>
@@ -820,7 +836,7 @@ Requests `timesetting.get_timezone`.
 ## Bulb ⇐ [<code>Device</code>](#Device)
 Bulb Device.
 
-TP-Link models: LB100, LB110, LB120.
+TP-Link models: LB100, LB110, LB120, LB130.
 
 **Kind**: global class  
 **Extends**: [<code>Device</code>](#Device), <code>EventEmitter</code>  
@@ -830,11 +846,16 @@ TP-Link models: LB100, LB110, LB120.
     * [new Bulb(options)](#new_Bulb_new)
     * [.sysInfo](#Bulb+sysInfo) ⇒ <code>Object</code>
     * [.lightState](#Bulb+lightState) ⇒ <code>Object</code>
+    * [.supportsBrightness](#Bulb+supportsBrightness) ⇒ <code>boolean</code>
+    * [.supportsColor](#Bulb+supportsColor) ⇒ <code>boolean</code>
+    * [.supportsColorTemperature](#Bulb+supportsColorTemperature) ⇒ <code>boolean</code>
+    * [.getColorTemperatureRange](#Bulb+getColorTemperatureRange) ⇒ <code>Object</code>
     * [.emeterRealtime](#Device+emeterRealtime) ⇒ <code>Object</code>
     * [.alias](#Device+alias) ⇒ <code>string</code>
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.deviceName](#Device+deviceName) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
+    * [.name](#Device+name) ⇒ <code>string</code>
     * [.type](#Device+type) ⇒ <code>string</code>
     * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
@@ -891,6 +912,31 @@ Returns cached results from last retrieval of `system.sys_info`.
 Returns cached results from last retrieval of `smartlife.iot.smartbulb.lightingservice.get_light_state`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+<a name="Bulb+supportsBrightness"></a>
+
+### bulb.supportsBrightness ⇒ <code>boolean</code>
+sys_info.is_dimmable === 1
+
+**Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+<a name="Bulb+supportsColor"></a>
+
+### bulb.supportsColor ⇒ <code>boolean</code>
+sys_info.is_color === 1
+
+**Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+<a name="Bulb+supportsColorTemperature"></a>
+
+### bulb.supportsColorTemperature ⇒ <code>boolean</code>
+sys_info.is_variable_color_temp === 1
+
+**Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+<a name="Bulb+getColorTemperatureRange"></a>
+
+### bulb.getColorTemperatureRange ⇒ <code>Object</code>
+Returns array with min and max supported color temperatures
+
+**Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+**Returns**: <code>Object</code> - range  
 <a name="Device+emeterRealtime"></a>
 
 ### bulb.emeterRealtime ⇒ <code>Object</code>
@@ -920,6 +966,12 @@ sys_info.dev_name
 
 ### bulb.model ⇒ <code>string</code>
 sys_info.model
+
+**Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+<a name="Device+name"></a>
+
+### bulb.name ⇒ <code>string</code>
+sys_info.alias
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+type"></a>
@@ -952,7 +1004,7 @@ sys_info.hw_ver
 <a name="Device+mac"></a>
 
 ### bulb.mac ⇒ <code>string</code>
-sys_info.[mac|ethernet_mac]
+sys_info.[mac|mic_mac|ethernet_mac]
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Bulb+getInfo"></a>
@@ -994,7 +1046,7 @@ Sends `lightingservice.transition_light_state` command.
 | options.hue | <code>number</code> | 0-360 |
 | options.saturation | <code>number</code> | 0-100 |
 | options.brightness | <code>number</code> | 0-100 |
-| options.color_temp | <code>number</code> | 0-7000 (Kelvin) |
+| options.color_temp | <code>number</code> | Kelvin (LB120:2700-6500 LB130:2500-9000) |
 
 <a name="Bulb+getPowerState"></a>
 
@@ -1267,6 +1319,7 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.deviceName](#Device+deviceName) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
+    * [.name](#Device+name) ⇒ <code>string</code>
     * [.type](#Device+type) ⇒ <code>string</code>
     * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
@@ -1365,6 +1418,12 @@ sys_info.dev_name
 sys_info.model
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
+<a name="Device+name"></a>
+
+### plug.name ⇒ <code>string</code>
+sys_info.alias
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+type"></a>
 
 ### plug.type ⇒ <code>string</code>
@@ -1395,7 +1454,7 @@ sys_info.hw_ver
 <a name="Device+mac"></a>
 
 ### plug.mac ⇒ <code>string</code>
-sys_info.[mac|ethernet_mac]
+sys_info.[mac|mic_mac|ethernet_mac]
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Plug+getInfo"></a>
@@ -1772,7 +1831,7 @@ Decrypts input where each byte is XOR'd with the previous encrypted byte.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| input | <code>string</code> |  | encrypted string |
+| input | <code>Buffer</code> \| <code>string</code> |  | encrypted Buffer/string |
 | [firstKey] | <code>number</code> | <code>0xAB</code> |  |
 
 <a name="module_tplink-crypto.decryptWithHeader"></a>
@@ -1786,7 +1845,7 @@ each byte is XOR'd with the previous encrypted byte
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| input | <code>string</code> |  | encrypted string with header |
+| input | <code>Buffer</code> \| <code>string</code> |  | encrypted Buffer/string with header |
 | [firstKey] | <code>number</code> | <code>0xAB</code> |  |
 
 
