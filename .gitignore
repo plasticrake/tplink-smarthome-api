@@ -38,3 +38,6 @@ node_modules
 /lib
 
 /docs
+
+# Webstorm IDE directory
+.idea
