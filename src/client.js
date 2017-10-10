@@ -300,6 +300,7 @@ class Client extends EventEmitter {
    * - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until {@link #stopDiscovery} is called).
    *   - If a device does not respond after `offlineTolerance` number of attempts, {@link event:device-offline} is emitted.
    * - If `deviceTypes` are specified only matching devices are found.
+   * - If `macAddresses` are specified only matching device with matching MAC addresses are found.
    * - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
    *   - `devices` are specified as an array of `[{host, [port: 9999]}]`.
    * @param  {Object}   options
@@ -310,6 +311,7 @@ class Client extends EventEmitter {
    * @param  {number}   [options.discoveryTimeout=0]          (ms)
    * @param  {number}   [options.offlineTolerance=3]
    * @param  {string[]} [options.deviceTypes]                 'plug','bulb'
+   * @param  {string[]} [options.macAddresses]                'plug','bulb'
    * @param  {Object}   [options.deviceOptions={}]            passed to device constructors
    * @param  {Object[]} [options.devices]                     known devices to query instead of relying on broadcast
    * @return {Client}                                 this
@@ -324,10 +326,23 @@ class Client extends EventEmitter {
    * @emits  Client#plug-online
    * @emits  Client#plug-offline
    */
-  startDiscovery ({address, port, broadcast = '255.255.255.255', discoveryInterval = 10000, discoveryTimeout = 0, offlineTolerance = 3, deviceTypes, deviceOptions = {}, devices} = {}) {
+  startDiscovery ({
+    address,
+    port,
+    broadcast = '255.255.255.255',
+    discoveryInterval = 10000,
+    discoveryTimeout = 0,
+    offlineTolerance = 3,
+    deviceTypes,
+    macAddresses = [],
+    deviceOptions = {},
+    devices
+  } = {}) {
     this.log.debug('client.startDiscovery(%j)', arguments[0]);
 
     try {
+      macAddresses = macAddresses.map((mac) => normalizeMac(mac));
+
       this.socket = dgram.createSocket('udp4');
 
       this.socket.on('error', (err) => {
@@ -352,7 +367,7 @@ class Client extends EventEmitter {
           return;
         }
 
-        if (deviceTypes) {
+        if (deviceTypes && deviceTypes.length > 0) {
           const deviceType = this.getTypeFromSysInfo(sysInfo);
           if (deviceTypes.indexOf(deviceType) === -1) {
             this.log.debug('client.startDiscovery(): Filtered out: %s (%s), allowed device types: (%j)', sysInfo.alias, deviceType, deviceTypes);
@@ -360,22 +375,15 @@ class Client extends EventEmitter {
           }
         }
 
-        if (this.devices.has(sysInfo.deviceId)) {
-          const device = this.devices.get(sysInfo.deviceId);
-          device.host = rinfo.address;
-          device.port = rinfo.port;
-          device.sysInfo = sysInfo;
-          device.status = 'online';
-          device.seenOnDiscovery = this.discoveryPacketSequence;
-          this.emit('online', device);
-        } else {
-          Object.assign(deviceOptions, {client: this, deviceId: sysInfo.deviceId, host: rinfo.address, port: rinfo.port, seenOnDiscovery: this.discoveryPacketSequence});
-          const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
-          device.sysInfo = sysInfo;
-          device.status = 'online';
-          this.devices.set(device.deviceId, device);
-          this.emit('new', device);
+        if (macAddresses && macAddresses.length > 0) {
+          const mac = normalizeMac(sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '');
+          if (macAddresses.indexOf(mac) === -1) {
+            this.log.debug('client.startDiscovery(): Filtered out: %s (%s), allowed macs: (%j)', sysInfo.alias, mac, macAddresses);
+            return;
+          }
         }
+
+        this.createOrUpdateDeviceFromSysInfo({sysInfo, host: rinfo.address, port: rinfo.port, options: deviceOptions});
       });
 
       this.socket.bind(port, address, () => {
@@ -403,7 +411,27 @@ class Client extends EventEmitter {
 
     return this;
   }
-
+  /**
+   * @private
+   */
+  createOrUpdateDeviceFromSysInfo ({sysInfo, host, port, options}) {
+    if (this.devices.has(sysInfo.deviceId)) {
+      const device = this.devices.get(sysInfo.deviceId);
+      device.host = host;
+      device.port = port;
+      device.sysInfo = sysInfo;
+      device.status = 'online';
+      device.seenOnDiscovery = this.discoveryPacketSequence;
+      this.emit('online', device);
+    } else {
+      let deviceOptions = Object.assign({}, options, {client: this, deviceId: sysInfo.deviceId, host, port, seenOnDiscovery: this.discoveryPacketSequence});
+      const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
+      device.sysInfo = sysInfo;
+      device.status = 'online';
+      this.devices.set(device.deviceId, device);
+      this.emit('new', device);
+    }
+  }
   /**
    * Stops discovery and closes UDP socket.
    */
@@ -418,7 +446,6 @@ class Client extends EventEmitter {
       this.socket.close();
     }
   }
-
   /**
    * @private
    */
@@ -460,6 +487,10 @@ class Client extends EventEmitter {
 
     return this;
   }
+}
+
+function normalizeMac (mac = '') {
+  return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 }
 
 module.exports = Client;
