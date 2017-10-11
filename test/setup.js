@@ -26,6 +26,34 @@ function getTestClient (options = {}) {
   return new Client(Object.assign({}, clientOptions, options));
 }
 
+const testDevices = [
+  { model: 'hs100', deviceType: 'plug', name: 'HS100(plug)' },
+  { model: 'hs105', deviceType: 'plug', name: 'HS105(plug)' },
+  { model: 'hs110', deviceType: 'plug', name: 'HS110(plug)' },
+  { model: 'hs200', deviceType: 'plug', name: 'HS200(plug)' },
+  { model: 'lb100', deviceType: 'bulb', name: 'LB100(bulb)' },
+  { model: 'lb120', deviceType: 'bulb', name: 'LB120(bulb)' },
+  { model: 'lb130', deviceType: 'bulb', name: 'LB130(bulb)' }];
+
+Object.entries(groupBy(testDevices, 'deviceType')).forEach(([key, value]) => {
+  testDevices[key] = value;
+});
+Object.entries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
+  testDevices[key] = value;
+});
+
+testDevices['anydevice'] = { name: 'Device', deviceType: 'device' };
+testDevices['anyplug'] = { name: 'Plug', deviceType: 'plug' };
+testDevices['anybulb'] = { name: 'Bulb', deviceType: 'bulb' };
+testDevices['unreliable'] = { name: 'Unreliable Device', deviceType: 'plug' };
+testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, timeout: 100 } };
+
+const addDevice = (target, device) => {
+  target.mac = device.mac;
+  target.options = device.options;
+  target.getDevice = device.getDevice;
+};
+
 async function getTestDevices () {
   if (useSimulator) {
     return getSimulatedTestDevices();
@@ -64,19 +92,26 @@ let simulatedUdpServer;
 async function getSimulatedTestDevices () {
   let client = getTestClient();
 
-  simulatedDevices.push(new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100' } }));
-  simulatedDevices.push(new simulator.Device({ model: 'hs105', data: { alias: 'Mock HS105' } }));
-  simulatedDevices.push(new simulator.Device({ model: 'hs110', data: { alias: 'Mock HS110' } }));
-  simulatedDevices.push(new simulator.Device({ model: 'hs200', data: { alias: 'Mock HS200' } }));
-  simulatedDevices.push(new simulator.Device({ model: 'lb100', data: { alias: 'Mock LB100' } }));
-  simulatedDevices.push(new simulator.Device({ model: 'lb120', data: { alias: 'Mock LB120' } }));
-  simulatedDevices.push(new simulator.Device({ model: 'lb130', data: { alias: 'Mock LB130' } }));
+  simulatedDevices.push({device: new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100' } })});
+  simulatedDevices.push({device: new simulator.Device({ model: 'hs105', data: { alias: 'Mock’s “HS105”' } })});
+  simulatedDevices.push({device: new simulator.Device({ model: 'hs110', data: { alias: 'Mock😽 HS110' } })});
+  simulatedDevices.push({device: new simulator.Device({ model: 'hs200', data: { alias: 'Mock HS200' } })});
+  simulatedDevices.push({device: new simulator.Device({ model: 'lb100', data: { alias: 'Mock LB100' } })});
+  simulatedDevices.push({device: new simulator.Device({ model: 'lb120', data: { alias: 'Mock LB120' } })});
+  simulatedDevices.push({device: new simulator.Device({ model: 'lb130', data: { alias: 'Mock LB130' } })});
 
-  let testDevices = [];
+  simulatedDevices.push({
+    testType: 'unreliable',
+    device: new simulator.Device({ model: 'hs100', unreliablePercent: 1, data: { alias: 'Mock Unreliable 100%' } })
+  });
+
+  let simulatedTestDevices = [];
   for (var i = 0; i < simulatedDevices.length; i++) {
-    let d = simulatedDevices[i];
+    let d = simulatedDevices[i].device;
+    let testType = simulatedDevices[i].testType;
     await d.start();
-    testDevices.push({
+    simulatedTestDevices.push({
+      testType: testType,
       model: d.model,
       mac: d.data.system.sysinfo.mac,
       options: { host: d.address, port: d.port },
@@ -86,65 +121,40 @@ async function getSimulatedTestDevices () {
 
   simulatedUdpServer = await simulator.UdpServer.start();
 
-  return testDevices;
+  return simulatedTestDevices;
 }
 
 function testDeviceCleanup () {
-  simulatedDevices.forEach((device) => {
-    device.stop();
+  simulatedDevices.forEach((sd) => {
+    sd.device.stop();
   });
   if (simulatedUdpServer) {
     simulatedUdpServer.stop();
   }
 }
 
-const testDevices = [
-  { model: 'hs100', deviceType: 'plug', name: 'HS100(plug)' },
-  { model: 'hs105', deviceType: 'plug', name: 'HS105(plug)' },
-  { model: 'hs110', deviceType: 'plug', name: 'HS110(plug)' },
-  { model: 'hs200', deviceType: 'plug', name: 'HS200(plug)' },
-  { model: 'lb100', deviceType: 'bulb', name: 'LB100(bulb)' },
-  { model: 'lb120', deviceType: 'bulb', name: 'LB120(bulb)' },
-  { model: 'lb130', deviceType: 'bulb', name: 'LB130(bulb)' }];
-
-Object.entries(groupBy(testDevices, 'deviceType')).forEach(([key, value]) => {
-  testDevices[key] = value;
-});
-Object.entries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
-  testDevices[key] = value;
-});
-
-testDevices['anydevice'] = { name: 'Device', deviceType: 'device' };
-testDevices['anyplug'] = { name: 'Plug', deviceType: 'plug' };
-testDevices['anybulb'] = { name: 'Bulb', deviceType: 'bulb' };
-testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, timeout: 100 } };
-
 (async () => {
   const realTestDevices = await getTestDevices();
-
-  const addDevice = (target, device) => {
-    target.mac = device.mac;
-    target.options = device.options;
-    target.getDevice = device.getDevice;
-  };
 
   testDevices.forEach((testDevice) => {
     let device = realTestDevices.find((realDevice) => (realDevice.model.substr(0, 5).toLowerCase() === testDevice.model));
 
     if (device) {
       addDevice(testDevice, device);
-      if (!testDevices['anydevice'].device) { addDevice(testDevices['anydevice'], device); }
+      if (!testDevices['anydevice'].mac) { addDevice(testDevices['anydevice'], device); }
       if (testDevice.deviceType === 'plug' && !testDevices['anyplug'].device) { addDevice(testDevices['anyplug'], device); }
       if (testDevice.deviceType === 'bulb' && !testDevices['anybulb'].device) { addDevice(testDevices['anybulb'], device); }
     }
   });
+
+  addDevice(testDevices['unreliable'], realTestDevices.find((realDevice) => (realDevice.testType === 'unreliable')));
 
   testDevices.forEach((td) => {
     let options = td.options || {};
     console.log(td.model, td.deviceType, td.name, options.host, options.port, td.mac);
   });
 
-  ['anydevice', 'anyplug', 'anybulb', 'unreachable'].forEach((key) => {
+  ['anydevice', 'anyplug', 'anybulb', 'unreachable', 'unreliable'].forEach((key) => {
     let td = testDevices[key];
     let options = td.options || {};
     console.log(key, td.deviceType, td.name, options.host, options.port, td.mac);

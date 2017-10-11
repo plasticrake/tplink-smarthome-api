@@ -46,6 +46,20 @@ describe('Test Environment Setup', function () {
       });
     });
 
+    context('unreliable', function () {
+      let testDevice;
+      before(function () {
+        testDevice = testDevices['unreliable'];
+      });
+      it(`should have options`, function () {
+        expect(testDevice.options).to.contain.keys('host', 'port');
+      });
+      it(`should have getDevice and throw`, function () {
+        expect(testDevice.getDevice).to.exist.and.be.an.instanceof(Function);
+        return expect(testDevice.getDevice()).to.eventually.be.rejected;
+      });
+    });
+
     context('unreachable', function () {
       it(`should have options`, function () {
         expect(testDevices['unreachable'].options).to.contain.keys('host', 'port');
