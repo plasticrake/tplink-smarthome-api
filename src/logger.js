@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function ({level, logger}) {
-  let levels = ['trace', 'debug', 'info', 'warn', 'error'];
+  let levels = ['trace', 'debug', 'info', 'warn', 'error', 'silent'];
   let log = require('loglevel');
 
   level = level || 'warn';

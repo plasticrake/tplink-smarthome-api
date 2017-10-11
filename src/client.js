@@ -249,6 +249,13 @@ class Client extends EventEmitter {
    * @property {Error}
    */
   /**
+   * Invalid/Unknown response from device.
+   * @event Client#discovery-invalid
+   * @property {Object} rinfo
+   * @property {Buffer} response
+   * @property {Buffer} decryptedResponse
+   */
+  /**
    * First response from device.
    * @event Client#device-new
    * @property {Device|Bulb|Plug}
@@ -364,6 +371,7 @@ class Client extends EventEmitter {
           sysInfo = jsonMsg.system.get_sysinfo;
         } catch (err) {
           this.log.error('client.startDiscovery(): Error parsing JSON: %s\nFrom: [%s] Original: [%s] Decrypted: [%s]', err, rinfo.address, msg, decryptedMsg);
+          this.emit('discovery-invalid', { rinfo, response: msg, decryptedResponse: decrypt(msg) });
           return;
         }
 

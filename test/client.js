@@ -22,15 +22,15 @@ describe('Client', function () {
   this.slow(2000);
   let client;
 
-  beforeEach(() => {
-    client = getTestClient();
-  });
-
-  afterEach(() => {
-    client.stopDiscovery();
-  });
-
   describe('#startDiscovery()', function () {
+    beforeEach(() => {
+      client = getTestClient({logLevel: 'silent'});
+    });
+
+    afterEach(() => {
+      client.stopDiscovery();
+    });
+
     it('should emit device-new when finding a new device', function (done) {
       client.startDiscovery({ discoveryInterval: 250 }).once('device-new', (device) => {
         expect(device).to.be.an.instanceof(Device);
@@ -116,6 +116,21 @@ describe('Client', function () {
         expect(client.discoveryTimer).to.not.exist;
         done();
       }, 50);
+    });
+
+    it('should emit discovery-invalid for the unreliable test device', function (done) {
+      let device = testDevices['unreliable'];
+      if (!device.options.port) this.skip();
+
+      client.startDiscovery({ discoveryInterval: 250 }).on('discovery-invalid', ({rinfo, response, decryptedResponse}) => {
+        expect(response).to.be.instanceof(Buffer);
+        expect(decryptedResponse).to.be.instanceof(Buffer);
+
+        if (rinfo.port === device.options.port) {
+          client.stopDiscovery();
+          done();
+        }
+      });
     });
   });
 
