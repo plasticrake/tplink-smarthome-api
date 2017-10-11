@@ -1,3 +1,14 @@
+# 0.18.0 / 2017-10-11
+
+## :tada: Enhancements
+
+- `encrypt` and `encyptWithHeader` now work properly with non-ascii characters
+- `Plug`
+  - added `#addTimerRule`
+  - added `#editTimerRule`
+  - added `#deleteAllTimerRules`
+- `Client#startDiscovery` now emits `discovery-invalid` when receiving an invalid response (perhaps from a non-tplink device)
+
 # 0.17.0 / 2017-10-10
 
 ## :bug: Fixes
