@@ -209,7 +209,7 @@ class Plug extends Device {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async addTimerRule ({ delay, powerState, name = 'timer', enable = true, deleteExisting = true }) {
-    await this.deleteAllTimerRules();
+    if (deleteExisting) await this.deleteAllTimerRules();
     return this.sendCommand(`{"count_down":{"add_rule":{"enable":${enable ? 1 : 0},"delay":${delay},"act":${powerState ? 1 : 0},"name":"${name}"}}}`);
   }
   /**

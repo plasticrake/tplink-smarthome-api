@@ -12,6 +12,8 @@ const expect = chai.expect;
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
+const utils = require('../src/utils');
+const ResponseError = utils.ResponseError;
 const { testDevices } = require('./setup');
 
 describe('Plug', function () {
@@ -220,6 +222,19 @@ describe('Plug', function () {
           let id = response.id;
           let rules = await plug.getTimerRules();
           expect(rules.rule_list[0].id).to.eql(id);
+        });
+
+        it('should delete existing rules and add timer rule when deleteExisting is true', async function () {
+          await plug.addTimerRule({delay: 20, powerState: false, deleteExisting: true});
+
+          let response = await plug.addTimerRule({delay: 50, powerState: false, deleteExisting: true});
+          expect(response).to.have.property('err_code', 0);
+          expect(response).to.have.property('id').that.is.a('string');
+        });
+
+        it('should fail if a timer rule exists when deleteExisting is false', async function () {
+          await plug.addTimerRule({delay: 20, powerState: false, deleteExisting: true});
+          return expect(plug.addTimerRule({delay: 20, powerState: false, deleteExisting: false})).to.eventually.be.rejectedWith(ResponseError);
         });
       });
 
