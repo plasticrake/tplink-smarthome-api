@@ -8,15 +8,15 @@
 /**
  * Encrypts input where each byte is XOR'd with the previous encrypted byte.
  * @alias  module:tplink-crypto.encrypt
- * @param  {string} input           string to encrypt
+ * @param  {(Buffer|string)} input           Buffer/string to encrypt
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 encrypted buffer
  */
 function encrypt (input, firstKey = 0xAB) {
-  let buf = Buffer.alloc(input.length);
+  let buf = Buffer.from(input);
   let key = firstKey;
-  for (var i = 0; i < input.length; i++) {
-    buf[i] = input.charCodeAt(i) ^ key;
+  for (var i = 0; i < buf.length; i++) {
+    buf[i] = buf[i] ^ key;
     key = buf[i];
   }
   return buf;
@@ -25,15 +25,15 @@ function encrypt (input, firstKey = 0xAB) {
  * Encrypts input that has a 4 byte big-endian length header;
  * each byte is XOR'd with the previous encrypted byte.
  * @alias  module:tplink-crypto.encryptWithHeader
- * @param  {string} input           string to encrypt
+ * @param  {(Buffer|string)} input           Buffer/string to encrypt
  * @param  {number} [firstKey=0xAB]
  * @return {Buffer}                 encrypted buffer with header
  */
 function encryptWithHeader (input, firstKey = 0xAB) {
   let bufMsg = encrypt(input, firstKey);
   let bufLength = Buffer.alloc(4);
-  bufLength.writeUInt32BE(input.length, 0);
-  return Buffer.concat([bufLength, bufMsg], input.length + 4);
+  bufLength.writeUInt32BE(bufMsg.length, 0);
+  return Buffer.concat([bufLength, bufMsg], bufMsg.length + 4);
 }
 /**
  * Decrypts input where each byte is XOR'd with the previous encrypted byte.

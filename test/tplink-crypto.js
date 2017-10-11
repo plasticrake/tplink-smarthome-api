@@ -31,6 +31,11 @@ var payloads = {
     plain: '{ "emeter":{ "get_realtime":null } }',
     encrypted: '0PDSt9q/y67c/sS/n73av8uU5oPijvqT/pu5g+2Y9Ji4xeWY',
     encryptedWithHeader: 'AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=='
+  },
+  specialChars: {
+    plain: 'right single quotation mark:’ left double quotation mark:“ right double quotation mark:” kissing cat face with closed eyes:😽',
+    encrypted: '2bDXv8vrmPGf+JTx0aDVus6v27Lds5P+n+2GvF7eR2cLbgh8XDhXIkAsSWkYbQJ2F2MKZQsrRidVPgTmZvraqMGmzrqa/pHkhuqPr96rxLDRpcyjze2A4ZP4wiCgPR12H2wfdhh/XzxdKQlvDm0IKF82QioKaQVqGXwYOF0kQTII+Gf/Qg==',
+    encryptedWithHeader: 'AAAAhdmw17/L65jxn/iU8dGg1brOr9uy3bOT/p/thrxe3kdnC24IfFw4VyJALElpGG0CdhdjCmULK0YnVT4E5mb62qjBps66mv6R5Ibqj6/eq8Sw0aXMo83tgOGT+MIgoD0ddh9sH3YYf188XSkJbw5tCChfNkIqCmkFahl8GDhdJEEyCPhn/0I='
   }
 };
 
@@ -53,13 +58,33 @@ describe('tplink-crypto', () => {
     describe('#encrypt', () => {
       it(`should encrypt ${plKey} payload (string)`, () => {
         let buf = encrypt(payloads[plKey].plain);
-        expect(buf.toString('base64')).to.eql(payloads[plKey].encrypted);
+        expect(buf).to.eql(Buffer.from(payloads[plKey].encrypted, 'base64'));
+      });
+      it(`should encrypt ${plKey} payload (Buffer)`, () => {
+        let buf = encrypt(Buffer.from(payloads[plKey].plain));
+        expect(buf).to.eql(Buffer.from(payloads[plKey].encrypted, 'base64'));
       });
     });
+
     describe('#encryptWithHeader', () => {
       it(`should encrypt ${plKey} payload (string)`, () => {
         let buf = encryptWithHeader(payloads[plKey].plain);
         expect(buf.toString('base64')).to.eql(payloads[plKey].encryptedWithHeader);
+      });
+      it(`should encrypt ${plKey} payload (Buffer)`, () => {
+        let buf = encryptWithHeader(Buffer.from(payloads[plKey].plain));
+        expect(buf.toString('base64')).to.eql(payloads[plKey].encryptedWithHeader);
+      });
+    });
+
+    describe('#encrypt and #decrypt', function () {
+      it(`should encrypt ${plKey} payload and decrypt back to original (string)`, () => {
+        let orig = payloads[plKey].plain;
+        expect(decrypt(encrypt(orig)).toString('utf8')).to.eql(orig);
+      });
+      it(`should decrypt ${plKey} payload and encrypt back to original (Buffer)`, () => {
+        let origBuf = Buffer.from(payloads[plKey].encrypted, 'base64');
+        expect(encrypt(decrypt(origBuf))).to.eql(origBuf);
       });
     });
   });
