@@ -211,6 +211,40 @@ describe('Plug', function () {
         });
       });
 
+      describe('#addTimerRule()', function () {
+        it('should add timer rule', async function () {
+          let response = await plug.addTimerRule({delay: 20, powerState: false});
+          expect(response).to.have.property('err_code', 0);
+          expect(response).to.have.property('id').that.is.a('string');
+
+          let id = response.id;
+          let rules = await plug.getTimerRules();
+          expect(rules.rule_list[0].id).to.eql(id);
+        });
+      });
+
+      describe('#editTimerRule()', function () {
+        it('should edit timer rule', async function () {
+          let response = await plug.addTimerRule({delay: 20, powerState: false});
+          expect(response).to.have.property('err_code', 0);
+          expect(response).to.have.property('id').that.is.a('string');
+
+          let id = response.id;
+
+          await plug.editTimerRule({id, delay: 50, powerStart: false});
+
+          let rules = await plug.getTimerRules();
+          expect(rules.rule_list[0].id).to.eql(id);
+          expect(rules.rule_list[0].delay).to.eql(50);
+        });
+      });
+
+      describe('#deleteAllTimerRules()', function () {
+        it('should delete timer rules', function () {
+          return expect(plug.deleteAllTimerRules()).to.eventually.have.property('err_code', 0);
+        });
+      });
+
       describe('#setLedState()', function () {
         it('should turn LED off', async function () {
           expect(await plug.setLedState(false)).to.be.true;

@@ -189,13 +189,51 @@ class Plug extends Device {
     return !powerState;
   }
   /**
-   * Get Timer Rules.
+   * Get Countdown Timer Rule (only one allowed).
    *
    * Requests `count_down.get_rules`.
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getTimerRules () {
     return this.sendCommand(`{"count_down":{"get_rules":{}}}`);
+  }
+  /**
+   * Add Countdown Timer Rule (only one allowed).
+   *
+   * Sends count_down.add_rule command.
+   * @param  {number}  delay                  delay in seconds
+   * @param  {boolean} powerState             turn on or off device
+   * @param  {string}  [name='timer']         rule name
+   * @param  {boolean} [enable=true]          rule enabled
+   * @param  {boolean} [deleteExisting=true]  send `delete_all_rules` command before adding
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async addTimerRule ({ delay, powerState, name = 'timer', enable = true, deleteExisting = true }) {
+    await this.deleteAllTimerRules();
+    return this.sendCommand(`{"count_down":{"add_rule":{"enable":${enable ? 1 : 0},"delay":${delay},"act":${powerState ? 1 : 0},"name":"${name}"}}}`);
+  }
+  /**
+   * Edit Countdown Timer Rule (only one allowed).
+   *
+   * Sends count_down.edit_rule command.
+   * @param  {string}  id                     rule id
+   * @param  {number}  delay                  delay in seconds
+   * @param  {number}  powerState             turn on or off device
+   * @param  {string}  [name='timer']         rule name
+   * @param  {Boolean} [enable=true]          rule enabled
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async editTimerRule ({ id, delay, powerState, name = 'timer', enable = true }) {
+    return this.sendCommand(`{"count_down":{"edit_rule":{"id":"${id}","enable":${enable ? 1 : 0},"delay":${delay},"act":${powerState ? 1 : 0},"name":"${name}"}}}`);
+  }
+  /**
+   * Delete Countdown Timer Rule (only one allowed).
+   *
+   * Sends count_down.delete_all_rules command.
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async deleteAllTimerRules () {
+    return this.sendCommand(`{"count_down":{"delete_all_rules":{}}}`);
   }
   /**
    * Blink Plug LED.
