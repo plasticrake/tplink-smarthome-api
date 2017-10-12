@@ -39,7 +39,8 @@
     "lodash.defaultto": "^4.14.0",
     "lodash.groupby": "^4.6.0",
     "lodash.isequal": "^4.5.0",
-    "loglevel": "^1.5.1"
+    "loglevel": "^1.5.1",
+    "tplink-smarthome-crypto": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

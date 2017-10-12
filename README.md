@@ -17,7 +17,10 @@ TP-Link Smart Home API
 
 I only have HS100, HS105 and HS110 (plugs), so I am unable to test Bulb support. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
 
-I have written a [TP-Link device simulator](https://github.com/plasticrake/tplink-smarthome-simulator) for automated testing that includes Bulbs. So while I don't have a physical Bulb to test with, I do have virtual ones!
+## Related Projects
+- [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
+- [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
+- [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-hs100)
 
 ## Examples
 See more [examples](https://github.com/plasticrake/hs100-api/tree/master/examples).
@@ -58,6 +61,7 @@ The API is not stable (but it's getting close!) and there may be breaking change
     * [.startDiscovery(options)](#Client+startDiscovery) ⇒ [<code>Client</code>](#Client)
     * [.stopDiscovery()](#Client+stopDiscovery)
     * ["error"](#Client+event_error)
+    * ["discovery-invalid"](#Client+event_discovery-invalid)
     * ["device-new"](#Client+event_device-new)
     * ["device-online"](#Client+event_device-online)
     * ["device-offline"](#Client+event_device-offline)
@@ -125,6 +129,7 @@ The API is not stable (but it's getting close!) and there may be breaking change
     * [.setLightState(options)](#Bulb+setLightState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.getPowerState()](#Bulb+getPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.setPowerState(value)](#Bulb+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.togglePowerState()](#Bulb+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.send(payload, [timeout])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
     * [.sendCommand(command, [timeout])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
@@ -169,7 +174,11 @@ The API is not stable (but it's getting close!) and there may be breaking change
     * [.setLedState(value)](#Plug+setLedState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.getPowerState()](#Plug+getPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.setPowerState(value)](#Plug+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.togglePowerState()](#Plug+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.getTimerRules()](#Plug+getTimerRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.addTimerRule(delay, powerState, [name], [enable], [deleteExisting])](#Plug+addTimerRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.editTimerRule(id, delay, powerState, [name], [enable])](#Plug+editTimerRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteAllTimerRules()](#Plug+deleteAllTimerRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.blink([times], [rate])](#Plug+blink) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.send(payload, [timeout])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
     * [.sendCommand(command, [timeout])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -192,14 +201,6 @@ The API is not stable (but it's getting close!) and there may be breaking change
     * ["not-in-use"](#Plug+event_not-in-use)
     * ["in-use-update"](#Plug+event_in-use-update)
     * ["emeter-realtime-update"](#Plug+event_emeter-realtime-update)
-
-
-
-* [tplink-crypto](#module_tplink-crypto)
-    * [.encrypt(input, [firstKey])](#module_tplink-crypto.encrypt) ⇒ <code>Buffer</code>
-    * [.encryptWithHeader(input, [firstKey])](#module_tplink-crypto.encryptWithHeader) ⇒ <code>Buffer</code>
-    * [.decrypt(input, [firstKey])](#module_tplink-crypto.decrypt) ⇒ <code>Buffer</code>
-    * [.decryptWithHeader(input, [firstKey])](#module_tplink-crypto.decryptWithHeader) ⇒ <code>Buffer</code>
 
 
 
@@ -226,6 +227,7 @@ Client that sends commands to specified devices or discover devices on the local
     * [.startDiscovery(options)](#Client+startDiscovery) ⇒ [<code>Client</code>](#Client)
     * [.stopDiscovery()](#Client+stopDiscovery)
     * ["error"](#Client+event_error)
+    * ["discovery-invalid"](#Client+event_discovery-invalid)
     * ["device-new"](#Client+event_device-new)
     * ["device-online"](#Client+event_device-online)
     * ["device-offline"](#Client+event_device-offline)
@@ -249,7 +251,7 @@ Client that sends commands to specified devices or discover devices on the local
 <a name="Client+send"></a>
 
 ### client.send(options) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-[Encrypts](#module_tplink-crypto) `payload` and sends (via TCP) to device.
+[Encrypts](module:tplink-crypto) `payload` and sends (via TCP) to device.
 - If `payload` is not a string, it is `JSON.stringify`'d.
 - Promise fulfills with parsed JSON response.
 
@@ -421,6 +423,20 @@ Error during discovery.
 | Type |
 | --- |
 | <code>Error</code> | 
+
+<a name="Client+event_discovery-invalid"></a>
+
+### "discovery-invalid"
+Invalid/Unknown response from device.
+
+**Kind**: event emitted by [<code>Client</code>](#Client)  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| rinfo | <code>Object</code> | 
+| response | <code>Buffer</code> | 
+| decryptedResponse | <code>Buffer</code> | 
 
 <a name="Client+event_device-new"></a>
 
@@ -866,6 +882,7 @@ TP-Link models: LB100, LB110, LB120, LB130.
     * [.setLightState(options)](#Bulb+setLightState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.getPowerState()](#Bulb+getPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.setPowerState(value)](#Bulb+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.togglePowerState()](#Bulb+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.send(payload, [timeout])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
     * [.sendCommand(command, [timeout])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
@@ -1069,6 +1086,14 @@ Sends `lightingservice.transition_light_state` command with on_off `value`.
 | --- | --- | --- |
 | value | <code>boolean</code> | true: on, false: off |
 
+<a name="Bulb+togglePowerState"></a>
+
+### bulb.togglePowerState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Toggles state of Bulb.
+
+Requests `lightingservice.get_light_state` sets the power state to the opposite of `on_off === 1` and returns the new power state.
+
+**Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 <a name="Device+send"></a>
 
 ### bulb.send(payload, [timeout]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
@@ -1332,7 +1357,11 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
     * [.setLedState(value)](#Plug+setLedState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.getPowerState()](#Plug+getPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.setPowerState(value)](#Plug+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.togglePowerState()](#Plug+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.getTimerRules()](#Plug+getTimerRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.addTimerRule(delay, powerState, [name], [enable], [deleteExisting])](#Plug+addTimerRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.editTimerRule(id, delay, powerState, [name], [enable])](#Plug+editTimerRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteAllTimerRules()](#Plug+deleteAllTimerRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.blink([times], [rate])](#Plug+blink) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.send(payload, [timeout])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
     * [.sendCommand(command, [timeout])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -1526,12 +1555,65 @@ Sends `system.set_relay_state` command.
 | --- | --- |
 | value | <code>boolean</code> | 
 
+<a name="Plug+togglePowerState"></a>
+
+### plug.togglePowerState() ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Toggles Plug relay state.
+
+Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and return the new power state`.
+
+**Kind**: instance method of [<code>Plug</code>](#Plug)  
 <a name="Plug+getTimerRules"></a>
 
 ### plug.getTimerRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-Get Timer Rules.
+Get Countdown Timer Rule (only one allowed).
 
 Requests `count_down.get_rules`.
+
+**Kind**: instance method of [<code>Plug</code>](#Plug)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+<a name="Plug+addTimerRule"></a>
+
+### plug.addTimerRule(delay, powerState, [name], [enable], [deleteExisting]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Add Countdown Timer Rule (only one allowed).
+
+Sends count_down.add_rule command.
+
+**Kind**: instance method of [<code>Plug</code>](#Plug)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| delay | <code>number</code> |  | delay in seconds |
+| powerState | <code>boolean</code> |  | turn on or off device |
+| [name] | <code>string</code> | <code>&quot;&#x27;timer&#x27;&quot;</code> | rule name |
+| [enable] | <code>boolean</code> | <code>true</code> | rule enabled |
+| [deleteExisting] | <code>boolean</code> | <code>true</code> | send `delete_all_rules` command before adding |
+
+<a name="Plug+editTimerRule"></a>
+
+### plug.editTimerRule(id, delay, powerState, [name], [enable]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Edit Countdown Timer Rule (only one allowed).
+
+Sends count_down.edit_rule command.
+
+**Kind**: instance method of [<code>Plug</code>](#Plug)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| id | <code>string</code> |  | rule id |
+| delay | <code>number</code> |  | delay in seconds |
+| powerState | <code>number</code> |  | turn on or off device |
+| [name] | <code>string</code> | <code>&quot;&#x27;timer&#x27;&quot;</code> | rule name |
+| [enable] | <code>Boolean</code> | <code>true</code> | rule enabled |
+
+<a name="Plug+deleteAllTimerRules"></a>
+
+### plug.deleteAllTimerRules() ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Delete Countdown Timer Rule (only one allowed).
+
+Sends count_down.delete_all_rules command.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1778,76 +1860,6 @@ Plug's Energy Monitoring Details were updated from device. Fired regardless if s
 | Name | Type | Description |
 | --- | --- | --- |
 | value | <code>Object</code> | emeterRealtime |
-
-
-<a name="module_tplink-crypto"></a>
-
-## tplink-crypto
-TP-Link device crypto.
-
-TCP communication includes a 4 byte header, UDP does not.
-
-
-* [tplink-crypto](#module_tplink-crypto)
-    * [.encrypt(input, [firstKey])](#module_tplink-crypto.encrypt) ⇒ <code>Buffer</code>
-    * [.encryptWithHeader(input, [firstKey])](#module_tplink-crypto.encryptWithHeader) ⇒ <code>Buffer</code>
-    * [.decrypt(input, [firstKey])](#module_tplink-crypto.decrypt) ⇒ <code>Buffer</code>
-    * [.decryptWithHeader(input, [firstKey])](#module_tplink-crypto.decryptWithHeader) ⇒ <code>Buffer</code>
-
-<a name="module_tplink-crypto.encrypt"></a>
-
-### tplink-crypto.encrypt(input, [firstKey]) ⇒ <code>Buffer</code>
-Encrypts input where each byte is XOR'd with the previous encrypted byte.
-
-**Kind**: static method of [<code>tplink-crypto</code>](#module_tplink-crypto)  
-**Returns**: <code>Buffer</code> - encrypted buffer  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| input | <code>string</code> |  | string to encrypt |
-| [firstKey] | <code>number</code> | <code>0xAB</code> |  |
-
-<a name="module_tplink-crypto.encryptWithHeader"></a>
-
-### tplink-crypto.encryptWithHeader(input, [firstKey]) ⇒ <code>Buffer</code>
-Encrypts input that has a 4 byte big-endian length header;
-each byte is XOR'd with the previous encrypted byte.
-
-**Kind**: static method of [<code>tplink-crypto</code>](#module_tplink-crypto)  
-**Returns**: <code>Buffer</code> - encrypted buffer with header  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| input | <code>string</code> |  | string to encrypt |
-| [firstKey] | <code>number</code> | <code>0xAB</code> |  |
-
-<a name="module_tplink-crypto.decrypt"></a>
-
-### tplink-crypto.decrypt(input, [firstKey]) ⇒ <code>Buffer</code>
-Decrypts input where each byte is XOR'd with the previous encrypted byte.
-
-**Kind**: static method of [<code>tplink-crypto</code>](#module_tplink-crypto)  
-**Returns**: <code>Buffer</code> - decrypted buffer  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| input | <code>Buffer</code> \| <code>string</code> |  | encrypted Buffer/string |
-| [firstKey] | <code>number</code> | <code>0xAB</code> |  |
-
-<a name="module_tplink-crypto.decryptWithHeader"></a>
-
-### tplink-crypto.decryptWithHeader(input, [firstKey]) ⇒ <code>Buffer</code>
-Decrypts input that has a 4 bype big-endian length header;
-each byte is XOR'd with the previous encrypted byte
-
-**Kind**: static method of [<code>tplink-crypto</code>](#module_tplink-crypto)  
-**Returns**: <code>Buffer</code> - decrypted buffer  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| input | <code>Buffer</code> \| <code>string</code> |  | encrypted Buffer/string with header |
-| [firstKey] | <code>number</code> | <code>0xAB</code> |  |
-
 
 
 

@@ -17,7 +17,10 @@ TP-Link Smart Home API
 
 I only have HS100, HS105 and HS110 (plugs), so I am unable to test Bulb support. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
 
-I have written a [TP-Link device simulator](https://github.com/plasticrake/tplink-smarthome-simulator) for automated testing that includes Bulbs. So while I don't have a physical Bulb to test with, I do have virtual ones!
+## Related Projects
+- [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
+- [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
+- [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-hs100)
 
 ## Examples
 See more [examples](https://github.com/plasticrake/hs100-api/tree/master/examples).
@@ -48,14 +51,11 @@ The API is not stable (but it's getting close!) and there may be breaking change
 {{#class name="Device"}}{{>member-index}}{{/class}}
 {{#class name="Bulb"}}{{>member-index}}{{/class}}
 {{#class name="Plug"}}{{>member-index}}{{/class}}
-{{#module name="tplink-crypto"}}{{>member-index}}{{/module}}
 
 {{#class name="Client"}}{{>docs}}{{/class}}
 {{#class name="Device"}}{{>docs}}{{/class}}
 {{#class name="Bulb"}}{{>docs}}{{/class}}
 {{#class name="Plug"}}{{>docs}}{{/class}}
-{{#module name="tplink-crypto"}}{{>docs}}{{/module}}
-
 
 ## Credits
 Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.

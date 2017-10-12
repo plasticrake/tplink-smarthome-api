@@ -8,9 +8,7 @@ const util = require('util');
 const Device = require('./device');
 const Plug = require('./plug');
 const Bulb = require('./bulb');
-const encrypt = require('./tplink-crypto').encrypt;
-const encryptWithHeader = require('./tplink-crypto').encryptWithHeader;
-const decrypt = require('./tplink-crypto').decrypt;
+const { encrypt, encryptWithHeader, decrypt } = require('tplink-smarthome-crypto');
 
 const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 let maxSocketId = 0;
@@ -37,7 +35,7 @@ class Client extends EventEmitter {
     this.discoveryPacketSequence = 0;
   }
   /**
-   * {@link module:tplink-crypto Encrypts} `payload` and sends (via TCP) to device.
+   * {@link https://github.com/plasticrake/tplink-smarthome-crypto Encrypts} `payload` and sends (via TCP) to device.
    * - If `payload` is not a string, it is `JSON.stringify`'d.
    * - Promise fulfills with parsed JSON response.
    *
