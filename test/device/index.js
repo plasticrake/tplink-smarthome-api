@@ -94,6 +94,7 @@ describe('Device', function () {
         }
         device = await testDevice.getDevice();
         this.device = device;
+        this.testDevice = testDevice;
         time = device.apiModuleNamespace.timesetting;
       });
       beforeEach(async function () {
@@ -106,6 +107,7 @@ describe('Device', function () {
         deviceType = testDevice.deviceType;
 
         this.device = device;
+        this.testDevice = testDevice;
       });
 
       describe('constructor', function () {
@@ -213,11 +215,11 @@ describe('Device', function () {
         });
       });
 
-      describe('#deviceName get', function () {
-        it('should return deviceName from cached sysInfo', function () {
-          expect(device.deviceName).to.eql(device.sysInfo.dev_name);
-          device.sysInfo.dev_name = 'My Test deviceName';
-          expect(device.deviceName).to.eql(device.sysInfo.dev_name);
+      describe('#description get', function () {
+        it('should return description from cached sysInfo', function () {
+          expect(device.description).to.eql(device.sysInfo.description || device.sysInfo.dev_name);
+          device.sysInfo.description = 'My Test deviceName';
+          expect(device.description).to.eql(device.sysInfo.description || device.sysInfo.dev_name);
         });
       });
 
@@ -338,11 +340,11 @@ describe('Device', function () {
         });
       });
 
-      cloudTests();
-      emeterTests();
-      netifTests();
-      scheduleTests();
-      timeTests();
+      cloudTests(testDevice);
+      emeterTests(testDevice);
+      netifTests(testDevice);
+      scheduleTests(testDevice);
+      timeTests(testDevice);
     });
   });
 });

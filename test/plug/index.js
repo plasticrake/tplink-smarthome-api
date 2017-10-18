@@ -33,6 +33,7 @@ describe('Plug', function () {
           return;
         }
         this.device = await testPlug.getDevice();
+        this.testDevice = testPlug;
       });
       beforeEach(async function () {
         if (!testPlug.getDevice) {
@@ -41,6 +42,7 @@ describe('Plug', function () {
         }
         plug = await testPlug.getDevice();
         this.device = plug;
+        this.testDevice = testPlug;
       });
 
       describe('#supportsEmeter', function () {

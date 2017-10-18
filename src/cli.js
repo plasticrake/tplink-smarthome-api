@@ -36,12 +36,10 @@ let search = function (sysInfo, timeout, params) {
   }
 };
 
-let send = async function (host, port, payload, timeout) {
+let send = async function (host, port, payload) {
   try {
-    console.log('Sending...');
-    let options = { host, port, payload, timeout };
-    if (program.udp) options.transport = 'udp';
-    let data = await client.send(options);
+    console.log(`Sending to ${host}:${port}...`);
+    let data = await client.send(payload, host, port);
     console.log('response:');
     console.dir(data, {colors: program.color === 'on', depth: 10});
   } catch (err) {
@@ -49,11 +47,11 @@ let send = async function (host, port, payload, timeout) {
   }
 };
 
-let sendCommand = async function (host, port, payload, timeout) {
+let sendCommand = async function (host, port, payload) {
   try {
-    console.log('Sending command...');
+    console.log(`Sending to ${host}:${port}...`);
     let device = await client.getDevice({host, port});
-    let results = await device.sendCommand(payload, timeout);
+    let results = await device.sendCommand(payload);
     console.log('response:');
     console.dir(results, {colors: program.color === 'on', depth: 10});
   } catch (err) {
@@ -63,7 +61,7 @@ let sendCommand = async function (host, port, payload, timeout) {
 
 let sendCommandDynamic = async function (host, port, command, commandParams = []) {
   try {
-    console.log(`Sending ${command} command...`);
+    console.log(`Sending ${command} command to ${host}:${port}...`);
     let device = await client.getDevice({host, port});
     let results = await device[command](...commandParams);
     console.log('response:');
@@ -75,7 +73,7 @@ let sendCommandDynamic = async function (host, port, command, commandParams = []
 
 let details = async function (host, port, timeout) {
   try {
-    console.log('Getting details...');
+    console.log(`Getting details from ${host}:${port}...`);
     let device = await client.getDevice({host, port});
     console.dir({
       alias: device.alias,
@@ -94,7 +92,7 @@ let details = async function (host, port, timeout) {
 };
 
 let blink = function (host, port, times, rate, timeout) {
-  console.log('Sending blink commands...');
+  console.log(`Sending blink commands to ${host}:${port}...`);
   client.getDevice({host, port}).then((device) => {
     return device.blink(times, rate).then(() => {
       console.log('Blinking complete');
@@ -109,7 +107,10 @@ let toInt = (s) => {
 };
 
 let setupClient = function () {
-  let client = new Client({timeout: program.timeout, logLevel});
+  let defaultSendOptions = {};
+  if (program.udp) defaultSendOptions.transport = 'udp';
+  if (program.timeout) defaultSendOptions.timeout = program.timeout;
+  let client = new Client({ logLevel, defaultSendOptions });
   return client;
 };
 
@@ -138,7 +139,7 @@ program
   .action(function (host, payload, options) {
     client = setupClient();
     let [hostOnly, port] = host.split(':');
-    send(hostOnly, port, payload, program.timeout);
+    send(hostOnly, port, payload);
   });
 
 program
@@ -147,7 +148,7 @@ program
   .action(function (host, payload, options) {
     client = setupClient();
     let [hostOnly, port] = host.split(':');
-    sendCommand(hostOnly, port, payload, program.timeout);
+    sendCommand(hostOnly, port, payload);
   });
 
 program
@@ -163,7 +164,7 @@ program
   .action(function (host, times = 5, rate = 500, options) {
     client = setupClient();
     let [hostOnly, port] = host.split(':');
-    blink(hostOnly, port, times, rate, program.timeout);
+    blink(hostOnly, port, times, rate);
   });
 
 [ 'getSysInfo', 'getInfo', 'setAlias', 'setLocation', 'getModel', 'reboot', 'reset'

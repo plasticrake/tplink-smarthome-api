@@ -8,8 +8,17 @@ const chaiAsPromised = require('chai-as-promised');
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
-module.exports = function () {
+module.exports = function (testDevice) {
   describe('Schedule', function () {
+    let month;
+    let year;
+
+    before(() => {
+      let today = new Date();
+      month = today.getMonth() + 1;
+      year = today.getFullYear();
+    });
+
     describe('#getNextAction()', function () {
       it('should return schedule next action', function () {
         return expect(this.device.schedule.getNextAction()).to.eventually.have.property('err_code', 0);
@@ -61,5 +70,26 @@ module.exports = function () {
         expect(await this.device.schedule.setOverallEnable(false)).to.have.property('err_code', 0);
       });
     });
+
+    describe('#getDayStats()', function () {
+      it('should return day stats', function () {
+        return expect(this.device.schedule.getDayStats(year, month)).to.eventually.have.property('err_code', 0);
+      });
+    });
+
+    describe('#getMonthStats()', function () {
+      it('should return day stats', function () {
+        return expect(this.device.schedule.getMonthStats(year)).to.eventually.have.property('err_code', 0);
+      });
+    });
+
+    if (testDevice.type !== 'simulated') {
+      describe('#eraseStats()', function () {
+        it('should return day stats', function () {
+          if (this.testDevice.type !== 'simulated') this.skip();
+          return expect(this.device.schedule.eraseStats()).to.eventually.have.property('err_code', 0);
+        });
+      });
+    }
   });
 };

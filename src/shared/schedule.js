@@ -114,6 +114,45 @@ class Schedule {
       [this.apiModuleName]: { set_overall_enable: { enable: (enable ? 1 : 0) } }
     }, sendOptions);
   }
+  /**
+   * Get Daily Usage Statisics.
+   *
+   * Sends `schedule.get_daystat` command.
+   * @param  {number}       year
+   * @param  {number}       month
+   * @param  {SendOptions} [sendOptions]
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getDayStats (year, month, sendOptions) {
+    return this.device.sendCommand({
+      [this.apiModuleName]: { get_daystat: { year, month } }
+    }, sendOptions);
+  }
+  /**
+   * Get Monthly Usage Statisics.
+   *
+   * Sends `schedule.get_monthstat` command.
+   * @param  {number}       year
+   * @param  {SendOptions} [sendOptions]
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getMonthStats (year, sendOptions) {
+    return this.device.sendCommand({
+      [this.apiModuleName]: { get_monthstat: { year } }
+    }, sendOptions);
+  }
+  /**
+   * Erase Usage Statistics.
+   *
+   * Sends `schedule.erase_runtime_stat` command.
+   * @param  {SendOptions} [sendOptions]
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async eraseStats (sendOptions) {
+    return this.device.sendCommand({
+      [this.apiModuleName]: { erase_runtime_stat: { } }
+    }, sendOptions);
+  }
 }
 
 module.exports = Schedule;

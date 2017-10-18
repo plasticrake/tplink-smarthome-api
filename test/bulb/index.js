@@ -29,6 +29,7 @@ describe('Bulb', function () {
           return;
         }
         this.device = await testBulb.getDevice();
+        this.testDevice = testBulb;
       });
       beforeEach(async function () {
         if (!testBulb.getDevice) {
@@ -38,6 +39,7 @@ describe('Bulb', function () {
         bulb = await testBulb.getDevice();
         model = testBulb.model;
         this.device = bulb;
+        this.testDevice = testBulb;
       });
 
       describe('#supportsBrightness get', function () {
