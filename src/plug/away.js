@@ -47,7 +47,7 @@ class Away {
    * @param  {(Date|number)} options.end     Date or number of minutes (only time component of date is used)
    * @param  {number[]}      options.daysOfWeek  [0,6] = weekend, [1,2,3,4,5] = weekdays
    * @param  {number}       [options.frequency=5]
-   * @param  {string}       [options.name='']
+   * @param  {string}       [options.name]
    * @param  {boolean}      [options.enable=true]
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -72,7 +72,7 @@ class Away {
    * @param  {(Date|number)} options.end     Date or number of minutes (only time component of date is used)
    * @param  {number[]}      options.daysOfWeek  [0,6] = weekend, [1,2,3,4,5] = weekdays
    * @param  {number}       [options.frequency=5]
-   * @param  {string}       [options.name='']
+   * @param  {string}       [options.name]
    * @param  {boolean}      [options.enable=true]
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response

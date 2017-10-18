@@ -16,7 +16,7 @@ class BulbSchedule extends Schedule {
    * @param  {Object}         options.lightState
    * @param  {(Date|number)}  options.start  Date or number of minutes
    * @param  {number[]}       options.daysOfWeek  [0,6] = weekend, [1,2,3,4,5] = weekdays
-   * @param  {string}        [options.name='']
+   * @param  {string}        [options.name]
    * @param  {boolean}       [options.enable=true]
    * @param  {SendOptions}   [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -41,7 +41,7 @@ class BulbSchedule extends Schedule {
    * @param  {Object}         options.lightState
    * @param  {(Date|number)}  options.start  Date or number of minutes
    * @param  {number[]}       options.daysOfWeek  [0,6] = weekend, [1,2,3,4,5] = weekdays
-   * @param  {string}        [options.name='']    [description]
+   * @param  {string}        [options.name]    [description]
    * @param  {boolean}       [options.enable=true]
    * @param  {SendOptions}   [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
