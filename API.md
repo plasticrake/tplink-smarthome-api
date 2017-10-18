@@ -395,7 +395,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;\&quot;\&quot;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -415,7 +415,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name=] | <code>string</code> |  | [description] |
+| [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -880,7 +880,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;\&quot;\&quot;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -900,7 +900,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name=] | <code>string</code> |  | [description] |
+| [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1601,7 +1601,7 @@ Sends `anti_theft.add_rule` command and returns rule id.
 | options.end | <code>Date</code> \| <code>number</code> |  | Date or number of minutes (only time component of date is used) |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.frequency] | <code>number</code> | <code>5</code> |  |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1623,7 +1623,7 @@ Sends `anti_theft.edit_rule` command and returns rule id.
 | options.end | <code>Date</code> \| <code>number</code> |  | Date or number of minutes (only time component of date is used) |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.frequency] | <code>number</code> | <code>5</code> |  |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1814,7 +1814,7 @@ Sends `anti_theft.add_rule` command and returns rule id.
 | options.end | <code>Date</code> \| <code>number</code> |  | Date or number of minutes (only time component of date is used) |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.frequency] | <code>number</code> | <code>5</code> |  |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1836,7 +1836,7 @@ Sends `anti_theft.edit_rule` command and returns rule id.
 | options.end | <code>Date</code> \| <code>number</code> |  | Date or number of minutes (only time component of date is used) |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.frequency] | <code>number</code> | <code>5</code> |  |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -2072,7 +2072,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -2093,7 +2093,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | [description] |
+| [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -2685,7 +2685,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -2706,7 +2706,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | [description] |
+| [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -2888,6 +2888,9 @@ Eemter
 * [Emeter](#Emeter)
     * [.realtime](#Emeter+realtime) ⇒ <code>Object</code>
     * [.getRealtime([sendOptions])](#Emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDayStats(year, month, [sendOptions])](#Emeter+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getMonthStats(year, [sendOptions])](#Emeter+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.eraseStats([sendOptions])](#Emeter+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 
 <a name="Emeter+realtime"></a>
 
@@ -2901,6 +2904,51 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 Gets device's current energy stats.
 
 Requests `emeter.get_realtime`.
+
+**Kind**: instance method of [<code>Emeter</code>](#Emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Emeter+getDayStats"></a>
+
+### emeter.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Daily Emeter Statisics.
+
+Sends `emeter.get_daystat` command.
+
+**Kind**: instance method of [<code>Emeter</code>](#Emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| month | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Emeter+getMonthStats"></a>
+
+### emeter.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Monthly Emeter Statisics.
+
+Sends `emeter.get_monthstat` command.
+
+**Kind**: instance method of [<code>Emeter</code>](#Emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Emeter+eraseStats"></a>
+
+### emeter.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Erase Emeter Statistics.
+
+Sends `emeter.erase_runtime_stat` command.
 
 **Kind**: instance method of [<code>Emeter</code>](#Emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -2925,6 +2973,9 @@ Schedule
     * [.deleteAllRules([sendOptions])](#Schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.deleteRule(id, [sendOptions])](#Schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.setOverallEnable(enable, [sendOptions])](#Schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDayStats(year, month, [sendOptions])](#Schedule+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getMonthStats(year, [sendOptions])](#Schedule+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.eraseStats([sendOptions])](#Schedule+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 
 <a name="Schedule+getNextAction"></a>
 
@@ -3041,6 +3092,51 @@ Sends `schedule.set_overall_enable` command.
 | Param | Type |
 | --- | --- |
 | enable | <code>boolean</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Schedule+getDayStats"></a>
+
+### schedule.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Daily Usage Statisics.
+
+Sends `schedule.get_daystat` command.
+
+**Kind**: instance method of [<code>Schedule</code>](#Schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| month | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Schedule+getMonthStats"></a>
+
+### schedule.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Monthly Usage Statisics.
+
+Sends `schedule.get_monthstat` command.
+
+**Kind**: instance method of [<code>Schedule</code>](#Schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Schedule+eraseStats"></a>
+
+### schedule.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Erase Usage Statistics.
+
+Sends `schedule.erase_runtime_stat` command.
+
+**Kind**: instance method of [<code>Schedule</code>](#Schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Time"></a>

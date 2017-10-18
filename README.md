@@ -792,7 +792,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;\&quot;\&quot;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -812,7 +812,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name=] | <code>string</code> |  | [description] |
+| [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1266,7 +1266,7 @@ Sends `anti_theft.add_rule` command and returns rule id.
 | options.end | <code>Date</code> \| <code>number</code> |  | Date or number of minutes (only time component of date is used) |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.frequency] | <code>number</code> | <code>5</code> |  |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1288,7 +1288,7 @@ Sends `anti_theft.edit_rule` command and returns rule id.
 | options.end | <code>Date</code> \| <code>number</code> |  | Date or number of minutes (only time component of date is used) |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.frequency] | <code>number</code> | <code>5</code> |  |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1524,7 +1524,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> |  |
+| [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
@@ -1545,7 +1545,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
-| [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | [description] |
+| [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
 
