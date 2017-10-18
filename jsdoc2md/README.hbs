@@ -54,15 +54,33 @@ Functions that take more than 3 arguments are passed a single options object as 
 {{#class name="Bulb"}}{{>member-index}}{{/class}}
 {{#class name="Plug"}}{{>member-index}}{{/class}}
 
-{{#class name="Client"}}{{>docs}}{{/class}}
-{{#class name="Bulb"}}{{>docs}}{{/class}}
-{{#class name="Plug"}}{{>docs}}{{/class}}
+{{#class name="Client"}}
+{{>header~}}
+{{>body}}
+{{>separator~}}
+{{>members~}}
+{{/class}}
+
+{{#class name="Bulb"}}
+{{>header~}}
+{{>body}}
+{{>separator~}}
+{{>members~}}
+{{/class}}
+
+{{#class name="Plug"}}
+{{>header~}}
+{{>body}}
+{{>separator~}}
+{{>members~}}
+{{/class}}
 
 {{#identifier name="SendOptions"}}{{>docs}}{{/identifier}}
 {{#identifier name="ResponseError"}}{{>docs}}{{/identifier}}
+
 
 ## Credits
 Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.
 https://georgovassilis.blogspot.com/2016/05/controlling-tp-link-hs100-wi-fi-smart.html
 
-Some design cues for Client based on https://github.com/MariusRumpf/node-lifx/
+Some design cues for Client based on [node-lifx](https://github.com/MariusRumpf/node-lifx/)

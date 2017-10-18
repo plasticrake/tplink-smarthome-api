@@ -93,8 +93,14 @@ Functions that take more than 3 arguments are passed a single options object as 
         * [.getLightState([sendOptions])](#Bulb+lighting+getLightState) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.setLightState(options, [sendOptions])](#Bulb+lighting+setLightState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.schedule](#Bulb+schedule)
+        * [.getNextAction([sendOptions])](#Bulb+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRules([sendOptions])](#Bulb+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRule(id, [sendOptions])](#Bulb+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.addRule(options, [sendOptions])](#Bulb+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.editRule([sendOptions])](#Bulb+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteAllRules([sendOptions])](#Bulb+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteRule(id, [sendOptions])](#Bulb+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setOverallEnable(enable, [sendOptions])](#Bulb+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.time](#Bulb+time)
         * [.getTime([sendOptions])](#Bulb+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getTimezone([sendOptions])](#Bulb+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -149,8 +155,14 @@ Functions that take more than 3 arguments are passed a single options object as 
         * [.realtime](#Plug+emeter+realtime) ⇒ <code>Object</code>
         * [.getRealtime([sendOptions])](#Plug+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.schedule](#Plug+schedule)
+        * [.getNextAction([sendOptions])](#Plug+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRules([sendOptions])](#Plug+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRule(id, [sendOptions])](#Plug+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.addRule(options, [sendOptions])](#Plug+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.editRule(options, [sendOptions])](#Plug+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteAllRules([sendOptions])](#Plug+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteRule(id, [sendOptions])](#Plug+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setOverallEnable(enable, [sendOptions])](#Plug+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.time](#Plug+time)
         * [.getTime([sendOptions])](#Plug+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getTimezone([sendOptions])](#Plug+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -208,31 +220,6 @@ Client that sends commands to specified devices or discover devices on the local
 
 **Kind**: global class  
 **Extends**: <code>EventEmitter</code>  
-
-* [Client](#Client) ⇐ <code>EventEmitter</code>
-    * [new Client(options)](#new_Client_new)
-    * [.send(payload, host, [port], [sendOptions])](#Client+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.getSysInfo(host, [port], [sendOptions])](#Client+getSysInfo) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.getBulb(deviceOptions)](#Client+getBulb) ⇒ [<code>Bulb</code>](#Bulb)
-    * [.getPlug(deviceOptions)](#Client+getPlug) ⇒ [<code>Plug</code>](#Plug)
-    * [.getDevice(deviceOptions, [sendOptions])](#Client+getDevice) ⇒ <code>Promise.&lt;(Plug\|Bulb), Error&gt;</code>
-    * [.getCommonDevice(deviceOptions)](#Client+getCommonDevice) ⇒ [<code>Device</code>](#Device)
-    * [.getDeviceFromSysInfo(sysInfo, deviceOptions)](#Client+getDeviceFromSysInfo) ⇒ [<code>Plug</code>](#Plug) \| [<code>Bulb</code>](#Bulb)
-    * [.getTypeFromSysInfo(sysInfo)](#Client+getTypeFromSysInfo) ⇒ <code>string</code>
-    * [.startDiscovery(options)](#Client+startDiscovery) ⇒ [<code>Client</code>](#Client)
-    * [.stopDiscovery()](#Client+stopDiscovery)
-    * ["device-new"](#Client+event_device-new)
-    * ["device-online"](#Client+event_device-online)
-    * ["device-offline"](#Client+event_device-offline)
-    * ["bulb-new"](#Client+event_bulb-new)
-    * ["bulb-online"](#Client+event_bulb-online)
-    * ["bulb-offline"](#Client+event_bulb-offline)
-    * ["plug-new"](#Client+event_plug-new)
-    * ["plug-online"](#Client+event_plug-online)
-    * ["plug-offline"](#Client+event_plug-offline)
-    * ["discovery-invalid"](#Client+event_discovery-invalid)
-    * ["error"](#Client+event_error)
-
 <a name="new_Client_new"></a>
 
 ### new Client(options)
@@ -553,58 +540,6 @@ TP-Link models: LB100, LB110, LB120, LB130.
 **Kind**: global class  
 **Extends**: [<code>Device</code>](#Device), <code>EventEmitter</code>  
 **Emits**: <code>Bulb#event:lightstate-on</code>, <code>Bulb#event:lightstate-off</code>, <code>Bulb#event:lightstate-change</code>, <code>Bulb#event:lightstate-update</code>, <code>Bulb#event:emeter-realtime-update</code>  
-
-* [Bulb](#Bulb) ⇐ [<code>Device</code>](#Device)
-    * [new Bulb(options)](#new_Bulb_new)
-    * [.cloud](#Bulb+cloud)
-        * [.getInfo([sendOptions])](#Bulb+cloud+getInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.bind(username, password, [sendOptions])](#Bulb+cloud+bind) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.unbind([sendOptions])](#Bulb+cloud+unbind) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.getFirmwareList([sendOptions])](#Bulb+cloud+getFirmwareList) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.setServerUrl(server, [sendOptions])](#Bulb+cloud+setServerUrl) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.emeter](#Bulb+emeter)
-        * [.realtime](#Bulb+emeter+realtime) ⇒ <code>Object</code>
-        * [.getRealtime([sendOptions])](#Bulb+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.lighting](#Bulb+lighting)
-        * [.lightState](#Bulb+lighting+lightState) ⇒ <code>Object</code>
-        * [.getLightState([sendOptions])](#Bulb+lighting+getLightState) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.setLightState(options, [sendOptions])](#Bulb+lighting+setLightState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.schedule](#Bulb+schedule)
-        * [.addRule(options, [sendOptions])](#Bulb+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.editRule([sendOptions])](#Bulb+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.time](#Bulb+time)
-        * [.getTime([sendOptions])](#Bulb+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.getTimezone([sendOptions])](#Bulb+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.sysInfo](#Bulb+sysInfo) ⇒ <code>Object</code>
-    * [.supportsBrightness](#Bulb+supportsBrightness) ⇒ <code>boolean</code>
-    * [.supportsColor](#Bulb+supportsColor) ⇒ <code>boolean</code>
-    * [.supportsColorTemperature](#Bulb+supportsColorTemperature) ⇒ <code>boolean</code>
-    * [.getColorTemperatureRange](#Bulb+getColorTemperatureRange) ⇒ <code>Object</code>
-    * [.alias](#Device+alias) ⇒ <code>string</code>
-    * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
-    * [.description](#Device+description) ⇒ <code>string</code>
-    * [.model](#Device+model) ⇒ <code>string</code>
-    * [.name](#Device+name) ⇒ <code>string</code>
-    * [.type](#Device+type) ⇒ <code>string</code>
-    * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
-    * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
-    * [.hardwareVersion](#Device+hardwareVersion) ⇒ <code>string</code>
-    * [.mac](#Device+mac) ⇒ <code>string</code>
-    * [.getInfo([sendOptions])](#Bulb+getInfo) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.getPowerState([sendOptions])](#Bulb+getPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.setPowerState(value, [sendOptions])](#Bulb+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.togglePowerState([sendOptions])](#Bulb+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.send(payload, [sendOptions])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.sendCommand(command, [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
-    * [.stopPolling()](#Device+stopPolling)
-    * [.getSysInfo([sendOptions])](#Device+getSysInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.setAlias(alias, [sendOptions])](#Device+setAlias) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.setLocation(latitude, longitude, [sendOptions])](#Device+setLocation) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.getModel([sendOptions])](#Device+getModel) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.reboot(delay, [sendOptions])](#Device+reboot) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.reset(delay, [sendOptions])](#Device+reset) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-
 <a name="new_Bulb_new"></a>
 
 ### new Bulb(options)
@@ -789,8 +724,57 @@ Sends `lightingservice.transition_light_state` command.
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 
 * [.schedule](#Bulb+schedule)
+    * [.getNextAction([sendOptions])](#Bulb+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRules([sendOptions])](#Bulb+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRule(id, [sendOptions])](#Bulb+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.addRule(options, [sendOptions])](#Bulb+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.editRule([sendOptions])](#Bulb+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteAllRules([sendOptions])](#Bulb+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteRule(id, [sendOptions])](#Bulb+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setOverallEnable(enable, [sendOptions])](#Bulb+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+
+<a name="Bulb+schedule+getNextAction"></a>
+
+#### schedule.getNextAction([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Next Schedule Rule Action.
+
+Requests `schedule.get_next_action`.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+getRules"></a>
+
+#### schedule.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rules.
+
+Requests `schedule.get_rules`.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+getRule"></a>
+
+#### schedule.getRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rule.
+
+Requests `schedule.get_rules` and return rule matching Id
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response of rule  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Bulb+schedule+addRule"></a>
 
@@ -831,6 +815,50 @@ Sends `schedule.edit_rule` command and returns rule id.
 | [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
+
+<a name="Bulb+schedule+deleteAllRules"></a>
+
+#### schedule.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes All Schedule Rules.
+
+Sends `schedule.delete_all_rules` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+deleteRule"></a>
+
+#### schedule.deleteRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes Schedule Rule.
+
+Sends `schedule.delete_rule` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+setOverallEnable"></a>
+
+#### schedule.setOverallEnable(enable, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Enables or Disables Schedule Rules.
+
+Sends `schedule.set_overall_enable` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| enable | <code>boolean</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Bulb+time"></a>
 
@@ -1181,74 +1209,6 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
 **Kind**: global class  
 **Extends**: [<code>Device</code>](#Device), <code>EventEmitter</code>  
 **Emits**: [<code>power-on</code>](#Plug+event_power-on), [<code>power-off</code>](#Plug+event_power-off), [<code>power-update</code>](#Plug+event_power-update), [<code>in-use</code>](#Plug+event_in-use), [<code>not-in-use</code>](#Plug+event_not-in-use), [<code>in-use-update</code>](#Plug+event_in-use-update), [<code>emeter-realtime-update</code>](#Plug+event_emeter-realtime-update)  
-
-* [Plug](#Plug) ⇐ [<code>Device</code>](#Device)
-    * [new Plug(options)](#new_Plug_new)
-    * [.away](#Plug+away)
-        * [.getRules([sendOptions])](#Plug+away+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.addRule(options, [sendOptions])](#Plug+away+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.editRule(options, [sendOptions])](#Plug+away+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.deleteAllRules([sendOptions])](#Plug+away+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.deleteRule(id, [sendOptions])](#Plug+away+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.setOverallEnable(enable, [sendOptions])](#Plug+away+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.cloud](#Plug+cloud)
-        * [.getInfo([sendOptions])](#Plug+cloud+getInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.bind(username, password, [sendOptions])](#Plug+cloud+bind) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.unbind([sendOptions])](#Plug+cloud+unbind) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.getFirmwareList([sendOptions])](#Plug+cloud+getFirmwareList) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.setServerUrl(server, [sendOptions])](#Plug+cloud+setServerUrl) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.emeter](#Plug+emeter)
-        * [.realtime](#Plug+emeter+realtime) ⇒ <code>Object</code>
-        * [.getRealtime([sendOptions])](#Plug+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.schedule](#Plug+schedule)
-        * [.addRule(options, [sendOptions])](#Plug+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.editRule(options, [sendOptions])](#Plug+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.time](#Plug+time)
-        * [.getTime([sendOptions])](#Plug+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.getTimezone([sendOptions])](#Plug+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.timer](#Plug+timer)
-        * [.getRules([sendOptions])](#Plug+timer+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.addRule(options, [sendOptions])](#Plug+timer+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.editRule(options, [sendOptions])](#Plug+timer+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-        * [.deleteAllRules([sendOptions])](#Plug+timer+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.sysInfo](#Plug+sysInfo) ⇒ <code>Object</code>
-    * [.inUse](#Plug+inUse) ⇒ <code>boolean</code>
-    * [.alias](#Device+alias) ⇒ <code>string</code>
-    * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
-    * [.description](#Device+description) ⇒ <code>string</code>
-    * [.model](#Device+model) ⇒ <code>string</code>
-    * [.name](#Device+name) ⇒ <code>string</code>
-    * [.type](#Device+type) ⇒ <code>string</code>
-    * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
-    * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
-    * [.hardwareVersion](#Device+hardwareVersion) ⇒ <code>string</code>
-    * [.mac](#Device+mac) ⇒ <code>string</code>
-    * [.getInfo([sendOptions])](#Plug+getInfo) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.getInUse([sendOptions])](#Plug+getInUse) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.getLedState([sendOptions])](#Plug+getLedState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.setLedState(value, [sendOptions])](#Plug+setLedState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.getPowerState([sendOptions])](#Plug+getPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.setPowerState(value, [sendOptions])](#Plug+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.togglePowerState([sendOptions])](#Plug+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.blink([times], [rate], [sendOptions])](#Plug+blink) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.send(payload, [sendOptions])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.sendCommand(command, [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
-    * [.stopPolling()](#Device+stopPolling)
-    * [.getSysInfo([sendOptions])](#Device+getSysInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.setAlias(alias, [sendOptions])](#Device+setAlias) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.setLocation(latitude, longitude, [sendOptions])](#Device+setLocation) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.getModel([sendOptions])](#Device+getModel) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.reboot(delay, [sendOptions])](#Device+reboot) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.reset(delay, [sendOptions])](#Device+reset) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * ["power-on"](#Plug+event_power-on)
-    * ["power-off"](#Plug+event_power-off)
-    * ["power-update"](#Plug+event_power-update)
-    * ["in-use"](#Plug+event_in-use)
-    * ["not-in-use"](#Plug+event_not-in-use)
-    * ["in-use-update"](#Plug+event_in-use-update)
-    * ["emeter-realtime-update"](#Plug+event_emeter-realtime-update)
-
 <a name="new_Plug_new"></a>
 
 ### new Plug(options)
@@ -1496,8 +1456,57 @@ Requests `emeter.get_realtime`.
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 
 * [.schedule](#Plug+schedule)
+    * [.getNextAction([sendOptions])](#Plug+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRules([sendOptions])](#Plug+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRule(id, [sendOptions])](#Plug+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.addRule(options, [sendOptions])](#Plug+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.editRule(options, [sendOptions])](#Plug+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteAllRules([sendOptions])](#Plug+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteRule(id, [sendOptions])](#Plug+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setOverallEnable(enable, [sendOptions])](#Plug+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+
+<a name="Plug+schedule+getNextAction"></a>
+
+#### schedule.getNextAction([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Next Schedule Rule Action.
+
+Requests `schedule.get_next_action`.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+getRules"></a>
+
+#### schedule.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rules.
+
+Requests `schedule.get_rules`.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+getRule"></a>
+
+#### schedule.getRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rule.
+
+Requests `schedule.get_rules` and return rule matching Id
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response of rule  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Plug+schedule+addRule"></a>
 
@@ -1539,6 +1548,50 @@ Sends `schedule.edit_rule` command and returns rule id.
 | [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
+
+<a name="Plug+schedule+deleteAllRules"></a>
+
+#### schedule.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes All Schedule Rules.
+
+Sends `schedule.delete_all_rules` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+deleteRule"></a>
+
+#### schedule.deleteRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes Schedule Rule.
+
+Sends `schedule.delete_rule` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+setOverallEnable"></a>
+
+#### schedule.setOverallEnable(enable, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Enables or Disables Schedule Rules.
+
+Sends `schedule.set_overall_enable` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| enable | <code>boolean</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Plug+time"></a>
 
@@ -2058,7 +2111,6 @@ Plug's Energy Monitoring Details were updated from device. Fired regardless if s
 | value | <code>Object</code> | emeterRealtime |
 
 
-
 <a name="SendOptions"></a>
 
 ## SendOptions : <code>Object</code>
@@ -2084,8 +2136,9 @@ Where response err_code != 0.
 **Extends**: <code>Error</code>  
 
 
+
 ## Credits
 Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.
 https://georgovassilis.blogspot.com/2016/05/controlling-tp-link-hs100-wi-fi-smart.html
 
-Some design cues for Client based on https://github.com/MariusRumpf/node-lifx/
+Some design cues for Client based on [node-lifx](https://github.com/MariusRumpf/node-lifx/)

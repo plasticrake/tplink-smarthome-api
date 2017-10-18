@@ -151,14 +151,6 @@ program
   });
 
 program
-  .command('info <host>')
-  .action(function (host, options) {
-    client = setupClient();
-    let [hostOnly, port] = host.split(':');
-    info(hostOnly, port, program.timeout);
-  });
-
-program
   .command('details <host>')
   .action(function (host, options) {
     client = setupClient();

@@ -102,8 +102,14 @@ TP-Link models: LB100, LB110, LB120, LB130.
         * [.getLightState([sendOptions])](#Bulb+lighting+getLightState) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.setLightState(options, [sendOptions])](#Bulb+lighting+setLightState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.schedule](#Bulb+schedule)
+        * [.getNextAction([sendOptions])](#Bulb+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRules([sendOptions])](#Bulb+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRule(id, [sendOptions])](#Bulb+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.addRule(options, [sendOptions])](#Bulb+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.editRule([sendOptions])](#Bulb+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteAllRules([sendOptions])](#Bulb+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteRule(id, [sendOptions])](#Bulb+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setOverallEnable(enable, [sendOptions])](#Bulb+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.time](#Bulb+time)
         * [.getTime([sendOptions])](#Bulb+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getTimezone([sendOptions])](#Bulb+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -321,8 +327,57 @@ Sends `lightingservice.transition_light_state` command.
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 
 * [.schedule](#Bulb+schedule)
+    * [.getNextAction([sendOptions])](#Bulb+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRules([sendOptions])](#Bulb+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRule(id, [sendOptions])](#Bulb+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.addRule(options, [sendOptions])](#Bulb+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.editRule([sendOptions])](#Bulb+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteAllRules([sendOptions])](#Bulb+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteRule(id, [sendOptions])](#Bulb+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setOverallEnable(enable, [sendOptions])](#Bulb+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+
+<a name="Bulb+schedule+getNextAction"></a>
+
+#### schedule.getNextAction([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Next Schedule Rule Action.
+
+Requests `schedule.get_next_action`.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+getRules"></a>
+
+#### schedule.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rules.
+
+Requests `schedule.get_rules`.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+getRule"></a>
+
+#### schedule.getRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rule.
+
+Requests `schedule.get_rules` and return rule matching Id
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response of rule  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Bulb+schedule+addRule"></a>
 
@@ -363,6 +418,50 @@ Sends `schedule.edit_rule` command and returns rule id.
 | [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
+
+<a name="Bulb+schedule+deleteAllRules"></a>
+
+#### schedule.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes All Schedule Rules.
+
+Sends `schedule.delete_all_rules` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+deleteRule"></a>
+
+#### schedule.deleteRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes Schedule Rule.
+
+Sends `schedule.delete_rule` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+setOverallEnable"></a>
+
+#### schedule.setOverallEnable(enable, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Enables or Disables Schedule Rules.
+
+Sends `schedule.set_overall_enable` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| enable | <code>boolean</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Bulb+time"></a>
 
@@ -1604,8 +1703,14 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
         * [.realtime](#Plug+emeter+realtime) ⇒ <code>Object</code>
         * [.getRealtime([sendOptions])](#Plug+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.schedule](#Plug+schedule)
+        * [.getNextAction([sendOptions])](#Plug+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRules([sendOptions])](#Plug+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRule(id, [sendOptions])](#Plug+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.addRule(options, [sendOptions])](#Plug+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.editRule(options, [sendOptions])](#Plug+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteAllRules([sendOptions])](#Plug+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.deleteRule(id, [sendOptions])](#Plug+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setOverallEnable(enable, [sendOptions])](#Plug+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.time](#Plug+time)
         * [.getTime([sendOptions])](#Plug+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getTimezone([sendOptions])](#Plug+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -1899,8 +2004,57 @@ Requests `emeter.get_realtime`.
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 
 * [.schedule](#Plug+schedule)
+    * [.getNextAction([sendOptions])](#Plug+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRules([sendOptions])](#Plug+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRule(id, [sendOptions])](#Plug+schedule+getRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.addRule(options, [sendOptions])](#Plug+schedule+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.editRule(options, [sendOptions])](#Plug+schedule+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteAllRules([sendOptions])](#Plug+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.deleteRule(id, [sendOptions])](#Plug+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setOverallEnable(enable, [sendOptions])](#Plug+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+
+<a name="Plug+schedule+getNextAction"></a>
+
+#### schedule.getNextAction([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Next Schedule Rule Action.
+
+Requests `schedule.get_next_action`.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+getRules"></a>
+
+#### schedule.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rules.
+
+Requests `schedule.get_rules`.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+getRule"></a>
+
+#### schedule.getRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Gets Schedule Rule.
+
+Requests `schedule.get_rules` and return rule matching Id
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response of rule  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Plug+schedule+addRule"></a>
 
@@ -1942,6 +2096,50 @@ Sends `schedule.edit_rule` command and returns rule id.
 | [options.name] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
+
+<a name="Plug+schedule+deleteAllRules"></a>
+
+#### schedule.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes All Schedule Rules.
+
+Sends `schedule.delete_all_rules` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+deleteRule"></a>
+
+#### schedule.deleteRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Deletes Schedule Rule.
+
+Sends `schedule.delete_rule` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+setOverallEnable"></a>
+
+#### schedule.setOverallEnable(enable, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Enables or Disables Schedule Rules.
+
+Sends `schedule.set_overall_enable` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| enable | <code>boolean</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Plug+time"></a>
 

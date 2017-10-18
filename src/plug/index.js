@@ -75,14 +75,14 @@ class Plug extends Device {
      */
     this.emeter = new Emeter(this, 'emeter');
     /**
-     * @borrows PlugSchedule#getNextAction as Plug.schedule#getNextAction
-     * @borrows PlugSchedule#getRules as Plug.schedule#getRules
-     * @borrows PlugSchedule#getRule as Plug.schedule#getRule
+     * @borrows Schedule#getNextAction as Plug.schedule#getNextAction
+     * @borrows Schedule#getRules as Plug.schedule#getRules
+     * @borrows Schedule#getRule as Plug.schedule#getRule
      * @borrows PlugSchedule#addRule as Plug.schedule#addRule
      * @borrows PlugSchedule#editRule as Plug.schedule#editRule
-     * @borrows PlugSchedule#deleteAllRules as Plug.schedule#deleteAllRules
-     * @borrows PlugSchedule#deleteRule as Plug.schedule#deleteRule
-     * @borrows PlugSchedule#setOverallEnable as Plug.schedule#setOverallEnable
+     * @borrows Schedule#deleteAllRules as Plug.schedule#deleteAllRules
+     * @borrows Schedule#deleteRule as Plug.schedule#deleteRule
+     * @borrows Schedule#setOverallEnable as Plug.schedule#setOverallEnable
      */
     this.schedule = new Schedule(this, 'schedule');
     /**

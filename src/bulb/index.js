@@ -62,14 +62,14 @@ class Bulb extends Device {
      */
     this.lighting = new Lighting(this, 'smartlife.iot.smartbulb.lightingservice');
     /**
-     * @borrows BulbSchedule#getNextAction as Bulb.schedule#getNextAction
-     * @borrows BulbSchedule#getRules as Bulb.schedule#getRules
-     * @borrows BulbSchedule#getRule as Bulb.schedule#getRule
+     * @borrows Schedule#getNextAction as Bulb.schedule#getNextAction
+     * @borrows Schedule#getRules as Bulb.schedule#getRules
+     * @borrows Schedule#getRule as Bulb.schedule#getRule
      * @borrows BulbSchedule#addRule as Bulb.schedule#addRule
      * @borrows BulbSchedule#editRule as Bulb.schedule#editRule
-     * @borrows BulbSchedule#deleteAllRules as Bulb.schedule#deleteAllRules
-     * @borrows BulbSchedule#deleteRule as Bulb.schedule#deleteRule
-     * @borrows BulbSchedule#setOverallEnable as Bulb.schedule#setOverallEnable
+     * @borrows Schedule#deleteAllRules as Bulb.schedule#deleteAllRules
+     * @borrows Schedule#deleteRule as Bulb.schedule#deleteRule
+     * @borrows Schedule#setOverallEnable as Bulb.schedule#setOverallEnable
      */
     this.schedule = new Schedule(this, 'smartlife.iot.common.schedule');
     /**
