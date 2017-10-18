@@ -4,23 +4,24 @@
 'use strict';
 
 const chai = require('chai');
-const sinon = require('sinon');
 const chaiAsPromised = require('chai-as-promised');
-const sinonChai = require('sinon-chai');
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
-chai.use(sinonChai);
 
 const rewire = require('rewire');
 
-const { getTestClient, testDevices } = require('./setup');
-const Hs100Api = require('../src');
-const Device = rewire('../src/device');
-const utils = require('../src/utils');
-const ResponseError = utils.ResponseError;
+const { getTestClient, testDevices } = require('../setup');
+const { Client, ResponseError } = require('../../src');
+const Device = rewire('../../src/device');
 
 const processResponse = Device.__get__('processResponse');
+
+const cloudTests = require('../shared/cloud');
+const emeterTests = require('../shared/emeter');
+const netifTests = require('./netif');
+const scheduleTests = require('../shared/schedule');
+const timeTests = require('../shared/time');
 
 describe('Device', function () {
   let client;
@@ -80,27 +81,43 @@ describe('Device', function () {
     });
   });
 
-  testDevices.forEach((testDevice) => {
+  testDevices.forEach(function (testDevice) {
     let device;
     let options;
     let deviceType;
+    let time;
     context(testDevice.name, function () {
+      before(async function () {
+        if (!testDevice.getDevice) {
+          this.skip();
+          return;
+        }
+        device = await testDevice.getDevice();
+        this.device = device;
+        time = device.apiModuleNamespace.timesetting;
+      });
       beforeEach(async function () {
         if (!testDevice.getDevice) {
           this.skip();
+          return;
         }
         device = await testDevice.getDevice();
         options = testDevice.options;
         deviceType = testDevice.deviceType;
+
+        this.device = device;
       });
 
       describe('constructor', function () {
-        it('should inherit timeout from Client', function () {
+        it('should inherit defaultSendOptions from Client', function () {
           let timeout = 9999;
-          let client = new Hs100Api.Client({timeout: timeout});
+          let transport = 'udp';
+          let client = new Client({ defaultSendOptions: { timeout, transport } });
           let anotherDevice = client.getDeviceFromType(device.type);
-          expect(client.timeout).to.equal(timeout);
-          expect(anotherDevice.timeout).to.equal(timeout);
+          expect(client.defaultSendOptions.timeout, 'client').to.equal(timeout);
+          expect(client.defaultSendOptions.transport, 'client').to.equal(transport);
+          expect(anotherDevice.defaultSendOptions.timeout, 'device').to.equal(timeout);
+          expect(anotherDevice.defaultSendOptions.transport, 'device').to.equal(transport);
         });
       });
 
@@ -109,29 +126,29 @@ describe('Device', function () {
           let response = await device.send('{"system":{"get_sysinfo":{}}}');
           expect(response).to.have.nested.property('system.get_sysinfo.err_code', 0);
         });
-        it('should send a multiple valid commands (same module) and receive response', async function () {
-          let time = device.apiModuleNamespace.timesetting;
+        it('should send multiple valid commands (same module) and receive response', async function () {
           let response = await device.send(`{"${time}":{"get_time":{},"get_timezone":{}}}`);
-          expect(response[time]).to.have.nested.property('get_time.err_code', 0);
-          expect(response[time]).to.have.nested.property('get_timezone.err_code', 0);
+          expect(response[time].get_time.err_code).to.eql(0);
+          expect(response[time].get_timezone.err_code).to.eql(0);
         });
-        it('should send a multiple valid commands (diff modules) and receive response', async function () {
-          let response = await device.send('{"system":{"get_sysinfo":{}},"netif":{"get_scaninfo":{}}}');
+        it('should send multiple valid commands (diff modules) and receive response', async function () {
+          let response = await device.send(`{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`);
           expect(response).to.have.nested.property('system.get_sysinfo.err_code', 0);
-          expect(response).to.have.nested.property('netif.get_scaninfo.err_code', 0);
+          expect(response[time].get_time.err_code).to.eql(0);
         });
         it('should send a single invalid command (member) and receive response', async function () {
           let response = await device.send('{"system":{"INVALID_MEMBER":{}}}');
-          expect(response).to.have.nested.property('system.INVALID_MEMBER.err_code', -2);
+          expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([-2, -2000]);
         });
         it('should send a single invalid command (module) and receive response', async function () {
           let response = await device.send('{"INVALID_MODULE":{"INVALID_MEMBER":{}}}');
-          expect(response).to.have.nested.property('INVALID_MODULE.err_code', -1);
+          expect(response).to.have.nested.property('INVALID_MODULE.err_code');
+          expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
         });
         it('should send mutiple invalid commands and receive response', async function () {
           let response = await device.send('{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}');
-          expect(response).to.have.nested.property('INVALID_MODULE.err_code', -1);
-          expect(response).to.have.nested.property('system.INVALID_MEMBER.err_code', -2);
+          expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
+          expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([-2, -2000]);
         });
       });
 
@@ -140,33 +157,35 @@ describe('Device', function () {
           let response = await device.sendCommand('{"system":{"get_sysinfo":{}}}');
           return expect(response).to.have.property('err_code', 0);
         });
-        it('should send a multiple valid commands (same module) and receive response', async function () {
-          let time = device.apiModuleNamespace.timesetting;
+        it('should send multiple valid commands (same module) and receive response', async function () {
           let response = await device.sendCommand(`{"${time}":{"get_time":{},"get_timezone":{}}}`);
-          expect(response[time]).to.have.nested.property('get_time.err_code', 0);
-          expect(response[time]).to.have.nested.property('get_timezone.err_code', 0);
+          expect(response[time].get_time.err_code).to.eql(0);
+          expect(response[time].get_timezone.err_code).to.eql(0);
         });
-        it('should send a multiple valid commands (diff modules) and receive response', async function () {
-          let response = await device.sendCommand('{"system":{"get_sysinfo":{}},"netif":{"get_scaninfo":{}}}');
+        it('should send multiple valid commands (diff modules) and receive response', async function () {
+          let response = await device.sendCommand(`{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`);
           expect(response).to.have.nested.property('system.get_sysinfo.err_code', 0);
-          expect(response).to.have.nested.property('netif.get_scaninfo.err_code', 0);
+          expect(response[time].get_time.err_code).to.eql(0);
         });
         it('should send a single invalid command (member) and reject with ResponseError', function () {
-          return expect(device.sendCommand('{"system":{"INVALID_MEMBER":{}}}'))
-            .to.eventually.be.rejectedWith(ResponseError)
-            .and.have.nested.property('response.err_code', -2);
+          return device.sendCommand('{"system":{"INVALID_MEMBER":{}}}').catch((err) => {
+            expect(err).to.be.instanceof(ResponseError);
+            expect(err.response).to.have.nested.property('err_code');
+            expect(err.response.err_code).to.be.oneOf([-2, -2000]);
+          });
         });
         it('should send a single invalid command (module) and reject with ResponseError', function () {
-          return expect(device.sendCommand('{"INVALID_MODULE":{"INVALID_MEMBER":{}}}'))
-          .to.eventually.be.rejectedWith(ResponseError)
-          .and.have.nested.property('response.err_code', -1);
+          return device.sendCommand('{"INVALID_MODULE":{"INVALID_MEMBER":{}}}').catch((err) => {
+            expect(err).to.be.instanceof(ResponseError);
+            expect(err.response).to.have.nested.property('err_code');
+            expect(err.response.err_code).to.be.oneOf([-1, -2001]);
+          });
         });
         it('should send multiple invalid commands and reject with ResponseError', function () {
-          let promise = device.sendCommand('{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}');
-          return promise.catch((reason) => {
-            expect(reason).to.be.an.instanceof(ResponseError);
-            expect(reason).to.have.nested.property('response.INVALID_MODULE.err_code', -1);
-            expect(reason).to.have.nested.property('response.system.INVALID_MEMBER.err_code', -2);
+          return device.sendCommand('{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}').catch((err) => {
+            expect(err).to.be.an.instanceof(ResponseError);
+            expect(err.response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
+            expect(err.response.system.INVALID_MEMBER.err_code).to.be.oneOf([-2, -2000]);
           });
         });
       });
@@ -175,18 +194,6 @@ describe('Device', function () {
         it('should return sysInfo after getSysInfo called', async function () {
           let si = await device.getSysInfo();
           expect(device.sysInfo).to.eql(si);
-        });
-      });
-
-      describe('#emeterRealtime get', function () {
-        it('should return emeterRealtime after getEmeterRealtime called', async function () {
-          await device.getSysInfo();
-          if (device.supportsEmeter) {
-            let er = await device.getEmeterRealtime();
-            expect(device.emeterRealtime).to.eql(er);
-          } else {
-            expect(device.emeterRealtime).to.eql({});
-          }
         });
       });
 
@@ -305,35 +312,9 @@ describe('Device', function () {
         });
       });
 
-      describe('#getCloudInfo()', function () {
-        it('should return cloud info', async function () {
-          let ci = await device.getCloudInfo();
-          expect(ci).to.have.property('err_code', 0);
-          expect(ci).to.include.keys('username', 'server');
-        });
-      });
-
-      describe('#getEmeterRealtime()', function () {
-        it('should return EmeterRealtime if supported or throw error', async function () {
-          await device.getSysInfo();
-          if (device.supportsEmeter) {
-            return expect(device.getEmeterRealtime()).to.eventually.have.property('err_code', 0);
-          } else {
-            return expect(device.getEmeterRealtime()).to.eventually.be.rejectedWith(ResponseError);
-          }
-        });
-        it('should emit emeter-realtime-update if supported', async function () {
-          await device.getSysInfo();
-          if (!device.supportsEmeter) return;
-
-          let spy = sinon.spy();
-
-          device.on('emeter-realtime-update', spy);
-          await device.getEmeterRealtime();
-          await device.getEmeterRealtime();
-
-          expect(spy).to.be.calledTwice;
-          expect(spy).to.be.calledWithMatch({err_code: 0});
+      describe('#setLocation()', function () {
+        it('should return model', function () {
+          return expect(device.setLocation(10, 10)).to.eventually.have.property('err_code', 0);
         });
       });
 
@@ -343,42 +324,25 @@ describe('Device', function () {
         });
       });
 
-      describe('#getScanInfo()', function () {
-        it('should return get scan info', function () {
-          this.timeout(10000);
-          this.slow(6000);
-          return expect(device.getScanInfo(true, 2)).to.eventually.have.property('err_code', 0);
-        });
-
-        it('should return get cached scan info', function () {
-          this.slow(1000);
-          return expect(device.getScanInfo(false)).to.eventually.have.property('err_code', 0);
+      describe('#reboot()', function () {
+        it('(simulator only) should reboot', function () {
+          if (testDevice.type !== 'simulated') this.skip();
+          return expect(device.reboot(1)).to.eventually.have.property('err_code', 0);
         });
       });
 
-      describe('#getScheduleNextAction()', function () {
-        it('should return schedule next action', function () {
-          return expect(device.getScheduleNextAction()).to.eventually.have.property('err_code', 0);
+      describe('#reset()', function () {
+        it('(simulator only) should reset', function () {
+          if (testDevice.type !== 'simulated') this.skip();
+          return expect(device.reset(1)).to.eventually.have.property('err_code', 0);
         });
       });
 
-      describe('#getScheduleRules()', function () {
-        it('should return schedule rules', function () {
-          return expect(device.getScheduleRules()).to.eventually.have.property('err_code', 0);
-        });
-      });
-
-      describe('#getTime()', function () {
-        it('should return time', function () {
-          return expect(device.getTime()).to.eventually.have.property('err_code', 0);
-        });
-      });
-
-      describe('#getTimeZone()', function () {
-        it('should return get time zone', function () {
-          return expect(device.getTimeZone()).to.eventually.have.property('err_code', 0);
-        });
-      });
+      cloudTests();
+      emeterTests();
+      netifTests();
+      scheduleTests();
+      timeTests();
     });
   });
 });

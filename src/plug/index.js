@@ -1,6 +1,12 @@
 'use strict';
 
-const Device = require('./device');
+const Device = require('../device');
+const Away = require('./away');
+const Cloud = require('../shared/cloud');
+const Emeter = require('../shared/emeter');
+const Schedule = require('./schedule');
+const Timer = require('./timer');
+const Time = require('../shared/time');
 
 /**
  * Plug Device.
@@ -23,7 +29,7 @@ class Plug extends Device {
    * Created by {@link Client} - Do not instantiate directly.
    *
    * See {@link Device#constructor} for common options.
-   * @param  {Object} options
+   * @param  {Object}  options
    * @param  {Number} [options.inUseThreshold=0]
    */
   constructor (options) {
@@ -45,6 +51,52 @@ class Plug extends Device {
     this.lastState = Object.assign(this.lastState, { powerOn: null, inUse: null });
 
     this.emitEventsEnabled = true;
+
+    /**
+     * @borrows Away#getRules as Plug.away#getRules
+     * @borrows Away#addRule as Plug.away#addRule
+     * @borrows Away#editRule as Plug.away#editRule
+     * @borrows Away#deleteAllRules as Plug.away#deleteAllRules
+     * @borrows Away#deleteRule as Plug.away#deleteRule
+     * @borrows Away#setOverallEnable as Plug.away#setOverallEnable
+     */
+    this.away = new Away(this, 'anti_theft');
+    /**
+     * @borrows Cloud#getInfo as Plug.cloud#getInfo
+     * @borrows Cloud#bind as Plug.cloud#bind
+     * @borrows Cloud#unbind as Plug.cloud#unbind
+     * @borrows Cloud#getFirmwareList as Plug.cloud#getFirmwareList
+     * @borrows Cloud#setServerUrl as Plug.cloud#setServerUrl
+     */
+    this.cloud = new Cloud(this, 'cnCloud');
+    /**
+     * @borrows Emeter#realtime as Plug.emeter#realtime
+     * @borrows Emeter#getRealtime as Plug.emeter#getRealtime
+     */
+    this.emeter = new Emeter(this, 'emeter');
+    /**
+     * @borrows PlugSchedule#getNextAction as Plug.schedule#getNextAction
+     * @borrows PlugSchedule#getRules as Plug.schedule#getRules
+     * @borrows PlugSchedule#getRule as Plug.schedule#getRule
+     * @borrows PlugSchedule#addRule as Plug.schedule#addRule
+     * @borrows PlugSchedule#editRule as Plug.schedule#editRule
+     * @borrows PlugSchedule#deleteAllRules as Plug.schedule#deleteAllRules
+     * @borrows PlugSchedule#deleteRule as Plug.schedule#deleteRule
+     * @borrows PlugSchedule#setOverallEnable as Plug.schedule#setOverallEnable
+     */
+    this.schedule = new Schedule(this, 'schedule');
+    /**
+     * @borrows Time#getTime as Plug.time#getTime
+     * @borrows Time#getTimezone as Plug.time#getTimezone
+     */
+    this.time = new Time(this, 'time');
+    /**
+     * @borrows Timer#getRules as Plug.timer#getRules
+     * @borrows Timer#addRule as Plug.timer#addRule
+     * @borrows Timer#editRule as Plug.timer#editRule
+     * @borrows Timer#deleteAllRules as Plug.timer#deleteAllRules
+     */
+    this.timer = new Timer(this, 'count_down');
   }
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
@@ -66,19 +118,19 @@ class Plug extends Device {
    * Returns cached results from last retrieval of `emeter.get_realtime`.
    * @return {Object}
    */
-  get emeterRealtime () {
-    return super.emeterRealtime;
-  }
-  /**
-   * @private
-   */
-  set emeterRealtime (emeterRealtime) {
-    this.log.debug('[%s] plug emeterRealtime set, supportsEmeter: %s', this.alias, this.supportsEmeter);
-    if (this.supportsEmeter) {
-      super.emeterRealtime = emeterRealtime;
-      this.emitEvents();
-    }
-  }
+  // get emeterRealtime () {
+  //   return super.emeterRealtime;
+  // }
+  // /**
+  //  * @private
+  //  */
+  // set emeterRealtime (emeterRealtime) {
+  //   this.log.debug('[%s] plug emeterRealtime set, supportsEmeter: %s', this.alias, this.supportsEmeter);
+  //   if (this.supportsEmeter) {
+  //     super.emeterRealtime = emeterRealtime;
+  //     this.emitEvents();
+  //   }
+  // }
   /**
    * Determines if device is in use based on cached `emeter.get_realtime` results.
    *
@@ -89,7 +141,7 @@ class Plug extends Device {
    */
   get inUse () {
     if (this.supportsEmeter) {
-      return (this.emeterRealtime.power > this.inUseThreshold);
+      return (this.emeter.realtime.power > this.inUseThreshold);
     }
     return (this.sysInfo.relay_state === 1);
   }
@@ -99,35 +151,35 @@ class Plug extends Device {
    * - `cloud.get_sysinfo`
    * - `emeter.get_realtime`
    * - `schedule.get_next_action`
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
-  async getInfo () {
+  async getInfo (sendOptions) {
+    // TODO force TCP unless overriden here
     // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
-    let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}');
+    let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', sendOptions);
     this.sysInfo = data.system.get_sysinfo;
-    this.cloudInfo = data.cnCloud.get_info;
-    this.emeterRealtime = data.emeter.get_realtime;
-    this.scheduleNextAction = data.schedule.get_next_action;
-    return {sysInfo: this.sysInfo, cloudInfo: this.cloudInfo, emeterRealtime: this.emeterRealtime, scheduleNextAction: this.scheduleNextAction};
+    this.cloud.info = data.cnCloud.get_info;
+    this.emeter.realtime = data.emeter.get_realtime;
+    this.schedule.nextAction = data.schedule.get_next_action;
+    return {
+      sysInfo: this.sysInfo,
+      cloud: {info: this.cloud.info},
+      emeter: {realtime: this.emeter.realtime},
+      schedule: {nextAction: this.schedule.nextAction}
+    };
   }
-  /**
-   * Get Away Rules.
-   *
-   * Requests `anti_theft.get_rules`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getAwayRules () {
-    return this.sendCommand(`{"anti_theft":{"get_rules":{}}}`);
-  }
+
   /**
    * Same as {@link #inUse}, but requests current `emeter.get_realtime`.
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async getInUse () {
+  async getInUse (sendOptions) {
     if (this.supportsEmeter) {
-      await this.getEmeterRealtime();
+      await this.emeter.getRealtime(sendOptions);
     } else {
-      await this.getSysInfo();
+      await this.getSysInfo(sendOptions);
     }
     return this.inUse;
   }
@@ -135,21 +187,23 @@ class Plug extends Device {
    * Get Plug LED state (night mode).
    *
    * Requests `system.sys_info` and returns true if `led_off === 0`.
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>} LED State, true === on
    */
-  async getLedState () {
-    let sysInfo = await this.getSysInfo();
+  async getLedState (sendOptions) {
+    let sysInfo = await this.getSysInfo(sendOptions);
     return (sysInfo.led_off === 0);
   }
   /**
    * Turn Plug LED on/off (night mode).
    *
    * Sends `system.set_led_off` command.
-   * @param  {boolean}  value LED State, true === on
+   * @param  {boolean}      value LED State, true === on
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setLedState (value) {
-    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`);
+  async setLedState (value, sendOptions) {
+    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`, sendOptions);
     this.sysInfo.set_led_off = (value ? 0 : 1);
     return true;
   }
@@ -157,22 +211,24 @@ class Plug extends Device {
    * Get Plug relay state (on/off).
    *
    * Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async getPowerState () {
-    let sysInfo = await this.getSysInfo();
+  async getPowerState (sendOptions) {
+    let sysInfo = await this.getSysInfo(sendOptions);
     return (sysInfo.relay_state === 1);
   }
   /**
    * Turns Plug relay on/off.
    *
    * Sends `system.set_relay_state` command.
-   * @param  {boolean}  value
+   * @param  {boolean}      value
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setPowerState (value) {
+  async setPowerState (value, sendOptions) {
     this.log.debug('[%s] plug.setPowerState(%s)', this.alias, value);
-    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`);
+    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`, sendOptions);
     this.sysInfo.relay_state = (value ? 1 : 0);
     this.emitEvents();
     return true;
@@ -181,59 +237,13 @@ class Plug extends Device {
    * Toggles Plug relay state.
    *
    * Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and return the new power state`.
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async togglePowerState () {
-    const powerState = await this.getPowerState();
-    await this.setPowerState(!powerState);
+  async togglePowerState (sendOptions) {
+    const powerState = await this.getPowerState(sendOptions);
+    await this.setPowerState(!powerState, sendOptions);
     return !powerState;
-  }
-  /**
-   * Get Countdown Timer Rule (only one allowed).
-   *
-   * Requests `count_down.get_rules`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getTimerRules () {
-    return this.sendCommand(`{"count_down":{"get_rules":{}}}`);
-  }
-  /**
-   * Add Countdown Timer Rule (only one allowed).
-   *
-   * Sends count_down.add_rule command.
-   * @param  {number}  delay                  delay in seconds
-   * @param  {boolean} powerState             turn on or off device
-   * @param  {string}  [name='timer']         rule name
-   * @param  {boolean} [enable=true]          rule enabled
-   * @param  {boolean} [deleteExisting=true]  send `delete_all_rules` command before adding
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async addTimerRule ({ delay, powerState, name = 'timer', enable = true, deleteExisting = true }) {
-    if (deleteExisting) await this.deleteAllTimerRules();
-    return this.sendCommand(`{"count_down":{"add_rule":{"enable":${enable ? 1 : 0},"delay":${delay},"act":${powerState ? 1 : 0},"name":"${name}"}}}`);
-  }
-  /**
-   * Edit Countdown Timer Rule (only one allowed).
-   *
-   * Sends count_down.edit_rule command.
-   * @param  {string}  id                     rule id
-   * @param  {number}  delay                  delay in seconds
-   * @param  {number}  powerState             turn on or off device
-   * @param  {string}  [name='timer']         rule name
-   * @param  {Boolean} [enable=true]          rule enabled
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async editTimerRule ({ id, delay, powerState, name = 'timer', enable = true }) {
-    return this.sendCommand(`{"count_down":{"edit_rule":{"id":"${id}","enable":${enable ? 1 : 0},"delay":${delay},"act":${powerState ? 1 : 0},"name":"${name}"}}}`);
-  }
-  /**
-   * Delete Countdown Timer Rule (only one allowed).
-   *
-   * Sends count_down.delete_all_rules command.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async deleteAllTimerRules () {
-    return this.sendCommand(`{"count_down":{"delete_all_rules":{}}}`);
   }
   /**
    * Blink Plug LED.
@@ -242,28 +252,29 @@ class Plug extends Device {
    * then sets the led to its pre-blink state.
    *
    * Note: `system.set_led_off` is particulally slow, so blink rate is not guaranteed.
-   * @param  {number}  [times=5]
-   * @param  {number}  [rate=1000]
+   * @param  {number}      [times=5]
+   * @param  {number}      [rate=1000]
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async blink (times = 5, rate = 1000) {
+  async blink (times = 5, rate = 1000, sendOptions) {
     let delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
 
-    let origLedState = await this.getLedState();
+    let origLedState = await this.getLedState(sendOptions);
     let lastBlink = Date.now();
 
     let currLedState = false;
     for (var i = 0; i < times * 2; i++) {
       currLedState = !currLedState;
       lastBlink = Date.now();
-      await this.setLedState(currLedState);
+      await this.setLedState(currLedState, sendOptions);
       let timeToWait = (rate / 2) - (Date.now() - lastBlink);
       if (timeToWait > 0) {
         await delay(timeToWait);
       }
     }
     if (currLedState !== origLedState) {
-      await this.setLedState(origLedState);
+      await this.setLedState(origLedState, sendOptions);
     }
     return true;
   }

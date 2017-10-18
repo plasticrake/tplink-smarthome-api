@@ -52,6 +52,7 @@ describe('Test Environment Setup', function () {
         testDevice = testDevices['unreliable'];
       });
       it(`should have options`, function () {
+        expect(testDevice).to.have.property('options');
         expect(testDevice.options).to.contain.keys('host', 'port');
       });
       it(`should have getDevice and throw`, function () {
@@ -62,6 +63,7 @@ describe('Test Environment Setup', function () {
 
     context('unreachable', function () {
       it(`should have options`, function () {
+        expect(testDevices['unreachable']).to.have.property('options');
         expect(testDevices['unreachable'].options).to.contain.keys('host', 'port');
       });
     });

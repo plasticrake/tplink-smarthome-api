@@ -13,18 +13,18 @@ chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 const { getTestClient, testDevices } = require('./setup');
-const Device = require('../src/device.js');
-const Plug = require('../src/plug.js');
-const Bulb = require('../src/bulb.js');
+const Device = require('../src/device');
+const Plug = require('../src/plug');
+const Bulb = require('../src/bulb');
 
 describe('Client', function () {
   this.timeout(5000);
   this.slow(2000);
-  let client;
 
   describe('#startDiscovery()', function () {
+    let client;
     beforeEach(() => {
-      client = getTestClient({logLevel: 'silent'});
+      client = getTestClient({ logLevel: 'silent' });
     });
 
     afterEach(() => {
@@ -95,6 +95,7 @@ describe('Client', function () {
         if (et.event === 'offline') {
           let invalidDevice = client.getDeviceFromType(et.typeName);
           invalidDevice.status = 'online';
+          invalidDevice.seenOnDiscovery = 0;
           invalidDevice.sysInfo.type = et.typeName;
           client.devices.set(invalidDevice.deviceId, invalidDevice);
         }
@@ -120,7 +121,7 @@ describe('Client', function () {
 
     it('should emit discovery-invalid for the unreliable test device', function (done) {
       let device = testDevices['unreliable'];
-      if (!device.options.port) this.skip();
+      if (!device.options || !device.options.port) this.skip();
 
       client.startDiscovery({ discoveryInterval: 250 }).on('discovery-invalid', ({rinfo, response, decryptedResponse}) => {
         expect(response).to.be.instanceof(Buffer);
@@ -137,10 +138,11 @@ describe('Client', function () {
   describe('#getDevice()', function () {
     this.timeout(2000);
     this.slow(1500);
+    let client;
     let device;
 
     before(async function () {
-      let client = getTestClient();
+      client = getTestClient();
       device = await client.getDevice(testDevices['anydevice'].options);
     });
 
@@ -150,8 +152,9 @@ describe('Client', function () {
 
     it('should be rejected with an invalid IP address', async function () {
       let error;
+      let deviceOptions = testDevices['unreachable'].options;
       try {
-        await client.getDevice(testDevices['unreachable'].options);
+        await client.getDevice(deviceOptions, deviceOptions.defaultSendOptions);
       } catch (err) {
         error = err;
       }
@@ -162,10 +165,12 @@ describe('Client', function () {
   describe('#getPlug()', function () {
     this.timeout(2000);
     this.slow(1500);
+    let client;
     let plug;
     let unreachablePlug;
 
     before(function () {
+      client = getTestClient();
       plug = client.getPlug(testDevices['anyplug'].options);
       unreachablePlug = client.getPlug(testDevices['unreachable'].options);
     });
@@ -182,10 +187,12 @@ describe('Client', function () {
   describe('#getBulb()', function () {
     this.timeout(2000);
     this.slow(1500);
+    let client;
     let bulb;
     let unreachableBulb;
 
     before(function () {
+      client = getTestClient();
       bulb = client.getBulb(testDevices['anybulb'].options);
       unreachableBulb = client.getBulb(testDevices['unreachable'].options);
     });
@@ -200,16 +207,18 @@ describe('Client', function () {
   });
 
   describe('.send()', function () {
+    let client;
     let options;
     before(function () {
+      client = getTestClient();
       options = testDevices['anydevice'].options;
     });
     it('should return info with string payload', function () {
-      return expect(client.send({host: options.host, port: options.port, payload: '{"system":{"get_sysinfo":{}}}', timeout: 1000}))
+      return expect(client.send('{"system":{"get_sysinfo":{}}}', options.host, options.port))
         .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
     });
     it('should return info with object payload', function () {
-      return expect(client.send({host: options.host, port: options.port, payload: {'system': {'get_sysinfo': {}}}, timeout: 1000}))
+      return expect(client.send({'system': {'get_sysinfo': {}}}, options.host, options.port))
         .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
     });
   });

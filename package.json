@@ -22,6 +22,7 @@
     "lb100",
     "lb110",
     "lb120",
+    "lb130",
     "home",
     "smartplug",
     "smartswitch",
@@ -53,8 +54,8 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
-    "codecov": "^2.3.0",
-    "cross-env": "^5.0.5",
+    "codecov": "^2.3.1",
+    "cross-env": "^5.1.0",
     "dotenv": "^4.0.0",
     "jsdoc-to-markdown": "^3.1.0-0",
     "mocha": "^4.0.1",
@@ -72,7 +73,7 @@
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "./node_modules/.bin/babel src -d lib",
     "prepare": "npm run build",
-    "docs": "jsdoc2md --template=jsdoc2md/README.hbs src/**.js > README.md"
+    "docs": "jsdoc2md 'src/**/*.js' > API.md && jsdoc2md --template=jsdoc2md/README.hbs 'src/**/*.js' > README.md"
   },
   "bin": {
     "hs100-api": "lib/cli.js"

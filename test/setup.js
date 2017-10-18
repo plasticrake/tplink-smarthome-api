@@ -6,7 +6,7 @@ const defaultTo = require('lodash.defaultto');
 const dotenv = require('dotenv');
 
 const simulator = require('tplink-smarthome-simulator');
-const Client = require('../src').Client;
+const { Client } = require('../src');
 
 dotenv.config();
 const clientOptions = { logLevel: process.env.TEST_CLIENT_LOGLEVEL };
@@ -18,12 +18,21 @@ const discoveryIpWhitelist = (() => {
   return [];
 })();
 
+const clientDefaultOptions = (() => {
+  let opt = {};
+  if (useSimulator) {
+    // set low timeout for simulator
+    opt = { defaultSendOptions: { timeout: 100 } };
+  }
+  return Object.assign(opt, clientOptions);
+})();
+
 function envIsTrue (value) {
   return !(value == null || value === 0 || value === 'false');
 }
 
 function getTestClient (options = {}) {
-  return new Client(Object.assign({}, clientOptions, options));
+  return new Client(Object.assign({}, clientDefaultOptions, options));
 }
 
 const testDevices = [
@@ -42,16 +51,18 @@ Object.entries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
   testDevices[key] = value;
 });
 
+testDevices.simulated = useSimulator;
 testDevices['anydevice'] = { name: 'Device', deviceType: 'device' };
 testDevices['anyplug'] = { name: 'Plug', deviceType: 'plug' };
 testDevices['anybulb'] = { name: 'Bulb', deviceType: 'bulb' };
 testDevices['unreliable'] = { name: 'Unreliable Device', deviceType: 'plug' };
-testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, timeout: 100 } };
+testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, defaultSendOptions: { timeout: 100 } } };
 
-const addDevice = (target, device) => {
+const addDevice = (target, device, type) => {
   target.mac = device.mac;
   target.options = device.options;
   target.getDevice = device.getDevice;
+  target.type = device.type;
 };
 
 async function getTestDevices () {
@@ -73,9 +84,10 @@ async function getDiscoveryTestDevices () {
         if (discoveryIpWhitelist.length === 0 || discoveryIpWhitelist.includes(device.host)) {
           discoveredTestDevices.push({
             model: device.model,
-            options: { host: device.host, port: device.port },
             mac: device.mac,
-            getDevice: (options) => client.getDevice(Object.assign({host: device.host, port: device.port}, options))
+            options: { host: device.host, port: device.port },
+            getDevice: (options) => client.getDevice(Object.assign({host: device.host, port: device.port}, options)),
+            type: 'real'
           });
         } else {
           console.log(`Excluding ${device.host}:${device.port} from test, not in whitelist`);
@@ -115,7 +127,8 @@ async function getSimulatedTestDevices () {
       model: d.model,
       mac: d.data.system.sysinfo.mac,
       options: { host: d.address, port: d.port },
-      getDevice: (options) => client.getDevice(Object.assign({host: d.address, port: d.port}, options))
+      getDevice: (options) => client.getDevice(Object.assign({ host: d.address, port: d.port }, options)),
+      type: 'simulated'
     });
   }
 
@@ -134,6 +147,7 @@ function testDeviceCleanup () {
 }
 
 (async () => {
+  console.log('clientDefaultOptions: %j', clientDefaultOptions);
   const realTestDevices = await getTestDevices();
 
   testDevices.forEach((testDevice) => {
@@ -141,13 +155,15 @@ function testDeviceCleanup () {
 
     if (device) {
       addDevice(testDevice, device);
+
       if (!testDevices['anydevice'].mac) { addDevice(testDevices['anydevice'], device); }
       if (testDevice.deviceType === 'plug' && !testDevices['anyplug'].device) { addDevice(testDevices['anyplug'], device); }
       if (testDevice.deviceType === 'bulb' && !testDevices['anybulb'].device) { addDevice(testDevices['anybulb'], device); }
     }
   });
 
-  addDevice(testDevices['unreliable'], realTestDevices.find((realDevice) => (realDevice.testType === 'unreliable')));
+  let unreliableDevice = realTestDevices.find((realDevice) => (realDevice.testType === 'unreliable'));
+  if (unreliableDevice) addDevice(testDevices['unreliable'], unreliableDevice);
 
   testDevices.forEach((td) => {
     let options = td.options || {};

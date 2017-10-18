@@ -1,3 +1,4 @@
+--delay
+--recursive
 --require babel-register
 --require source-map-support
---delay
