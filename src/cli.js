@@ -1,11 +1,11 @@
 #! /usr/bin/env node
+'use strict';
+
 const util = require('util');
 const program = require('commander');
-
-const Hs100Api = require('./');
-const Client = Hs100Api.Client;
-const { ResponseError } = require('./utils');
 const tplinkCrypto = require('tplink-smarthome-crypto');
+
+const { Client, ResponseError } = require('./');
 
 let logLevel;
 let client;
@@ -39,7 +39,9 @@ let search = function (sysInfo, timeout, params) {
 let send = async function (host, port, payload, timeout) {
   try {
     console.log('Sending...');
-    let data = await client.send({host, port, payload, timeout});
+    let options = { host, port, payload, timeout };
+    if (program.udp) options.transport = 'udp';
+    let data = await client.send(options);
     console.log('response:');
     console.dir(data, {colors: program.color === 'on', depth: 10});
   } catch (err) {
@@ -78,7 +80,7 @@ let details = async function (host, port, timeout) {
     console.dir({
       alias: device.alias,
       deviceId: device.deviceId,
-      deviceName: device.deviceName,
+      description: device.description,
       model: device.model,
       deviceType: device.deviceType,
       type: device.type,
@@ -86,17 +88,6 @@ let details = async function (host, port, timeout) {
       hardwareVersion: device.hardwareVersion,
       mac: device.mac
     }, {colors: program.color === 'on', depth: 10});
-  } catch (err) {
-    outputError(err);
-  }
-};
-
-let info = async function (host, port, timeout) {
-  try {
-    console.log('Getting device info...');
-    let device = await client.getDevice({host, port});
-    let info = await device.getInfo();
-    console.dir(info, {colors: program.color === 'on', depth: 10});
   } catch (err) {
     outputError(err);
   }
@@ -125,6 +116,7 @@ let setupClient = function () {
 program
   .option('-D, --debug', 'turn on debug level logging', () => { logLevel = 'debug'; })
   .option('-t, --timeout <ms>', 'timeout (ms)', toInt, 5000)
+  .option('-u, --udp', 'send via UDP')
   .option('-c, --color [on]', 'output will be styled with ANSI color codes', 'on');
 
 program
@@ -182,8 +174,7 @@ program
     blink(hostOnly, port, times, rate, program.timeout);
   });
 
-[ 'getSysInfo', 'getModel', 'getCloudInfo', 'setAlias', 'getScheduleNextAction', 'getScheduleRules',
-  'getTime', 'getTimeZone', 'getScanInfo', 'getEmeterRealtime'
+[ 'getSysInfo', 'getInfo', 'setAlias', 'setLocation', 'getModel', 'reboot', 'reset'
 ].forEach((command) => {
   program
     .command(`${command} <host> [params]`)

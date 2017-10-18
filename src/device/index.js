@@ -77,11 +77,11 @@ class Device extends EventEmitter {
     return this.sysInfo.deviceId;
   }
   /**
-   * sys_info.dev_name
+   * sys_info.description|dev_name
    * @return {string}
    */
-  get deviceName () {
-    return this.sysInfo.dev_name;
+  get description () {
+    return this.sysInfo.description || this.sysInfo.dev_name;
   }
   /**
    * sys_info.model

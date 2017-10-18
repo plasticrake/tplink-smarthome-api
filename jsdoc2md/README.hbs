@@ -15,8 +15,6 @@ TP-Link Smart Home API
 | HS100, HS105, HS110, HS200 | Plug |
 | LB100, LB110, LB120, LB130 | Bulb |
 
-I only have HS100, HS105 and HS110 (plugs), so I am unable to test Bulb support. I'd gladly accept pull requests to add features or equipment donations ([amazon wishlist](http://a.co/bw0EfsB)) so I can do my own development!
-
 ## Related Projects
 - [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
 - [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
@@ -47,6 +45,11 @@ Install the command line utility with `npm install -g hs100-api`. Run `hs100-api
 ## API
 The API is not stable (but it's getting close!) and there may be breaking changes.
 
+For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`.
+
+Functions that take more than 3 arguments are passed a single options object as the first argument (and if its a network commmand, SendOptions as the second.)
+
+
 {{#class name="Client"}}{{>member-index}}{{/class}}
 {{#class name="Device"}}{{>member-index}}{{/class}}
 {{#class name="Bulb"}}{{>member-index}}{{/class}}
@@ -56,6 +59,9 @@ The API is not stable (but it's getting close!) and there may be breaking change
 {{#class name="Device"}}{{>docs}}{{/class}}
 {{#class name="Bulb"}}{{>docs}}{{/class}}
 {{#class name="Plug"}}{{>docs}}{{/class}}
+
+{{#identifier name="SendOptions"}}{{>docs}}{{/identifier}}
+{{#identifier name="ResponseError"}}{{>docs}}{{/identifier}}
 
 ## Credits
 Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.

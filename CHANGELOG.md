@@ -1,44 +1,66 @@
-# 0.18.0 / 2017-10-11
+## Unreleased
 
-## :tada: Enhancements
+### Breaking Changes :boom:
+- `Device`/`Bulb`/`Plug`
+  - Many methods were moved to mirror the TPLink API.
+    - Example: `Plug#getScheduleRules()` is now `Plug.schedule#getRules()`
+    - Example: `Bulb#getCloudInfo()` is now `Bulb.cloud#getInfo()`
+    - See documenation for details.
 
-- `encrypt` and `encyptWithHeader` now work properly with non-ascii characters
+### Added :heavy_plus_sign:
+- `Device`/`Bulb`/`Plug`
+  - Dozens of new methods, see documentation for details.
+  - `options` added as last argument to functions that send commands
+    - `options.timeout` and `options.transport` can be set to customize the timeout and transport (tcp, udp) used for a single command
+  - `defaultSendOptions` added to constructor
+- `Client`
+  - `send`/`sendCommand`
+    - Receiving large TCP responses split across multiple segments are now supported
+    - Support UDP in addition to TCP
+      - UDP can be unreliable, large replies may not be sent back from the device
+- `ResponseError` now exported so consumer can check errors with `instanceof`
+
+## 0.18.0 / 2017-10-11
+
+### Added :heavy_plus_sign:
 - `Plug`
-  - added `#addTimerRule`
-  - added `#editTimerRule`
-  - added `#deleteAllTimerRules`
+  - `#addTimerRule`
+  - `#editTimerRule`
+  - `#deleteAllTimerRules`
 - `Client#startDiscovery` now emits `discovery-invalid` when receiving an invalid response (perhaps from a non-tplink device)
 
-# 0.17.0 / 2017-10-10
+### Fixed :bug:
+- `encrypt` and `encyptWithHeader` now work properly with non-ascii characters
 
-## :bug: Fixes
+## 0.17.0 / 2017-10-10
 
+### Fixed :bug:
 - [plasticrake/homebridge-hs100#35]: Switch to utf8 from ascii to support special characters in Alias (thanks [@wzaatar])
 
 [plasticrake/homebridge-hs100#35]: https://github.com/plasticrake/homebridge-hs100/issues/35
 [@wzaatar]: https://github.com/wzaatar
 
-# 0.16.0 / 2017-10-09
+## 0.16.0 / 2017-10-09
 
-## :tada: Enhancements
+### Added :heavy_plus_sign:
 - `Device#name` re-added as alias for `Device#alias` for backwards compatibility
 - `Client.startDiscovery` has additional parameter `macAddresses`
   - if specified only devices matching MAC will be found
 - `Bulb`
-  - added `#supportsBrightness`
-  - added `#supportsColor`
-  - added `#supportsColorTemperature`
-  - added `#getColorTemperatureRange`
-  - [#18] added `#togglePowerState` (thanks [@adamsandle]!)
+  - `#supportsBrightness`
+  - `#supportsColor`
+  - `#supportsColorTemperature`
+  - `#getColorTemperatureRange`
+  - [#18]`#togglePowerState` (thanks [@adamsandle]!)
 - `Plug`
-  - [#18] added `#togglePowerState` (thanks [@adamsandle]!)
+  - [#18]`#togglePowerState` (thanks [@adamsandle]!)
 
 [#18]: https://github.com/plasticrake/hs100-api/pulls/18
 [@adamsandle]: https://github.com/adamsandle
 
-# 0.15.0 / 2017-10-07
+## 0.15.0 / 2017-10-07
 
-## :boom: Breaking Changes
+### Breaking Changes :boom:
 
 - `Client#getGeneralDevice` is now `Client#getCommonDevice`
 - `Device#name` is now `Device#alias`
@@ -48,12 +70,11 @@
 - `consumption-update` is now `emeter-realtime-update`
 -  Existing `Device`/`Bulb`/`Plug` events have changed to no longer emit with `this` as argument
 
-## :tada: Enhancements
+### Added :heavy_plus_sign:
 
 - Support for older Node 4.8
 - `Bulb#getInfo()` added to mirror `Plug#getInfo()`
 - New `Bulb` events: `lightstate-on`, `lightstate-off`, `lightstate-change`, `lightstate-update`
 
-## :nut_and_bolt: Other
-
+### Changes :zap:
 - Updated examples

@@ -213,13 +213,15 @@ describe('Client', function () {
       client = getTestClient();
       options = testDevices['anydevice'].options;
     });
-    it('should return info with string payload', function () {
-      return expect(client.send('{"system":{"get_sysinfo":{}}}', options.host, options.port))
-        .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
-    });
-    it('should return info with object payload', function () {
-      return expect(client.send({'system': {'get_sysinfo': {}}}, options.host, options.port))
-        .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
+    [{ transport: 'tcp' }, { transport: 'udp' }].forEach((sendOptions) => {
+      it(`should return info with string payload ${sendOptions.transport}`, function () {
+        return expect(client.send('{"system":{"get_sysinfo":{}}}', options.host, options.port, sendOptions))
+          .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
+      });
+      it(`should return info with object payload${sendOptions.transport}`, function () {
+        return expect(client.send({'system': {'get_sysinfo': {}}}, options.host, options.port, sendOptions))
+          .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
+      });
     });
   });
 });
