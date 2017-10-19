@@ -1,7 +1,7 @@
 ## Modules
 
 <dl>
-<dt><a href="#module_hs100-api">hs100-api</a></dt>
+<dt><a href="#module_tplink-smarthome-api">tplink-smarthome-api</a></dt>
 <dd></dd>
 </dl>
 
@@ -72,9 +72,9 @@
 </dd>
 </dl>
 
-<a name="module_hs100-api"></a>
+<a name="module_tplink-smarthome-api"></a>
 
-## hs100-api
+## tplink-smarthome-api
 <a name="Bulb"></a>
 
 ## Bulb ⇐ [<code>Device</code>](#Device)
