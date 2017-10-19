@@ -97,6 +97,9 @@ TP-Link models: LB100, LB110, LB120, LB130.
     * [.emeter](#Bulb+emeter)
         * [.realtime](#Bulb+emeter+realtime) ⇒ <code>Object</code>
         * [.getRealtime([sendOptions])](#Bulb+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getDayStats(year, month, [sendOptions])](#Bulb+emeter+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getMonthStats(year, [sendOptions])](#Bulb+emeter+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.eraseStats([sendOptions])](#Bulb+emeter+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.lighting](#Bulb+lighting)
         * [.lightState](#Bulb+lighting+lightState) ⇒ <code>Object</code>
         * [.getLightState([sendOptions])](#Bulb+lighting+getLightState) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -110,6 +113,9 @@ TP-Link models: LB100, LB110, LB120, LB130.
         * [.deleteAllRules([sendOptions])](#Bulb+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.deleteRule(id, [sendOptions])](#Bulb+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.setOverallEnable(enable, [sendOptions])](#Bulb+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getDayStats(year, month, [sendOptions])](#Bulb+schedule+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getMonthStats(year, [sendOptions])](#Bulb+schedule+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.eraseStats([sendOptions])](#Bulb+schedule+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.time](#Bulb+time)
         * [.getTime([sendOptions])](#Bulb+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getTimezone([sendOptions])](#Bulb+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -248,6 +254,9 @@ Sends `cloud.set_server_url` command.
 * [.emeter](#Bulb+emeter)
     * [.realtime](#Bulb+emeter+realtime) ⇒ <code>Object</code>
     * [.getRealtime([sendOptions])](#Bulb+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDayStats(year, month, [sendOptions])](#Bulb+emeter+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getMonthStats(year, [sendOptions])](#Bulb+emeter+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.eraseStats([sendOptions])](#Bulb+emeter+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 
 <a name="Bulb+emeter+realtime"></a>
 
@@ -261,6 +270,51 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 Gets device's current energy stats.
 
 Requests `emeter.get_realtime`.
+
+**Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+emeter+getDayStats"></a>
+
+#### emeter.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Daily Emeter Statisics.
+
+Sends `emeter.get_daystat` command.
+
+**Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| month | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+emeter+getMonthStats"></a>
+
+#### emeter.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Monthly Emeter Statisics.
+
+Sends `emeter.get_monthstat` command.
+
+**Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+emeter+eraseStats"></a>
+
+#### emeter.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Erase Emeter Statistics.
+
+Sends `emeter.erase_runtime_stat` command.
 
 **Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -335,6 +389,9 @@ Sends `lightingservice.transition_light_state` command.
     * [.deleteAllRules([sendOptions])](#Bulb+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.deleteRule(id, [sendOptions])](#Bulb+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.setOverallEnable(enable, [sendOptions])](#Bulb+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDayStats(year, month, [sendOptions])](#Bulb+schedule+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getMonthStats(year, [sendOptions])](#Bulb+schedule+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.eraseStats([sendOptions])](#Bulb+schedule+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 
 <a name="Bulb+schedule+getNextAction"></a>
 
@@ -394,7 +451,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options | <code>Object</code> |  |  |
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
@@ -414,7 +471,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.id | <code>string</code> |  |  |
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
@@ -461,6 +518,51 @@ Sends `schedule.set_overall_enable` command.
 | Param | Type |
 | --- | --- |
 | enable | <code>boolean</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+getDayStats"></a>
+
+#### schedule.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Daily Usage Statisics.
+
+Sends `schedule.get_daystat` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| month | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+getMonthStats"></a>
+
+#### schedule.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Monthly Usage Statisics.
+
+Sends `schedule.get_monthstat` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Bulb+schedule+eraseStats"></a>
+
+#### schedule.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Erase Usage Statistics.
+
+Sends `schedule.erase_runtime_stat` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Bulb+time"></a>
@@ -511,19 +613,19 @@ Returns cached results from last retrieval of `system.sys_info`.
 <a name="Bulb+supportsBrightness"></a>
 
 ### bulb.supportsBrightness ⇒ <code>boolean</code>
-sys_info.is_dimmable === 1
+Cached value of `sys_info.is_dimmable === 1`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Bulb+supportsColor"></a>
 
 ### bulb.supportsColor ⇒ <code>boolean</code>
-sys_info.is_color === 1
+Cached value of `sys_info.is_color === 1`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Bulb+supportsColorTemperature"></a>
 
 ### bulb.supportsColorTemperature ⇒ <code>boolean</code>
-sys_info.is_variable_color_temp === 1
+Cached value of `sys_info.is_variable_color_temp === 1`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Bulb+getColorTemperatureRange"></a>
@@ -536,37 +638,37 @@ Returns array with min and max supported color temperatures
 <a name="Device+alias"></a>
 
 ### bulb.alias ⇒ <code>string</code>
-sys_info.alias
+Cached value of `sys_info.alias`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+deviceId"></a>
 
 ### bulb.deviceId ⇒ <code>string</code>
-sys_info.deviceId
+Cached value of `sys_info.deviceId`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+description"></a>
 
 ### bulb.description ⇒ <code>string</code>
-sys_info.description|dev_name
+Cached value of `sys_info.[description|dev_name]`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+model"></a>
 
 ### bulb.model ⇒ <code>string</code>
-sys_info.model
+Cached value of `sys_info.model`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+name"></a>
 
 ### bulb.name ⇒ <code>string</code>
-sys_info.alias
+Cached value of `sys_info.alias`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+type"></a>
 
 ### bulb.type ⇒ <code>string</code>
-sys_info.[type|mic_type]
+Cached value of `sys_info.[type|mic_type]``
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+deviceType"></a>
@@ -574,26 +676,26 @@ sys_info.[type|mic_type]
 ### bulb.deviceType ⇒ <code>string</code>
 Type of device (or device if unknown)
 
-Based on sys_info.[type|mic_type]
+Based on cached value of `sys_info.[type|mic_type]``
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 **Returns**: <code>string</code> - 'plub'|'bulb'|'device'  
 <a name="Device+softwareVersion"></a>
 
 ### bulb.softwareVersion ⇒ <code>string</code>
-sys_info.sw_ver
+Cached value of `sys_info.sw_ver`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+hardwareVersion"></a>
 
 ### bulb.hardwareVersion ⇒ <code>string</code>
-sys_info.hw_ver
+Cached value of `sys_info.hw_ver`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+mac"></a>
 
 ### bulb.mac ⇒ <code>string</code>
-sys_info.[mac|mic_mac|ethernet_mac]
+Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Bulb+getInfo"></a>
@@ -879,7 +981,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options | <code>Object</code> |  |  |
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
@@ -899,7 +1001,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.id | <code>string</code> |  |  |
 | options.lightState | <code>Object</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
@@ -1308,37 +1410,37 @@ Returns cached results from last retrieval of `system.sys_info`.
 <a name="Device+alias"></a>
 
 ### device.alias ⇒ <code>string</code>
-sys_info.alias
+Cached value of `sys_info.alias`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+deviceId"></a>
 
 ### device.deviceId ⇒ <code>string</code>
-sys_info.deviceId
+Cached value of `sys_info.deviceId`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+description"></a>
 
 ### device.description ⇒ <code>string</code>
-sys_info.description|dev_name
+Cached value of `sys_info.[description|dev_name]`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+model"></a>
 
 ### device.model ⇒ <code>string</code>
-sys_info.model
+Cached value of `sys_info.model`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+name"></a>
 
 ### device.name ⇒ <code>string</code>
-sys_info.alias
+Cached value of `sys_info.alias`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+type"></a>
 
 ### device.type ⇒ <code>string</code>
-sys_info.[type|mic_type]
+Cached value of `sys_info.[type|mic_type]``
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+deviceType"></a>
@@ -1346,26 +1448,26 @@ sys_info.[type|mic_type]
 ### device.deviceType ⇒ <code>string</code>
 Type of device (or device if unknown)
 
-Based on sys_info.[type|mic_type]
+Based on cached value of `sys_info.[type|mic_type]``
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 **Returns**: <code>string</code> - 'plub'|'bulb'|'device'  
 <a name="Device+softwareVersion"></a>
 
 ### device.softwareVersion ⇒ <code>string</code>
-sys_info.sw_ver
+Cached value of `sys_info.sw_ver`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+hardwareVersion"></a>
 
 ### device.hardwareVersion ⇒ <code>string</code>
-sys_info.hw_ver
+Cached value of `sys_info.hw_ver`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+mac"></a>
 
 ### device.mac ⇒ <code>string</code>
-sys_info.[mac|mic_mac|ethernet_mac]
+Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+send"></a>
@@ -1702,6 +1804,9 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
     * [.emeter](#Plug+emeter)
         * [.realtime](#Plug+emeter+realtime) ⇒ <code>Object</code>
         * [.getRealtime([sendOptions])](#Plug+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getDayStats(year, month, [sendOptions])](#Plug+emeter+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getMonthStats(year, [sendOptions])](#Plug+emeter+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.eraseStats([sendOptions])](#Plug+emeter+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.schedule](#Plug+schedule)
         * [.getNextAction([sendOptions])](#Plug+schedule+getNextAction) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getRules([sendOptions])](#Plug+schedule+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -1711,6 +1816,9 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
         * [.deleteAllRules([sendOptions])](#Plug+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.deleteRule(id, [sendOptions])](#Plug+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.setOverallEnable(enable, [sendOptions])](#Plug+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getDayStats(year, month, [sendOptions])](#Plug+schedule+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getMonthStats(year, [sendOptions])](#Plug+schedule+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.eraseStats([sendOptions])](#Plug+schedule+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.time](#Plug+time)
         * [.getTime([sendOptions])](#Plug+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getTimezone([sendOptions])](#Plug+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -1721,6 +1829,7 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
         * [.deleteAllRules([sendOptions])](#Plug+timer+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.sysInfo](#Plug+sysInfo) ⇒ <code>Object</code>
     * [.inUse](#Plug+inUse) ⇒ <code>boolean</code>
+    * [.relayState](#Plug+relayState) ⇒ <code>boolean</code>
     * [.alias](#Device+alias) ⇒ <code>string</code>
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.description](#Device+description) ⇒ <code>string</code>
@@ -1977,6 +2086,9 @@ Sends `cloud.set_server_url` command.
 * [.emeter](#Plug+emeter)
     * [.realtime](#Plug+emeter+realtime) ⇒ <code>Object</code>
     * [.getRealtime([sendOptions])](#Plug+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDayStats(year, month, [sendOptions])](#Plug+emeter+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getMonthStats(year, [sendOptions])](#Plug+emeter+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.eraseStats([sendOptions])](#Plug+emeter+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 
 <a name="Plug+emeter+realtime"></a>
 
@@ -1990,6 +2102,51 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 Gets device's current energy stats.
 
 Requests `emeter.get_realtime`.
+
+**Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+emeter+getDayStats"></a>
+
+#### emeter.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Daily Emeter Statisics.
+
+Sends `emeter.get_daystat` command.
+
+**Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| month | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+emeter+getMonthStats"></a>
+
+#### emeter.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Monthly Emeter Statisics.
+
+Sends `emeter.get_monthstat` command.
+
+**Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+emeter+eraseStats"></a>
+
+#### emeter.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Erase Emeter Statistics.
+
+Sends `emeter.erase_runtime_stat` command.
 
 **Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -2012,6 +2169,9 @@ Requests `emeter.get_realtime`.
     * [.deleteAllRules([sendOptions])](#Plug+schedule+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.deleteRule(id, [sendOptions])](#Plug+schedule+deleteRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.setOverallEnable(enable, [sendOptions])](#Plug+schedule+setOverallEnable) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDayStats(year, month, [sendOptions])](#Plug+schedule+getDayStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getMonthStats(year, [sendOptions])](#Plug+schedule+getMonthStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.eraseStats([sendOptions])](#Plug+schedule+eraseStats) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 
 <a name="Plug+schedule+getNextAction"></a>
 
@@ -2071,7 +2231,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options | <code>Object</code> |  |  |
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
@@ -2092,7 +2252,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.id | <code>string</code> |  |  |
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
@@ -2139,6 +2299,51 @@ Sends `schedule.set_overall_enable` command.
 | Param | Type |
 | --- | --- |
 | enable | <code>boolean</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+getDayStats"></a>
+
+#### schedule.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Daily Usage Statisics.
+
+Sends `schedule.get_daystat` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| month | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+getMonthStats"></a>
+
+#### schedule.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Get Monthly Usage Statisics.
+
+Sends `schedule.get_monthstat` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| year | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+schedule+eraseStats"></a>
+
+#### schedule.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Erase Usage Statistics.
+
+Sends `schedule.erase_runtime_stat` command.
+
+**Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Plug+time"></a>
@@ -2275,40 +2480,46 @@ If device supports energy monitoring (HS110): `power > inUseThreshold`
 Otherwise fallback on relay state:  `relay_state === 1`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
+<a name="Plug+relayState"></a>
+
+### plug.relayState ⇒ <code>boolean</code>
+`sys_info.relay_state === 1`
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+alias"></a>
 
 ### plug.alias ⇒ <code>string</code>
-sys_info.alias
+Cached value of `sys_info.alias`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+deviceId"></a>
 
 ### plug.deviceId ⇒ <code>string</code>
-sys_info.deviceId
+Cached value of `sys_info.deviceId`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+description"></a>
 
 ### plug.description ⇒ <code>string</code>
-sys_info.description|dev_name
+Cached value of `sys_info.[description|dev_name]`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+model"></a>
 
 ### plug.model ⇒ <code>string</code>
-sys_info.model
+Cached value of `sys_info.model`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+name"></a>
 
 ### plug.name ⇒ <code>string</code>
-sys_info.alias
+Cached value of `sys_info.alias`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+type"></a>
 
 ### plug.type ⇒ <code>string</code>
-sys_info.[type|mic_type]
+Cached value of `sys_info.[type|mic_type]``
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+deviceType"></a>
@@ -2316,26 +2527,26 @@ sys_info.[type|mic_type]
 ### plug.deviceType ⇒ <code>string</code>
 Type of device (or device if unknown)
 
-Based on sys_info.[type|mic_type]
+Based on cached value of `sys_info.[type|mic_type]``
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 **Returns**: <code>string</code> - 'plub'|'bulb'|'device'  
 <a name="Device+softwareVersion"></a>
 
 ### plug.softwareVersion ⇒ <code>string</code>
-sys_info.sw_ver
+Cached value of `sys_info.sw_ver`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+hardwareVersion"></a>
 
 ### plug.hardwareVersion ⇒ <code>string</code>
-sys_info.hw_ver
+Cached value of `sys_info.hw_ver`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+mac"></a>
 
 ### plug.mac ⇒ <code>string</code>
-sys_info.[mac|mic_mac|ethernet_mac]
+Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Plug+getInfo"></a>
@@ -2684,7 +2895,7 @@ Sends `schedule.add_rule` command and returns rule id.
 | options | <code>Object</code> |  |  |
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  |  |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
@@ -2705,7 +2916,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 | options.id | <code>string</code> |  |  |
 | options.powerState | <code>boolean</code> |  |  |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
-| options.daysOfWeek | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
+| [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  | [description] |
 | [options.enable] | <code>boolean</code> | <code>true</code> |  |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
