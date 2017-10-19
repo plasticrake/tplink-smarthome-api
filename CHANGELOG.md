@@ -1,3 +1,9 @@
+## 1.0.0 / 2017-10-19
+
+### Changes :zap:
+- new name, `hs100-api` is now `tplink-smarthome-api`
+- - 1.0.0!
+
 ## 0.19.0 / 2017-10-18
 
 ### Breaking Changes :boom:
@@ -37,7 +43,7 @@
 ### Fixed :bug:
 - [plasticrake/homebridge-hs100#35]: Switch to utf8 from ascii to support special characters in Alias (thanks [@wzaatar])
 
-[plasticrake/homebridge-hs100#35]: https://github.com/plasticrake/homebridge-hs100/issues/35
+[plasticrake/homebridge-hs100#35]: https://github.com/plasticrake/homebridge-tplink-smarthome/issues/35
 [@wzaatar]: https://github.com/wzaatar
 
 ## 0.16.0 / 2017-10-09
@@ -55,7 +61,7 @@
 - `Plug`
   - [#18]`#togglePowerState` (thanks [@adamsandle]!)
 
-[#18]: https://github.com/plasticrake/hs100-api/pulls/18
+[#18]: https://github.com/plasticrake/tplink-smarthome-api/pulls/18
 [@adamsandle]: https://github.com/adamsandle
 
 ## 0.15.0 / 2017-10-07
