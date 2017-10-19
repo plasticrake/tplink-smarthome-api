@@ -14,7 +14,6 @@ class Lighting {
     this.apiModuleName = apiModuleName;
 
     this._lastState = { powerOn: null, lightState: null };
-    device.emit('test');
   }
   /**
    * Returns cached results from last retrieval of `lightingservice.get_light_state`.
@@ -30,6 +29,26 @@ class Lighting {
     _lightState = lightState;
     this.emitEvents();
   }
+  /**
+   * Bulb was turned on (`lightstate.on_off`).
+   * @event Bulb#lightstate-on
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb was turned off (`lightstate.on_off`).
+   * @event Bulb#lightstate-off
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's lightstate was changed.
+   * @event Bulb#lightstate-change
+   * @property {Object} value lightstate
+   */
+  /**
+   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+   * @event Bulb#lightstate-update
+   * @property {Object} value lightstate
+   */
   /**
    * @private
    */

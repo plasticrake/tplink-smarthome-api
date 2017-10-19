@@ -51,6 +51,11 @@ class Bulb extends Device {
      */
     this.cloud = new Cloud(this, 'smartlife.iot.common.cloud');
     /**
+     * Bulb's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+     * @event Bulb#emeter-realtime-update
+     * @property {Object} value emeterRealtime
+     */
+    /**
      * @borrows Emeter#realtime as Bulb.emeter#realtime
      * @borrows Emeter#getRealtime as Bulb.emeter#getRealtime
      * @borrows Emeter#getDayStats as Bulb.emeter#getDayStats
@@ -194,31 +199,6 @@ class Bulb extends Device {
     await this.setPowerState(!powerState, sendOptions);
     return !powerState;
   }
-  /**
-   * Bulb was turned on (`lightstate.on_off`).
-   * @event Bulb#lightstate-on
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb was turned off (`lightstate.on_off`).
-   * @event Bulb#lightstate-off
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's lightstate was changed.
-   * @event Bulb#lightstate-change
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
-   * @event Bulb#lightstate-update
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
-   * @event Bulb#emeter-realtime-update
-   * @property {Object} value emeterRealtime
-   */
 }
 
 module.exports = Bulb;

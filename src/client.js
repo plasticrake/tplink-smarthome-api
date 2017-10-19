@@ -30,8 +30,8 @@ class Client extends EventEmitter {
   /**
    * @param  {Object}       options
    * @param  {SendOptions} [options.defaultSendOptions]
-   * @param  {Number}      [options.defaultSendOptions.timeout=5000]
-   * @param  {string}      [options.defaultSendOptions.transport=tcp]
+   * @param  {Number}      [options.defaultSendOptions.timeout=5000]  (ms)
+   * @param  {string}      [options.defaultSendOptions.transport=tcp] 'tcp' or 'udp'
    * @param  {string}      [options.logLevel]       level for built in logger ['error','warn','info','debug','trace']
    */
   constructor ({ defaultSendOptions = { timeout: 5000, transport: 'tcp' }, logLevel, logger } = {}) {
@@ -44,7 +44,7 @@ class Client extends EventEmitter {
     this.discoveryPacketSequence = 0;
   }
   /**
-   * {@link https://github.com/plasticrake/tplink-smarthome-crypto Encrypts} `payload` and sends (via TCP) to device.
+   * {@link https://github.com/plasticrake/tplink-smarthome-crypto Encrypts} `payload` and sends to device.
    * - If `payload` is not a string, it is `JSON.stringify`'d.
    * - Promise fulfills with parsed JSON response.
    *
@@ -60,7 +60,7 @@ class Client extends EventEmitter {
    *       ...
    *     }}}`
    *
-   * All responses contain an `err_code` (`0` is success).
+   * All responses from device contain an `err_code` (`0` is success).
    *
    * @param  {Object|string}  payload
    * @param  {string}         host
@@ -393,7 +393,7 @@ class Client extends EventEmitter {
    *
    * - Sends a discovery packet (via UDP) to the `broadcast` address every `discoveryInterval`(ms).
    * - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until {@link #stopDiscovery} is called).
-   *   - If a device does not respond after `offlineTolerance` number of attempts, {@link event:device-offline} is emitted.
+   *   - If a device does not respond after `offlineTolerance` number of attempts, {@link event:Client#device-offline} is emitted.
    * - If `deviceTypes` are specified only matching devices are found.
    * - If `macAddresses` are specified only matching device with matching MAC addresses are found.
    * - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
@@ -404,9 +404,9 @@ class Client extends EventEmitter {
    * @param  {string}   [options.broadcast=255.255.255.255] broadcast address
    * @param  {number}   [options.discoveryInterval=10000]     (ms)
    * @param  {number}   [options.discoveryTimeout=0]          (ms)
-   * @param  {number}   [options.offlineTolerance=3]
+   * @param  {number}   [options.offlineTolerance=3]          # of consecutive missed replies to consider offline
    * @param  {string[]} [options.deviceTypes]                 'plug','bulb'
-   * @param  {string[]} [options.macAddresses]                'plug','bulb'
+   * @param  {string[]} [options.macAddresses]                MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
    * @param  {Object}   [options.deviceOptions={}]            passed to device constructors
    * @param  {Object[]} [options.devices]                     known devices to query instead of relying on broadcast
    * @return {Client}                                         this
