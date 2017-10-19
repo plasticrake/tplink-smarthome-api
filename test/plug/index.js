@@ -1,35 +1,34 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const chaiAsPromised = require('chai-as-promised');
-const sinonChai = require('sinon-chai');
+const { expect, sinon, testDevices } = require('../setup');
 
-const expect = chai.expect;
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
-
-const utils = require('../src/utils');
-const ResponseError = utils.ResponseError;
-const { testDevices } = require('./setup');
+const awayTests = require('./away');
+const timerTests = require('./timer');
+const scheduleTests = require('./schedule');
 
 describe('Plug', function () {
-  before(function () {
-    this.timeout(4000);
-    this.slow(2000);
-  });
+  this.timeout(5000);
+  this.slow(2000);
 
-  testDevices['plug'].forEach((testPlug) => {
-    let plug;
-    context(testPlug.name, function () {
-      beforeEach(async function () {
-        if (!testPlug.getDevice) {
-          this.skip();
+  testDevices['plug'].forEach((testDevice) => {
+    context(testDevice.name, function () {
+      let plug;
+      before(async function () {
+        // beforeEach() doesn't work with assigning to `this`
+        if (testDevice.getDevice) {
+          plug = await testDevice.getDevice();
+          this.device = plug;
         }
-        plug = await testPlug.getDevice();
+      });
+      beforeEach(async function () {
+        // before() doesn't skip nested describes
+        if (!testDevice.getDevice) {
+          return this.skip();
+        }
+        plug = await testDevice.getDevice();
+        this.device = plug;
       });
 
       describe('#supportsEmeter', function () {
@@ -47,19 +46,19 @@ describe('Plug', function () {
           if (!plug.supportsEmeter) return;
 
           plug.inUseThreshold = 0;
-          plug.emeterRealtime = {power: 0};
+          plug.emeter.realtime = {power: 0};
           expect(plug.inUse).to.be.false;
 
           plug.inUseThreshold = 10;
-          plug.emeterRealtime = {power: 10};
+          plug.emeter.realtime = {power: 10};
           expect(plug.inUse).to.be.false;
 
           plug.inUseThreshold = 0;
-          plug.emeterRealtime = {power: 0.1};
+          plug.emeter.realtime = {power: 0.1};
           expect(plug.inUse).to.be.true;
 
           plug.inUseThreshold = 10;
-          plug.emeterRealtime = {power: 11};
+          plug.emeter.realtime = {power: 11};
           expect(plug.inUse).to.be.true;
         });
         it('should return status based on relay_state if Emeter not supported', function () {
@@ -83,9 +82,9 @@ describe('Plug', function () {
         it('should return info', async function () {
           let results = await plug.getInfo();
           expect(results).to.have.property('sysInfo');
-          expect(results).to.have.property('cloudInfo');
-          expect(results).to.have.property('emeterRealtime');
-          expect(results).to.have.property('scheduleNextAction');
+          expect(results).to.have.nested.property('cloud.info');
+          expect(results).to.have.nested.property('emeter.realtime');
+          expect(results).to.have.nested.property('schedule.nextAction');
         });
       });
 
@@ -140,17 +139,16 @@ describe('Plug', function () {
 
           await plug.setPowerState(false);
           await plug.setPowerState(true);
+          await plug.setPowerState(false);
 
-          expect(spyInUse).to.be.calledOnce;
-          expect(spyNotInUse).to.be.calledOnce;
-          expect(spyInUseUpdate).to.be.calledTwice;
-          expect(spyInUseUpdate).to.be.always.calledWithMatch(sinon.match.bool);
+          expect(spyInUse, 'in-use').to.be.calledOnce;
+          expect(spyNotInUse, 'not-in-use').to.be.calledOnce;
+          expect(spyInUseUpdate, 'in-use-update').to.be.calledThrice;
+          expect(spyInUseUpdate, 'in-use-update').to.be.always.calledWithMatch(sinon.match.bool);
         });
       });
 
       describe('#getPowerState()', function () {
-        this.timeout(2000);
-        this.slow(1000);
         it('should return power state when on', async function () {
           expect(await plug.setPowerState(true)).to.be.true;
           expect(await plug.getPowerState()).to.be.true;
@@ -201,65 +199,6 @@ describe('Plug', function () {
         });
       });
 
-      describe('#getAwayRules()', function () {
-        it('should return away rules', function () {
-          return expect(plug.getAwayRules()).to.eventually.have.property('err_code', 0);
-        });
-      });
-
-      describe('#getTimerRules()', function () {
-        it('should return timer rules', function () {
-          return expect(plug.getTimerRules()).to.eventually.have.property('err_code', 0);
-        });
-      });
-
-      describe('#addTimerRule()', function () {
-        it('should add timer rule', async function () {
-          let response = await plug.addTimerRule({delay: 20, powerState: false});
-          expect(response).to.have.property('err_code', 0);
-          expect(response).to.have.property('id').that.is.a('string');
-
-          let id = response.id;
-          let rules = await plug.getTimerRules();
-          expect(rules.rule_list[0].id).to.eql(id);
-        });
-
-        it('should delete existing rules and add timer rule when deleteExisting is true', async function () {
-          await plug.addTimerRule({delay: 20, powerState: false, deleteExisting: true});
-
-          let response = await plug.addTimerRule({delay: 50, powerState: false, deleteExisting: true});
-          expect(response).to.have.property('err_code', 0);
-          expect(response).to.have.property('id').that.is.a('string');
-        });
-
-        it('should fail if a timer rule exists when deleteExisting is false', async function () {
-          await plug.addTimerRule({delay: 20, powerState: false, deleteExisting: true});
-          return expect(plug.addTimerRule({delay: 20, powerState: false, deleteExisting: false})).to.eventually.be.rejectedWith(ResponseError);
-        });
-      });
-
-      describe('#editTimerRule()', function () {
-        it('should edit timer rule', async function () {
-          let response = await plug.addTimerRule({delay: 20, powerState: false});
-          expect(response).to.have.property('err_code', 0);
-          expect(response).to.have.property('id').that.is.a('string');
-
-          let id = response.id;
-
-          await plug.editTimerRule({id, delay: 50, powerStart: false});
-
-          let rules = await plug.getTimerRules();
-          expect(rules.rule_list[0].id).to.eql(id);
-          expect(rules.rule_list[0].delay).to.eql(50);
-        });
-      });
-
-      describe('#deleteAllTimerRules()', function () {
-        it('should delete timer rules', function () {
-          return expect(plug.deleteAllTimerRules()).to.eventually.have.property('err_code', 0);
-        });
-      });
-
       describe('#setLedState()', function () {
         it('should turn LED off', async function () {
           expect(await plug.setLedState(false)).to.be.true;
@@ -284,11 +223,15 @@ describe('Plug', function () {
 
       describe('#blink()', function () {
         this.timeout(5000);
-        this.slow(300);
+        this.slow(3000);
         it('should blink LED', async function () {
           expect(await plug.blink(2, 100)).to.be.true;
         });
       });
+
+      awayTests(testDevice);
+      scheduleTests(testDevice);
+      timerTests(testDevice);
     });
   });
 });

@@ -22,6 +22,7 @@
     "lb100",
     "lb110",
     "lb120",
+    "lb130",
     "home",
     "smartplug",
     "smartswitch",
@@ -48,13 +49,13 @@
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-object-entries": "^1.0.0",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
+    "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
-    "codecov": "^2.3.0",
-    "cross-env": "^5.0.5",
+    "codecov": "^2.3.1",
+    "cross-env": "^5.1.0",
     "dotenv": "^4.0.0",
     "jsdoc-to-markdown": "^3.1.0-0",
     "mocha": "^4.0.1",
@@ -63,16 +64,16 @@
     "semistandard": "^11.0.0",
     "sinon": "^4.0.1",
     "sinon-chai": "^2.14.0",
-    "tplink-smarthome-simulator": "^1.4.0"
+    "tplink-smarthome-simulator": "^1.5.2"
   },
   "scripts": {
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
     "test": "semistandard && cross-env NODE_ENV=test nyc mocha",
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
-    "build": "./node_modules/.bin/babel src -d lib",
+    "build": "babel src -d lib",
     "prepare": "npm run build",
-    "docs": "jsdoc2md --template=jsdoc2md/README.hbs src/**.js > README.md"
+    "docs": "jsdoc2md 'src/**/*.js' > API.md && jsdoc2md --template=jsdoc2md/README.hbs 'src/**/*.js' > README.md"
   },
   "bin": {
     "hs100-api": "lib/cli.js"

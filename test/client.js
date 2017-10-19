@@ -1,33 +1,24 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const chaiAsPromised = require('chai-as-promised');
-const sinonChai = require('sinon-chai');
+const { expect, sinon, getTestClient, testDevices } = require('./setup');
 
-const expect = chai.expect;
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
-
-const { getTestClient, testDevices } = require('./setup');
-const Device = require('../src/device.js');
-const Plug = require('../src/plug.js');
-const Bulb = require('../src/bulb.js');
+const Device = require('../src/device');
+const Plug = require('../src/plug');
+const Bulb = require('../src/bulb');
 
 describe('Client', function () {
   this.timeout(5000);
   this.slow(2000);
-  let client;
 
   describe('#startDiscovery()', function () {
-    beforeEach(() => {
-      client = getTestClient({logLevel: 'silent'});
+    let client;
+    beforeEach(function () {
+      client = getTestClient({ logLevel: 'silent' });
     });
 
-    afterEach(() => {
+    afterEach(function () {
       client.stopDiscovery();
     });
 
@@ -95,6 +86,7 @@ describe('Client', function () {
         if (et.event === 'offline') {
           let invalidDevice = client.getDeviceFromType(et.typeName);
           invalidDevice.status = 'online';
+          invalidDevice.seenOnDiscovery = 0;
           invalidDevice.sysInfo.type = et.typeName;
           client.devices.set(invalidDevice.deviceId, invalidDevice);
         }
@@ -120,13 +112,13 @@ describe('Client', function () {
 
     it('should emit discovery-invalid for the unreliable test device', function (done) {
       let device = testDevices['unreliable'];
-      if (!device.options.port) this.skip();
+      if (!device.deviceOptions || !device.deviceOptions.port) this.skip();
 
       client.startDiscovery({ discoveryInterval: 250 }).on('discovery-invalid', ({rinfo, response, decryptedResponse}) => {
         expect(response).to.be.instanceof(Buffer);
         expect(decryptedResponse).to.be.instanceof(Buffer);
 
-        if (rinfo.port === device.options.port) {
+        if (rinfo.port === device.deviceOptions.port) {
           client.stopDiscovery();
           done();
         }
@@ -137,11 +129,12 @@ describe('Client', function () {
   describe('#getDevice()', function () {
     this.timeout(2000);
     this.slow(1500);
+    let client;
     let device;
 
     before(async function () {
-      let client = getTestClient();
-      device = await client.getDevice(testDevices['anydevice'].options);
+      client = getTestClient();
+      device = await client.getDevice(testDevices['anydevice'].deviceOptions);
     });
 
     it('should find a device by IP address', function () {
@@ -150,8 +143,9 @@ describe('Client', function () {
 
     it('should be rejected with an invalid IP address', async function () {
       let error;
+      let deviceOptions = testDevices['unreachable'].deviceOptions;
       try {
-        await client.getDevice(testDevices['unreachable'].options);
+        await client.getDevice(deviceOptions, { timeout: 500 });
       } catch (err) {
         error = err;
       }
@@ -162,12 +156,14 @@ describe('Client', function () {
   describe('#getPlug()', function () {
     this.timeout(2000);
     this.slow(1500);
+    let client;
     let plug;
     let unreachablePlug;
 
     before(function () {
-      plug = client.getPlug(testDevices['anyplug'].options);
-      unreachablePlug = client.getPlug(testDevices['unreachable'].options);
+      client = getTestClient();
+      plug = client.getPlug(testDevices['anyplug'].deviceOptions);
+      unreachablePlug = client.getPlug(testDevices['unreachable'].deviceOptions);
     });
 
     it('should find a plug by IP address', function () {
@@ -175,19 +171,21 @@ describe('Client', function () {
     });
 
     it('should be rejected with an invalid IP address', function () {
-      return expect(unreachablePlug.getSysInfo()).to.eventually.be.rejected;
+      return expect(unreachablePlug.getSysInfo({ timeout: 500 })).to.eventually.be.rejected;
     });
   });
 
   describe('#getBulb()', function () {
     this.timeout(2000);
     this.slow(1500);
+    let client;
     let bulb;
     let unreachableBulb;
 
     before(function () {
-      bulb = client.getBulb(testDevices['anybulb'].options);
-      unreachableBulb = client.getBulb(testDevices['unreachable'].options);
+      client = getTestClient();
+      bulb = client.getBulb(testDevices['anybulb'].deviceOptions);
+      unreachableBulb = client.getBulb(testDevices['unreachable'].deviceOptions);
     });
 
     it('should find a bulb by IP address', function () {
@@ -195,22 +193,26 @@ describe('Client', function () {
     });
 
     it('should be rejected with an invalid IP address', function () {
-      return expect(unreachableBulb.getSysInfo()).to.eventually.be.rejected;
+      return expect(unreachableBulb.getSysInfo({ timeout: 500 })).to.eventually.be.rejected;
     });
   });
 
   describe('.send()', function () {
+    let client;
     let options;
     before(function () {
-      options = testDevices['anydevice'].options;
+      client = getTestClient();
+      options = testDevices['anydevice'].deviceOptions;
     });
-    it('should return info with string payload', function () {
-      return expect(client.send({host: options.host, port: options.port, payload: '{"system":{"get_sysinfo":{}}}', timeout: 1000}))
-        .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
-    });
-    it('should return info with object payload', function () {
-      return expect(client.send({host: options.host, port: options.port, payload: {'system': {'get_sysinfo': {}}}, timeout: 1000}))
-        .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
+    [{ transport: 'tcp' }, { transport: 'udp' }].forEach((sendOptions) => {
+      it(`should return info with string payload ${sendOptions.transport}`, function () {
+        return expect(client.send('{"system":{"get_sysinfo":{}}}', options.host, options.port, sendOptions))
+          .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
+      });
+      it(`should return info with object payload${sendOptions.transport}`, function () {
+        return expect(client.send({'system': {'get_sysinfo': {}}}, options.host, options.port, sendOptions))
+          .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
+      });
     });
   });
 });

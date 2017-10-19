@@ -2,7 +2,8 @@
 
 const EventEmitter = require('events');
 
-const ResponseError = require('./utils').ResponseError;
+const Netif = require('./netif');
+const { ResponseError } = require('../utils');
 
 /**
  * TP-Link Device.
@@ -13,33 +14,39 @@ const ResponseError = require('./utils').ResponseError;
  */
 class Device extends EventEmitter {
   /**
-   * Created by {@link Client#getGeneralDevice} - Do not instantiate directly
-   * @param  {Object} options
-   * @param  {Client} options.client
-   * @param  {string} options.host
-   * @param  {number} [options.port=9999]
-   * @param  {number} [options.seenOnDiscovery]
-   * @param  {number} [options.timeout]
-   * @param  {Object} [options.logger]
+   * Created by {@link Client#getCommonDevice} - Do not instantiate directly
+   * @param  {Object}       options
+   * @param  {Client}       options.client
+   * @param  {Object}       options.sysInfo
+   * @param  {string}       options.host
+   * @param  {number}      [options.port=9999]
+   * @param  {Object}      [options.logger]
+   * @param  {SendOptions} [options.defaultSendOptions]
    */
-  constructor (options) {
+  constructor ({
+    client,
+    sysInfo,
+    host,
+    port = 9999,
+    logger,
+    defaultSendOptions = { transport: 'tcp', timeout: 5000 }
+  }) {
     super();
 
-    this.client = options.client;
-    this.host = options.host;
-    this.port = options.port || 9999;
-
-    this.seenOnDiscovery = options.seenOnDiscovery || null;
-    this.timeout = options.timeout || this.client.timeout || 5000;
-    this.log = options.logger || this.client.log;
-    this.log.debug('device.constructor(%j)', Object.assign({}, options, {client: 'not shown'}));
+    this.client = client;
+    this.host = host;
+    this.port = port;
+    this.defaultSendOptions = defaultSendOptions;
+    this.log = logger || this.client.log;
+    this.log.debug('device.constructor(%j)', Object.assign({}, arguments[0], { client: 'not shown' }));
 
     this.lastState = {};
 
     this._sysInfo = {};
-    this._emeterRealtime = {};
 
-    if (options.sysInfo) { this.sysInfo = options.sysInfo; }
+    if (sysInfo) { this.sysInfo = sysInfo; }
+
+    this.netif = new Netif(this, 'netif');
   }
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
@@ -56,56 +63,42 @@ class Device extends EventEmitter {
     this._sysInfo = sysInfo;
   }
   /**
-   * Returns cached results from last retrieval of `emeter.get_realtime`.
-   * @return {Object}
-   */
-  get emeterRealtime () {
-    return this._emeterRealtime;
-  }
-  /**
-   * @private
-   */
-  set emeterRealtime (emeterRealtime) {
-    this._emeterRealtime = emeterRealtime;
-    this.emit('emeter-realtime-update', this._emeterRealtime);
-  }
-  /**
-   * sys_info.alias
+   * Cached value of `sys_info.alias`
    * @return {string}
    */
   get alias () {
     return this.sysInfo.alias;
   }
   /**
-   * sys_info.deviceId
+   * Cached value of `sys_info.deviceId`
    * @return {string}
    */
   get deviceId () {
     return this.sysInfo.deviceId;
   }
   /**
-   * sys_info.dev_name
+   * Cached value of `sys_info.[description|dev_name]`
    * @return {string}
    */
-  get deviceName () {
-    return this.sysInfo.dev_name;
+  get description () {
+    return this.sysInfo.description || this.sysInfo.dev_name;
   }
   /**
-   * sys_info.model
+   * Cached value of `sys_info.model`
    * @return {string}
    */
   get model () {
     return this.sysInfo.model;
   }
   /**
-   * sys_info.alias
+   * Cached value of `sys_info.alias`
    * @return {string}
    */
   get name () {
     return this.alias;
   }
   /**
-   * sys_info.[type|mic_type]
+   * Cached value of `sys_info.[type|mic_type]``
    * @return {string}
    */
   get type () {
@@ -114,7 +107,7 @@ class Device extends EventEmitter {
   /**
    * Type of device (or device if unknown)
    *
-   * Based on sys_info.[type|mic_type]
+   * Based on cached value of `sys_info.[type|mic_type]``
    * @return {string} 'plub'|'bulb'|'device'
    */
   get deviceType () {
@@ -126,21 +119,21 @@ class Device extends EventEmitter {
     }
   }
   /**
-   * sys_info.sw_ver
+   * Cached value of `sys_info.sw_ver`
    * @return {string}
    */
   get softwareVersion () {
     return this.sysInfo.sw_ver;
   }
   /**
-   * sys_info.hw_ver
+   * Cached value of `sys_info.hw_ver`
    * @return {string}
    */
   get hardwareVersion () {
     return this.sysInfo.hw_ver;
   }
   /**
-   * sys_info.[mac|mic_mac|ethernet_mac]
+   * Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
    * @return {string}
    */
   get mac () {
@@ -148,14 +141,14 @@ class Device extends EventEmitter {
   }
   /**
    * Sends `payload` to device (using {@link Client#send})
-   * @param  {Object|string}  payload
-   * @param  {number}         [timeout]
+   * @param  {Object|string} payload
+   * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
-  async send (payload, timeout = null) {
-    timeout = (timeout == null ? this.timeout : timeout);
+  async send (payload, sendOptions) {
     this.log.debug('[%s] device.send()', this.alias);
-    return this.client.send({host: this.host, port: this.port, payload, timeout})
+    let thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
+    return this.client.send(payload, this.host, this.port, thisSendOptions)
       .catch((reason) => {
         this.log.error('[%s] device.send() %s', this.alias, reason);
         this.log.debug(payload);
@@ -168,7 +161,7 @@ class Device extends EventEmitter {
    * Calls {@link #send} and processes the response.
    *
    * - If only one operation was sent:
-   *   - Promise fulfills with specific parsed JSON response for comand.\
+   *   - Promise fulfills with specific parsed JSON response for command.\
    *     Example: `{system:{get_sysinfo:{}}}`
    *     - resolves to: `{err_code:0,...}`\
    *     - instead of: `{system:{get_sysinfo:{err_code:0,...}}}` (as {@link #send} would)
@@ -176,14 +169,14 @@ class Device extends EventEmitter {
    *   - Promise fulfills with full parsed JSON response (same as {@link #send})
    *
    * Also, the response's `err_code`(s) are checked, if any are missing or != `0` the Promise is rejected with {@link ResponseError}.
-   * @param  {Object|string}  command
-   * @param  {number}  [timeout]
+   * @param  {Object|string} command
+   * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async sendCommand (command, timeout) {
+  async sendCommand (command, sendOptions) {
     // TODO allow certain err codes (particually emeter for non HS110 devices)
     let commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
-    let response = await this.send(commandObj, timeout);
+    let response = await this.send(commandObj, sendOptions);
     let results = processResponse(commandObj, response);
     return results;
   }
@@ -213,110 +206,83 @@ class Device extends EventEmitter {
    * Gets device's SysInfo.
    *
    * Requests `system.sys_info` from device.
-   * @param  {number}  [timeout]
+   * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getSysInfo ({timeout} = {}) {
+  async getSysInfo (sendOptions) {
     this.log.debug('[%s] device.getSysInfo()', this.alias);
-    this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', timeout);
+    this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', sendOptions);
     return this.sysInfo;
   }
   /**
    * Change device's alias (name).
    *
    * Sends `system.set_dev_alias` command.
-   * @param  {string}  alias
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param  {string}       alias
+   * @param  {SendOptions} [sendOptions]
+   * @return {Promise<boolean, ResponseError>}
    */
-  async setAlias (alias) {
-    await this.sendCommand({ [this.apiModuleNamespace.system]: {set_dev_alias: {alias: alias}} });
+  async setAlias (alias, sendOptions) {
+    await this.sendCommand({
+      [this.apiModuleNamespace.system]: { set_dev_alias: { alias: alias } }
+    }, sendOptions);
     this.sysInfo.alias = alias;
     return true;
   }
   /**
-   * Gets device's TP-Link Cloud info.
+   * Set device's location.
    *
-   * Requests `cloud.get_info`.
+   * Sends `system.set_dev_location` command.
+   * @param  {number}       latitude
+   * @param  {number}       longitude
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getCloudInfo () {
-    this.cloudInfo = await this.sendCommand({ [this.apiModuleNamespace.cloud]: {get_info: {}} });
-    return this.cloudInfo;
-  }
-  /**
-   * Gets device's current energy stats.
-   *
-   * Requests `emeter.get_realtime`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getEmeterRealtime () {
-    let response = await this.sendCommand(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}}}`);
-    if (response) {
-      this.emeterRealtime = response;
-      return this.emeterRealtime;
-    }
-    throw new Error('Error parsing getEmeterRealtime results', response);
+  async setLocation (latitude, longitude, sendOptions) {
+    let latitude_i = Math.round(latitude * 10000); // eslint-disable-line camelcase
+    let longitude_i = Math.round(longitude * 10000); // eslint-disable-line camelcase
+    return this.sendCommand({
+      [this.apiModuleNamespace.system]: {
+        set_dev_location: { latitude, longitude, latitude_i, longitude_i }
+      }
+    }, sendOptions);
   }
   /**
    * Gets device's model.
    *
    * Requests `system.sys_info` and returns model name.
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getModel () {
-    let sysInfo = await this.getSysInfo();
+  async getModel (sendOptions) {
+    let sysInfo = await this.getSysInfo(sendOptions);
     return sysInfo.model;
   }
   /**
-   * Requests `netif.get_scaninfo` (list of WiFi networks).
+   * Reboot device.
    *
-   * Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
-   * The network timeout for the request is calculated by adding the
-   * default network timeout to the request timeout.
-   * @param  {Boolean} [refresh=false]       request device's cached results
-   * @param  {number}  [timeoutInSeconds=10] timeout for scan in seconds
+   * Sends `system.reboot` command.
+   * @param  {number}       delay
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getScanInfo (refresh = false, timeoutInSeconds = 10) {
-    let timeout = ((timeoutInSeconds * 1000) * 2) + this.timeout; // add original timeout to wait for response
-    let command = `{"${this.apiModuleNamespace.netif}":{"get_scaninfo":{"refresh":${(refresh ? 1 : 0)},"timeout":${timeoutInSeconds}}}}`;
-    return this.sendCommand(command, timeout);
+  async reboot (delay, sendOptions) {
+    return this.sendCommand({
+      [this.apiModuleNamespace.system]: {reboot: {delay}}
+    }, sendOptions);
   }
   /**
-   * Gets Next Schedule Rule Action.
+   * Reset device.
    *
-   * Requests `schedule.get_next_action`.
+   * Sends `system.reset` command.
+   * @param  {number}       delay
+   * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getScheduleNextAction () {
-    return this.sendCommand(`{"${this.apiModuleNamespace.schedule}":{"get_next_action":{}}}`);
-  }
-  /**
-   * Gets Schedule Rules.
-   *
-   * Requests `schedule.get_rules`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getScheduleRules () {
-    return this.sendCommand(`{"${this.apiModuleNamespace.schedule}":{"get_rules":{}}}`);
-  }
-  /**
-   * Gets device's time.
-   *
-   * Requests `timesetting.get_time`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getTime () {
-    return this.sendCommand(`{"${this.apiModuleNamespace.timesetting}":{"get_time":{}}}`);
-  }
-  /**
-   * Gets device's timezone.
-   *
-   * Requests `timesetting.get_timezone`.
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async getTimeZone () {
-    return this.sendCommand(`{"${this.apiModuleNamespace.timesetting}":{"get_timezone":{}}}`);
+  async reset (delay, sendOptions) {
+    return this.sendCommand({
+      [this.apiModuleNamespace.system]: {reset: {delay}}
+    }, sendOptions);
   }
 }
 

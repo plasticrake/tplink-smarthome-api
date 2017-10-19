@@ -1,11 +1,11 @@
 #! /usr/bin/env node
+'use strict';
+
 const util = require('util');
 const program = require('commander');
-
-const Hs100Api = require('./');
-const Client = Hs100Api.Client;
-const { ResponseError } = require('./utils');
 const tplinkCrypto = require('tplink-smarthome-crypto');
+
+const { Client, ResponseError } = require('./');
 
 let logLevel;
 let client;
@@ -36,10 +36,10 @@ let search = function (sysInfo, timeout, params) {
   }
 };
 
-let send = async function (host, port, payload, timeout) {
+let send = async function (host, port, payload) {
   try {
-    console.log('Sending...');
-    let data = await client.send({host, port, payload, timeout});
+    console.log(`Sending to ${host}:${port}...`);
+    let data = await client.send(payload, host, port);
     console.log('response:');
     console.dir(data, {colors: program.color === 'on', depth: 10});
   } catch (err) {
@@ -47,11 +47,11 @@ let send = async function (host, port, payload, timeout) {
   }
 };
 
-let sendCommand = async function (host, port, payload, timeout) {
+let sendCommand = async function (host, port, payload) {
   try {
-    console.log('Sending command...');
+    console.log(`Sending to ${host}:${port}...`);
     let device = await client.getDevice({host, port});
-    let results = await device.sendCommand(payload, timeout);
+    let results = await device.sendCommand(payload);
     console.log('response:');
     console.dir(results, {colors: program.color === 'on', depth: 10});
   } catch (err) {
@@ -61,7 +61,7 @@ let sendCommand = async function (host, port, payload, timeout) {
 
 let sendCommandDynamic = async function (host, port, command, commandParams = []) {
   try {
-    console.log(`Sending ${command} command...`);
+    console.log(`Sending ${command} command to ${host}:${port}...`);
     let device = await client.getDevice({host, port});
     let results = await device[command](...commandParams);
     console.log('response:');
@@ -73,12 +73,12 @@ let sendCommandDynamic = async function (host, port, command, commandParams = []
 
 let details = async function (host, port, timeout) {
   try {
-    console.log('Getting details...');
+    console.log(`Getting details from ${host}:${port}...`);
     let device = await client.getDevice({host, port});
     console.dir({
       alias: device.alias,
       deviceId: device.deviceId,
-      deviceName: device.deviceName,
+      description: device.description,
       model: device.model,
       deviceType: device.deviceType,
       type: device.type,
@@ -91,19 +91,8 @@ let details = async function (host, port, timeout) {
   }
 };
 
-let info = async function (host, port, timeout) {
-  try {
-    console.log('Getting device info...');
-    let device = await client.getDevice({host, port});
-    let info = await device.getInfo();
-    console.dir(info, {colors: program.color === 'on', depth: 10});
-  } catch (err) {
-    outputError(err);
-  }
-};
-
 let blink = function (host, port, times, rate, timeout) {
-  console.log('Sending blink commands...');
+  console.log(`Sending blink commands to ${host}:${port}...`);
   client.getDevice({host, port}).then((device) => {
     return device.blink(times, rate).then(() => {
       console.log('Blinking complete');
@@ -118,13 +107,17 @@ let toInt = (s) => {
 };
 
 let setupClient = function () {
-  let client = new Client({timeout: program.timeout, logLevel});
+  let defaultSendOptions = {};
+  if (program.udp) defaultSendOptions.transport = 'udp';
+  if (program.timeout) defaultSendOptions.timeout = program.timeout;
+  let client = new Client({ logLevel, defaultSendOptions });
   return client;
 };
 
 program
   .option('-D, --debug', 'turn on debug level logging', () => { logLevel = 'debug'; })
   .option('-t, --timeout <ms>', 'timeout (ms)', toInt, 5000)
+  .option('-u, --udp', 'send via UDP')
   .option('-c, --color [on]', 'output will be styled with ANSI color codes', 'on');
 
 program
@@ -146,7 +139,7 @@ program
   .action(function (host, payload, options) {
     client = setupClient();
     let [hostOnly, port] = host.split(':');
-    send(hostOnly, port, payload, program.timeout);
+    send(hostOnly, port, payload);
   });
 
 program
@@ -155,15 +148,7 @@ program
   .action(function (host, payload, options) {
     client = setupClient();
     let [hostOnly, port] = host.split(':');
-    sendCommand(hostOnly, port, payload, program.timeout);
-  });
-
-program
-  .command('info <host>')
-  .action(function (host, options) {
-    client = setupClient();
-    let [hostOnly, port] = host.split(':');
-    info(hostOnly, port, program.timeout);
+    sendCommand(hostOnly, port, payload);
   });
 
 program
@@ -179,11 +164,10 @@ program
   .action(function (host, times = 5, rate = 500, options) {
     client = setupClient();
     let [hostOnly, port] = host.split(':');
-    blink(hostOnly, port, times, rate, program.timeout);
+    blink(hostOnly, port, times, rate);
   });
 
-[ 'getSysInfo', 'getModel', 'getCloudInfo', 'setAlias', 'getScheduleNextAction', 'getScheduleRules',
-  'getTime', 'getTimeZone', 'getScanInfo', 'getEmeterRealtime'
+[ 'getSysInfo', 'getInfo', 'setAlias', 'setLocation', 'getModel', 'reboot', 'reset'
 ].forEach((command) => {
   program
     .command(`${command} <host> [params]`)
