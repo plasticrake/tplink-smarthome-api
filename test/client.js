@@ -1,18 +1,9 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const chaiAsPromised = require('chai-as-promised');
-const sinonChai = require('sinon-chai');
+const { expect, sinon, getTestClient, testDevices } = require('./setup');
 
-const expect = chai.expect;
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
-
-const { getTestClient, testDevices } = require('./setup');
 const Device = require('../src/device');
 const Plug = require('../src/plug');
 const Bulb = require('../src/bulb');
@@ -23,11 +14,11 @@ describe('Client', function () {
 
   describe('#startDiscovery()', function () {
     let client;
-    beforeEach(() => {
+    beforeEach(function () {
       client = getTestClient({ logLevel: 'silent' });
     });
 
-    afterEach(() => {
+    afterEach(function () {
       client.stopDiscovery();
     });
 
@@ -121,13 +112,13 @@ describe('Client', function () {
 
     it('should emit discovery-invalid for the unreliable test device', function (done) {
       let device = testDevices['unreliable'];
-      if (!device.options || !device.options.port) this.skip();
+      if (!device.deviceOptions || !device.deviceOptions.port) this.skip();
 
       client.startDiscovery({ discoveryInterval: 250 }).on('discovery-invalid', ({rinfo, response, decryptedResponse}) => {
         expect(response).to.be.instanceof(Buffer);
         expect(decryptedResponse).to.be.instanceof(Buffer);
 
-        if (rinfo.port === device.options.port) {
+        if (rinfo.port === device.deviceOptions.port) {
           client.stopDiscovery();
           done();
         }
@@ -143,7 +134,7 @@ describe('Client', function () {
 
     before(async function () {
       client = getTestClient();
-      device = await client.getDevice(testDevices['anydevice'].options);
+      device = await client.getDevice(testDevices['anydevice'].deviceOptions);
     });
 
     it('should find a device by IP address', function () {
@@ -152,9 +143,9 @@ describe('Client', function () {
 
     it('should be rejected with an invalid IP address', async function () {
       let error;
-      let deviceOptions = testDevices['unreachable'].options;
+      let deviceOptions = testDevices['unreachable'].deviceOptions;
       try {
-        await client.getDevice(deviceOptions, deviceOptions.defaultSendOptions);
+        await client.getDevice(deviceOptions, { timeout: 500 });
       } catch (err) {
         error = err;
       }
@@ -171,8 +162,8 @@ describe('Client', function () {
 
     before(function () {
       client = getTestClient();
-      plug = client.getPlug(testDevices['anyplug'].options);
-      unreachablePlug = client.getPlug(testDevices['unreachable'].options);
+      plug = client.getPlug(testDevices['anyplug'].deviceOptions);
+      unreachablePlug = client.getPlug(testDevices['unreachable'].deviceOptions);
     });
 
     it('should find a plug by IP address', function () {
@@ -180,7 +171,7 @@ describe('Client', function () {
     });
 
     it('should be rejected with an invalid IP address', function () {
-      return expect(unreachablePlug.getSysInfo()).to.eventually.be.rejected;
+      return expect(unreachablePlug.getSysInfo({ timeout: 500 })).to.eventually.be.rejected;
     });
   });
 
@@ -193,8 +184,8 @@ describe('Client', function () {
 
     before(function () {
       client = getTestClient();
-      bulb = client.getBulb(testDevices['anybulb'].options);
-      unreachableBulb = client.getBulb(testDevices['unreachable'].options);
+      bulb = client.getBulb(testDevices['anybulb'].deviceOptions);
+      unreachableBulb = client.getBulb(testDevices['unreachable'].deviceOptions);
     });
 
     it('should find a bulb by IP address', function () {
@@ -202,7 +193,7 @@ describe('Client', function () {
     });
 
     it('should be rejected with an invalid IP address', function () {
-      return expect(unreachableBulb.getSysInfo()).to.eventually.be.rejected;
+      return expect(unreachableBulb.getSysInfo({ timeout: 500 })).to.eventually.be.rejected;
     });
   });
 
@@ -211,7 +202,7 @@ describe('Client', function () {
     let options;
     before(function () {
       client = getTestClient();
-      options = testDevices['anydevice'].options;
+      options = testDevices['anydevice'].deviceOptions;
     });
     [{ transport: 'tcp' }, { transport: 'udp' }].forEach((sendOptions) => {
       it(`should return info with string payload ${sendOptions.transport}`, function () {

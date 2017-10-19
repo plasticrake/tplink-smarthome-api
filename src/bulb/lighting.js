@@ -14,6 +14,7 @@ class Lighting {
     this.apiModuleName = apiModuleName;
 
     this._lastState = { powerOn: null, lightState: null };
+    device.emit('test');
   }
   /**
    * Returns cached results from last retrieval of `lightingservice.get_light_state`.
@@ -80,7 +81,7 @@ class Lighting {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setLightState ({ transition_period, on_off, mode, hue, saturation, brightness, color_temp, ignore_default = 1 }, sendOptions) {
+  async setLightState ({ transition_period, on_off, mode, hue, saturation, brightness, color_temp, ignore_default = true }, sendOptions) {
     let state = {};
     if (ignore_default !== undefined) state.ignore_default = (ignore_default ? 1 : 0);
     if (transition_period !== undefined) state.transition_period = transition_period;

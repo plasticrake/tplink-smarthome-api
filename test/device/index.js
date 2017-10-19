@@ -1,17 +1,10 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-const expect = chai.expect;
-chai.use(chaiAsPromised);
+const { expect, getTestClient, testDevices } = require('../setup');
 
 const rewire = require('rewire');
-
-const { getTestClient, testDevices } = require('../setup');
 const { Client, ResponseError } = require('../../src');
 const Device = rewire('../../src/device');
 
@@ -24,11 +17,11 @@ const scheduleTests = require('../shared/schedule');
 const timeTests = require('../shared/time');
 
 describe('Device', function () {
+  this.timeout(5000);
+  this.slow(2000);
   let client;
 
   before(function () {
-    this.timeout(4000);
-    this.slow(2000);
     client = getTestClient();
   });
 
@@ -83,31 +76,24 @@ describe('Device', function () {
 
   testDevices.forEach(function (testDevice) {
     let device;
-    let options;
-    let deviceType;
     let time;
+
     context(testDevice.name, function () {
+      // beforeEach() doesn't work with assigning to `this`
       before(async function () {
-        if (!testDevice.getDevice) {
-          this.skip();
-          return;
+        if (testDevice.getDevice) {
+          device = await testDevice.getDevice();
+          this.device = device;
+          time = device.apiModuleNamespace.timesetting;
         }
-        device = await testDevice.getDevice();
-        this.device = device;
-        this.testDevice = testDevice;
-        time = device.apiModuleNamespace.timesetting;
       });
       beforeEach(async function () {
+        // before() doesn't skip nested describes
         if (!testDevice.getDevice) {
-          this.skip();
-          return;
+          return this.skip();
         }
         device = await testDevice.getDevice();
-        options = testDevice.options;
-        deviceType = testDevice.deviceType;
-
         this.device = device;
-        this.testDevice = testDevice;
       });
 
       describe('constructor', function () {
@@ -245,13 +231,13 @@ describe('Device', function () {
 
       describe('#deviceType get', function () {
         it('should return type of "device" before querying device', function () {
-          let generalDevice = client.getCommonDevice(options);
+          let generalDevice = client.getCommonDevice(testDevice.deviceOptions);
           expect(generalDevice.deviceType).to.equal('device');
         });
         it('should return actual type after querying device', async function () {
-          let generalDevice = client.getCommonDevice(options);
+          let generalDevice = client.getCommonDevice(testDevice.deviceOptions);
           await generalDevice.getSysInfo();
-          expect(generalDevice.deviceType).to.eql(deviceType);
+          expect(generalDevice.deviceType).to.eql(testDevice.deviceType);
         });
       });
 
@@ -296,21 +282,24 @@ describe('Device', function () {
       });
 
       describe('#setAlias()', function () {
-        this.slow(200);
-        this.timeout(4000);
+        let origAlias;
+        before(async function () {
+          if (!testDevice.getDevice) return;
+          let si = await device.getSysInfo();
+          origAlias = si.alias;
+        });
+        after(async function () {
+          if (!testDevice.getDevice) return;
+          expect((await device.setAlias(origAlias))).to.be.true;
+          let si = await device.getSysInfo();
+          expect(si.alias).to.equal(origAlias);
+        });
+
         it('should change the alias', async function () {
           let testAlias = `Testing ${Math.floor(Math.random() * (100 + 1))}`;
-
-          let si = await device.getSysInfo();
-          let origAlias = si.alias;
           expect((await device.setAlias(testAlias))).to.be.true;
-
-          si = await device.getSysInfo();
+          let si = await device.getSysInfo();
           expect(si.alias).to.equal(testAlias);
-
-          expect((await device.setAlias(origAlias))).to.be.true;
-          si = await device.getSysInfo();
-          expect(si.alias).to.equal(origAlias);
         });
       });
 

@@ -1,15 +1,14 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-const expect = chai.expect;
-chai.use(chaiAsPromised);
+const { expect } = require('../setup');
 
-module.exports = function () {
+module.exports = function (testDevice) {
   describe('Time', function () {
+    this.timeout(5000);
+    this.slow(2000);
+
     describe('#getTime()', function () {
       it('should return time', function () {
         return expect(this.device.time.getTime()).to.eventually.have.property('err_code', 0);

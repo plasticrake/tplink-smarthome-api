@@ -6,7 +6,7 @@ const defaultTo = require('lodash.defaultto');
 const dotenv = require('dotenv');
 
 const simulator = require('tplink-smarthome-simulator');
-const { Client } = require('../src');
+const { Client } = require('../../src');
 
 dotenv.config();
 const clientOptions = { logLevel: process.env.TEST_CLIENT_LOGLEVEL };
@@ -56,11 +56,11 @@ testDevices['anydevice'] = { name: 'Device', deviceType: 'device' };
 testDevices['anyplug'] = { name: 'Plug', deviceType: 'plug' };
 testDevices['anybulb'] = { name: 'Bulb', deviceType: 'bulb' };
 testDevices['unreliable'] = { name: 'Unreliable Device', deviceType: 'plug' };
-testDevices['unreachable'] = { name: 'Unreachable Device', options: { host: '192.0.2.0', port: 9999, defaultSendOptions: { timeout: 100 } } };
+testDevices['unreachable'] = { name: 'Unreachable Device', deviceOptions: { host: '192.0.2.0', port: 9999, defaultSendOptions: { timeout: 100 } } };
 
 const addDevice = (target, device, type) => {
   target.mac = device.mac;
-  target.options = device.options;
+  target.deviceOptions = device.deviceOptions;
   target.getDevice = device.getDevice;
   target.type = device.type;
 };
@@ -85,8 +85,8 @@ async function getDiscoveryTestDevices () {
           discoveredTestDevices.push({
             model: device.model,
             mac: device.mac,
-            options: { host: device.host, port: device.port },
-            getDevice: (options) => client.getDevice(Object.assign({host: device.host, port: device.port}, options)),
+            deviceOptions: { host: device.host, port: device.port },
+            getDevice: (deviceOptions, sendOptions) => client.getDevice(Object.assign({ host: device.host, port: device.port }, deviceOptions)),
             type: 'real'
           });
         } else {
@@ -126,8 +126,8 @@ async function getSimulatedTestDevices () {
       testType: testType,
       model: d.model,
       mac: d.data.system.sysinfo.mac,
-      options: { host: d.address, port: d.port },
-      getDevice: (options) => client.getDevice(Object.assign({ host: d.address, port: d.port }, options)),
+      deviceOptions: { host: d.address, port: d.port },
+      getDevice: (deviceOptions) => client.getDevice(Object.assign({ host: d.address, port: d.port }, deviceOptions)),
       type: 'simulated'
     });
   }
@@ -166,14 +166,14 @@ function testDeviceCleanup () {
   if (unreliableDevice) addDevice(testDevices['unreliable'], unreliableDevice);
 
   testDevices.forEach((td) => {
-    let options = td.options || {};
-    console.log(td.model, td.deviceType, td.name, options.host, options.port, td.mac);
+    let deviceOptions = td.deviceOptions || {};
+    console.log(td.model, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac);
   });
 
   ['anydevice', 'anyplug', 'anybulb', 'unreachable', 'unreliable'].forEach((key) => {
     let td = testDevices[key];
-    let options = td.options || {};
-    console.log(key, td.deviceType, td.name, options.host, options.port, td.mac);
+    let deviceOptions = td.deviceOptions || {};
+    console.log(key, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac);
   });
 
   run();

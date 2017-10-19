@@ -49,7 +49,7 @@
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-object-entries": "^1.0.0",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
+    "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
@@ -71,7 +71,7 @@
     "postversion": "git push && git push --tags",
     "test": "semistandard && cross-env NODE_ENV=test nyc mocha",
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
-    "build": "./node_modules/.bin/babel src -d lib",
+    "build": "babel src -d lib",
     "prepare": "npm run build",
     "docs": "jsdoc2md 'src/**/*.js' > API.md && jsdoc2md --template=jsdoc2md/README.hbs 'src/**/*.js' > README.md"
   },

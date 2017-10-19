@@ -1,48 +1,34 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const chaiAsPromised = require('chai-as-promised');
-const sinonChai = require('sinon-chai');
-
-const expect = chai.expect;
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
-
-const { testDevices } = require('../setup');
+const { expect, sinon, testDevices } = require('../setup');
 
 const awayTests = require('./away');
 const timerTests = require('./timer');
 const scheduleTests = require('./schedule');
 
 describe('Plug', function () {
-  before(function () {
-    this.timeout(4000);
-    this.slow(2000);
-  });
+  this.timeout(5000);
+  this.slow(2000);
 
-  testDevices['plug'].forEach((testPlug) => {
-    let plug;
-    context(testPlug.name, function () {
+  testDevices['plug'].forEach((testDevice) => {
+    context(testDevice.name, function () {
+      let plug;
       before(async function () {
-        if (!testPlug.getDevice) {
-          this.skip();
-          return;
+        // beforeEach() doesn't work with assigning to `this`
+        if (testDevice.getDevice) {
+          plug = await testDevice.getDevice();
+          this.device = plug;
         }
-        this.device = await testPlug.getDevice();
-        this.testDevice = testPlug;
       });
       beforeEach(async function () {
-        if (!testPlug.getDevice) {
-          this.skip();
-          return;
+        // before() doesn't skip nested describes
+        if (!testDevice.getDevice) {
+          return this.skip();
         }
-        plug = await testPlug.getDevice();
+        plug = await testDevice.getDevice();
         this.device = plug;
-        this.testDevice = testPlug;
       });
 
       describe('#supportsEmeter', function () {
@@ -153,17 +139,16 @@ describe('Plug', function () {
 
           await plug.setPowerState(false);
           await plug.setPowerState(true);
+          await plug.setPowerState(false);
 
-          expect(spyInUse).to.be.calledOnce;
-          expect(spyNotInUse).to.be.calledOnce;
-          expect(spyInUseUpdate).to.be.calledTwice;
-          expect(spyInUseUpdate).to.be.always.calledWithMatch(sinon.match.bool);
+          expect(spyInUse, 'in-use').to.be.calledOnce;
+          expect(spyNotInUse, 'not-in-use').to.be.calledOnce;
+          expect(spyInUseUpdate, 'in-use-update').to.be.calledThrice;
+          expect(spyInUseUpdate, 'in-use-update').to.be.always.calledWithMatch(sinon.match.bool);
         });
       });
 
       describe('#getPowerState()', function () {
-        this.timeout(2000);
-        this.slow(1000);
         it('should return power state when on', async function () {
           expect(await plug.setPowerState(true)).to.be.true;
           expect(await plug.getPowerState()).to.be.true;
@@ -238,15 +223,15 @@ describe('Plug', function () {
 
       describe('#blink()', function () {
         this.timeout(5000);
-        this.slow(300);
+        this.slow(3000);
         it('should blink LED', async function () {
           expect(await plug.blink(2, 100)).to.be.true;
         });
       });
 
-      awayTests();
-      scheduleTests();
-      timerTests();
+      awayTests(testDevice);
+      scheduleTests(testDevice);
+      timerTests(testDevice);
     });
   });
 });

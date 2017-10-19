@@ -63,42 +63,42 @@ class Device extends EventEmitter {
     this._sysInfo = sysInfo;
   }
   /**
-   * sys_info.alias
+   * Cached value of `sys_info.alias`
    * @return {string}
    */
   get alias () {
     return this.sysInfo.alias;
   }
   /**
-   * sys_info.deviceId
+   * Cached value of `sys_info.deviceId`
    * @return {string}
    */
   get deviceId () {
     return this.sysInfo.deviceId;
   }
   /**
-   * sys_info.description|dev_name
+   * Cached value of `sys_info.[description|dev_name]`
    * @return {string}
    */
   get description () {
     return this.sysInfo.description || this.sysInfo.dev_name;
   }
   /**
-   * sys_info.model
+   * Cached value of `sys_info.model`
    * @return {string}
    */
   get model () {
     return this.sysInfo.model;
   }
   /**
-   * sys_info.alias
+   * Cached value of `sys_info.alias`
    * @return {string}
    */
   get name () {
     return this.alias;
   }
   /**
-   * sys_info.[type|mic_type]
+   * Cached value of `sys_info.[type|mic_type]``
    * @return {string}
    */
   get type () {
@@ -107,7 +107,7 @@ class Device extends EventEmitter {
   /**
    * Type of device (or device if unknown)
    *
-   * Based on sys_info.[type|mic_type]
+   * Based on cached value of `sys_info.[type|mic_type]``
    * @return {string} 'plub'|'bulb'|'device'
    */
   get deviceType () {
@@ -119,21 +119,21 @@ class Device extends EventEmitter {
     }
   }
   /**
-   * sys_info.sw_ver
+   * Cached value of `sys_info.sw_ver`
    * @return {string}
    */
   get softwareVersion () {
     return this.sysInfo.sw_ver;
   }
   /**
-   * sys_info.hw_ver
+   * Cached value of `sys_info.hw_ver`
    * @return {string}
    */
   get hardwareVersion () {
     return this.sysInfo.hw_ver;
   }
   /**
-   * sys_info.[mac|mic_mac|ethernet_mac]
+   * Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
    * @return {string}
    */
   get mac () {

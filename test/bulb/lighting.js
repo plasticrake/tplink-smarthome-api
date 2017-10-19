@@ -1,19 +1,14 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const chaiAsPromised = require('chai-as-promised');
-const sinonChai = require('sinon-chai');
-
-const expect = chai.expect;
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
+const { expect, sinon } = require('../setup');
 
 module.exports = function () {
   describe('Lighting', function () {
+    this.timeout(5000);
+    this.slow(2000);
+
     describe('#setLightState()', async function () {
       it('should turn on', async function () {
         expect(await this.device.lighting.setLightState({on_off: true, ignore_default: true})).to.be.true;

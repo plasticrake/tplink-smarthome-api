@@ -1,22 +1,25 @@
 /* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
-
+/* eslint no-unused-expressions: [off] */
 'use strict';
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-const expect = chai.expect;
-chai.use(chaiAsPromised);
+const { expect } = require('../setup');
 
 module.exports = function (testDevice) {
   describe('Schedule', function () {
+    this.timeout(5000);
+    this.slow(2000);
+
     let month;
     let year;
 
-    before(() => {
+    before(async function () {
+      if (!testDevice.getDevice) return this.skip();
       let today = new Date();
       month = today.getMonth() + 1;
       year = today.getFullYear();
+
+      let device = await testDevice.getDevice();
+      await device.schedule.deleteAllRules();
     });
 
     describe('#getNextAction()', function () {
@@ -33,10 +36,6 @@ module.exports = function (testDevice) {
 
     describe('#deleteAllRules()', function () {
       it('should delete all rules', async function () {
-        let addResponse = await this.device.schedule.addRule({ powerState: true, start: 60 });
-        expect(addResponse, 'addRule').to.have.property('err_code', 0);
-        expect(addResponse, 'addRule').to.have.property('id');
-
         let deleteResponse = await this.device.schedule.deleteAllRules();
         expect(deleteResponse).to.have.property('err_code', 0);
 
@@ -48,7 +47,9 @@ module.exports = function (testDevice) {
 
     describe('#deleteRule()', function () {
       it('should delete a rule', async function () {
-        let addResponse = await this.device.schedule.addRule({ powerState: true, start: 60 });
+        // need to suport both Bulb and Plug
+        let lightState = { saturation: 21, hue: 129, brightness: 17, color_temp: 0, mode: 'customize_preset', on_off: 1 };
+        let addResponse = await this.device.schedule.addRule({ powerState: true, lightState, start: 60 });
         expect(addResponse, 'addRule').to.have.property('err_code', 0);
         expect(addResponse, 'addRule').to.have.property('id');
 
@@ -86,7 +87,7 @@ module.exports = function (testDevice) {
     if (testDevice.type !== 'simulated') {
       describe('#eraseStats()', function () {
         it('should return day stats', function () {
-          if (this.testDevice.type !== 'simulated') this.skip();
+          if (testDevice.type !== 'simulated') this.skip();
           return expect(this.device.schedule.eraseStats()).to.eventually.have.property('err_code', 0);
         });
       });

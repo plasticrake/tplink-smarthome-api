@@ -115,7 +115,7 @@ class Client extends EventEmitter {
             }
             resolve(msgObj);
           } catch (err) {
-            this.log.error('Error parsing JSON: %s\nFrom: [%s] Original: [%s] Decrypted: [%s]', err, rinfo, msg, decryptedMsg);
+            this.log.error('Error parsing JSON: %s\nFrom: [%s UDP] Original: [%s] Decrypted: [%s]', err, rinfo, msg, decryptedMsg);
             reject(err);
           }
         });
@@ -150,6 +150,7 @@ class Client extends EventEmitter {
       let socket;
       let timer;
       let deviceDataBuf;
+      let segmentCount = 0;
       try {
         let payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
 
@@ -165,16 +166,19 @@ class Client extends EventEmitter {
         }
 
         socket.on('data', (data) => {
-          this.log.debug(`[${socketId}] client.sendTcp(): socket:data ${socket.remoteAddress}:${socket.remotePort}`);
+          segmentCount += 1;
+          this.log.debug(`[${socketId}] client.sendTcp(): socket:data ${socket.remoteAddress}:${socket.remotePort} segment:${segmentCount}`);
 
-          if (!deviceDataBuf) {
+          if (deviceDataBuf === undefined) {
             deviceDataBuf = data;
           } else {
             deviceDataBuf = Buffer.concat([deviceDataBuf, data], deviceDataBuf.length + data.length);
           }
-          let msgLen = deviceDataBuf.slice(0, 4).readInt32BE();
 
-          if (deviceDataBuf.length >= msgLen) {
+          let expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
+          let actualMsgLen = deviceDataBuf.length - 4;
+
+          if (actualMsgLen >= expectedMsgLen) {
             clearTimeout(timer);
             socket.end();
 
@@ -188,7 +192,7 @@ class Client extends EventEmitter {
               }
               resolve(msgObj);
             } catch (err) {
-              this.log.error('Error parsing JSON: %s\nFrom: [%s %s] Original: [%s] Decrypted: [%s]', err, socket.remoteAddress, socket.remotePort, data, decryptedMsg);
+              this.log.error(`Error parsing JSON: %s\nFrom: [${socket.remoteAddress} ${socket.remotePort}] TCP ${segmentCount} ${actualMsgLen}/${expectedMsgLen} Original: [%s] Decrypted: [${decryptedMsg}]`, err, data);
               reject(err);
             }
           }

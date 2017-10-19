@@ -1,15 +1,20 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-const expect = chai.expect;
-chai.use(chaiAsPromised);
+const { expect } = require('../setup');
 
-module.exports = function () {
+module.exports = function (testDevice) {
   describe('Schedule', function () {
+    this.timeout(5000);
+    this.slow(2000);
+
+    before(async function () {
+      if (!testDevice.getDevice) return this.skip();
+      let device = await testDevice.getDevice();
+      await device.schedule.deleteAllRules();
+    });
+
     describe('#addRule()', function () {
       it('should add non repeating rule', async function () {
         let response = await this.device.schedule.addRule({ powerState: true, start: 60 });
@@ -30,6 +35,8 @@ module.exports = function () {
 
     describe('#editRule()', function () {
       it('should edit a rule', async function () {
+        this.timeout(7000);
+        this.slow(4000);
         let addResponse = await this.device.schedule.addRule({ powerState: true, start: 60 });
         expect(addResponse).to.have.property('err_code', 0);
         expect(addResponse).to.have.property('id');

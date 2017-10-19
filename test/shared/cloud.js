@@ -1,9 +1,7 @@
 /* eslint-env mocha */
-
 'use strict';
 
-const chai = require('chai');
-const expect = chai.expect;
+const { expect } = require('../setup');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -19,14 +17,14 @@ async function bindCloud (device, force = false) {
     ci.binded = 0;
   }
   if (ci.binded === 0) {
-    expect(await device.cloud.bind({ username, password })).to.have.property('err_code', 0);
+    expect(await device.cloud.bind(username, password)).to.have.property('err_code', 0);
   }
 }
 
 async function unbindCloud (device, force = false) {
   let ci = await device.cloud.getInfo();
   if (ci.binded === 0 && force) {
-    expect(await device.cloud.bind({ username, password })).to.have.property('err_code', 0);
+    expect(await device.cloud.bind(username, password)).to.have.property('err_code', 0);
     ci.binded = 1;
   }
   if (ci.binded === 1) {
@@ -34,24 +32,28 @@ async function unbindCloud (device, force = false) {
   }
 }
 
-module.exports = function () {
+module.exports = function (testDevice) {
   describe('Cloud', function () {
+    this.timeout(7000);
+    this.slow(3000);
+
     let originalCloudInfo;
 
     before(async function getOriginalCloudInfo () {
-      if (!this.device) this.skip();
-      originalCloudInfo = await this.device.cloud.getInfo();
+      if (!testDevice.getDevice) return this.skip();
+      let device = await testDevice.getDevice();
+      originalCloudInfo = await device.cloud.getInfo();
     });
 
     after(async function resetCloudToOriginal () {
-      if (!this.device) this.skip();
+      if (!testDevice.getDevice) this.skip();
       const currentCloudInfo = await this.device.cloud.getInfo();
       if (originalCloudInfo.server !== currentCloudInfo.server) {
         await this.device.cloud.setServerUrl(originalCloudInfo.server);
       }
       if (originalCloudInfo.binded !== currentCloudInfo.binded) {
         if (originalCloudInfo.binded === 1) {
-          await this.device.cloud.bind({ username, password });
+          await this.device.cloud.bind(username, password);
         } else {
           await this.device.cloud.unbind();
         }
@@ -79,7 +81,7 @@ module.exports = function () {
     describe('#getFirmwareList()', function () {
       // Does not require to be logged in to cloud
       it('should get firmware list from cloud', async function () {
-        this.timeout(4000);
+        this.timeout(5000);
         expect(await this.device.cloud.getFirmwareList()).to.have.property('err_code', 0);
       });
     });

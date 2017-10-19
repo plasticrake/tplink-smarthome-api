@@ -53,6 +53,9 @@ class Bulb extends Device {
     /**
      * @borrows Emeter#realtime as Bulb.emeter#realtime
      * @borrows Emeter#getRealtime as Bulb.emeter#getRealtime
+     * @borrows Emeter#getDayStats as Bulb.emeter#getDayStats
+     * @borrows Emeter#getMonthStats as Bulb.emeter#getMonthStats
+     * @borrows Emeter#eraseStats as Bulb.emeter#eraseStats
      */
     this.emeter = new Emeter(this, 'smartlife.iot.common.emeter');
     /**
@@ -70,6 +73,9 @@ class Bulb extends Device {
      * @borrows Schedule#deleteAllRules as Bulb.schedule#deleteAllRules
      * @borrows Schedule#deleteRule as Bulb.schedule#deleteRule
      * @borrows Schedule#setOverallEnable as Bulb.schedule#setOverallEnable
+     * @borrows Schedule#getDayStats as Bulb.schedule#getDayStats
+     * @borrows Schedule#getMonthStats as Bulb.schedule#getMonthStats
+     * @borrows Schedule#eraseStats as Bulb.schedule#eraseStats
      */
     this.schedule = new Schedule(this, 'smartlife.iot.common.schedule');
     /**
@@ -98,21 +104,21 @@ class Bulb extends Device {
     this.lighting.lightState = sysInfo.light_state;
   }
   /**
-   * sys_info.is_dimmable === 1
+   * Cached value of `sys_info.is_dimmable === 1`
    * @return {boolean}
    */
   get supportsBrightness () {
     return (this.sysInfo.is_dimmable === 1);
   }
   /**
-   * sys_info.is_color === 1
+   * Cached value of `sys_info.is_color === 1`
    * @return {boolean}
    */
   get supportsColor () {
     return (this.sysInfo.is_color === 1);
   }
   /**
-   * sys_info.is_variable_color_temp === 1
+   * Cached value of `sys_info.is_variable_color_temp === 1`
    * @return {boolean}
    */
   get supportsColorTemperature () {

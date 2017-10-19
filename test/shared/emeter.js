@@ -1,32 +1,29 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const chaiAsPromised = require('chai-as-promised');
-const sinonChai = require('sinon-chai');
-
-const expect = chai.expect;
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
+const { expect, sinon } = require('../setup');
 
 const { ResponseError } = require('../../src');
 
-module.exports = function () {
+module.exports = function (testDevice) {
   describe('Emeter', function () {
+    this.timeout(5000);
+    this.slow(2000);
+
     let month;
     let year;
     let supportsEmeter;
 
     before(async function () {
+      if (!testDevice.getDevice) return this.skip();
       let today = new Date();
       month = today.getMonth() + 1;
       year = today.getFullYear();
 
-      await this.device.getSysInfo();
-      supportsEmeter = this.device.supportsEmeter;
+      let device = await testDevice.getDevice();
+      await device.getSysInfo();
+      supportsEmeter = device.supportsEmeter;
     });
 
     describe('#realtime get', function () {
@@ -83,7 +80,7 @@ module.exports = function () {
 
     describe('#eraseStats()', function () {
       it('(simulated only) should erase stats', function () {
-        if (this.testDevice.type !== 'simulated') this.skip();
+        if (testDevice.type !== 'simulated') this.skip();
         if (supportsEmeter) {
           return expect(this.device.emeter.eraseStats()).to.eventually.have.property('err_code', 0);
         } else {

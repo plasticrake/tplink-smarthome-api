@@ -1,13 +1,9 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const expect = chai.expect;
-chai.use(require('chai-as-promised'));
+const { expect, getTestClient, testDevices, testDeviceCleanup } = require('./setup');
 
-const { getTestClient, testDevices, testDeviceCleanup } = require('./setup');
 const Client = require('../src/client');
 const Device = require('../src/device');
 
@@ -28,8 +24,8 @@ describe('Test Environment Setup', function () {
       expect(testDevice.getDevice).to.exist.and.be.an.instanceof(Function);
       return expect(testDevice.getDevice()).to.eventually.exist.and.be.an.instanceof(Device);
     });
-    it(`should have options`, function () {
-      expect(testDevice.options).to.exist.and.to.contain.keys('host', 'port');
+    it(`should have deviceOptions`, function () {
+      expect(testDevice.deviceOptions).to.exist.and.to.contain.keys('host', 'port');
     });
   }
 
@@ -51,9 +47,9 @@ describe('Test Environment Setup', function () {
       before(function () {
         testDevice = testDevices['unreliable'];
       });
-      it(`should have options`, function () {
-        expect(testDevice).to.have.property('options');
-        expect(testDevice.options).to.contain.keys('host', 'port');
+      it(`should have deviceOptions`, function () {
+        expect(testDevice).to.have.property('deviceOptions');
+        expect(testDevice.deviceOptions).to.contain.keys('host', 'port');
       });
       it(`should have getDevice and throw`, function () {
         expect(testDevice.getDevice).to.exist.and.be.an.instanceof(Function);
@@ -62,9 +58,9 @@ describe('Test Environment Setup', function () {
     });
 
     context('unreachable', function () {
-      it(`should have options`, function () {
-        expect(testDevices['unreachable']).to.have.property('options');
-        expect(testDevices['unreachable'].options).to.contain.keys('host', 'port');
+      it(`should have deviceOptions`, function () {
+        expect(testDevices['unreachable']).to.have.property('deviceOptions');
+        expect(testDevices['unreachable'].deviceOptions).to.contain.keys('host', 'port');
       });
     });
   });

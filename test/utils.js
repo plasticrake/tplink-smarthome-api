@@ -1,10 +1,8 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const expect = chai.expect;
+const { expect } = require('./setup');
 
 const { createScheduleRule } = require('../src/utils');
 
@@ -135,6 +133,8 @@ let tests = [
 ];
 
 describe('Utils', function () {
+  this.timeout(1000);
+  this.slow(500);
   describe('.createScheduleRule()', function () {
     tests.forEach(function (test) {
       it(`should accept ${test.name}`, function () {

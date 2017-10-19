@@ -1,45 +1,33 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-
 'use strict';
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-const expect = chai.expect;
-chai.use(chaiAsPromised);
-
-const { testDevices } = require('../setup');
+const { expect, testDevices } = require('../setup');
 
 const lightingTests = require('./lighting');
 const scheduleTests = require('./schedule');
 
 describe('Bulb', function () {
-  before(function () {
-    this.timeout(4000);
-    this.slow(2000);
-  });
+  this.timeout(5000);
+  this.slow(2000);
 
-  testDevices['bulb'].forEach((testBulb) => {
-    let bulb;
-    let model;
-    context(testBulb.name, function () {
+  testDevices['bulb'].forEach((testDevice) => {
+    context(testDevice.name, function () {
+      let bulb;
       before(async function () {
-        if (!testBulb.getDevice) {
-          this.skip();
-          return;
+        // beforeEach() doesn't work with assigning to `this`
+        if (testDevice.getDevice) {
+          bulb = await testDevice.getDevice();
+          this.device = bulb;
         }
-        this.device = await testBulb.getDevice();
-        this.testDevice = testBulb;
       });
       beforeEach(async function () {
-        if (!testBulb.getDevice) {
-          this.skip();
-          return;
+        // before() doesn't skip nested describes
+        if (!testDevice.getDevice) {
+          return this.skip();
         }
-        bulb = await testBulb.getDevice();
-        model = testBulb.model;
+        bulb = await testDevice.getDevice();
         this.device = bulb;
-        this.testDevice = testBulb;
       });
 
       describe('#supportsBrightness get', function () {
@@ -76,22 +64,27 @@ describe('Bulb', function () {
       });
 
       describe('#getColorTemperatureRange get', function () {
-        it('should return is_variable_color_temp from cached sysInfo', function () {
+        it('should return is_variable_color_temp from cached sysInfo if supported (LB120/LB130)', function () {
           let range = bulb.getColorTemperatureRange;
-          if (!bulb.supportsColorTemperature) {
-            expect(range).to.be.undefined;
-          } else {
+          if (bulb.supportsColorTemperature) {
             expect(range).to.to.have.property('min').a('number').within(2500, 9000);
             expect(range).to.to.have.property('max').a('number').within(2500, 9000);
 
-            expect(model).to.match(/lb1[23]0/);
-            if (model === 'lb120') {
+            expect(testDevice.model).to.match(/lb1[23]0/);
+            if (testDevice.model === 'lb120') {
               expect(range.min).to.eql(2700);
               expect(range.max).to.eql(6500);
-            } else if (model === 'lb130') {
+            } else if (testDevice.model === 'lb130') {
               expect(range.min).to.eql(2500);
               expect(range.max).to.eql(9000);
             }
+          }
+        });
+        it('should return undefined if not supported (LB100)', function () {
+          let range = bulb.getColorTemperatureRange;
+          if (!bulb.supportsColorTemperature) {
+            expect(range).to.be.undefined;
+            expect(testDevice.model).to.not.match(/lb1[23]0/);
           }
         });
       });
@@ -107,8 +100,8 @@ describe('Bulb', function () {
         });
       });
 
-      lightingTests();
-      scheduleTests();
+      lightingTests(testDevice);
+      scheduleTests(testDevice);
 
       describe('#setPowerState()', function () {
         it('should turn on', function () {
@@ -121,8 +114,6 @@ describe('Bulb', function () {
       });
 
       describe('#getPowerState()', function () {
-        this.timeout(2000);
-        this.slow(1000);
         it('should return power state when on', async function () {
           await bulb.setPowerState(true);
           expect(await bulb.getPowerState()).to.be.true;

@@ -48,8 +48,6 @@ class Plug extends Device {
 
     this.inUseThreshold = options.inUseThreshold || 0;
 
-    this.lastState = Object.assign(this.lastState, { powerOn: null, inUse: null });
-
     this.emitEventsEnabled = true;
 
     /**
@@ -72,6 +70,9 @@ class Plug extends Device {
     /**
      * @borrows Emeter#realtime as Plug.emeter#realtime
      * @borrows Emeter#getRealtime as Plug.emeter#getRealtime
+     * @borrows Emeter#getDayStats as Plug.emeter#getDayStats
+     * @borrows Emeter#getMonthStats as Plug.emeter#getMonthStats
+     * @borrows Emeter#eraseStats as Plug.emeter#eraseStats
      */
     this.emeter = new Emeter(this, 'emeter');
     /**
@@ -83,6 +84,9 @@ class Plug extends Device {
      * @borrows Schedule#deleteAllRules as Plug.schedule#deleteAllRules
      * @borrows Schedule#deleteRule as Plug.schedule#deleteRule
      * @borrows Schedule#setOverallEnable as Plug.schedule#setOverallEnable
+     * @borrows Schedule#getDayStats as Plug.schedule#getDayStats
+     * @borrows Schedule#getMonthStats as Plug.schedule#getMonthStats
+     * @borrows Schedule#eraseStats as Plug.schedule#eraseStats
      */
     this.schedule = new Schedule(this, 'schedule');
     /**
@@ -97,6 +101,11 @@ class Plug extends Device {
      * @borrows Timer#deleteAllRules as Plug.timer#deleteAllRules
      */
     this.timer = new Timer(this, 'count_down');
+
+    if (this.sysInfo) {
+      this.lastState.inUse = this.inUse;
+      this.lastState.relayState = this.relayState;
+    }
   }
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
@@ -143,6 +152,13 @@ class Plug extends Device {
     if (this.supportsEmeter) {
       return (this.emeter.realtime.power > this.inUseThreshold);
     }
+    return this.relayState;
+  }
+  /**
+   * `sys_info.relay_state === 1`
+   * @return {boolean}
+   */
+  get relayState () {
     return (this.sysInfo.relay_state === 1);
   }
   /**
@@ -227,7 +243,6 @@ class Plug extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async setPowerState (value, sendOptions) {
-    this.log.debug('[%s] plug.setPowerState(%s)', this.alias, value);
     await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`, sendOptions);
     this.sysInfo.relay_state = (value ? 1 : 0);
     this.emitEvents();
@@ -316,9 +331,9 @@ class Plug extends Device {
     if (!this.emitEventsEnabled) { return; }
 
     const inUse = this.inUse;
-    const powerOn = (this.sysInfo.relay_state === 1);
+    const relayState = this.relayState;
 
-    this.log.debug('[%s] plug.emitEvents() inUse: %s powerOn: %s lastState: %j', this.alias, inUse, powerOn, this.lastState);
+    this.log.debug('[%s] plug.emitEvents() inUse: %s relayState: %s lastState: %j', this.alias, inUse, relayState, this.lastState);
     if (this.lastState.inUse !== inUse) {
       this.lastState.inUse = inUse;
       if (inUse) {
@@ -329,15 +344,15 @@ class Plug extends Device {
     }
     this.emit('in-use-update', inUse);
 
-    if (this.lastState.powerOn !== powerOn) {
-      this.lastState.powerOn = powerOn;
-      if (powerOn) {
+    if (this.lastState.relayState !== relayState) {
+      this.lastState.relayState = relayState;
+      if (relayState) {
         this.emit('power-on');
       } else {
         this.emit('power-off');
       }
     }
-    this.emit('power-update', powerOn);
+    this.emit('power-update', relayState);
   }
 }
 
