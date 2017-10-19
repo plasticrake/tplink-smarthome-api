@@ -1,11 +1,11 @@
-## Unreleased
+## 0.19.0 / 2017-10-18
 
 ### Breaking Changes :boom:
 - `Device`/`Bulb`/`Plug`
   - Many methods were moved to mirror the TPLink API.
     - Example: `Plug#getScheduleRules()` is now `Plug.schedule#getRules()`
     - Example: `Bulb#getCloudInfo()` is now `Bulb.cloud#getInfo()`
-    - See documenation for details.
+    - See API documenation for details.
 
 ### Added :heavy_plus_sign:
 - `Device`/`Bulb`/`Plug`
@@ -17,7 +17,7 @@
   - `send`/`sendCommand`
     - Receiving large TCP responses split across multiple segments are now supported
     - Support UDP in addition to TCP
-      - UDP can be unreliable, large replies may not be sent back from the device
+      - UDP can be unreliable, also large replies may not be sent back from the device
 - `ResponseError` now exported so consumer can check errors with `instanceof`
 
 ## 0.18.0 / 2017-10-11
