@@ -84,7 +84,7 @@ TP-Link models: LB100, LB110, LB120, LB130.
 
 **Kind**: global class  
 **Extends**: [<code>Device</code>](#Device), <code>EventEmitter</code>  
-**Emits**: <code>Bulb#event:lightstate-on</code>, <code>Bulb#event:lightstate-off</code>, <code>Bulb#event:lightstate-change</code>, <code>Bulb#event:lightstate-update</code>, <code>Bulb#event:emeter-realtime-update</code>  
+**Emits**: [<code>lightstate-on</code>](#Bulb+event_lightstate-on), [<code>lightstate-off</code>](#Bulb+event_lightstate-off), [<code>lightstate-change</code>](#Bulb+event_lightstate-change), [<code>lightstate-update</code>](#Bulb+event_lightstate-update), [<code>emeter-realtime-update</code>](#Bulb+event_emeter-realtime-update)  
 
 * [Bulb](#Bulb) ⇐ [<code>Device</code>](#Device)
     * [new Bulb(options)](#new_Bulb_new)
@@ -148,6 +148,11 @@ TP-Link models: LB100, LB110, LB120, LB130.
     * [.getModel([sendOptions])](#Device+getModel) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.reboot(delay, [sendOptions])](#Device+reboot) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.reset(delay, [sendOptions])](#Device+reset) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * ["emeter-realtime-update"](#Bulb+event_emeter-realtime-update)
+    * ["lightstate-on"](#Bulb+event_lightstate-on)
+    * ["lightstate-off"](#Bulb+event_lightstate-off)
+    * ["lightstate-change"](#Bulb+event_lightstate-change)
+    * ["lightstate-update"](#Bulb+event_lightstate-update)
 
 <a name="new_Bulb_new"></a>
 
@@ -901,6 +906,66 @@ Sends `system.reset` command.
 | delay | <code>number</code> | 
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
+<a name="Bulb+event_emeter-realtime-update"></a>
+
+### "emeter-realtime-update"
+Bulb's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+
+**Kind**: event emitted by [<code>Bulb</code>](#Bulb)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> | emeterRealtime |
+
+<a name="Bulb+event_lightstate-on"></a>
+
+### "lightstate-on"
+Bulb was turned on (`lightstate.on_off`).
+
+**Kind**: event emitted by [<code>Bulb</code>](#Bulb)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> | lightstate |
+
+<a name="Bulb+event_lightstate-off"></a>
+
+### "lightstate-off"
+Bulb was turned off (`lightstate.on_off`).
+
+**Kind**: event emitted by [<code>Bulb</code>](#Bulb)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> | lightstate |
+
+<a name="Bulb+event_lightstate-change"></a>
+
+### "lightstate-change"
+Bulb's lightstate was changed.
+
+**Kind**: event emitted by [<code>Bulb</code>](#Bulb)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> | lightstate |
+
+<a name="Bulb+event_lightstate-update"></a>
+
+### "lightstate-update"
+Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+
+**Kind**: event emitted by [<code>Bulb</code>](#Bulb)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> | lightstate |
+
 <a name="Lighting"></a>
 
 ## Lighting
@@ -1048,14 +1113,14 @@ Client that sends commands to specified devices or discover devices on the local
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
 | [options.defaultSendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
-| [options.defaultSendOptions.timeout] | <code>Number</code> | <code>5000</code> |  |
-| [options.defaultSendOptions.transport] | <code>string</code> | <code>&quot;tcp&quot;</code> |  |
+| [options.defaultSendOptions.timeout] | <code>Number</code> | <code>5000</code> | (ms) |
+| [options.defaultSendOptions.transport] | <code>string</code> | <code>&quot;tcp&quot;</code> | 'tcp' or 'udp' |
 | [options.logLevel] | <code>string</code> |  | level for built in logger ['error','warn','info','debug','trace'] |
 
 <a name="Client+send"></a>
 
 ### client.send(payload, host, [port], [sendOptions]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-[Encrypts](https://github.com/plasticrake/tplink-smarthome-crypto) `payload` and sends (via TCP) to device.
+[Encrypts](https://github.com/plasticrake/tplink-smarthome-crypto) `payload` and sends to device.
 - If `payload` is not a string, it is `JSON.stringify`'d.
 - Promise fulfills with parsed JSON response.
 
@@ -1071,7 +1136,7 @@ For Example:
       ...
     }}}`
 
-All responses contain an `err_code` (`0` is success).
+All responses from device contain an `err_code` (`0` is success).
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 
@@ -1185,7 +1250,7 @@ Discover TP-Link Smarthome devices on the network.
 
 - Sends a discovery packet (via UDP) to the `broadcast` address every `discoveryInterval`(ms).
 - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until [#stopDiscovery](#stopDiscovery) is called).
-  - If a device does not respond after `offlineTolerance` number of attempts, [event:device-offline](event:device-offline) is emitted.
+  - If a device does not respond after `offlineTolerance` number of attempts, [event:Client#device-offline](event:Client#device-offline) is emitted.
 - If `deviceTypes` are specified only matching devices are found.
 - If `macAddresses` are specified only matching device with matching MAC addresses are found.
 - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
@@ -1203,9 +1268,9 @@ Discover TP-Link Smarthome devices on the network.
 | [options.broadcast] | <code>string</code> | <code>&quot;255.255.255.255&quot;</code> | broadcast address |
 | [options.discoveryInterval] | <code>number</code> | <code>10000</code> | (ms) |
 | [options.discoveryTimeout] | <code>number</code> | <code>0</code> | (ms) |
-| [options.offlineTolerance] | <code>number</code> | <code>3</code> |  |
+| [options.offlineTolerance] | <code>number</code> | <code>3</code> | # of consecutive missed replies to consider offline |
 | [options.deviceTypes] | <code>Array.&lt;string&gt;</code> |  | 'plug','bulb' |
-| [options.macAddresses] | <code>Array.&lt;string&gt;</code> |  | 'plug','bulb' |
+| [options.macAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive |
 | [options.deviceOptions] | <code>Object</code> | <code>{}</code> | passed to device constructors |
 | [options.devices] | <code>Array.&lt;Object&gt;</code> |  | known devices to query instead of relying on broadcast |
 
