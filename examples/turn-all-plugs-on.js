@@ -1,5 +1,5 @@
-const Hs100Api = require('..');
-const client = new Hs100Api.Client();
+const { Client } = require('..');
+const client = new Client();
 
 // Search for all plugs and turn them on
 client.on('plug-new', function (plug) {

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module hs100-api
+ * @module tplink-smarthome-api
  */
 module.exports = {
   Client: require('./client'),

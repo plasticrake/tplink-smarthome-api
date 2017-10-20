@@ -1,12 +1,12 @@
-# hs100-api
-[![NPM Version](https://img.shields.io/npm/v/hs100-api.svg)](https://www.npmjs.com/package/hs100-api)
-[![Build Status](https://travis-ci.org/plasticrake/hs100-api.svg?branch=master)](https://travis-ci.org/plasticrake/hs100-api)
-[![codecov](https://codecov.io/gh/plasticrake/hs100-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/hs100-api)
+# tplink-smarthome-api
+[![NPM Version](https://img.shields.io/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
+[![Build Status](https://travis-ci.org/plasticrake/tplink-smarthome-api.svg?branch=master)](https://travis-ci.org/plasticrake/tplink-smarthome-api)
+[![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
 
 TP-Link Smart Home API
 
-#### [Changelog](https://github.com/plasticrake/hs100-api/tree/master/CHANGELOG.md)
+#### [Changelog](https://github.com/plasticrake/tplink-smarthome-api/tree/master/CHANGELOG.md)
 
 ## Supported Devices
 
@@ -18,15 +18,15 @@ TP-Link Smart Home API
 ## Related Projects
 - [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
 - [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
-- [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-hs100)
+- [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-tplink-smarthome)
 
 ## Examples
-See more [examples](https://github.com/plasticrake/hs100-api/tree/master/examples).
+See more [examples](https://github.com/plasticrake/tplink-smarthome-api/tree/master/examples).
 
 ```javascript
-const Hs100Api = require('hs100-api');
+const { Client } = require('tplink-smarthome-api');
 
-const client = new Hs100Api.Client();
+const client = new Client();
 const plug = client.getDevice({host: '10.0.1.2'}).then((device)=>{
   device.getSysInfo().then(console.log);
   device.setPowerState(true);
@@ -40,11 +40,9 @@ client.startDiscovery().on('device-new', (device) => {
 ```
 
 ## CLI
-Install the command line utility with `npm install -g hs100-api`. Run `hs100-api --help` for help.
+Install the command line utility with `npm install -g tplink-smarthome-api`. Run `tplink-smarthome-api --help` for help.
 
 ## API
-The API is not stable (but it's getting close!) and there may be breaking changes.
-
 For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`.
 
 Functions that take more than 3 arguments are passed a single options object as the first argument (and if its a network commmand, SendOptions as the second.)

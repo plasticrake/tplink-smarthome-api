@@ -1,7 +1,7 @@
 const util = require('util');
 
-const Hs100Api = require('..');
-const client = new Hs100Api.Client();
+const { Client } = require('..');
+const client = new Client();
 
 var logEvent = function (eventName, device, state) {
   let stateString = (state != null ? util.inspect(state) : '');
