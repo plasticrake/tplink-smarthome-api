@@ -1,8 +1,7 @@
-## 1.0.0 / 2017-10-19
+## 0.20.0 / 2017-10-19
 
 ### Changes :zap:
 - new name, `hs100-api` is now `tplink-smarthome-api`
-- - 1.0.0!
 
 ## 0.19.0 / 2017-10-18
 
