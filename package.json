@@ -54,7 +54,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
-    "codecov": "^2.3.1",
+    "codecov": "^3.0.0",
     "cross-env": "^5.1.0",
     "dotenv": "^4.0.0",
     "jsdoc-to-markdown": "^3.1.0-0",
