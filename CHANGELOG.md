@@ -1,4 +1,4 @@
-## 0.20.1 / 2017-10-19
+## 0.20.1 / 2017-10-24
 
 ### Fixed :bug:
 - Reject instead of incorrectly throwing error for network errors
