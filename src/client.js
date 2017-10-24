@@ -121,8 +121,9 @@ class Client extends EventEmitter {
         });
 
         socket.on('error', (err) => {
-          this.log.debug(`[${socketId}] client.sendUdp(): socket:error`);
-          throw err;
+          this.log.debug(`[${socketId}] client.sendUdp(): socket:error`, err);
+          if (isSocketBound) socket.close();
+          reject(err);
         });
 
         this.log.debug(`[${socketId}] client.sendUdp(): attempting to open. host:${host}, port:${port}`);
@@ -200,7 +201,8 @@ class Client extends EventEmitter {
 
         socket.on('error', (err) => {
           this.log.debug(`[${socketId}] client.sendTcp(): socket:error`);
-          throw err;
+          socket.destroy();
+          reject(err);
         });
 
         this.log.debug(`[${socketId}] client.sendTcp(): attempting to open. host:${host}, port:${port}`);
