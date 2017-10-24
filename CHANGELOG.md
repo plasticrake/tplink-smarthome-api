@@ -1,3 +1,8 @@
+## 0.20.1 / 2017-10-19
+
+### Fixed :bug:
+- Reject instead of incorrectly throwing error for network errors
+
 ## 0.20.0 / 2017-10-19
 
 ### Changes :zap:
