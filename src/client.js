@@ -547,7 +547,7 @@ class Client extends EventEmitter {
    * @private
    */
   sendDiscovery (address, devices, offlineTolerance) {
-    this.log.debug('client.sendDiscovery(%j)', arguments[0]);
+    this.log.debug('client.sendDiscovery(%s, %j, %s)', arguments[0], arguments[1], arguments[2]);
     try {
       devices = devices || [];
 
@@ -569,6 +569,7 @@ class Client extends EventEmitter {
       this.socket.send(discoveryMsgBuf, 0, discoveryMsgBuf.length, 9999, address);
 
       devices.forEach((d) => {
+        this.log.debug('client.sendDiscovery() direct device:', d);
         this.socket.send(discoveryMsgBuf, 0, discoveryMsgBuf.length, d.port || 9999, d.host);
       });
 
