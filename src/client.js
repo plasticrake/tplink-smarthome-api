@@ -180,20 +180,31 @@ class Client extends EventEmitter {
           let actualMsgLen = deviceDataBuf.length - 4;
 
           if (actualMsgLen >= expectedMsgLen) {
-            clearTimeout(timer);
             socket.end();
+          }
+        });
 
+        socket.on('close', () => {
+          this.log.debug(`[${socketId}] client.sendTcp(): socket:close`);
+          clearTimeout(timer);
+
+          if (deviceDataBuf == null) return;
+
+          let expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
+          let actualMsgLen = deviceDataBuf.length - 4;
+
+          if (actualMsgLen >= expectedMsgLen) {
             let decryptedMsg;
             try {
               decryptedMsg = decrypt(deviceDataBuf.slice(4)).toString('utf8');
-              this.log.debug(`[${socketId}] client.sendTcp(): socket:data message: ${decryptedMsg}`);
+              this.log.debug(`[${socketId}] client.sendTcp(): socket:close message: ${decryptedMsg}`);
               let msgObj = '';
               if (decryptedMsg !== '') {
                 msgObj = JSON.parse(decryptedMsg);
               }
               resolve(msgObj);
             } catch (err) {
-              this.log.error(`Error parsing JSON: %s\nFrom: [${socket.remoteAddress} ${socket.remotePort}] TCP ${segmentCount} ${actualMsgLen}/${expectedMsgLen} Original: [%s] Decrypted: [${decryptedMsg}]`, err, data);
+              this.log.error(`Error parsing JSON: %s\nFrom: [${socket.remoteAddress} ${socket.remotePort}] TCP ${segmentCount} ${actualMsgLen}/${expectedMsgLen} Original: [%s] Decrypted: [${decryptedMsg}]`, err, deviceDataBuf);
               reject(err);
             }
           }
