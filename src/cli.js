@@ -114,6 +114,18 @@ let setupClient = function () {
   return client;
 };
 
+let setParamTypes = function setParamTypes (params, types) {
+  if (params && params.length > 0 && types && types.length > 0) {
+    return Array.from(params).map((el, i) => {
+      if (types[i] === 'number') {
+        return +el;
+      }
+      return el;
+    });
+  }
+  return params;
+};
+
 program
   .option('-D, --debug', 'turn on debug level logging', () => { logLevel = 'debug'; })
   .option('-t, --timeout <ms>', 'timeout (ms)', toInt, 5000)
@@ -167,16 +179,27 @@ program
     blink(hostOnly, port, times, rate);
   });
 
-[ 'getSysInfo', 'getInfo', 'setAlias', 'setLocation', 'getModel', 'reboot', 'reset'
+[ 'getSysInfo', 'getInfo', 'setAlias', 'getModel',
+  { fnName: 'setLocation', paramTypes: ['number', 'number'] },
+  { fnName: 'reboot', paramTypes: ['number'] },
+  { fnName: 'reset', paramTypes: ['number'] }
 ].forEach((command) => {
+  let commandName;
+  let paramTypes;
+  if (command.fnName) {
+    commandName = command.fnName;
+    paramTypes = command.paramTypes;
+  } else {
+    commandName = command;
+  }
   program
-    .command(`${command} <host> [params]`)
-    .description(`Send ${command} to device (using Device#${command})`)
+    .command(`${commandName} <host> [params]`)
+    .description(`Send ${commandName} to device (using Device#${commandName})`)
     .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 5000)
     .action(function (host, params, options) {
       client = setupClient();
       let [hostOnly, port] = host.split(':');
-      sendCommandDynamic(hostOnly, port, command, params);
+      sendCommandDynamic(hostOnly, port, commandName, setParamTypes(params, paramTypes));
     });
 });
 
