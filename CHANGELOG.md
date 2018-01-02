@@ -1,3 +1,11 @@
+## 0.21.0 / 2017-01-02
+
+### Changes :zap:
+- Changed TCP response handling to timeout when device responds but does not close connection
+
+### Fixed :bug:
+- CLI: Fixed reboot, reset, setLocation commands that expect integer arguments
+
 ## 0.20.1 / 2017-10-24
 
 ### Fixed :bug:
