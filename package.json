@@ -1,6 +1,6 @@
 {
   "name": "tplink-smarthome-api",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "TP-Link Smart Home API",
   "author": "Patrick Seal",
   "license": "MIT",
