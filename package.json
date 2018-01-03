@@ -52,6 +52,8 @@
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "bats": "^0.4.2",
+    "bats-assert": "git+https://github.com/ztombol/bats-assert.git",
+    "bats-support": "git+https://github.com/ztombol/bats-support.git",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
