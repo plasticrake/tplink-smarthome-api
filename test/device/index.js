@@ -38,7 +38,7 @@ describe('Device', function () {
         let command = {emeter: {get_realtime: {}}};
         let response = { emeter: { err_code: -1, err_msg: 'module not support' } };
         expect(() => processResponse(command, response))
-            .to.throw(ResponseError).and.to.have.deep.property('response', { err_code: -1, err_msg: 'module not support' });
+          .to.throw(ResponseError).and.to.have.deep.property('response', { err_code: -1, err_msg: 'module not support' });
       });
 
       it('return fragment for single command system.set_dev_alias', function () {
