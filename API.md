@@ -134,6 +134,7 @@ TP-Link models: LB100, LB110, LB120, LB130.
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
     * [.hardwareVersion](#Device+hardwareVersion) ⇒ <code>string</code>
     * [.mac](#Device+mac) ⇒ <code>string</code>
+    * [.macNormalized](#Device+macNormalized) ⇒ <code>string</code>
     * [.getInfo([sendOptions])](#Bulb+getInfo) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
     * [.getPowerState([sendOptions])](#Bulb+getPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.setPowerState(value, [sendOptions])](#Bulb+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
@@ -643,64 +644,73 @@ Returns array with min and max supported color temperatures
 <a name="Device+alias"></a>
 
 ### bulb.alias ⇒ <code>string</code>
-Cached value of `sys_info.alias`
+Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+deviceId"></a>
 
 ### bulb.deviceId ⇒ <code>string</code>
-Cached value of `sys_info.deviceId`
+Cached value of `sys_info.deviceId`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+description"></a>
 
 ### bulb.description ⇒ <code>string</code>
-Cached value of `sys_info.[description|dev_name]`
+Cached value of `sys_info.[description|dev_name]`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+model"></a>
 
 ### bulb.model ⇒ <code>string</code>
-Cached value of `sys_info.model`
+Cached value of `sys_info.model`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+name"></a>
 
 ### bulb.name ⇒ <code>string</code>
-Cached value of `sys_info.alias`
+Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+type"></a>
 
 ### bulb.type ⇒ <code>string</code>
-Cached value of `sys_info.[type|mic_type]``
+Cached value of `sys_info.[type|mic_type]`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+deviceType"></a>
 
 ### bulb.deviceType ⇒ <code>string</code>
-Type of device (or device if unknown)
+Type of device (or `device` if unknown).
 
-Based on cached value of `sys_info.[type|mic_type]``
+Based on cached value of `sys_info.[type|mic_type]`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 **Returns**: <code>string</code> - 'plub'|'bulb'|'device'  
 <a name="Device+softwareVersion"></a>
 
 ### bulb.softwareVersion ⇒ <code>string</code>
-Cached value of `sys_info.sw_ver`
+Cached value of `sys_info.sw_ver`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+hardwareVersion"></a>
 
 ### bulb.hardwareVersion ⇒ <code>string</code>
-Cached value of `sys_info.hw_ver`
+Cached value of `sys_info.hw_ver`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+mac"></a>
 
 ### bulb.mac ⇒ <code>string</code>
-Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
+Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
+
+**Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+<a name="Device+macNormalized"></a>
+
+### bulb.macNormalized ⇒ <code>string</code>
+Normalized cached value of `sys_info.[mac|mic_mac|ethernet_mac]`
+
+Removes all non alphanumeric characters and makes uppercase
+`aa:bb:cc:00:11:22` will be normalized to `AABBCC001122`
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Bulb+getInfo"></a>
@@ -1438,6 +1448,7 @@ Shared behavior for [Plug](#Plug) and [Bulb](#Bulb).
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
     * [.hardwareVersion](#Device+hardwareVersion) ⇒ <code>string</code>
     * [.mac](#Device+mac) ⇒ <code>string</code>
+    * [.macNormalized](#Device+macNormalized) ⇒ <code>string</code>
     * [.send(payload, [sendOptions])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
     * [.sendCommand(command, [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
@@ -1475,64 +1486,73 @@ Returns cached results from last retrieval of `system.sys_info`.
 <a name="Device+alias"></a>
 
 ### device.alias ⇒ <code>string</code>
-Cached value of `sys_info.alias`
+Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+deviceId"></a>
 
 ### device.deviceId ⇒ <code>string</code>
-Cached value of `sys_info.deviceId`
+Cached value of `sys_info.deviceId`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+description"></a>
 
 ### device.description ⇒ <code>string</code>
-Cached value of `sys_info.[description|dev_name]`
+Cached value of `sys_info.[description|dev_name]`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+model"></a>
 
 ### device.model ⇒ <code>string</code>
-Cached value of `sys_info.model`
+Cached value of `sys_info.model`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+name"></a>
 
 ### device.name ⇒ <code>string</code>
-Cached value of `sys_info.alias`
+Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+type"></a>
 
 ### device.type ⇒ <code>string</code>
-Cached value of `sys_info.[type|mic_type]``
+Cached value of `sys_info.[type|mic_type]`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+deviceType"></a>
 
 ### device.deviceType ⇒ <code>string</code>
-Type of device (or device if unknown)
+Type of device (or `device` if unknown).
 
-Based on cached value of `sys_info.[type|mic_type]``
+Based on cached value of `sys_info.[type|mic_type]`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 **Returns**: <code>string</code> - 'plub'|'bulb'|'device'  
 <a name="Device+softwareVersion"></a>
 
 ### device.softwareVersion ⇒ <code>string</code>
-Cached value of `sys_info.sw_ver`
+Cached value of `sys_info.sw_ver`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+hardwareVersion"></a>
 
 ### device.hardwareVersion ⇒ <code>string</code>
-Cached value of `sys_info.hw_ver`
+Cached value of `sys_info.hw_ver`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+mac"></a>
 
 ### device.mac ⇒ <code>string</code>
-Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
+Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
+
+**Kind**: instance property of [<code>Device</code>](#Device)  
+<a name="Device+macNormalized"></a>
+
+### device.macNormalized ⇒ <code>string</code>
+Normalized cached value of `sys_info.[mac|mic_mac|ethernet_mac]`
+
+Removes all non alphanumeric characters and makes uppercase
+`aa:bb:cc:00:11:22` will be normalized to `AABBCC001122`
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+send"></a>
@@ -1905,6 +1925,7 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
     * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
     * [.hardwareVersion](#Device+hardwareVersion) ⇒ <code>string</code>
     * [.mac](#Device+mac) ⇒ <code>string</code>
+    * [.macNormalized](#Device+macNormalized) ⇒ <code>string</code>
     * [.getInfo([sendOptions])](#Plug+getInfo) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
     * [.getInUse([sendOptions])](#Plug+getInUse) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.getLedState([sendOptions])](#Plug+getLedState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
@@ -2554,64 +2575,73 @@ Otherwise fallback on relay state:  `relay_state === 1`
 <a name="Device+alias"></a>
 
 ### plug.alias ⇒ <code>string</code>
-Cached value of `sys_info.alias`
+Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+deviceId"></a>
 
 ### plug.deviceId ⇒ <code>string</code>
-Cached value of `sys_info.deviceId`
+Cached value of `sys_info.deviceId`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+description"></a>
 
 ### plug.description ⇒ <code>string</code>
-Cached value of `sys_info.[description|dev_name]`
+Cached value of `sys_info.[description|dev_name]`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+model"></a>
 
 ### plug.model ⇒ <code>string</code>
-Cached value of `sys_info.model`
+Cached value of `sys_info.model`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+name"></a>
 
 ### plug.name ⇒ <code>string</code>
-Cached value of `sys_info.alias`
+Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+type"></a>
 
 ### plug.type ⇒ <code>string</code>
-Cached value of `sys_info.[type|mic_type]``
+Cached value of `sys_info.[type|mic_type]`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+deviceType"></a>
 
 ### plug.deviceType ⇒ <code>string</code>
-Type of device (or device if unknown)
+Type of device (or `device` if unknown).
 
-Based on cached value of `sys_info.[type|mic_type]``
+Based on cached value of `sys_info.[type|mic_type]`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 **Returns**: <code>string</code> - 'plub'|'bulb'|'device'  
 <a name="Device+softwareVersion"></a>
 
 ### plug.softwareVersion ⇒ <code>string</code>
-Cached value of `sys_info.sw_ver`
+Cached value of `sys_info.sw_ver`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+hardwareVersion"></a>
 
 ### plug.hardwareVersion ⇒ <code>string</code>
-Cached value of `sys_info.hw_ver`
+Cached value of `sys_info.hw_ver`.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+mac"></a>
 
 ### plug.mac ⇒ <code>string</code>
-Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
+Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
+<a name="Device+macNormalized"></a>
+
+### plug.macNormalized ⇒ <code>string</code>
+Normalized cached value of `sys_info.[mac|mic_mac|ethernet_mac]`
+
+Removes all non alphanumeric characters and makes uppercase
+`aa:bb:cc:00:11:22` will be normalized to `AABBCC001122`
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Plug+getInfo"></a>

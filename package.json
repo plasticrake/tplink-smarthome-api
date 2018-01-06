@@ -1,6 +1,6 @@
 {
   "name": "tplink-smarthome-api",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "TP-Link Smart Home API",
   "author": "Patrick Seal",
   "license": "MIT",
@@ -23,6 +23,7 @@
     "lb110",
     "lb120",
     "lb130",
+    "lb200",
     "home",
     "smartplug",
     "smartswitch",

@@ -1,6 +1,7 @@
-## Unreleased
+## 0.22.0 / 2017-01-05
 
 ### Added :heavy_plus_sign:
+- `Device#macNormalized`
 - Basic automated testing of CLI
 
 ## 0.21.0 / 2017-01-02
