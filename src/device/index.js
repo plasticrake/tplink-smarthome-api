@@ -63,51 +63,51 @@ class Device extends EventEmitter {
     this._sysInfo = sysInfo;
   }
   /**
-   * Cached value of `sys_info.alias`
+   * Cached value of `sys_info.alias`.
    * @return {string}
    */
   get alias () {
     return this.sysInfo.alias;
   }
   /**
-   * Cached value of `sys_info.deviceId`
+   * Cached value of `sys_info.deviceId`.
    * @return {string}
    */
   get deviceId () {
     return this.sysInfo.deviceId;
   }
   /**
-   * Cached value of `sys_info.[description|dev_name]`
+   * Cached value of `sys_info.[description|dev_name]`.
    * @return {string}
    */
   get description () {
     return this.sysInfo.description || this.sysInfo.dev_name;
   }
   /**
-   * Cached value of `sys_info.model`
+   * Cached value of `sys_info.model`.
    * @return {string}
    */
   get model () {
     return this.sysInfo.model;
   }
   /**
-   * Cached value of `sys_info.alias`
+   * Cached value of `sys_info.alias`.
    * @return {string}
    */
   get name () {
     return this.alias;
   }
   /**
-   * Cached value of `sys_info.[type|mic_type]``
+   * Cached value of `sys_info.[type|mic_type]`.
    * @return {string}
    */
   get type () {
     return this.sysInfo.type || this.sysInfo.mic_type;
   }
   /**
-   * Type of device (or device if unknown)
+   * Type of device (or `device` if unknown).
    *
-   * Based on cached value of `sys_info.[type|mic_type]``
+   * Based on cached value of `sys_info.[type|mic_type]`
    * @return {string} 'plub'|'bulb'|'device'
    */
   get deviceType () {
@@ -119,25 +119,36 @@ class Device extends EventEmitter {
     }
   }
   /**
-   * Cached value of `sys_info.sw_ver`
+   * Cached value of `sys_info.sw_ver`.
    * @return {string}
    */
   get softwareVersion () {
     return this.sysInfo.sw_ver;
   }
   /**
-   * Cached value of `sys_info.hw_ver`
+   * Cached value of `sys_info.hw_ver`.
    * @return {string}
    */
   get hardwareVersion () {
     return this.sysInfo.hw_ver;
   }
   /**
-   * Cached value of `sys_info.[mac|mic_mac|ethernet_mac]``
+   * Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
    * @return {string}
    */
   get mac () {
     return this.sysInfo.mac || this.sysInfo.mic_mac || this.sysInfo.ethernet_mac;
+  }
+  /**
+   * Normalized cached value of `sys_info.[mac|mic_mac|ethernet_mac]`
+   *
+   * Removes all non alphanumeric characters and makes uppercase
+   * `aa:bb:cc:00:11:22` will be normalized to `AABBCC001122`
+   * @return {string}
+   */
+  get macNormalized () {
+    let mac = this.mac || '';
+    return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   }
   /**
    * Sends `payload` to device (using {@link Client#send})
