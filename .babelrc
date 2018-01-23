@@ -11,6 +11,5 @@
     "test": {
       "plugins": [ "istanbul" ]
     }
-  },
-  "plugins": ["transform-object-entries"]
+  }
 }
