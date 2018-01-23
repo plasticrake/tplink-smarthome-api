@@ -44,10 +44,21 @@ const testDevices = [
   { model: 'lb120', deviceType: 'bulb', name: 'LB120(bulb)' },
   { model: 'lb130', deviceType: 'bulb', name: 'LB130(bulb)' }];
 
-Object.entries(groupBy(testDevices, 'deviceType')).forEach(([key, value]) => {
+// Object.entries polyfill
+let objectEntries = function (obj) {
+  let ownProps = Object.keys(obj);
+  let i = ownProps.length;
+  let resArray = new Array(i); // preallocate the Array
+  while (i--) {
+    resArray[i] = [ownProps[i], obj[ownProps[i]]];
+  }
+  return resArray;
+};
+
+objectEntries(groupBy(testDevices, 'deviceType')).forEach(([key, value]) => {
   testDevices[key] = value;
 });
-Object.entries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
+objectEntries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
   testDevices[key] = value;
 });
 
