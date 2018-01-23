@@ -3,6 +3,7 @@ node_js:
   - "node"
   - "lts/*"
   - "6"
+  - "6.4"
 cache:
   directories:
     - "node_modules"
