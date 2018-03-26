@@ -48,7 +48,7 @@ class Cloud {
     }, sendOptions);
   }
   /**
-   * Remove device from TP-Link cloud.
+   * Get device's TP-Link cloud firmware list.
    *
    * Sends `cloud.get_intl_fw_list` command.
    * @param  {SendOptions} [sendOptions]
