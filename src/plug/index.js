@@ -150,7 +150,11 @@ class Plug extends Device {
    */
   get inUse () {
     if (this.supportsEmeter) {
-      return (this.emeter.realtime.power > this.inUseThreshold);
+      if (this.emeter.realtime.power == null) {
+        return this.emeter.realtime.power_mw / 1000 > this.inUseThreshold;
+      } else {
+        return this.emeter.realtime.power > this.inUseThreshold;
+      }
     }
     return this.relayState;
   }
