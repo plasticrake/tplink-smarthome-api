@@ -40,7 +40,8 @@ class Emeter {
   /**
    * Gets device's current energy stats.
    *
-   * Requests `emeter.get_realtime`.
+   * Requests `emeter.get_realtime`. Older devices return `current`, `voltage`,... while newer devices return `current_ma`, `voltage_mv`...
+   * This will return a normalized response including both old and new style properies for backwards compatibility.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
