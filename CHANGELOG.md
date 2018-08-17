@@ -1,4 +1,7 @@
-## Unreleased
+## 0.23.0 / 2018-08-16
+
+### Breaking Changes :boom:
+- Requires minimum Node version 6.4
 
 ### Changes :zap:
 - Bulb`/`Plug`
