@@ -2435,6 +2435,6 @@ Where response err_code != 0.
 
 ## Credits
 Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.
-https://georgovassilis.blogspot.com/2016/05/controlling-tp-link-hs100-wi-fi-smart.html
+https://blog.georgovassilis.com/2016/05/07/controlling-the-tp-link-hs100-wi-fi-smart-plug/
 
 Some design cues for Client based on [node-lifx](https://github.com/MariusRumpf/node-lifx/)
