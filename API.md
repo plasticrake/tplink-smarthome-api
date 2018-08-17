@@ -226,7 +226,7 @@ Sends `cloud.unbind` command.
 <a name="Bulb+cloud+getFirmwareList"></a>
 
 #### cloud.getFirmwareList([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-Remove device from TP-Link cloud.
+Get device's TP-Link cloud firmware list.
 
 Sends `cloud.get_intl_fw_list` command.
 
@@ -2139,7 +2139,7 @@ Sends `cloud.unbind` command.
 <a name="Plug+cloud+getFirmwareList"></a>
 
 #### cloud.getFirmwareList([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-Remove device from TP-Link cloud.
+Get device's TP-Link cloud firmware list.
 
 Sends `cloud.get_intl_fw_list` command.
 
@@ -3160,7 +3160,7 @@ Sends `cloud.unbind` command.
 <a name="Cloud+getFirmwareList"></a>
 
 ### cloud.getFirmwareList([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-Remove device from TP-Link cloud.
+Get device's TP-Link cloud firmware list.
 
 Sends `cloud.get_intl_fw_list` command.
 
