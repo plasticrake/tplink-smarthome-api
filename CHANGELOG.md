@@ -1,3 +1,12 @@
+## Unreleased
+
+### Changes :zap:
+- Bulb`/`Plug`
+  - `getEmeterRealtime` will now simultaneously return both the new and old API style responses, i.e. `current` and `current_ma`.
+
+### Fixed :bug:
+- Change `Bulb#getInfo()` to request `system: { get_sysinfo }` instead of `smartlife.iot.common.system: { get_sysInfo }`
+
 ## 0.22.0 / 2017-01-05
 
 ### Added :heavy_plus_sign:

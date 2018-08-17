@@ -629,7 +629,7 @@ Sends `cloud.unbind` command.
 <a name="Bulb+cloud+getFirmwareList"></a>
 
 #### cloud.getFirmwareList([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-Remove device from TP-Link cloud.
+Get device's TP-Link cloud firmware list.
 
 Sends `cloud.get_intl_fw_list` command.
 
@@ -678,7 +678,8 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 #### emeter.getRealtime([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's current energy stats.
 
-Requests `emeter.get_realtime`.
+Requests `emeter.get_realtime`. Older devices return `current`, `voltage`,... while newer devices return `current_ma`, `voltage_mv`...
+This will return a normalized response including both old and new style properies for backwards compatibility.
 
 **Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1578,7 +1579,7 @@ Sends `cloud.unbind` command.
 <a name="Plug+cloud+getFirmwareList"></a>
 
 #### cloud.getFirmwareList([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-Remove device from TP-Link cloud.
+Get device's TP-Link cloud firmware list.
 
 Sends `cloud.get_intl_fw_list` command.
 
@@ -1627,7 +1628,8 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 #### emeter.getRealtime([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's current energy stats.
 
-Requests `emeter.get_realtime`.
+Requests `emeter.get_realtime`. Older devices return `current`, `voltage`,... while newer devices return `current_ma`, `voltage_mv`...
+This will return a normalized response including both old and new style properies for backwards compatibility.
 
 **Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  

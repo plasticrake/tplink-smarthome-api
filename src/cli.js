@@ -26,7 +26,7 @@ let search = function (sysInfo, timeout, params) {
     console.log(`startDiscovery(${util.inspect(commandParams)})`);
     client.startDiscovery(commandParams)
       .on('device-new', (device) => {
-        console.log(`${device.model} ${device.deviceType} ${device.type} ${device.host} ${device.port} ${device.deviceId} ${device.alias}`);
+        console.log(`${device.model} ${device.deviceType} ${device.type} ${device.host} ${device.port} ${device.macNormalized} ${device.deviceId} ${device.alias}`);
         if (sysInfo) {
           console.dir(device.sysInfo, {colors: program.color === 'on', depth: 10});
         }

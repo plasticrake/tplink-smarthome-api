@@ -56,6 +56,34 @@ module.exports = function (testDevice) {
         expect(spy).to.be.calledTwice;
         expect(spy).to.be.calledWithMatch({err_code: 0});
       });
+      it('should return Realtime normalized with old and new API', async function () {
+        if (supportsEmeter) {
+          let response = await this.device.emeter.getRealtime();
+          expect(response).to.have.property('err_code', 0);
+          if (response.current != null || response.current_ma != null) {
+            expect(response).to.have.property('current');
+            expect(response).to.have.property('current_ma');
+            expect(response.current, 'current').to.be.closeTo(response.current_ma / 1000, 1);
+          }
+          if (response.power != null || response.power_mw != null) {
+            expect(response).to.have.property('power');
+            expect(response).to.have.property('power_mw');
+            expect(response.power, 'power').to.be.closeTo(response.power_mw / 1000, 1);
+          }
+          if (response.total != null || response.total_wh != null) {
+            expect(response).to.have.property('total');
+            expect(response).to.have.property('total_wh');
+            expect(response.total, 'total').to.be.closeTo(response.total_wh / 1000, 1);
+          }
+          if (response.voltage != null || response.voltage_mv != null) {
+            expect(response).to.have.property('voltage');
+            expect(response).to.have.property('voltage_mv');
+            expect(response.voltage, 'voltage').to.be.closeTo(response.voltage_mv / 1000, 1);
+          }
+        } else {
+          return expect(this.device.emeter.getRealtime()).to.eventually.be.rejectedWith(ResponseError);
+        }
+      });
     });
 
     describe('#getDayStats()', function () {

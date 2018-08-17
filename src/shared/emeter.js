@@ -21,13 +21,27 @@ class Emeter {
    * @private
    */
   set realtime (realtime) {
+    let normalize = function (propName, propName2, multiplier) {
+      if (realtime[propName] != null && realtime[propName2] == null) {
+        realtime[propName2] = Math.floor(realtime[propName] * multiplier);
+      } else if (realtime[propName] == null && realtime[propName2] != null) {
+        realtime[propName] = realtime[propName2] / multiplier;
+      }
+    };
+
+    normalize('current', 'current_ma', 1000);
+    normalize('power', 'power_mw', 1000);
+    normalize('total', 'total_wh', 1000);
+    normalize('voltage', 'voltage_mv', 1000);
+
     this._realtime = realtime;
     this.device.emit('emeter-realtime-update', this._realtime);
   }
   /**
    * Gets device's current energy stats.
    *
-   * Requests `emeter.get_realtime`.
+   * Requests `emeter.get_realtime`. Older devices return `current`, `voltage`,... while newer devices return `current_ma`, `voltage_mv`...
+   * This will return a normalized response including both old and new style properies for backwards compatibility.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
