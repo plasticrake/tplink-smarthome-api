@@ -1,7 +1,5 @@
 'use strict';
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 const Device = require('../device');
 const Away = require('./away');
 const Cloud = require('../shared/cloud');
@@ -34,7 +32,7 @@ class Plug extends Device {
    * @param  {Object}  options
    * @param  {Number} [options.inUseThreshold=0]
    */
-  constructor(options) {
+  constructor (options) {
     super(options);
 
     this.log.debug('plug.constructor()');
@@ -113,15 +111,15 @@ class Plug extends Device {
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
    */
-  get sysInfo() {
+  get sysInfo () {
     return super.sysInfo;
   }
   /**
    * @private
    */
-  set sysInfo(sysInfo) {
+  set sysInfo (sysInfo) {
     super.sysInfo = sysInfo;
-    this.supportsEmeter = sysInfo.feature && typeof sysInfo.feature === 'string' ? sysInfo.feature.indexOf('ENE') >= 0 : false;
+    this.supportsEmeter = (sysInfo.feature && typeof sysInfo.feature === 'string' ? sysInfo.feature.indexOf('ENE') >= 0 : false);
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
@@ -150,9 +148,9 @@ class Plug extends Device {
    * Otherwise fallback on relay state:  `relay_state === 1`
    * @return {boolean}
    */
-  get inUse() {
+  get inUse () {
     if (this.supportsEmeter) {
-      return this.emeter.realtime.power > this.inUseThreshold;
+      return (this.emeter.realtime.power > this.inUseThreshold);
     }
     return this.relayState;
   }
@@ -160,8 +158,8 @@ class Plug extends Device {
    * `sys_info.relay_state === 1`
    * @return {boolean}
    */
-  get relayState() {
-    return this.sysInfo.relay_state === 1;
+  get relayState () {
+    return (this.sysInfo.relay_state === 1);
   }
   /**
    * Requests common Plug status details in a single request.
@@ -172,28 +170,20 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
-  getInfo(sendOptions) {
-    var _this = this;
-
-    return _asyncToGenerator(function* () {
-      // TODO force TCP unless overriden here
-      // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
-      let data = yield _this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', sendOptions);
-      _this.sysInfo = data.system.get_sysinfo;
-      _this.cloud.info = data.cnCloud.get_info;
-      if (data.emeter.hasOwnProperty('err_code')) {
-        _this.emeter.realtime = null;
-      } else {
-        _this.emeter.realtime = data.emeter.get_realtime;
-      }
-      _this.schedule.nextAction = data.schedule.get_next_action;
-      return {
-        sysInfo: _this.sysInfo,
-        cloud: { info: _this.cloud.info },
-        emeter: { realtime: _this.emeter.realtime },
-        schedule: { nextAction: _this.schedule.nextAction }
-      };
-    })();
+  async getInfo (sendOptions) {
+    // TODO force TCP unless overriden here
+    // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
+    let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', sendOptions);
+    this.sysInfo = data.system.get_sysinfo;
+    this.cloud.info = data.cnCloud.get_info;
+    this.emeter.realtime = data.emeter.get_realtime;
+    this.schedule.nextAction = data.schedule.get_next_action;
+    return {
+      sysInfo: this.sysInfo,
+      cloud: {info: this.cloud.info},
+      emeter: {realtime: this.emeter.realtime},
+      schedule: {nextAction: this.schedule.nextAction}
+    };
   }
 
   /**
@@ -201,17 +191,13 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  getInUse(sendOptions) {
-    var _this2 = this;
-
-    return _asyncToGenerator(function* () {
-      if (_this2.supportsEmeter) {
-        yield _this2.emeter.getRealtime(sendOptions);
-      } else {
-        yield _this2.getSysInfo(sendOptions);
-      }
-      return _this2.inUse;
-    })();
+  async getInUse (sendOptions) {
+    if (this.supportsEmeter) {
+      await this.emeter.getRealtime(sendOptions);
+    } else {
+      await this.getSysInfo(sendOptions);
+    }
+    return this.inUse;
   }
   /**
    * Get Plug LED state (night mode).
@@ -220,13 +206,9 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>} LED State, true === on
    */
-  getLedState(sendOptions) {
-    var _this3 = this;
-
-    return _asyncToGenerator(function* () {
-      let sysInfo = yield _this3.getSysInfo(sendOptions);
-      return sysInfo.led_off === 0;
-    })();
+  async getLedState (sendOptions) {
+    let sysInfo = await this.getSysInfo(sendOptions);
+    return (sysInfo.led_off === 0);
   }
   /**
    * Turn Plug LED on/off (night mode).
@@ -236,14 +218,10 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  setLedState(value, sendOptions) {
-    var _this4 = this;
-
-    return _asyncToGenerator(function* () {
-      yield _this4.sendCommand(`{"system":{"set_led_off":{"off":${value ? 0 : 1}}}}`, sendOptions);
-      _this4.sysInfo.set_led_off = value ? 0 : 1;
-      return true;
-    })();
+  async setLedState (value, sendOptions) {
+    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`, sendOptions);
+    this.sysInfo.set_led_off = (value ? 0 : 1);
+    return true;
   }
   /**
    * Get Plug relay state (on/off).
@@ -252,13 +230,9 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  getPowerState(sendOptions) {
-    var _this5 = this;
-
-    return _asyncToGenerator(function* () {
-      let sysInfo = yield _this5.getSysInfo(sendOptions);
-      return sysInfo.relay_state === 1;
-    })();
+  async getPowerState (sendOptions) {
+    let sysInfo = await this.getSysInfo(sendOptions);
+    return (sysInfo.relay_state === 1);
   }
   /**
    * Turns Plug relay on/off.
@@ -268,15 +242,11 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  setPowerState(value, sendOptions) {
-    var _this6 = this;
-
-    return _asyncToGenerator(function* () {
-      yield _this6.sendCommand(`{"system":{"set_relay_state":{"state":${value ? 1 : 0}}}}`, sendOptions);
-      _this6.sysInfo.relay_state = value ? 1 : 0;
-      _this6.emitEvents();
-      return true;
-    })();
+  async setPowerState (value, sendOptions) {
+    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`, sendOptions);
+    this.sysInfo.relay_state = (value ? 1 : 0);
+    this.emitEvents();
+    return true;
   }
   /**
    * Toggles Plug relay state.
@@ -285,14 +255,10 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  togglePowerState(sendOptions) {
-    var _this7 = this;
-
-    return _asyncToGenerator(function* () {
-      const powerState = yield _this7.getPowerState(sendOptions);
-      yield _this7.setPowerState(!powerState, sendOptions);
-      return !powerState;
-    })();
+  async togglePowerState (sendOptions) {
+    const powerState = await this.getPowerState(sendOptions);
+    await this.setPowerState(!powerState, sendOptions);
+    return !powerState;
   }
   /**
    * Blink Plug LED.
@@ -306,34 +272,26 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  blink(times = 5, rate = 1000, sendOptions) {
-    var _this8 = this;
+  async blink (times = 5, rate = 1000, sendOptions) {
+    let delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
 
-    return _asyncToGenerator(function* () {
-      let delay = function delay(t) {
-        return new Promise(function (resolve) {
-          setTimeout(resolve, t);
-        });
-      };
+    let origLedState = await this.getLedState(sendOptions);
+    let lastBlink = Date.now();
 
-      let origLedState = yield _this8.getLedState(sendOptions);
-      let lastBlink = Date.now();
-
-      let currLedState = false;
-      for (var i = 0; i < times * 2; i++) {
-        currLedState = !currLedState;
-        lastBlink = Date.now();
-        yield _this8.setLedState(currLedState, sendOptions);
-        let timeToWait = rate / 2 - (Date.now() - lastBlink);
-        if (timeToWait > 0) {
-          yield delay(timeToWait);
-        }
+    let currLedState = false;
+    for (var i = 0; i < times * 2; i++) {
+      currLedState = !currLedState;
+      lastBlink = Date.now();
+      await this.setLedState(currLedState, sendOptions);
+      let timeToWait = (rate / 2) - (Date.now() - lastBlink);
+      if (timeToWait > 0) {
+        await delay(timeToWait);
       }
-      if (currLedState !== origLedState) {
-        yield _this8.setLedState(origLedState, sendOptions);
-      }
-      return true;
-    })();
+    }
+    if (currLedState !== origLedState) {
+      await this.setLedState(origLedState, sendOptions);
+    }
+    return true;
   }
   /**
    * Plug's relay was turned on.
@@ -369,10 +327,8 @@ class Plug extends Device {
   /**
    * @private
    */
-  emitEvents() {
-    if (!this.emitEventsEnabled) {
-      return;
-    }
+  emitEvents () {
+    if (!this.emitEventsEnabled) { return; }
 
     const inUse = this.inUse;
     const relayState = this.relayState;
