@@ -22,6 +22,9 @@ class Emeter {
    */
   set realtime (realtime) {
     let normalize = function (propName, propName2, multiplier) {
+      if (null == realtime) {
+        return null;
+      }
       if (realtime[propName] != null && realtime[propName2] == null) {
         realtime[propName2] = Math.floor(realtime[propName] * multiplier);
       } else if (realtime[propName] == null && realtime[propName2] != null) {
