@@ -1,3 +1,10 @@
+# Change Log
+
+## 0.23.1 / 2018-12-02
+
+### Fixed :bug:
+  - Plug#getInfo and Emeter#realtime for devices without energy monitoring (Regression introducted in 0.23.0)
+
 ## 0.23.0 / 2018-08-16
 
 ### Breaking Changes :boom:
