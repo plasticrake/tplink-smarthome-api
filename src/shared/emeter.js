@@ -29,10 +29,12 @@ class Emeter {
       }
     };
 
-    normalize('current', 'current_ma', 1000);
-    normalize('power', 'power_mw', 1000);
-    normalize('total', 'total_wh', 1000);
-    normalize('voltage', 'voltage_mv', 1000);
+    if (realtime != null) {
+      normalize('current', 'current_ma', 1000);
+      normalize('power', 'power_mw', 1000);
+      normalize('total', 'total_wh', 1000);
+      normalize('voltage', 'voltage_mv', 1000);
+    }
 
     this._realtime = realtime;
     this.device.emit('emeter-realtime-update', this._realtime);

@@ -176,7 +176,9 @@ class Plug extends Device {
     let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', sendOptions);
     this.sysInfo = data.system.get_sysinfo;
     this.cloud.info = data.cnCloud.get_info;
-    this.emeter.realtime = data.emeter.get_realtime;
+    if (data.emeter.hasOwnProperty('get_realtime')) {
+      this.emeter.realtime = data.emeter.get_realtime;
+    }
     this.schedule.nextAction = data.schedule.get_next_action;
     return {
       sysInfo: this.sysInfo,
