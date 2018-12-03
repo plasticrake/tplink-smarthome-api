@@ -17,7 +17,7 @@ class Time {
    */
   async getTime (sendOptions) {
     return this.device.sendCommand({
-      [this.apiModuleName]: {get_time: {}}
+      [this.apiModuleName]: { get_time: {} }
     }, sendOptions);
   }
   /**
@@ -29,7 +29,7 @@ class Time {
    */
   async getTimezone (sendOptions) {
     return this.device.sendCommand({
-      [this.apiModuleName]: {get_timezone: {}}
+      [this.apiModuleName]: { get_timezone: {} }
     }, sendOptions);
   }
 }

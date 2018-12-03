@@ -54,7 +54,7 @@ module.exports = function (testDevice) {
         await this.device.emeter.getRealtime();
 
         expect(spy).to.be.calledTwice;
-        expect(spy).to.be.calledWithMatch({err_code: 0});
+        expect(spy).to.be.calledWithMatch({ err_code: 0 });
       });
       it('should return Realtime normalized with old and new API', async function () {
         if (supportsEmeter) {

@@ -19,7 +19,7 @@ class Away {
    */
   async getRules (sendOptions) {
     return this.device.sendCommand({
-      [this.apiModuleName]: {get_rules: {}}
+      [this.apiModuleName]: { get_rules: {} }
     }, sendOptions);
   }
   /**

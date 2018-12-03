@@ -28,28 +28,28 @@ describe('Device', function () {
   describe('private', function () {
     describe('processResponse', function () {
       it('return fragment for single command emeter.get_realtime', function () {
-        let command = {emeter: {get_realtime: {}}};
+        let command = { emeter: { get_realtime: {} } };
         let response = { emeter: { get_realtime: { current: 0.012933, voltage: 120.793324, power: 0, total: 0.001, err_code: 0 } } };
         let pr = processResponse(command, response);
         expect(pr).to.have.keys('current', 'voltage', 'power', 'total', 'err_code');
       });
 
       it('to throw ResponseError for single command emeter.get_realtime not supported', function () {
-        let command = {emeter: {get_realtime: {}}};
+        let command = { emeter: { get_realtime: {} } };
         let response = { emeter: { err_code: -1, err_msg: 'module not support' } };
         expect(() => processResponse(command, response))
           .to.throw(ResponseError).and.to.have.deep.property('response', { err_code: -1, err_msg: 'module not support' });
       });
 
       it('return fragment for single command system.set_dev_alias', function () {
-        let command = {system: {set_dev_alias: {alias: 'New Alias'}}};
+        let command = { system: { set_dev_alias: { alias: 'New Alias' } } };
         let response = { system: { set_dev_alias: { err_code: 0 } } };
         let pr = processResponse(command, response);
         expect(pr).to.have.property('err_code', 0);
       });
 
       it('return fragment for single command netif.get_scaninfo', function () {
-        let command = {netif: {get_scaninfo: {refresh: 1, timeout: 3}}};
+        let command = { netif: { get_scaninfo: { refresh: 1, timeout: 3 } } };
         let response = { netif: { get_scaninfo: { ap_list: [ { ssid: 'wifi_network_1', key_type: 1 }, { ssid: 'wifi_network_2', key_type: 2 }, { ssid: 'wifi_network_3', key_type: 3 } ], err_code: 0 } } };
         let pr = processResponse(command, response);
         expect(pr).to.have.property('err_code', 0);
@@ -57,7 +57,7 @@ describe('Device', function () {
       });
 
       it('return whole result for multiple commands emeter.get_realtime system.get_sysinfo', function () {
-        let command = {'emeter': {'get_realtime': {}}, 'system': {'get_sysinfo': {}}};
+        let command = { 'emeter': { 'get_realtime': {} }, 'system': { 'get_sysinfo': {} } };
         let response = { emeter: { get_realtime: { current: 0.01257, voltage: 121.162244, power: 0, total: 0.001, err_code: 0 } }, system: { get_sysinfo: { err_code: 0, sw_ver: '1.0.8 Build 151113 Rel.24658', hw_ver: '1.0', type: 'IOT.SMARTPLUGSWITCH', model: 'HS110(US)', mac: '00:00:00:00:00:00', deviceId: '1234', hwId: '1234', fwId: '1234', oemId: '1234', alias: 'sup', dev_name: 'Wi-Fi Smart Plug With Energy Monitoring', icon_hash: '', relay_state: 0, on_time: 0, active_mode: 'schedule', feature: 'TIM:ENE', updating: 0, rssi: -63, led_off: 0, latitude: 0.000000, longitude: 0.000000 } } };
         let pr = processResponse(command, response);
         expect(pr).to.have.keys('emeter', 'system');

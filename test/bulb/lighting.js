@@ -11,24 +11,24 @@ module.exports = function () {
 
     describe('#setLightState()', async function () {
       it('should turn on', async function () {
-        expect(await this.device.lighting.setLightState({on_off: true, ignore_default: true})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: true, ignore_default: true })).to.be.true;
         expect(await this.device.lighting.getLightState()).to.have.property('on_off', 1);
       });
 
       it('should turn off', async function () {
-        expect(await this.device.lighting.setLightState({on_off: false, transition_period: 100})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: false, transition_period: 100 })).to.be.true;
         expect(await this.device.lighting.getLightState()).to.have.property('on_off', 0);
       });
 
       it('should change brightness if suported', async function () {
         if (!this.device.supportsBrightness) return;
 
-        expect(await this.device.lighting.setLightState({on_off: 1, brightness: 20})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: 1, brightness: 20 })).to.be.true;
         let ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
         expect(ls).to.have.property('brightness', 20);
 
-        expect(await this.device.lighting.setLightState({on_off: 1, brightness: 60})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: 1, brightness: 60 })).to.be.true;
         ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
         expect(ls).to.have.property('brightness', 60);
@@ -37,12 +37,12 @@ module.exports = function () {
       it('should change color temperature if suported', async function () {
         if (!this.device.supportsColorTemperature) return;
 
-        expect(await this.device.lighting.setLightState({on_off: 1, color_temp: 4000})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: 1, color_temp: 4000 })).to.be.true;
         let ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
         expect(ls).to.have.property('color_temp', 4000);
 
-        expect(await this.device.lighting.setLightState({on_off: 1, color_temp: 5000})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: 1, color_temp: 5000 })).to.be.true;
         ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
         expect(ls).to.have.property('color_temp', 5000);
@@ -51,14 +51,14 @@ module.exports = function () {
       it('should change color if suported', async function () {
         if (!this.device.supportsColor) return;
 
-        expect(await this.device.lighting.setLightState({on_off: 1, hue: 100, saturation: 40, brightness: 20})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: 1, hue: 100, saturation: 40, brightness: 20 })).to.be.true;
         let ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
         expect(ls).to.have.property('hue', 100);
         expect(ls).to.have.property('saturation', 40);
         expect(ls).to.have.property('brightness', 20);
 
-        expect(await this.device.lighting.setLightState({on_off: 1, hue: 200, saturation: 50, brightness: 60})).to.be.true;
+        expect(await this.device.lighting.setLightState({ on_off: 1, hue: 200, saturation: 50, brightness: 60 })).to.be.true;
         ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
         expect(ls).to.have.property('hue', 200);
@@ -72,19 +72,19 @@ module.exports = function () {
         let spyChange = sinon.spy();
         let spyUpdate = sinon.spy();
 
-        await this.device.lighting.setLightState({on_off: 0});
+        await this.device.lighting.setLightState({ on_off: 0 });
 
         this.device.on('lightstate-on', spyOn);
         this.device.on('lightstate-off', spyOff);
         this.device.on('lightstate-change', spyChange);
         this.device.on('lightstate-update', spyUpdate);
 
-        await this.device.lighting.setLightState({on_off: 0});
-        await this.device.lighting.setLightState({on_off: 1});
-        await this.device.lighting.setLightState({on_off: 1});
-        await this.device.lighting.setLightState({on_off: 0});
-        await this.device.lighting.setLightState({on_off: 0});
-        await this.device.lighting.setLightState({on_off: 1});
+        await this.device.lighting.setLightState({ on_off: 0 });
+        await this.device.lighting.setLightState({ on_off: 1 });
+        await this.device.lighting.setLightState({ on_off: 1 });
+        await this.device.lighting.setLightState({ on_off: 0 });
+        await this.device.lighting.setLightState({ on_off: 0 });
+        await this.device.lighting.setLightState({ on_off: 1 });
 
         expect(spyOn).to.be.calledTwice;
         expect(spyOn).to.be.always.calledWithMatch(sinon.match.has('on_off'));
@@ -104,13 +104,13 @@ module.exports = function () {
       this.timeout(2000);
       this.slow(1000);
       it('should return light state when on', async function () {
-        await this.device.lighting.setLightState({on_off: 1});
+        await this.device.lighting.setLightState({ on_off: 1 });
         let ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
       });
 
       it('should return light state when off', async function () {
-        await this.device.lighting.setLightState({on_off: 0});
+        await this.device.lighting.setLightState({ on_off: 0 });
         let ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 0);
       });
@@ -121,7 +121,7 @@ module.exports = function () {
         let spyChange = sinon.spy();
         let spyUpdate = sinon.spy();
 
-        await this.device.lighting.setLightState({on_off: 0});
+        await this.device.lighting.setLightState({ on_off: 0 });
 
         this.device.on('lightstate-on', spyOn);
         this.device.on('lightstate-off', spyOff);

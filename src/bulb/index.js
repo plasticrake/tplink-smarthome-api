@@ -185,7 +185,7 @@ class Bulb extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async setPowerState (value, sendOptions) {
-    return this.lighting.setLightState({on_off: (value ? 1 : 0)}, sendOptions);
+    return this.lighting.setLightState({ on_off: (value ? 1 : 0) }, sendOptions);
   }
   /**
    * Toggles state of Bulb.

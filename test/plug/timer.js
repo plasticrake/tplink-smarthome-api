@@ -19,7 +19,7 @@ module.exports = function () {
 
     describe('#addRule()', function () {
       it('should add timer rule', async function () {
-        let response = await this.device.timer.addRule({delay: 20, powerState: false});
+        let response = await this.device.timer.addRule({ delay: 20, powerState: false });
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id').that.is.a('string');
 
@@ -29,28 +29,28 @@ module.exports = function () {
       });
 
       it('should delete existing rules and add timer rule when deleteExisting is true', async function () {
-        await this.device.timer.addRule({delay: 20, powerState: false, deleteExisting: true});
+        await this.device.timer.addRule({ delay: 20, powerState: false, deleteExisting: true });
 
-        let response = await this.device.timer.addRule({delay: 50, powerState: false, deleteExisting: true});
+        let response = await this.device.timer.addRule({ delay: 50, powerState: false, deleteExisting: true });
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id').that.is.a('string');
       });
 
       it('should fail if a timer rule exists when deleteExisting is false', async function () {
-        await this.device.timer.addRule({delay: 20, powerState: false, deleteExisting: true});
-        return expect(this.device.timer.addRule({delay: 20, powerState: false, deleteExisting: false})).to.eventually.be.rejectedWith(ResponseError);
+        await this.device.timer.addRule({ delay: 20, powerState: false, deleteExisting: true });
+        return expect(this.device.timer.addRule({ delay: 20, powerState: false, deleteExisting: false })).to.eventually.be.rejectedWith(ResponseError);
       });
     });
 
     describe('#editRule()', function () {
       it('should edit timer rule', async function () {
-        let response = await this.device.timer.addRule({delay: 20, powerState: false});
+        let response = await this.device.timer.addRule({ delay: 20, powerState: false });
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id').that.is.a('string');
 
         let id = response.id;
 
-        await this.device.timer.editRule({id, delay: 50, powerStart: false});
+        await this.device.timer.editRule({ id, delay: 50, powerStart: false });
 
         let rules = await this.device.timer.getRules();
         expect(rules.rule_list[0].id).to.eql(id);

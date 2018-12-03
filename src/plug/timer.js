@@ -17,7 +17,7 @@ class Timer {
    */
   async getRules (sendOptions) {
     return this.device.sendCommand({
-      [this.apiModuleName]: {get_rules: {}}
+      [this.apiModuleName]: { get_rules: {} }
     }, sendOptions);
   }
   /**
@@ -81,7 +81,7 @@ class Timer {
    */
   async deleteAllRules (sendOptions) {
     return this.device.sendCommand({
-      [this.apiModuleName]: {delete_all_rules: {}}
+      [this.apiModuleName]: { delete_all_rules: {} }
     }, sendOptions);
   }
 }

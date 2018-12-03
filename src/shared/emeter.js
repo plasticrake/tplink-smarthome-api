@@ -50,7 +50,7 @@ class Emeter {
    */
   async getRealtime (sendOptions) {
     this.realtime = await this.device.sendCommand({
-      [this.apiModuleName]: {get_realtime: {}}
+      [this.apiModuleName]: { get_realtime: {} }
     }, sendOptions);
     return this.realtime;
   }

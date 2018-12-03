@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function ({level, logger}) {
+module.exports = function ({ level, logger }) {
   let levels = ['trace', 'debug', 'info', 'warn', 'error', 'silent'];
   let log = require('loglevel');
 

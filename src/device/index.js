@@ -279,7 +279,7 @@ class Device extends EventEmitter {
    */
   async reboot (delay, sendOptions) {
     return this.sendCommand({
-      [this.apiModuleNamespace.system]: {reboot: {delay}}
+      [this.apiModuleNamespace.system]: { reboot: { delay } }
     }, sendOptions);
   }
   /**
@@ -292,7 +292,7 @@ class Device extends EventEmitter {
    */
   async reset (delay, sendOptions) {
     return this.sendCommand({
-      [this.apiModuleNamespace.system]: {reset: {delay}}
+      [this.apiModuleNamespace.system]: { reset: { delay } }
     }, sendOptions);
   }
 }
@@ -306,9 +306,9 @@ function processResponse (command, response) {
   let errors = [];
   commandResponses.forEach((r) => {
     if (r.err_code == null) {
-      errors.push({msg: 'err_code missing', response: r});
+      errors.push({ msg: 'err_code missing', response: r });
     } else if (r.err_code !== 0) {
-      errors.push({msg: 'err_code not zero', response: r});
+      errors.push({ msg: 'err_code not zero', response: r });
     }
   });
 

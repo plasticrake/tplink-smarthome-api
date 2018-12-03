@@ -182,9 +182,9 @@ class Plug extends Device {
     this.schedule.nextAction = data.schedule.get_next_action;
     return {
       sysInfo: this.sysInfo,
-      cloud: {info: this.cloud.info},
-      emeter: {realtime: this.emeter.realtime},
-      schedule: {nextAction: this.schedule.nextAction}
+      cloud: { info: this.cloud.info },
+      emeter: { realtime: this.emeter.realtime },
+      schedule: { nextAction: this.schedule.nextAction }
     };
   }
 
