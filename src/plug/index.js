@@ -28,9 +28,9 @@ class Plug extends Device {
   /**
    * Created by {@link Client} - Do not instantiate directly.
    *
-   * See {@link Device#constructor} for common options.
+   * See [Device constructor]{@link Device} for common options.
    * @param  {Object}  options
-   * @param  {Number} [options.inUseThreshold=0]
+   * @param  {Number} [options.inUseThreshold=0] Watts
    */
   constructor (options) {
     super(options);
@@ -143,7 +143,7 @@ class Plug extends Device {
   /**
    * Determines if device is in use based on cached `emeter.get_realtime` results.
    *
-   * If device supports energy monitoring (HS110): `power > inUseThreshold`
+   * If device supports energy monitoring (HS110): `power > inUseThreshold`. `inUseThreshold` is specified in Watts
    *
    * Otherwise fallback on relay state:  `relay_state === 1`
    * @return {boolean}

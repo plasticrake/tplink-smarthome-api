@@ -259,8 +259,8 @@ class Client extends EventEmitter {
   /**
    * Creates Bulb object.
    *
-   * See {@link Device#constructor} and {@link Bulb#constructor} for valid options.
-   * @param  {Object} deviceOptions passed to {@link Bulb#constructor}
+   * See [Device constructor]{@link Device} and [Bulb constructor]{@link Bulb} for valid options.
+   * @param  {Object} deviceOptions passed to [Bulb constructor]{@link Bulb}
    * @return {Bulb}
    */
   getBulb (deviceOptions) {
@@ -269,8 +269,8 @@ class Client extends EventEmitter {
   /**
    * Creates {@link Plug} object.
    *
-   * See {@link Device#constructor} and {@link Plug#constructor} for valid options.
-   * @param  {Object} deviceOptions passed to {@link Plug#constructor}
+   * See [Device constructor]{@link Device} and [Plug constructor]{@link Plug} for valid options.
+   * @param  {Object} deviceOptions passed to [Plug constructor]{@link Plug}
    * @return {Plug}
    */
   getPlug (deviceOptions) {
@@ -279,8 +279,8 @@ class Client extends EventEmitter {
   /**
    * Creates a {@link Plug} or {@link Bulb} after querying device to determine type.
    *
-   * See {@link Device#constructor}, {@link Bulb#constructor}, {@link Plug#constructor} for valid options.
-   * @param  {Object}      deviceOptions passed to {@link Device#constructor}
+   * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options.
+   * @param  {Object}      deviceOptions passed to [Device constructor]{@link Device}
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Plug|Bulb, Error>}
    */
@@ -291,9 +291,9 @@ class Client extends EventEmitter {
   /**
    * Create {@link Device} object.
    * - Device object only supports common Device methods.
-   * - See {@link Device#constructor} for valid options.
+   * - See [Device constructor]{@link Device} for valid options.
    * - Instead use {@link #getDevice} to create a fully featured object.
-   * @param  {Object} deviceOptions passed to {@link Device#constructor}
+   * @param  {Object} deviceOptions passed to [Device constructor]{@link Device}
    * @return {Device}
    */
   getCommonDevice (deviceOptions) {
@@ -315,7 +315,7 @@ class Client extends EventEmitter {
   /**
    * Creates device corresponding to the provided `sysInfo`.
    *
-   * See {@link Device#constructor}, {@link Bulb#constructor}, {@link Plug#constructor} for valid options
+   * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options
    * @param  {Object} sysInfo
    * @param  {Object} deviceOptions passed to device constructor
    * @return {Plug|Bulb}

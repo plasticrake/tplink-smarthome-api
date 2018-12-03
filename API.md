@@ -160,7 +160,7 @@ TP-Link models: LB100, LB110, LB120, LB130.
 ### new Bulb(options)
 Created by [Client](#Client) - Do not instantiate directly.
 
-See [Device#constructor](Device#constructor) for common options.
+See [Device constructor](#Device) for common options.
 
 
 | Param | Type |
@@ -275,7 +275,8 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 #### emeter.getRealtime([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's current energy stats.
 
-Requests `emeter.get_realtime`. Older devices return `current`, `voltage`,... while newer devices return `current_ma`, `voltage_mv`...
+Requests `emeter.get_realtime`. Older devices return `current`, `voltage`, etc,
+while newer devices return `current_ma`, `voltage_mv` etc
 This will return a normalized response including both old and new style properies for backwards compatibility.
 
 **Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
@@ -1177,39 +1178,39 @@ Requests `{system:{get_sysinfo:{}}}` from device.
 ### client.getBulb(deviceOptions) ⇒ [<code>Bulb</code>](#Bulb)
 Creates Bulb object.
 
-See [Device#constructor](Device#constructor) and [Bulb#constructor](Bulb#constructor) for valid options.
+See [Device constructor](#Device) and [Bulb constructor](#Bulb) for valid options.
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| deviceOptions | <code>Object</code> | passed to [Bulb#constructor](Bulb#constructor) |
+| deviceOptions | <code>Object</code> | passed to [Bulb constructor](#Bulb) |
 
 <a name="Client+getPlug"></a>
 
 ### client.getPlug(deviceOptions) ⇒ [<code>Plug</code>](#Plug)
 Creates [Plug](#Plug) object.
 
-See [Device#constructor](Device#constructor) and [Plug#constructor](Plug#constructor) for valid options.
+See [Device constructor](#Device) and [Plug constructor](#Plug) for valid options.
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| deviceOptions | <code>Object</code> | passed to [Plug#constructor](Plug#constructor) |
+| deviceOptions | <code>Object</code> | passed to [Plug constructor](#Plug) |
 
 <a name="Client+getDevice"></a>
 
 ### client.getDevice(deviceOptions, [sendOptions]) ⇒ <code>Promise.&lt;(Plug\|Bulb), Error&gt;</code>
 Creates a [Plug](#Plug) or [Bulb](#Bulb) after querying device to determine type.
 
-See [Device#constructor](Device#constructor), [Bulb#constructor](Bulb#constructor), [Plug#constructor](Plug#constructor) for valid options.
+See [Device constructor](#Device), [Bulb constructor](#Bulb), [Plug constructor](#Plug) for valid options.
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| deviceOptions | <code>Object</code> | passed to [Device#constructor](Device#constructor) |
+| deviceOptions | <code>Object</code> | passed to [Device constructor](#Device) |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
 
 <a name="Client+getCommonDevice"></a>
@@ -1217,21 +1218,21 @@ See [Device#constructor](Device#constructor), [Bulb#constructor](Bulb#constructo
 ### client.getCommonDevice(deviceOptions) ⇒ [<code>Device</code>](#Device)
 Create [Device](#Device) object.
 - Device object only supports common Device methods.
-- See [Device#constructor](Device#constructor) for valid options.
+- See [Device constructor](#Device) for valid options.
 - Instead use [#getDevice](#getDevice) to create a fully featured object.
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| deviceOptions | <code>Object</code> | passed to [Device#constructor](Device#constructor) |
+| deviceOptions | <code>Object</code> | passed to [Device constructor](#Device) |
 
 <a name="Client+getDeviceFromSysInfo"></a>
 
 ### client.getDeviceFromSysInfo(sysInfo, deviceOptions) ⇒ [<code>Plug</code>](#Plug) \| [<code>Bulb</code>](#Bulb)
 Creates device corresponding to the provided `sysInfo`.
 
-See [Device#constructor](Device#constructor), [Bulb#constructor](Bulb#constructor), [Plug#constructor](Plug#constructor) for valid options
+See [Device constructor](#Device), [Bulb constructor](#Bulb), [Plug constructor](#Plug) for valid options
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 
@@ -1958,13 +1959,13 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
 ### new Plug(options)
 Created by [Client](#Client) - Do not instantiate directly.
 
-See [Device#constructor](Device#constructor) for common options.
+See [Device constructor](#Device) for common options.
 
 
-| Param | Type | Default |
-| --- | --- | --- |
-| options | <code>Object</code> |  | 
-| [options.inUseThreshold] | <code>Number</code> | <code>0</code> | 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | <code>Object</code> |  |  |
+| [options.inUseThreshold] | <code>Number</code> | <code>0</code> | Watts |
 
 <a name="Plug+away"></a>
 
@@ -2188,7 +2189,8 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 #### emeter.getRealtime([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's current energy stats.
 
-Requests `emeter.get_realtime`. Older devices return `current`, `voltage`,... while newer devices return `current_ma`, `voltage_mv`...
+Requests `emeter.get_realtime`. Older devices return `current`, `voltage`, etc,
+while newer devices return `current_ma`, `voltage_mv` etc
 This will return a normalized response including both old and new style properies for backwards compatibility.
 
 **Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
@@ -2563,7 +2565,7 @@ Returns cached results from last retrieval of `system.sys_info`.
 ### plug.inUse ⇒ <code>boolean</code>
 Determines if device is in use based on cached `emeter.get_realtime` results.
 
-If device supports energy monitoring (HS110): `power > inUseThreshold`
+If device supports energy monitoring (HS110): `power > inUseThreshold`. `inUseThreshold` is specified in Watts
 
 Otherwise fallback on relay state:  `relay_state === 1`
 
@@ -3211,7 +3213,8 @@ Returns cached results from last retrieval of `emeter.get_realtime`.
 ### emeter.getRealtime([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's current energy stats.
 
-Requests `emeter.get_realtime`. Older devices return `current`, `voltage`,... while newer devices return `current_ma`, `voltage_mv`...
+Requests `emeter.get_realtime`. Older devices return `current`, `voltage`, etc,
+while newer devices return `current_ma`, `voltage_mv` etc
 This will return a normalized response including both old and new style properies for backwards compatibility.
 
 **Kind**: instance method of [<code>Emeter</code>](#Emeter)  

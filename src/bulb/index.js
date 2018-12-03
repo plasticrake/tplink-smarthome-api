@@ -23,8 +23,8 @@ class Bulb extends Device {
   /**
    * Created by {@link Client} - Do not instantiate directly.
    *
-   * See {@link Device#constructor} for common options.
-   * @see Device#constructor
+   * See [Device constructor]{@link Device} for common options.
+   * @see Device
    * @param  {Object} options
    */
   constructor ({ client, sysInfo, host, port, logger, defaultSendOptions }) {
