@@ -8,13 +8,13 @@ cli='babel-node ./src/cli.js'
 @test "run without arguments" {
   run $cli
   assert_success
-  assert_output --regexp '^[[:space:]]+Usage: '
+  assert_output --regexp '^[[:space:]]*Usage: '
 }
 
 @test "--help" {
   run $cli --help
   assert_success
-  assert_output --regexp '^[[:space:]]+Usage: '
+  assert_output --regexp '^[[:space:]]*Usage: '
 }
 
 @test "search" {
