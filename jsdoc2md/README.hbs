@@ -1,4 +1,5 @@
 # tplink-smarthome-api
+
 [![NPM Version](https://img.shields.io/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
 [![Build Status](https://travis-ci.org/plasticrake/tplink-smarthome-api.svg?branch=master)](https://travis-ci.org/plasticrake/tplink-smarthome-api)
 [![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
@@ -6,7 +7,7 @@
 
 TP-Link Smart Home API
 
-#### [Changelog](https://github.com/plasticrake/tplink-smarthome-api/tree/master/CHANGELOG.md)
+**[Changelog](https://github.com/plasticrake/tplink-smarthome-api/tree/master/CHANGELOG.md)**
 
 ## Supported Devices
 
@@ -16,11 +17,13 @@ TP-Link Smart Home API
 | LB100, LB110, LB120, LB130, LB200, LB230 | Bulb |
 
 ## Related Projects
+
 - [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
 - [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
 - [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-tplink-smarthome)
 
 ## Examples
+
 See more [examples](https://github.com/plasticrake/tplink-smarthome-api/tree/master/examples).
 
 ```javascript
@@ -40,13 +43,16 @@ client.startDiscovery().on('device-new', (device) => {
 ```
 
 ## CLI
+
 Install the command line utility with `npm install -g tplink-smarthome-api`. Run `tplink-smarthome-api --help` for help.
 
 ## API
+
+[Full API docs can be found here.](https://github.com/plasticrake/tplink-smarthome-api/blob/master/API.md)
+
 For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`.
 
 Functions that take more than 3 arguments are passed a single options object as the first argument (and if its a network commmand, SendOptions as the second.)
-
 
 {{#class name="Client"}}{{>member-index}}{{/class}}
 {{#class name="Bulb"}}{{>member-index}}{{/class}}
@@ -76,9 +82,8 @@ Functions that take more than 3 arguments are passed a single options object as 
 {{#identifier name="SendOptions"}}{{>docs}}{{/identifier}}
 {{#identifier name="ResponseError"}}{{>docs}}{{/identifier}}
 
-
 ## Credits
-Thanks to George Georgovassilis and Thomas Baust for figuring out the HS1XX encryption.
-https://blog.georgovassilis.com/2016/05/07/controlling-the-tp-link-hs100-wi-fi-smart-plug/
+
+Thanks to George Georgovassilis and Thomas Baust for [figuring out the HS1XX encryption](https://blog.georgovassilis.com/2016/05/07/controlling-the-tp-link-hs100-wi-fi-smart-plug/).
 
 Some design cues for Client based on [node-lifx](https://github.com/MariusRumpf/node-lifx/)
