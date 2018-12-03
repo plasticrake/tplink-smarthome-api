@@ -87,7 +87,7 @@ async function getDiscoveryTestDevices () {
   return new Promise((resolve, reject) => {
     let discoveredTestDevices = [];
     let client = getTestClient();
-    client.startDiscovery({discoveryTimeout: discoveryTimeout});
+    client.startDiscovery({ discoveryTimeout: discoveryTimeout });
 
     setTimeout(() => {
       client.stopDiscovery();
@@ -115,13 +115,13 @@ let simulatedUdpServer;
 async function getSimulatedTestDevices () {
   let client = getTestClient();
 
-  simulatedDevices.push({device: new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100' } })});
-  simulatedDevices.push({device: new simulator.Device({ model: 'hs105', data: { alias: 'Mock’s “HS105”' } })});
-  simulatedDevices.push({device: new simulator.Device({ model: 'hs110', data: { alias: 'Mock😽 HS110' } })});
-  simulatedDevices.push({device: new simulator.Device({ model: 'hs200', data: { alias: 'Mock HS200' } })});
-  simulatedDevices.push({device: new simulator.Device({ model: 'lb100', data: { alias: 'Mock LB100' } })});
-  simulatedDevices.push({device: new simulator.Device({ model: 'lb120', data: { alias: 'Mock LB120' } })});
-  simulatedDevices.push({device: new simulator.Device({ model: 'lb130', data: { alias: 'Mock LB130' } })});
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs105', data: { alias: 'Mock’s “HS105”' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs110', data: { alias: 'Mock😽 HS110' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs200', data: { alias: 'Mock HS200' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'lb100', data: { alias: 'Mock LB100' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'lb120', data: { alias: 'Mock LB120' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'lb130', data: { alias: 'Mock LB130' } }) });
 
   simulatedDevices.push({
     testType: 'unreliable',

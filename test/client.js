@@ -62,7 +62,7 @@ describe('Client', function () {
 
       setTimeout(() => {
         expect(spy, `MAC:[${mac}] not found`).to.be.called;
-        expect(spy).to.always.be.calledWithMatch({mac: mac});
+        expect(spy).to.always.be.calledWithMatch({ mac: mac });
         done();
       }, 1000);
     });
@@ -70,12 +70,12 @@ describe('Client', function () {
     let events = ['new', 'online', 'offline'];
     let eventTests = [];
     [
-      {typeName: 'device', type: Device},
-      {typeName: 'plug', type: Plug},
-      {typeName: 'bulb', type: Bulb}
+      { typeName: 'device', type: Device },
+      { typeName: 'plug', type: Plug },
+      { typeName: 'bulb', type: Bulb }
     ].forEach((t) => {
       events.forEach((e) => {
-        eventTests.push(Object.assign({}, t, {event: e}));
+        eventTests.push(Object.assign({}, t, { event: e }));
       });
     });
 
@@ -114,7 +114,7 @@ describe('Client', function () {
       let device = testDevices['unreliable'];
       if (!device.deviceOptions || !device.deviceOptions.port) this.skip();
 
-      client.startDiscovery({ discoveryInterval: 250 }).on('discovery-invalid', ({rinfo, response, decryptedResponse}) => {
+      client.startDiscovery({ discoveryInterval: 250 }).on('discovery-invalid', ({ rinfo, response, decryptedResponse }) => {
         expect(response).to.be.instanceof(Buffer);
         expect(decryptedResponse).to.be.instanceof(Buffer);
 
@@ -210,7 +210,7 @@ describe('Client', function () {
           .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
       });
       it(`should return info with object payload${sendOptions.transport}`, function () {
-        return expect(client.send({'system': {'get_sysinfo': {}}}, options.host, options.port, sendOptions))
+        return expect(client.send({ 'system': { 'get_sysinfo': {} } }, options.host, options.port, sendOptions))
           .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
       });
     });

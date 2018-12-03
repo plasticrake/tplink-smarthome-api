@@ -54,7 +54,7 @@ function createWday (daysOfWeek) {
   return wday;
 }
 
-function createScheduleRule ({start, end = null, daysOfWeek = null}) {
+function createScheduleRule ({ start, end = null, daysOfWeek = null }) {
   let sched = {};
 
   Object.assign(sched, createScheduleDate(start, 'start'));

@@ -145,7 +145,7 @@ class Client extends EventEmitter {
    */
   sendTcp (payload, host, port = 9999, timeout) {
     let socketId = maxSocketId += 1;
-    this.log.debug(`[${socketId}] client.sendTcp(%j)`, {payload, host, port, timeout});
+    this.log.debug(`[${socketId}] client.sendTcp(%j)`, { payload, host, port, timeout });
 
     return new Promise((resolve, reject) => {
       let socket;
@@ -217,7 +217,7 @@ class Client extends EventEmitter {
         });
 
         this.log.debug(`[${socketId}] client.sendTcp(): attempting to open. host:${host}, port:${port}`);
-        socket.connect({port, host}, () => {
+        socket.connect({ port, host }, () => {
           this.log.debug(`[${socketId}] client.sendTcp(): socket:connect ${socket.remoteAddress} ${socket.remotePort}`);
           socket.write(encryptWithHeader(payloadString));
         });
@@ -485,7 +485,7 @@ class Client extends EventEmitter {
           }
         }
 
-        this.createOrUpdateDeviceFromSysInfo({sysInfo, host: rinfo.address, port: rinfo.port, options: deviceOptions});
+        this.createOrUpdateDeviceFromSysInfo({ sysInfo, host: rinfo.address, port: rinfo.port, options: deviceOptions });
       });
 
       this.socket.on('error', (err) => {
