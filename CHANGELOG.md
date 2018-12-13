@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Changes :zap:
+- `Device`/`Bulb`/`Plug`
+  - `sendCommand`
+    - `ResponseError` thrown by `sendCommand` now includes:
+      - `command`: command sent to device
+      - `errorModules`: array of modules that returned with errors.
+
 ### Fixed :bug:
 - `Plug`
   - `constructor`

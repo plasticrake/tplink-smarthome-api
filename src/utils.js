@@ -7,11 +7,13 @@
  * @extends Error
  */
 class ResponseError extends Error {
-  constructor (message, response) {
+  constructor (message, response, command, errorModules) {
     super(message);
     this.name = 'ResponseError';
-    this.message = `${message} response: ${JSON.stringify(response)}`;
+    this.message = `${message} response: ${JSON.stringify(response)} command: ${JSON.stringify(command)}`;
     this.response = response;
+    this.command = command;
+    this.errorModules = errorModules;
     Error.captureStackTrace(this, this.constructor);
   }
 }
