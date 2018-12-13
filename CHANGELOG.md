@@ -1,5 +1,12 @@
 # Change Log
 
+## Unreleased
+
+### Fixed :bug:
+- `Plug`
+  - `constructor`
+    - change default `inUseThreshold` from `0` to `0.1`. Even with nothing plugged into some outlets and relay turned off they may report a small power draw.
+
 ## 0.23.1 / 2018-12-02
 
 ### Fixed :bug:

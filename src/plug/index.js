@@ -30,7 +30,8 @@ class Plug extends Device {
    *
    * See [Device constructor]{@link Device} for common options.
    * @param  {Object}  options
-   * @param  {Number} [options.inUseThreshold=0] Watts
+   * @param  {number} [options.inUseThreshold=0.1] Watts
+   * @param  {string} [options.childId]
    */
   constructor (options) {
     super(options);
@@ -46,7 +47,7 @@ class Plug extends Device {
       'netif': 'netif'
     };
 
-    this.inUseThreshold = options.inUseThreshold || 0;
+    this.inUseThreshold = options.inUseThreshold || 0.1;
 
     this.emitEventsEnabled = true;
 
