@@ -111,7 +111,7 @@ class Device extends EventEmitter {
    * @return {string} 'plub'|'bulb'|'device'
    */
   get deviceType () {
-    let type = this.type;
+    const type = this.type;
     switch (true) {
       case (/plug/i).test(type): return 'plug';
       case (/bulb/i).test(type): return 'bulb';
@@ -158,7 +158,7 @@ class Device extends EventEmitter {
    */
   async send (payload, sendOptions) {
     this.log.debug('[%s] device.send()', this.alias);
-    let thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
+    const thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
     return this.client.send(payload, this.host, this.port, thisSendOptions)
       .catch((reason) => {
         this.log.error('[%s] device.send() %s', this.alias, reason);
@@ -250,8 +250,8 @@ class Device extends EventEmitter {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async setLocation (latitude, longitude, sendOptions) {
-    let latitude_i = Math.round(latitude * 10000); // eslint-disable-line camelcase
-    let longitude_i = Math.round(longitude * 10000); // eslint-disable-line camelcase
+    const latitude_i = Math.round(latitude * 10000); // eslint-disable-line camelcase
+    const longitude_i = Math.round(longitude * 10000); // eslint-disable-line camelcase
     return this.sendCommand({
       [this.apiModuleNamespace.system]: {
         set_dev_location: { latitude, longitude, latitude_i, longitude_i }
@@ -266,7 +266,7 @@ class Device extends EventEmitter {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getModel (sendOptions) {
-    let sysInfo = await this.getSysInfo(sendOptions);
+    const sysInfo = await this.getSysInfo(sendOptions);
     return sysInfo.model;
   }
   /**
@@ -301,9 +301,9 @@ class Device extends EventEmitter {
  * @private
  */
 function processResponse (command, response) {
-  let commandResponses = recur(command, response);
+  const commandResponses = recur(command, response);
 
-  let errors = [];
+  const errors = [];
   commandResponses.forEach((r) => {
     if (r.err_code == null) {
       errors.push({ msg: 'err_code missing', response: r });
@@ -323,11 +323,10 @@ function processResponse (command, response) {
   }
   return response;
 
-  function recur (command, response, depth = 0, results = []) {
-    let keys = Object.keys(command);
+    const keys = Object.keys(command);
     if (keys.length === 0) { results.push(response); }
     for (var i = 0; i < keys.length; i++) {
-      let key = keys[i];
+      const key = keys[i];
       if (depth === 1) {
         if (response[key]) {
           results.push(response[key]);

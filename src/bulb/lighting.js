@@ -54,7 +54,7 @@ class Lighting {
    */
   emitEvents () {
     if (!_lightState) return;
-    let powerOn = (_lightState.on_off === 1);
+    const powerOn = (_lightState.on_off === 1);
 
     if (this._lastState.powerOn !== powerOn) {
       this._lastState.powerOn = powerOn;
@@ -101,7 +101,7 @@ class Lighting {
    * @return {Promise<boolean, ResponseError>}
    */
   async setLightState ({ transition_period, on_off, mode, hue, saturation, brightness, color_temp, ignore_default = true }, sendOptions) {
-    let state = {};
+    const state = {};
     if (ignore_default !== undefined) state.ignore_default = (ignore_default ? 1 : 0);
     if (transition_period !== undefined) state.transition_period = transition_period;
     if (on_off !== undefined) state.on_off = (on_off ? 1 : 0);

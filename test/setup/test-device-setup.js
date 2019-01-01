@@ -13,7 +13,7 @@ const clientOptions = { logLevel: process.env.TEST_CLIENT_LOGLEVEL };
 const useSimulator = envIsTrue(defaultTo(process.env.TEST_SIMULATOR, true));
 const discoveryTimeout = process.env.TEST_DISCOVERY_TIMEOUT || 2000;
 const discoveryIpWhitelist = (() => {
-  let list = process.env.TEST_DISCOVERY_IP_WHITELIST;
+  const list = process.env.TEST_DISCOVERY_IP_WHITELIST;
   if (list) return list.split(',');
   return [];
 })();
@@ -173,18 +173,16 @@ function testDeviceCleanup () {
     }
   });
 
-  let unreliableDevice = realTestDevices.find((realDevice) => (realDevice.testType === 'unreliable'));
+  const unreliableDevice = realTestDevices.find((realDevice) => (realDevice.testType === 'unreliable'));
   if (unreliableDevice) addDevice(testDevices['unreliable'], unreliableDevice);
 
   testDevices.forEach((td) => {
-    let deviceOptions = td.deviceOptions || {};
-    console.log(td.model, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac);
+    const deviceOptions = td.deviceOptions || {};
   });
 
   ['anydevice', 'anyplug', 'anybulb', 'unreachable', 'unreliable'].forEach((key) => {
-    let td = testDevices[key];
-    let deviceOptions = td.deviceOptions || {};
-    console.log(key, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac);
+    const td = testDevices[key];
+    const deviceOptions = td.deviceOptions || {};
   });
 
   run();

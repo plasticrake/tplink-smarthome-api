@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function ({ level, logger }) {
-  let levels = ['trace', 'debug', 'info', 'warn', 'error', 'silent'];
-  let log = require('loglevel');
+  const levels = ['trace', 'debug', 'info', 'warn', 'error', 'silent'];
+  const log = require('loglevel');
 
   level = level || 'warn';
   if (levels.indexOf(level) === -1) { console.error('invalid log level: %s', level); }
