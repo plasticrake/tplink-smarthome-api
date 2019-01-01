@@ -69,7 +69,7 @@ class Client extends EventEmitter {
    * @return {Promise<Object, Error>}
    */
   async send (payload, host, port = 9999, sendOptions) {
-    let thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
+    const thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
     if (thisSendOptions.transport === 'udp') {
       return this.sendUdp(payload, host, port, thisSendOptions.timeout);
     }
@@ -86,7 +86,7 @@ class Client extends EventEmitter {
       let socket;
       let isSocketBound = false;
       try {
-        let payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
+        const payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
 
         socket = dgram.createSocket('udp4');
 
@@ -130,7 +130,7 @@ class Client extends EventEmitter {
         socket.bind(() => {
           isSocketBound = true;
           this.log.debug(`[${socketId}] client.sendUdp(): listening on %j`, socket.address());
-          let msgBuf = encrypt(payloadString);
+          const msgBuf = encrypt(payloadString);
           socket.send(msgBuf, 0, msgBuf.length, port, host);
         });
       } catch (err) {
@@ -153,7 +153,7 @@ class Client extends EventEmitter {
       let deviceDataBuf;
       let segmentCount = 0;
       try {
-        let payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
+        const payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
 
         socket = new net.Socket();
 
@@ -176,8 +176,8 @@ class Client extends EventEmitter {
             deviceDataBuf = Buffer.concat([deviceDataBuf, data], deviceDataBuf.length + data.length);
           }
 
-          let expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
-          let actualMsgLen = deviceDataBuf.length - 4;
+          const expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
+          const actualMsgLen = deviceDataBuf.length - 4;
 
           if (actualMsgLen >= expectedMsgLen) {
             socket.end();
@@ -190,8 +190,8 @@ class Client extends EventEmitter {
 
           if (deviceDataBuf == null) return;
 
-          let expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
-          let actualMsgLen = deviceDataBuf.length - 4;
+          const expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
+          const actualMsgLen = deviceDataBuf.length - 4;
 
           if (actualMsgLen >= expectedMsgLen) {
             let decryptedMsg;
@@ -239,7 +239,7 @@ class Client extends EventEmitter {
    */
   async getSysInfo (host, port = 9999, sendOptions) {
     this.log.debug('client.getSysInfo(%j)', { host, port, sendOptions });
-    let data = await this.send('{"system":{"get_sysinfo":{}}}', host, port, sendOptions);
+    const data = await this.send('{"system":{"get_sysinfo":{}}}', host, port, sendOptions);
     return data.system.get_sysinfo;
   }
   /**
@@ -285,7 +285,7 @@ class Client extends EventEmitter {
    * @return {Promise<Plug|Bulb, Error>}
    */
   async getDevice (deviceOptions, sendOptions) {
-    let sysInfo = await this.getSysInfo(deviceOptions.host, deviceOptions.port, sendOptions);
+    const sysInfo = await this.getSysInfo(deviceOptions.host, deviceOptions.port, sendOptions);
     return this.getDeviceFromSysInfo(sysInfo, Object.assign({}, deviceOptions, { client: this }));
   }
   /**
@@ -321,7 +321,7 @@ class Client extends EventEmitter {
    * @return {Plug|Bulb}
    */
   getDeviceFromSysInfo (sysInfo, deviceOptions) {
-    let thisDeviceOptions = Object.assign({}, deviceOptions, { sysInfo: sysInfo });
+    const thisDeviceOptions = Object.assign({}, deviceOptions, { sysInfo: sysInfo });
     switch (this.getTypeFromSysInfo(sysInfo)) {
       case 'plug': return this.getPlug(thisDeviceOptions);
       case 'bulb': return this.getBulb(thisDeviceOptions);
@@ -414,7 +414,7 @@ class Client extends EventEmitter {
    * @param  {Object}    options
    * @param  {string}   [options.address]                     address to bind udp socket
    * @param  {number}   [options.port]                        port to bind udp socket
-   * @param  {string}   [options.broadcast=255.255.255.255] broadcast address
+   * @param  {string}   [options.broadcast=255.255.255.255]   broadcast address
    * @param  {number}   [options.discoveryInterval=10000]     (ms)
    * @param  {number}   [options.discoveryTimeout=0]          (ms)
    * @param  {number}   [options.offlineTolerance=3]          # of consecutive missed replies to consider offline
@@ -564,7 +564,7 @@ class Client extends EventEmitter {
 
       this.devices.forEach((device) => {
         if (device.status !== 'offline') {
-          let diff = this.discoveryPacketSequence - device.seenOnDiscovery;
+          const diff = this.discoveryPacketSequence - device.seenOnDiscovery;
           if (diff >= offlineTolerance) {
             device.status = 'offline';
             this.emit('offline', device);

@@ -49,7 +49,7 @@ function createScheduleDate (date, startOrEnd) {
 }
 
 function createWday (daysOfWeek) {
-  let wday = [ false, false, false, false, false, false, false ];
+  const wday = [ false, false, false, false, false, false, false ];
   daysOfWeek.forEach((dw) => {
     wday[dw] = true;
   });
@@ -57,7 +57,7 @@ function createWday (daysOfWeek) {
 }
 
 function createScheduleRule ({ start, end = null, daysOfWeek = null }) {
-  let sched = {};
+  const sched = {};
 
   Object.assign(sched, createScheduleDate(start, 'start'));
   if (end !== null) {
@@ -68,7 +68,7 @@ function createScheduleRule ({ start, end = null, daysOfWeek = null }) {
     sched.wday = createWday(daysOfWeek);
     sched.repeat = true;
   } else {
-    let date = (isDate(start) ? start : new Date());
+    const date = (isDate(start) ? start : new Date());
     sched.day = date.getDate();
     sched.month = date.getMonth() + 1;
     sched.year = date.getFullYear();

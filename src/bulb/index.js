@@ -151,7 +151,7 @@ class Bulb extends Device {
    */
   async getInfo (sendOptions) {
     // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
-    let data = await this.send(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}},"${this.apiModuleNamespace.lightingservice}":{"get_light_state":{}},"${this.apiModuleNamespace.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModuleNamespace.cloud}":{"get_info":{}}}`, sendOptions);
+    const data = await this.send(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}},"${this.apiModuleNamespace.lightingservice}":{"get_light_state":{}},"${this.apiModuleNamespace.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModuleNamespace.cloud}":{"get_info":{}}}`, sendOptions);
     this.sysInfo = data.system.get_sysinfo;
     this.cloud.info = data[this.apiModuleNamespace.cloud].get_info;
     this.emeter.realtime = data[this.apiModuleNamespace.emeter].get_realtime;
@@ -173,7 +173,7 @@ class Bulb extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async getPowerState (sendOptions) {
-    let lightState = await this.lighting.getLightState(sendOptions);
+    const lightState = await this.lighting.getLightState(sendOptions);
     return (lightState.on_off === 1);
   }
   /**

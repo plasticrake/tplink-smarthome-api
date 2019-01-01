@@ -4,7 +4,7 @@ const { Client } = require('..');
 const client = new Client();
 
 var logEvent = function (eventName, device, state) {
-  let stateString = (state != null ? util.inspect(state) : '');
+  const stateString = (state != null ? util.inspect(state) : '');
   console.log(`${(new Date()).toISOString()} ${eventName} ${device.model} ${device.host}:${device.port} ${stateString}`);
 };
 

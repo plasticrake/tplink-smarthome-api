@@ -31,8 +31,8 @@ class Away {
    * @return {Promise<Object, ResponseError>} parsed JSON response of rule
    */
   async getRule (id, sendOptions) {
-    let rules = await this.getRules(sendOptions);
-    let rule = rules.rule_list.find((r) => r.id === id);
+    const rules = await this.getRules(sendOptions);
+    const rule = rules.rule_list.find((r) => r.id === id);
     if (rule) {
       rule.err_code = rules.err_code;
     }

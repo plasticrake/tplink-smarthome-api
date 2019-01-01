@@ -210,7 +210,7 @@ class Plug extends Device {
    * @return {Promise<boolean, ResponseError>} LED State, true === on
    */
   async getLedState (sendOptions) {
-    let sysInfo = await this.getSysInfo(sendOptions);
+    const sysInfo = await this.getSysInfo(sendOptions);
     return (sysInfo.led_off === 0);
   }
   /**
@@ -276,9 +276,9 @@ class Plug extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async blink (times = 5, rate = 1000, sendOptions) {
-    let delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
+    const delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
 
-    let origLedState = await this.getLedState(sendOptions);
+    const origLedState = await this.getLedState(sendOptions);
     let lastBlink = Date.now();
 
     let currLedState = false;
@@ -286,7 +286,7 @@ class Plug extends Device {
       currLedState = !currLedState;
       lastBlink = Date.now();
       await this.setLedState(currLedState, sendOptions);
-      let timeToWait = (rate / 2) - (Date.now() - lastBlink);
+      const timeToWait = (rate / 2) - (Date.now() - lastBlink);
       if (timeToWait > 0) {
         await delay(timeToWait);
       }
