@@ -29,7 +29,7 @@ class Device extends EventEmitter {
     host,
     port = 9999,
     logger,
-    defaultSendOptions = { transport: 'tcp', timeout: 5000 }
+    defaultSendOptions = { transport: 'tcp', timeout: 10000 }
   }) {
     super();
 
