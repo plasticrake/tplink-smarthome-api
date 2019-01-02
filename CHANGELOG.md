@@ -8,6 +8,8 @@
     - `ResponseError` thrown by `sendCommand` now includes:
       - `command`: command sent to device
       - `errorModules`: array of modules that returned with errors.
+- `Client`
+  - `defaultSendOptions.timeout` default changed to 10000 ms from 5000 ms
 
 ### Fixed :bug:
 - `Plug`

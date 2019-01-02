@@ -30,11 +30,11 @@ class Client extends EventEmitter {
   /**
    * @param  {Object}       options
    * @param  {SendOptions} [options.defaultSendOptions]
-   * @param  {Number}      [options.defaultSendOptions.timeout=5000]  (ms)
+   * @param  {Number}      [options.defaultSendOptions.timeout=10000]  (ms)
    * @param  {string}      [options.defaultSendOptions.transport=tcp] 'tcp' or 'udp'
    * @param  {string}      [options.logLevel]       level for built in logger ['error','warn','info','debug','trace']
    */
-  constructor ({ defaultSendOptions = { timeout: 5000, transport: 'tcp' }, logLevel, logger } = {}) {
+  constructor ({ defaultSendOptions = { timeout: 10000, transport: 'tcp' }, logLevel, logger } = {}) {
     super();
     this.defaultSendOptions = defaultSendOptions;
     this.log = require('./logger')({ level: logLevel, logger: logger });
