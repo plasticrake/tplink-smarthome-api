@@ -4,10 +4,10 @@
  * Eemter
  */
 class Emeter {
-  constructor (device, apiModuleName) {
+  constructor (device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
-
+    this.childId = childId;
     this._realtime = {};
   }
   /**
@@ -45,19 +45,20 @@ class Emeter {
    * Requests `emeter.get_realtime`. Older devices return `current`, `voltage`, etc,
    * while newer devices return `current_ma`, `voltage_mv` etc
    * This will return a normalized response including both old and new style properies for backwards compatibility.
+   * Supports childId.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getRealtime (sendOptions) {
     this.realtime = await this.device.sendCommand({
       [this.apiModuleName]: { get_realtime: {} }
-    }, sendOptions);
+    }, this.childId, sendOptions);
     return this.realtime;
   }
   /**
    * Get Daily Emeter Statisics.
    *
-   * Sends `emeter.get_daystat` command.
+   * Sends `emeter.get_daystat` command. Supports childId.
    * @param  {number}       year
    * @param  {number}       month
    * @param  {SendOptions} [sendOptions]
@@ -66,12 +67,12 @@ class Emeter {
   async getDayStats (year, month, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_daystat: { year, month } }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Get Monthly Emeter Statisics.
    *
-   * Sends `emeter.get_monthstat` command.
+   * Sends `emeter.get_monthstat` command. Supports childId.
    * @param  {number}       year
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -79,19 +80,19 @@ class Emeter {
   async getMonthStats (year, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_monthstat: { year } }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Erase Emeter Statistics.
    *
-   * Sends `emeter.erase_runtime_stat` command.
+   * Sends `emeter.erase_runtime_stat` command. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async eraseStats (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { erase_emeter_stat: {} }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
 }
 

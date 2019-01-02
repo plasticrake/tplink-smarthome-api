@@ -4,26 +4,28 @@
  * Timer
  */
 class Timer {
-  constructor (device, apiModuleName) {
+  constructor (device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
+    this.childId = childId;
   }
   /**
    * Get Countdown Timer Rule (only one allowed).
    *
-   * Requests `count_down.get_rules`.
+   * Requests `count_down.get_rules`. Supports childId.
+   * @param  {string[]|string|number[]|number} [childIds] for multi-outlet devices, which outlet(s) to target
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getRules (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_rules: {} }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Add Countdown Timer Rule (only one allowed).
    *
-   * Sends count_down.add_rule command.
+   * Sends count_down.add_rule command. Supports childId.
    * @param  {Object}       options
    * @param  {number}       options.delay                delay in seconds
    * @param  {boolean}      options.powerState           turn on or off device
@@ -34,7 +36,7 @@ class Timer {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async addRule ({ delay, powerState, name = 'timer', enable = true, deleteExisting = true }, sendOptions) {
-    if (deleteExisting) await this.deleteAllRules();
+    if (deleteExisting) await this.deleteAllRules(sendOptions);
     return this.device.sendCommand({
       [this.apiModuleName]: {
         add_rule: {
@@ -44,12 +46,12 @@ class Timer {
           name
         }
       }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Edit Countdown Timer Rule (only one allowed).
    *
-   * Sends count_down.edit_rule command.
+   * Sends count_down.edit_rule command. Supports childId.
    * @param  {Object}       options
    * @param  {string}       options.id               rule id
    * @param  {number}       options.delay            delay in seconds
@@ -70,19 +72,19 @@ class Timer {
           name
         }
       }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Delete Countdown Timer Rule (only one allowed).
    *
-   * Sends count_down.delete_all_rules command.
+   * Sends count_down.delete_all_rules command. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async deleteAllRules (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { delete_all_rules: {} }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
 }
 

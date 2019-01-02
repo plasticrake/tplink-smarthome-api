@@ -81,7 +81,7 @@ class Lighting {
   async getLightState (sendOptions) {
     this.lightState = await this.device.sendCommand({
       [this.apiModuleName]: { get_light_state: {} }
-    }, sendOptions);
+    }, null, sendOptions);
     return this.lightState;
   }
   /**
@@ -113,7 +113,7 @@ class Lighting {
 
     this.lightState = await this.device.sendCommand({
       [this.apiModuleName]: { transition_light_state: state }
-    }, sendOptions);
+    }, null, sendOptions);
     return true;
   }
 }

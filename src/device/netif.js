@@ -30,7 +30,7 @@ class Netif {
           timeout: timeoutInSeconds
         }
       }
-    }, sendOptions);
+    }, null, sendOptions);
   }
 }
 

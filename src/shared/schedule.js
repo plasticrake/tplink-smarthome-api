@@ -5,39 +5,40 @@
  * Schedule
  */
 class Schedule {
-  constructor (device, apiModuleName) {
+  constructor (device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
+    this.childId = childId;
   }
   /**
    * Gets Next Schedule Rule Action.
    *
-   * Requests `schedule.get_next_action`.
+   * Requests `schedule.get_next_action`. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getNextAction (sendOptions) {
     this.nextaction = this.device.sendCommand({
       [this.apiModuleName]: { get_next_action: {} }
-    }, sendOptions);
+    }, this.childId, sendOptions);
     return this.nextaction;
   }
   /**
    * Gets Schedule Rules.
    *
-   * Requests `schedule.get_rules`.
+   * Requests `schedule.get_rules`. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getRules (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_rules: {} }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Gets Schedule Rule.
    *
-   * Requests `schedule.get_rules` and return rule matching Id
+   * Requests `schedule.get_rules` and return rule matching Id. Supports childId.
    * @param  {string}       id
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response of rule
@@ -53,7 +54,7 @@ class Schedule {
   /**
    * Adds Schedule rule.
    *
-   * Sends `schedule.add_rule` command and returns rule id.
+   * Sends `schedule.add_rule` command and returns rule id. Supports childId.
    * @param  {Object}       rule
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -61,12 +62,12 @@ class Schedule {
   async addRule (rule, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { add_rule: rule }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Edits Schedule Rule.
    *
-   * Sends `schedule.edit_rule` command.
+   * Sends `schedule.edit_rule` command. Supports childId.
    * @param  {Object}       rule
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -74,24 +75,24 @@ class Schedule {
   async editRule (rule, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { edit_rule: rule }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Deletes All Schedule Rules.
    *
-   * Sends `schedule.delete_all_rules` command.
+   * Sends `schedule.delete_all_rules` command. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async deleteAllRules (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { delete_all_rules: {} }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Deletes Schedule Rule.
    *
-   * Sends `schedule.delete_rule` command.
+   * Sends `schedule.delete_rule` command. Supports childId.
    * @param  {string}       id
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -99,12 +100,12 @@ class Schedule {
   async deleteRule (id, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { delete_rule: { id } }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Enables or Disables Schedule Rules.
    *
-   * Sends `schedule.set_overall_enable` command.
+   * Sends `schedule.set_overall_enable` command. Supports childId.
    * @param  {boolean}     enable
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -112,12 +113,12 @@ class Schedule {
   async setOverallEnable (enable, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { set_overall_enable: { enable: (enable ? 1 : 0) } }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Get Daily Usage Statisics.
    *
-   * Sends `schedule.get_daystat` command.
+   * Sends `schedule.get_daystat` command. Supports childId.
    * @param  {number}       year
    * @param  {number}       month
    * @param  {SendOptions} [sendOptions]
@@ -126,12 +127,12 @@ class Schedule {
   async getDayStats (year, month, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_daystat: { year, month } }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Get Monthly Usage Statisics.
    *
-   * Sends `schedule.get_monthstat` command.
+   * Sends `schedule.get_monthstat` command. Supports childId.
    * @param  {number}       year
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -139,19 +140,19 @@ class Schedule {
   async getMonthStats (year, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_monthstat: { year } }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
   /**
    * Erase Usage Statistics.
    *
-   * Sends `schedule.erase_runtime_stat` command.
+   * Sends `schedule.erase_runtime_stat` command. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async eraseStats (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { erase_runtime_stat: { } }
-    }, sendOptions);
+    }, this.childId, sendOptions);
   }
 }
 

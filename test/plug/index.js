@@ -12,6 +12,69 @@ describe('Plug', function () {
   this.timeout(5000);
   this.slow(2000);
 
+  testDevices['plugchildren'].forEach((testDevice) => {
+    context(testDevice.name, function () {
+      let plug;
+      let otherChildrenPreState;
+      before(async function () {
+        // beforeEach() doesn't work with assigning to `this`
+        if (testDevice.getDevice) {
+          plug = await testDevice.getDevice();
+          this.device = plug;
+        }
+      });
+      beforeEach(async function () {
+        // before() doesn't skip nested describes
+        if (!testDevice.getDevice) {
+          return this.skip();
+        }
+        plug = await testDevice.getDevice();
+        this.device = plug;
+
+        otherChildrenPreState = await testDevice.getOtherChildrenState();
+      });
+
+      afterEach(async function () {
+        const currentState = await testDevice.getOtherChildrenState();
+        expect(currentState).to.eql(otherChildrenPreState);
+      });
+
+      describe('#setAlias()', function () {
+        let origAlias;
+        before(async function () {
+          if (!testDevice.getDevice) return;
+          await plug.getSysInfo();
+          origAlias = plug.alias;
+        });
+        after(async function () {
+          if (!testDevice.getDevice) return;
+          expect((await plug.setAlias(origAlias))).to.be.true;
+          await plug.getSysInfo();
+          expect(plug.alias).to.equal(origAlias);
+        });
+
+        it('should change the alias and not affect other children', async function () {
+          let testAlias = `Testing ${Math.floor(Math.random() * (100 + 1))}`;
+          expect((await plug.setAlias(testAlias))).to.be.true;
+          await plug.getSysInfo();
+          expect(plug.alias).to.equal(testAlias);
+        });
+      });
+
+      describe('#setPowerState()', function () {
+        it('should turn on child plug and not affect other children', async function () {
+          expect(await plug.setPowerState(true)).to.be.true;
+          expect(await plug.getPowerState()).to.be.true;
+        });
+
+        it('should turn off child plug and not affect other children', async function () {
+          expect(await plug.setPowerState(false)).to.be.true;
+          expect(await plug.getPowerState()).to.be.false;
+        });
+      });
+    });
+  });
+
   testDevices['plug'].forEach((testDevice) => {
     context(testDevice.name, function () {
       let plug;
@@ -32,8 +95,8 @@ describe('Plug', function () {
       });
 
       describe('#supportsEmeter', function () {
-        it('should be true for hs110 and false for other plugs', function () {
-          if (plug.model.match(/^HS110/)) {
+        it('should be true for hs110, hs300 and false for other plugs', function () {
+          if (plug.model.match(/^HS(110|300)/)) {
             expect(plug.supportsEmeter).to.be.true;
           } else {
             expect(plug.supportsEmeter).to.be.false;
@@ -113,7 +176,7 @@ describe('Plug', function () {
           expect(spyPowerUpdate).to.be.always.calledWithMatch(sinon.match.bool);
         });
 
-        it('should emit lightstate-off / power-update', async function () {
+        it('should emit power-off / power-update', async function () {
           let spy = sinon.spy();
           let spyPowerUpdate = sinon.spy();
 

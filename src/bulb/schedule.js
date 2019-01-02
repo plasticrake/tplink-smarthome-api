@@ -31,7 +31,7 @@ class BulbSchedule extends Schedule {
       etime_opt: -1
     }, createScheduleRule({ start, daysOfWeek }));
 
-    return Schedule.prototype.addRule.call(this, rule, sendOptions); // super.addRule(rule); // workaround babel bug
+    return Schedule.prototype.addRule.call(this, rule, null, sendOptions); // super.addRule(rule); // workaround babel bug
   }
   /**
    * Edits Schedule rule.
@@ -57,7 +57,7 @@ class BulbSchedule extends Schedule {
       etime_opt: -1
     }, createScheduleRule({ start, daysOfWeek }));
 
-    return Schedule.prototype.editRule.call(this, rule, sendOptions); // super.addRule(rule); // workaround babel bug
+    return Schedule.prototype.editRule.call(this, rule, null, sendOptions); // super.addRule(rule); // workaround babel bug
   }
 }
 

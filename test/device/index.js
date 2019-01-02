@@ -65,6 +65,13 @@ describe('Device', function () {
         expect(pr.system.get_sysinfo).to.include.keys('err_code', 'sw_ver', 'hw_ver', 'type');
       });
 
+      it('to throw ResponseError including whole result for multiple commands emeter.get_realtime system.get_sysinfo', function () {
+        let command = { 'emeter': { 'get_realtime': {} }, 'system': { 'get_sysinfo': {} } };
+        let response = { emeter: { err_code: -1, err_msg: 'module not support' }, system: { get_sysinfo: { err_code: 0, sw_ver: '1.0.8 Build 151113 Rel.24658', hw_ver: '1.0', type: 'IOT.SMARTPLUGSWITCH', model: 'HS110(US)', mac: '00:00:00:00:00:00', deviceId: '1234', hwId: '1234', fwId: '1234', oemId: '1234', alias: 'sup', dev_name: 'Wi-Fi Smart Plug With Energy Monitoring', icon_hash: '', relay_state: 0, on_time: 0, active_mode: 'schedule', feature: 'TIM:ENE', updating: 0, rssi: -63, led_off: 0, latitude: 0.000000, longitude: 0.000000 } } };
+        expect(() => processResponse(command, response)).to.throw(ResponseError).and.to.have.deep.property('response', response);
+        expect(() => processResponse(command, response)).to.throw(ResponseError).and.to.have.deep.property('errorModules', ['emeter']);
+      });
+
       it('to throw ResponseError when err_code missing', function () {
         let command = { emeter: { get_realtime: {} } };
         let response = { emeter: { get_realtime: {} } };
@@ -187,9 +194,16 @@ describe('Device', function () {
 
       describe('#alias get', function () {
         it('should return alias from cached sysInfo', function () {
-          expect(device.alias).to.eql(device.sysInfo.alias);
-          device.sysInfo.alias = 'My Test alias';
-          expect(device.alias).to.eql(device.sysInfo.alias);
+          if (device.childId) {
+            const child = device.sysInfo.children.find(c => c.id === device.childId);
+            expect(device.alias).to.eql(child.alias);
+            child.alias = 'My Test Alias';
+            expect(device.alias).to.eql(child.alias);
+          } else {
+            expect(device.alias).to.eql(device.sysInfo.alias);
+            device.sysInfo.alias = 'My Test Alias';
+            expect(device.alias).to.eql(device.sysInfo.alias);
+          }
         });
       });
 
@@ -302,21 +316,21 @@ describe('Device', function () {
         let origAlias;
         before(async function () {
           if (!testDevice.getDevice) return;
-          let si = await device.getSysInfo();
-          origAlias = si.alias;
+          await device.getSysInfo();
+          origAlias = device.alias;
         });
         after(async function () {
           if (!testDevice.getDevice) return;
           expect((await device.setAlias(origAlias))).to.be.true;
-          let si = await device.getSysInfo();
-          expect(si.alias).to.equal(origAlias);
+          await device.getSysInfo();
+          expect(device.alias).to.equal(origAlias);
         });
 
         it('should change the alias', async function () {
           let testAlias = `Testing ${Math.floor(Math.random() * (100 + 1))}`;
           expect((await device.setAlias(testAlias))).to.be.true;
-          let si = await device.getSysInfo();
-          expect(si.alias).to.equal(testAlias);
+          await device.getSysInfo();
+          expect(device.alias).to.equal(testAlias);
         });
       });
 

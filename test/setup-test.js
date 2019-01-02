@@ -31,7 +31,7 @@ describe('Test Environment Setup', function () {
 
   describe('testDevices', function () {
     testDevices.forEach((testDevice) => {
-      context(testDevice.model, function () {
+      context(testDevice.name, function () {
         deviceIsOk(testDevice);
       });
     });
@@ -39,6 +39,17 @@ describe('Test Environment Setup', function () {
     ['anydevice', 'anyplug', 'anybulb'].forEach((deviceKey) => {
       context(deviceKey, function () {
         deviceIsOk(testDevices[deviceKey]);
+      });
+    });
+
+    ['plugchildren'].forEach((deviceKey) => {
+      context(deviceKey, function () {
+        it(`should be an array with at least one item`, function () {
+          expect(testDevices[deviceKey].length).to.be.above(0);
+        });
+        testDevices[deviceKey].forEach((d) => {
+          deviceIsOk(d);
+        });
       });
     });
 

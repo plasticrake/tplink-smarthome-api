@@ -7,11 +7,16 @@ const Emeter = require('../shared/emeter');
 const Schedule = require('./schedule');
 const Timer = require('./timer');
 const Time = require('../shared/time');
+const { ResponseError } = require('../utils');
 
 /**
  * Plug Device.
  *
- * TP-Link models: HS100, HS105, HS110, HS200.
+ * TP-Link models: HS100, HS105, HS107, HS110, HS200, HS220, HS300.
+ *
+ * Models with multiple outlets (HS107, HS300) will have a children property.
+ * If Plug is instantiated with a childId it will control the outlet associated with that childId.
+ * Some functions only apply to the entire device, and are noted below.
  *
  * Emits events after device status is queried, such as {@link #getSysInfo} and {@link #getEmeterRealtime}.
  * @extends Device
@@ -31,7 +36,7 @@ class Plug extends Device {
    * See [Device constructor]{@link Device} for common options.
    * @param  {Object}  options
    * @param  {number} [options.inUseThreshold=0.1] Watts
-   * @param  {string} [options.childId]
+   * @param  {string} [options.childId] If passed an integer or string between 0 and 99 it will prepend the deviceId
    */
   constructor (options) {
     super(options);
@@ -49,6 +54,10 @@ class Plug extends Device {
 
     this.inUseThreshold = options.inUseThreshold || 0.1;
 
+    if (options.sysInfo) { this.sysInfo = options.sysInfo; }
+
+    this.childId = options.childId || null;
+
     this.emitEventsEnabled = true;
 
     /**
@@ -59,7 +68,7 @@ class Plug extends Device {
      * @borrows Away#deleteRule as Plug.away#deleteRule
      * @borrows Away#setOverallEnable as Plug.away#setOverallEnable
      */
-    this.away = new Away(this, 'anti_theft');
+    this.away = new Away(this, 'anti_theft', this.childId);
     /**
      * @borrows Cloud#getInfo as Plug.cloud#getInfo
      * @borrows Cloud#bind as Plug.cloud#bind
@@ -75,7 +84,7 @@ class Plug extends Device {
      * @borrows Emeter#getMonthStats as Plug.emeter#getMonthStats
      * @borrows Emeter#eraseStats as Plug.emeter#eraseStats
      */
-    this.emeter = new Emeter(this, 'emeter');
+    this.emeter = new Emeter(this, 'emeter', this.childId);
     /**
      * @borrows Schedule#getNextAction as Plug.schedule#getNextAction
      * @borrows Schedule#getRules as Plug.schedule#getRules
@@ -89,7 +98,7 @@ class Plug extends Device {
      * @borrows Schedule#getMonthStats as Plug.schedule#getMonthStats
      * @borrows Schedule#eraseStats as Plug.schedule#eraseStats
      */
-    this.schedule = new Schedule(this, 'schedule');
+    this.schedule = new Schedule(this, 'schedule', this.childId);
     /**
      * @borrows Time#getTime as Plug.time#getTime
      * @borrows Time#getTimezone as Plug.time#getTimezone
@@ -101,7 +110,7 @@ class Plug extends Device {
      * @borrows Timer#editRule as Plug.timer#editRule
      * @borrows Timer#deleteAllRules as Plug.timer#deleteAllRules
      */
-    this.timer = new Timer(this, 'count_down');
+    this.timer = new Timer(this, 'count_down', this.childId);
 
     if (this.sysInfo) {
       this.lastState.inUse = this.inUse;
@@ -121,32 +130,87 @@ class Plug extends Device {
   set sysInfo (sysInfo) {
     super.sysInfo = sysInfo;
     this.supportsEmeter = (sysInfo.feature && typeof sysInfo.feature === 'string' ? sysInfo.feature.indexOf('ENE') >= 0 : false);
+    this.children = (sysInfo.children ? sysInfo.children : null);
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
   /**
-   * Returns cached results from last retrieval of `emeter.get_realtime`.
-   * @return {Object}
+   * Returns children as a map keyed by childId. From cached results from last retrieval of `system.sys_info.children`.
+   * @return {Map} children
    */
-  // get emeterRealtime () {
-  //   return super.emeterRealtime;
-  // }
-  // /**
-  //  * @private
-  //  */
-  // set emeterRealtime (emeterRealtime) {
-  //   this.log.debug('[%s] plug emeterRealtime set, supportsEmeter: %s', this.alias, this.supportsEmeter);
-  //   if (this.supportsEmeter) {
-  //     super.emeterRealtime = emeterRealtime;
-  //     this.emitEvents();
-  //   }
-  // }
+  get children () {
+    return this._children;
+  }
+  /**
+   * @private
+   */
+  set children (children) {
+    if (Array.isArray(children)) {
+      this._children = new Map(children.map((child) => {
+        child.id = this.normalizeChildId(child.id);
+        return [ child.id, child ];
+      }));
+    } else if (children instanceof Map) {
+      this._children = children;
+    }
+    if (this._childId && this._children) {
+      this.childId = this._childId;
+      // this._child = this._children.get(this.normalizeChildId(this._childId));
+    }
+  }
+  /**
+   * Returns childId.
+   * @return {string} childId
+   */
+  get childId () {
+    return this._childId;
+  }
+  /**
+   * @private
+   */
+  set childId (childId) {
+    this._childId = this.normalizeChildId(childId);
+    if (this._childId && this._children) {
+      this._child = this._children.get(this._childId);
+    }
+  }
+  /**
+   * Cached value of `sys_info.alias` or `sys_info.children[childId].alias` if childId set.
+   * @return {string}
+   */
+  get alias () {
+    if (this.childId) {
+      return this._child.alias;
+    }
+    return this.sysInfo.alias;
+  }
+  /**
+   * @private
+   */
+  set alias (alias) {
+    if (this.childId) {
+      this._child.alias = alias;
+    }
+    this.sysInfo.alias = alias;
+  }
+  /**
+   * Cached value of `sys_info.deviceId` or `childId` if set.
+   * @return {string}
+   */
+  get id () {
+    if (this.childId) {
+      return this.childId;
+    }
+    return this.sysInfo.deviceId;
+  }
   /**
    * Determines if device is in use based on cached `emeter.get_realtime` results.
    *
-   * If device supports energy monitoring (HS110): `power > inUseThreshold`. `inUseThreshold` is specified in Watts
+   * If device supports energy monitoring (e.g. HS110): `power > inUseThreshold`. `inUseThreshold` is specified in Watts
    *
-   * Otherwise fallback on relay state:  `relay_state === 1`
+   * Otherwise fallback on relay state: `relay_state === 1` or `sys_info.children[childId].state === 1`.
+   *
+   * Supports childId.
    * @return {boolean}
    */
   get inUse () {
@@ -156,11 +220,24 @@ class Plug extends Device {
     return this.relayState;
   }
   /**
-   * `sys_info.relay_state === 1`
-   * @return {boolean}
+   * `sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
+   * @return {boolean} On (true) or Off (false)
    */
   get relayState () {
+    if (this.childId) {
+      return (this._child.state === 1);
+    }
     return (this.sysInfo.relay_state === 1);
+  }
+  /**
+   * @private
+   */
+  set relayState (relayState) {
+    if (this.childId) {
+      this._child.state = (relayState ? 1 : 0);
+      return;
+    }
+    this.sysInfo.relay_state = (relayState ? 1 : 0);
   }
   /**
    * Requests common Plug status details in a single request.
@@ -168,13 +245,24 @@ class Plug extends Device {
    * - `cloud.get_sysinfo`
    * - `emeter.get_realtime`
    * - `schedule.get_next_action`
+   *
+   * Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
   async getInfo (sendOptions) {
     // TODO force TCP unless overriden here
-    // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
-    let data = await this.send('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', sendOptions);
+    let data;
+    try {
+      data = await this.sendCommand('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', this.childId, sendOptions);
+    } catch (err) {
+      // Ignore emeter section errors as not all devices support it
+      if (err instanceof ResponseError && err.errorModules.length === 1 && err.errorModules[0] === 'emeter') {
+        data = err.response;
+      } else {
+        throw err;
+      }
+    }
     this.sysInfo = data.system.get_sysinfo;
     this.cloud.info = data.cnCloud.get_info;
     if (data.emeter.hasOwnProperty('get_realtime')) {
@@ -188,9 +276,8 @@ class Plug extends Device {
       schedule: { nextAction: this.schedule.nextAction }
     };
   }
-
   /**
-   * Same as {@link #inUse}, but requests current `emeter.get_realtime`.
+   * Same as {@link #inUse}, but requests current `emeter.get_realtime`. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
@@ -205,7 +292,7 @@ class Plug extends Device {
   /**
    * Get Plug LED state (night mode).
    *
-   * Requests `system.sys_info` and returns true if `led_off === 0`.
+   * Requests `system.sys_info` and returns true if `led_off === 0`. Does not support childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>} LED State, true === on
    */
@@ -214,7 +301,7 @@ class Plug extends Device {
     return (sysInfo.led_off === 0);
   }
   /**
-   * Turn Plug LED on/off (night mode).
+   * Turn Plug LED on/off (night mode). Does not support childId.
    *
    * Sends `system.set_led_off` command.
    * @param  {boolean}      value LED State, true === on
@@ -222,39 +309,39 @@ class Plug extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async setLedState (value, sendOptions) {
-    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`, sendOptions);
+    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`, null, sendOptions);
     this.sysInfo.set_led_off = (value ? 0 : 1);
     return true;
   }
   /**
    * Get Plug relay state (on/off).
    *
-   * Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
+   * Requests `system.get_sysinfo` and returns true if On. Calls {@link #relayState}. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
   async getPowerState (sendOptions) {
-    let sysInfo = await this.getSysInfo(sendOptions);
-    return (sysInfo.relay_state === 1);
+    await this.getSysInfo(sendOptions);
+    return this.relayState;
   }
   /**
    * Turns Plug relay on/off.
    *
-   * Sends `system.set_relay_state` command.
+   * Sends `system.set_relay_state` command. Supports childId.
    * @param  {boolean}      value
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
   async setPowerState (value, sendOptions) {
-    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`, sendOptions);
-    this.sysInfo.relay_state = (value ? 1 : 0);
+    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`, this.childId, sendOptions);
+    this.relayState = value;
     this.emitEvents();
     return true;
   }
   /**
    * Toggles Plug relay state.
    *
-   * Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and return the new power state`.
+   * Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and returns the new power state`. Supports childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
@@ -267,7 +354,7 @@ class Plug extends Device {
    * Blink Plug LED.
    *
    * Sends `system.set_led_off` command alternating on and off number of `times` at `rate`,
-   * then sets the led to its pre-blink state.
+   * then sets the led to its pre-blink state. Does not support childId.
    *
    * Note: `system.set_led_off` is particulally slow, so blink rate is not guaranteed.
    * @param  {number}      [times=5]
