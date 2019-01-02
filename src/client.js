@@ -420,6 +420,7 @@ class Client extends EventEmitter {
    * @param  {number}   [options.offlineTolerance=3]          # of consecutive missed replies to consider offline
    * @param  {string[]} [options.deviceTypes]                 'plug','bulb'
    * @param  {string[]} [options.macAddresses]                MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
+   * @param  {boolean}  [options.breakoutChildren=true]       if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
    * @param  {Object}   [options.deviceOptions={}]            passed to device constructors
    * @param  {Object[]} [options.devices]                     known devices to query instead of relying on broadcast
    * @return {Client}                                         this
@@ -443,6 +444,7 @@ class Client extends EventEmitter {
     offlineTolerance = 3,
     deviceTypes,
     macAddresses = [],
+    breakoutChildren = true,
     deviceOptions = {},
     devices
   } = {}) {
