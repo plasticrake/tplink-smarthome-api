@@ -11,26 +11,26 @@ class Time {
   /**
    * Gets device's time.
    *
-   * Requests `timesetting.get_time`.
+   * Requests `timesetting.get_time`. Does not support ChildId.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getTime (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_time: {} }
-    }, sendOptions);
+    }, null, sendOptions);
   }
   /**
    * Gets device's timezone.
    *
-   * Requests `timesetting.get_timezone`.
+   * Requests `timesetting.get_timezone`. Does not support ChildId.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getTimezone (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_timezone: {} }
-    }, sendOptions);
+    }, null, sendOptions);
   }
 }
 

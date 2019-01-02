@@ -8,6 +8,8 @@
     - `ResponseError` thrown by `sendCommand` now includes:
       - `command`: command sent to device
       - `errorModules`: array of modules that returned with errors.
+  - add `id` property. Returns `deviceId` or `childId` if childId is set.
+  - `alias` returns child alias if childId is set
   - `defaultSendOptions.timeout` default changed to 10000 ms from 5000 ms
 - `Client`
   - `breakoutChildren` parameter added to `startDiscovery`
@@ -17,6 +19,11 @@
 - `Plug`
   - `constructor`
     - change default `inUseThreshold` from `0` to `0.1`. Even with nothing plugged into some outlets and relay turned off they may report a small power draw.
+
+### Breaking Changes :boom:
+- `Device`/`Bulb`/`Plug`
+  - `sendCommand`
+    - BREAKING CHANGE: Add childId parameter that will add `"context":{child_ids:[]}` to the command. This is to support plugs with multiple outlets.
 
 ## 0.23.1 / 2018-12-02
 
@@ -29,7 +36,7 @@
 - Requires minimum Node version 6.4
 
 ### Changes :zap:
-- Bulb`/`Plug`
+- `Bulb`/`Plug`
   - `getEmeterRealtime` will now simultaneously return both the new and old API style responses, i.e. `current` and `current_ma`.
 
 ### Fixed :bug:

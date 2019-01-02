@@ -11,20 +11,20 @@ class Cloud {
   /**
    * Gets device's TP-Link cloud info.
    *
-   * Requests `cloud.get_info`.
+   * Requests `cloud.get_info`. Does not support childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getInfo (sendOptions) {
     this.info = await this.device.sendCommand({
       [this.apiModuleName]: { get_info: {} }
-    }, sendOptions);
+    }, null, sendOptions);
     return this.info;
   }
   /**
    * Add device to TP-Link cloud.
    *
-   * Sends `cloud.bind` command.
+   * Sends `cloud.bind` command. Does not support childId.
    * @param  {string}       username
    * @param  {string}       password
    * @param  {SendOptions} [sendOptions]
@@ -33,36 +33,36 @@ class Cloud {
   async bind (username, password, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { bind: { username, password } }
-    }, sendOptions);
+    }, null, sendOptions);
   }
   /**
    * Remove device from TP-Link cloud.
    *
-   * Sends `cloud.unbind` command.
+   * Sends `cloud.unbind` command. Does not support childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async unbind (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { unbind: {} }
-    }, sendOptions);
+    }, null, sendOptions);
   }
   /**
    * Get device's TP-Link cloud firmware list.
    *
-   * Sends `cloud.get_intl_fw_list` command.
+   * Sends `cloud.get_intl_fw_list` command. Does not support childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getFirmwareList (sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { get_intl_fw_list: {} }
-    }, sendOptions);
+    }, null, sendOptions);
   }
   /**
    * Sets device's TP-Link cloud server URL.
    *
-   * Sends `cloud.set_server_url` command.
+   * Sends `cloud.set_server_url` command. Does not support childId.
    * @param  {string}       server URL
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -70,7 +70,7 @@ class Cloud {
   async setServerUrl (server, sendOptions) {
     return this.device.sendCommand({
       [this.apiModuleName]: { set_server_url: { server } }
-    }, sendOptions);
+    }, null, sendOptions);
   }
 }
 

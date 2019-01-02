@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "commander": "^2.19.0",
+    "lodash.castarray": "^4.4.0",
     "lodash.defaultto": "^4.14.0",
     "lodash.groupby": "^4.6.0",
     "lodash.isequal": "^4.5.0",
@@ -67,7 +68,7 @@
     "semistandard": "^13.0.1",
     "sinon": "^7.1.1",
     "sinon-chai": "^3.3.0",
-    "tplink-smarthome-simulator": "^1.6.0"
+    "tplink-smarthome-simulator": "^1.7.0"
   },
   "scripts": {
     "preversion": "npm test",

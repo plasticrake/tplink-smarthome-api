@@ -124,6 +124,44 @@ describe('Client', function () {
         }
       });
     });
+
+    it('should emit device-new for each child for devices with children and breakoutChildren is true', function (done) {
+      const devices = {};
+      client.startDiscovery({ discoveryInterval: 250, deviceTypes: ['plug'], breakoutChildren: true }).on('device-new', (device) => {
+        if (device.model.match(/^HS300/)) {
+          expect(device.sysInfo.children.length).to.be.above(1);
+          expect(device.sysInfo.children.length).to.eql(device.children.size);
+          if (devices[device.deviceId] == null) {
+            devices[device.deviceId] = {};
+            devices[device.deviceId].children = [];
+          }
+          devices[device.deviceId].children.push(device.childId);
+
+          if (devices[device.deviceId].children.length >= device.children.size) {
+            devices[device.deviceId].children.sort().forEach((childId, i) => {
+              expect(childId).to.eql(device.deviceId + '0' + i);
+            });
+            done();
+          }
+        }
+      });
+    });
+
+    it('should emit device-new for only the device and not each child for devices with children and breakoutChildren is false', function (done) {
+      const devices = {};
+      client.startDiscovery({ discoveryInterval: 250, deviceTypes: ['plug'], breakoutChildren: false }).on('device-new', (device) => {
+        if (device.model.match(/^HS300/)) {
+          expect(device.sysInfo.children.length).to.be.above(1);
+          expect(device.sysInfo.children.length).to.eql(device.children.size);
+          expect(devices[device.deviceId]).to.be.undefined;
+          devices[device.deviceId] = device;
+        }
+      });
+      setTimeout(() => {
+        expect(Object.keys(devices).length).to.be.above(0);
+        done();
+      }, 1000);
+    });
   });
 
   describe('#getDevice()', function () {

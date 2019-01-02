@@ -487,7 +487,7 @@ class Client extends EventEmitter {
           }
         }
 
-        this.createOrUpdateDeviceFromSysInfo({ sysInfo, host: rinfo.address, port: rinfo.port, options: deviceOptions });
+        this.createOrUpdateDeviceFromSysInfo({ sysInfo, host: rinfo.address, port: rinfo.port, breakoutChildren, options: deviceOptions });
       });
 
       this.socket.on('error', (err) => {
@@ -525,23 +525,34 @@ class Client extends EventEmitter {
   /**
    * @private
    */
-  createOrUpdateDeviceFromSysInfo ({ sysInfo, host, port, options }) {
-    if (this.devices.has(sysInfo.deviceId)) {
-      const device = this.devices.get(sysInfo.deviceId);
-      device.host = host;
-      device.port = port;
-      device.sysInfo = sysInfo;
-      device.status = 'online';
-      device.seenOnDiscovery = this.discoveryPacketSequence;
-      this.emit('online', device);
+  createOrUpdateDeviceFromSysInfo ({ sysInfo, host, port, options, breakoutChildren }) {
+    const process = (sysInfo, id, childId) => {
+      if (this.devices.has(id)) {
+        const device = this.devices.get(id);
+        device.host = host;
+        device.port = port;
+        device.sysInfo = sysInfo;
+        device.status = 'online';
+        device.seenOnDiscovery = this.discoveryPacketSequence;
+        this.emit('online', device);
+      } else {
+        const deviceOptions = Object.assign({}, options, { client: this, host, port, childId });
+        const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
+        // device.sysInfo = sysInfo;
+        device.status = 'online';
+        device.seenOnDiscovery = this.discoveryPacketSequence;
+        this.devices.set(id, device);
+        this.emit('new', device);
+      }
+    };
+
+    if (breakoutChildren && sysInfo.children && sysInfo.children.length > 0) {
+      sysInfo.children.forEach((child) => {
+        const childId = (child.id.length === 2 ? sysInfo.deviceId + child.id : child.id);
+        process(sysInfo, childId, childId);
+      });
     } else {
-      let deviceOptions = Object.assign({}, options, { client: this, deviceId: sysInfo.deviceId, host, port });
-      const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
-      device.sysInfo = sysInfo;
-      device.status = 'online';
-      device.seenOnDiscovery = this.discoveryPacketSequence;
-      this.devices.set(device.deviceId, device);
-      this.emit('new', device);
+      process(sysInfo, sysInfo.deviceId);
     }
   }
   /**

@@ -1,5 +1,6 @@
 'use strict';
 
+const castArray = require('lodash.castarray');
 const EventEmitter = require('events');
 
 const Netif = require('./netif');
@@ -44,8 +45,6 @@ class Device extends EventEmitter {
 
     this._sysInfo = {};
 
-    if (sysInfo) { this.sysInfo = sysInfo; }
-
     this.netif = new Netif(this, 'netif');
   }
   /**
@@ -68,6 +67,19 @@ class Device extends EventEmitter {
    */
   get alias () {
     return this.sysInfo.alias;
+  }
+  /**
+   * @private
+   */
+  set alias (alias) {
+    this.sysInfo.alias = alias;
+  }
+  /**
+   * Cached value of `sys_info.deviceId`.
+   * @return {string}
+   */
+  get id () {
+    return this.deviceId;
   }
   /**
    * Cached value of `sys_info.deviceId`.
@@ -147,7 +159,7 @@ class Device extends EventEmitter {
    * @return {string}
    */
   get macNormalized () {
-    let mac = this.mac || '';
+    const mac = this.mac || '';
     return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   }
   /**
@@ -171,6 +183,10 @@ class Device extends EventEmitter {
    *
    * Calls {@link #send} and processes the response.
    *
+   * - Adds context.child_ids:[] to the command.
+   *   - If `childIds` parameter is set. _or_
+   *   - If device was instantiated with a childId it will default to that value.
+   *
    * - If only one operation was sent:
    *   - Promise fulfills with specific parsed JSON response for command.\
    *     Example: `{system:{get_sysinfo:{}}}`
@@ -180,16 +196,53 @@ class Device extends EventEmitter {
    *   - Promise fulfills with full parsed JSON response (same as {@link #send})
    *
    * Also, the response's `err_code`(s) are checked, if any are missing or != `0` the Promise is rejected with {@link ResponseError}.
+   * @param  {Object|string}    command
+   * @param  {string[]|string} [childIds]
+   * @param  {SendOptions}     [sendOptions]
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async sendCommand (command, childIds = this.childId, sendOptions) {
+    // TODO allow certain err codes (particually emeter for non HS110 devices)
+    const commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
+
+    if (childIds) {
+      const childIdsArray = castArray(childIds).map(this.normalizeChildId, this);
+      commandObj.context = { child_ids: childIdsArray };
+    }
+
+    const response = await this.send(commandObj, sendOptions);
+    const results = processResponse(commandObj, response);
+    return results;
+  }
+  /**
+   * @private
+   */
+  normalizeChildId (childId) {
+    let normalizedChildId = childId;
+    if (Number.isInteger(childId) && (childId >= 0 && childId < 100)) {
+      normalizedChildId = normalizedChildId + '';
+    }
+    if (typeof normalizedChildId === 'string' || normalizedChildId instanceof String) {
+      if (normalizedChildId.length === 1) {
+        return (this.deviceId || '') + '0' + normalizedChildId;
+      } else if (normalizedChildId.length === 2) {
+        return (this.deviceId || '') + normalizedChildId;
+      }
+    }
+    return normalizedChildId;
+  }
+
+  /**
+   * Adds context.child_ids:[] to the command and sends via {@link #sendCommand}.
    * @param  {Object|string} command
+   * @param  {string[]|string} [childIds]
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async sendCommand (command, sendOptions) {
-    // TODO allow certain err codes (particually emeter for non HS110 devices)
-    let commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
-    let response = await this.send(commandObj, sendOptions);
-    let results = processResponse(commandObj, response);
-    return results;
+  async sendCommandWithChildren (command, childIds, sendOptions) {
+    const commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
+
+    return this.sendCommand(commandObj, sendOptions);
   }
   /**
    * Polls the device every `interval`.
@@ -216,19 +269,19 @@ class Device extends EventEmitter {
   /**
    * Gets device's SysInfo.
    *
-   * Requests `system.sys_info` from device.
+   * Requests `system.sys_info` from device. Does not support childId.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getSysInfo (sendOptions) {
     this.log.debug('[%s] device.getSysInfo()', this.alias);
-    this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', sendOptions);
+    this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', null, sendOptions);
     return this.sysInfo;
   }
   /**
    * Change device's alias (name).
    *
-   * Sends `system.set_dev_alias` command.
+   * Sends `system.set_dev_alias` command. Supports childId.
    * @param  {string}       alias
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
@@ -236,14 +289,14 @@ class Device extends EventEmitter {
   async setAlias (alias, sendOptions) {
     await this.sendCommand({
       [this.apiModuleNamespace.system]: { set_dev_alias: { alias: alias } }
-    }, sendOptions);
-    this.sysInfo.alias = alias;
+    }, this.childId, sendOptions);
+    this.alias = alias;
     return true;
   }
   /**
    * Set device's location.
    *
-   * Sends `system.set_dev_location` command.
+   * Sends `system.set_dev_location` command. Does not support childId.
    * @param  {number}       latitude
    * @param  {number}       longitude
    * @param  {SendOptions} [sendOptions]
@@ -256,12 +309,12 @@ class Device extends EventEmitter {
       [this.apiModuleNamespace.system]: {
         set_dev_location: { latitude, longitude, latitude_i, longitude_i }
       }
-    }, sendOptions);
+    }, null, sendOptions);
   }
   /**
    * Gets device's model.
    *
-   * Requests `system.sys_info` and returns model name.
+   * Requests `system.sys_info` and returns model name. Does not support childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
@@ -272,7 +325,7 @@ class Device extends EventEmitter {
   /**
    * Reboot device.
    *
-   * Sends `system.reboot` command.
+   * Sends `system.reboot` command. Does not support childId.
    * @param  {number}       delay
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -280,12 +333,12 @@ class Device extends EventEmitter {
   async reboot (delay, sendOptions) {
     return this.sendCommand({
       [this.apiModuleNamespace.system]: { reboot: { delay } }
-    }, sendOptions);
+    }, null, sendOptions);
   }
   /**
    * Reset device.
    *
-   * Sends `system.reset` command.
+   * Sends `system.reset` command. Does not support childId.
    * @param  {number}       delay
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -293,7 +346,7 @@ class Device extends EventEmitter {
   async reset (delay, sendOptions) {
     return this.sendCommand({
       [this.apiModuleNamespace.system]: { reset: { delay } }
-    }, sendOptions);
+    }, null, sendOptions);
   }
 }
 
@@ -301,41 +354,44 @@ class Device extends EventEmitter {
  * @private
  */
 function processResponse (command, response) {
+  const multipleResponses = (Object.keys(response).length > 1);
   const commandResponses = recur(command, response);
 
   const errors = [];
   commandResponses.forEach((r) => {
-    if (r.err_code == null) {
-      errors.push({ msg: 'err_code missing', response: r });
-    } else if (r.err_code !== 0) {
-      errors.push({ msg: 'err_code not zero', response: r });
+    if (r.response.err_code == null) {
+      errors.push({ msg: 'err_code missing', response: r.response, section: r.section });
+    } else if (r.response.err_code !== 0) {
+      errors.push({ msg: 'err_code not zero', response: r.response, section: r.section });
     }
   });
 
-  if (errors.length === 1) {
-    throw new ResponseError(errors[0].msg, errors[0].response);
-  } else if (errors.length > 1) {
-    throw new ResponseError('err_code', response);
+  if (errors.length === 1 && !multipleResponses) {
+    throw new ResponseError(errors[0].msg, errors[0].response, command, errors[0].section);
+  } else if (errors.length > 0) {
+    throw new ResponseError('err_code', response, command, errors.map((e) => e.section));
   }
 
   if (commandResponses.length === 1) {
-    return commandResponses[0];
+    return commandResponses[0].response;
   }
   return response;
 
+  function recur (command, response, depth = 0, section, results = []) {
     const keys = Object.keys(command);
     if (keys.length === 0) { results.push(response); }
     for (var i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (depth === 1) {
         if (response[key]) {
-          results.push(response[key]);
+          results.push({ section, response: response[key] });
         } else {
-          return results.push(response);
+          return results.push({ section, response });
         }
       } else if (depth < 1) {
+        section = key;
         if (response[key] !== undefined) {
-          recur(command[key], response[key], depth + 1, results);
+          recur(command[key], response[key], depth + 1, section, results);
         }
       }
     }
