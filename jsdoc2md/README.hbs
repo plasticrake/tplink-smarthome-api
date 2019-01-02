@@ -1,6 +1,8 @@
+<!-- markdownlint-disable MD007 MD012 MD033 -->
+
 # tplink-smarthome-api
 
-[![NPM Version](https://img.shields.io/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
+[![NPM Version](https://img.shieldsio/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
 [![Build Status](https://travis-ci.org/plasticrake/tplink-smarthome-api.svg?branch=master)](https://travis-ci.org/plasticrake/tplink-smarthome-api)
 [![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
@@ -13,14 +15,14 @@ TP-Link Smart Home API
 
 | Model                                    | Type |
 |------------------------------------------|------|
-| HS100, HS105, HS110, HS200               | Plug |
+| HS100, HS105, HS107, HS110, HS200, HS300 | Plug |
 | LB100, LB110, LB120, LB130, LB200, LB230 | Bulb |
 
 ## Related Projects
 
-- [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
-- [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
-- [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-tplink-smarthome)
+* [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
+* [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
+* [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-tplink-smarthome)
 
 ## Examples
 
@@ -53,7 +55,7 @@ Install the command line utility with `npm install -g tplink-smarthome-api`. Run
 For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`.
 
 Functions that take more than 3 arguments are passed a single options object as the first argument (and if its a network commmand, SendOptions as the second.)
-
+<!-- markdownlint-disable MD004 MD007 MD009 MD012 MD022 MD024 MD032 MD033 -->
 {{#class name="Client"}}{{>member-index}}{{/class}}
 {{#class name="Bulb"}}{{>member-index}}{{/class}}
 {{#class name="Plug"}}{{>member-index}}{{/class}}

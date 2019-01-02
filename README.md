@@ -1,6 +1,8 @@
+<!-- markdownlint-disable MD007 MD012 MD033 -->
+
 # tplink-smarthome-api
 
-[![NPM Version](https://img.shields.io/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
+[![NPM Version](https://img.shieldsio/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
 [![Build Status](https://travis-ci.org/plasticrake/tplink-smarthome-api.svg?branch=master)](https://travis-ci.org/plasticrake/tplink-smarthome-api)
 [![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
@@ -13,14 +15,14 @@ TP-Link Smart Home API
 
 | Model                                    | Type |
 |------------------------------------------|------|
-| HS100, HS105, HS110, HS200               | Plug |
+| HS100, HS105, HS107, HS110, HS200, HS300 | Plug |
 | LB100, LB110, LB120, LB130, LB200, LB230 | Bulb |
 
 ## Related Projects
 
-- [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
-- [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
-- [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-tplink-smarthome)
+* [TP-Link Smarthome Device Simulator](https://github.com/plasticrake/tplink-smarthome-simulator) - Useful for automated testing
+* [TP-Link Smarthome Crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
+* [TP-Link Smarthome Homebridge Plugin](https://github.com/plasticrake/homebridge-tplink-smarthome)
 
 ## Examples
 
@@ -53,7 +55,7 @@ Install the command line utility with `npm install -g tplink-smarthome-api`. Run
 For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`.
 
 Functions that take more than 3 arguments are passed a single options object as the first argument (and if its a network commmand, SendOptions as the second.)
-
+<!-- markdownlint-disable MD004 MD007 MD009 MD012 MD022 MD024 MD032 MD033 -->
 
 * [Client](#Client) ⇐ <code>EventEmitter</code>
     * [new Client(options)](#new_Client_new)
@@ -120,6 +122,7 @@ Functions that take more than 3 arguments are passed a single options object as 
     * [.supportsColorTemperature](#Bulb+supportsColorTemperature) ⇒ <code>boolean</code>
     * [.getColorTemperatureRange](#Bulb+getColorTemperatureRange) ⇒ <code>Object</code>
     * [.alias](#Device+alias) ⇒ <code>string</code>
+    * [.id](#Device+id) ⇒ <code>string</code>
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.description](#Device+description) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
@@ -135,7 +138,8 @@ Functions that take more than 3 arguments are passed a single options object as 
     * [.setPowerState(value, [sendOptions])](#Bulb+setPowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.togglePowerState([sendOptions])](#Bulb+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.send(payload, [sendOptions])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.sendCommand(command, [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.sendCommand(command, [childIds], [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.sendCommandWithChildren(command, [childIds], [sendOptions])](#Device+sendCommandWithChildren) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
     * [.stopPolling()](#Device+stopPolling)
     * [.getSysInfo([sendOptions])](#Device+getSysInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -189,14 +193,17 @@ Functions that take more than 3 arguments are passed a single options object as 
         * [.getTime([sendOptions])](#Plug+time+getTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getTimezone([sendOptions])](#Plug+time+getTimezone) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.timer](#Plug+timer)
-        * [.getRules([sendOptions])](#Plug+timer+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getRules([childIds], [sendOptions])](#Plug+timer+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.addRule(options, [sendOptions])](#Plug+timer+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.editRule(options, [sendOptions])](#Plug+timer+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.deleteAllRules([sendOptions])](#Plug+timer+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.sysInfo](#Plug+sysInfo) ⇒ <code>Object</code>
+    * [.children](#Plug+children) ⇒ <code>Map</code>
+    * [.childId](#Plug+childId) ⇒ <code>string</code>
+    * [.alias](#Plug+alias) ⇒ <code>string</code>
+    * [.id](#Plug+id) ⇒ <code>string</code>
     * [.inUse](#Plug+inUse) ⇒ <code>boolean</code>
     * [.relayState](#Plug+relayState) ⇒ <code>boolean</code>
-    * [.alias](#Device+alias) ⇒ <code>string</code>
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.description](#Device+description) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
@@ -216,7 +223,8 @@ Functions that take more than 3 arguments are passed a single options object as 
     * [.togglePowerState([sendOptions])](#Plug+togglePowerState) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.blink([times], [rate], [sendOptions])](#Plug+blink) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
     * [.send(payload, [sendOptions])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.sendCommand(command, [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.sendCommand(command, [childIds], [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.sendCommandWithChildren(command, [childIds], [sendOptions])](#Device+sendCommandWithChildren) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
     * [.stopPolling()](#Device+stopPolling)
     * [.getSysInfo([sendOptions])](#Device+getSysInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -252,7 +260,7 @@ Client that sends commands to specified devices or discover devices on the local
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
 | [options.defaultSendOptions] | [<code>SendOptions</code>](#SendOptions) |  |  |
-| [options.defaultSendOptions.timeout] | <code>Number</code> | <code>5000</code> | (ms) |
+| [options.defaultSendOptions.timeout] | <code>Number</code> | <code>10000</code> | (ms) |
 | [options.defaultSendOptions.transport] | <code>string</code> | <code>&quot;tcp&quot;</code> | 'tcp' or 'udp' |
 | [options.logLevel] | <code>string</code> |  | level for built in logger ['error','warn','info','debug','trace'] |
 
@@ -410,6 +418,7 @@ Discover TP-Link Smarthome devices on the network.
 | [options.offlineTolerance] | <code>number</code> | <code>3</code> | # of consecutive missed replies to consider offline |
 | [options.deviceTypes] | <code>Array.&lt;string&gt;</code> |  | 'plug','bulb' |
 | [options.macAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive |
+| [options.breakoutChildren] | <code>boolean</code> | <code>true</code> | if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device |
 | [options.deviceOptions] | <code>Object</code> | <code>{}</code> | passed to device constructors |
 | [options.devices] | <code>Array.&lt;Object&gt;</code> |  | known devices to query instead of relying on broadcast |
 
@@ -593,7 +602,7 @@ See [Device constructor](#Device) for common options.
 #### cloud.getInfo([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's TP-Link cloud info.
 
-Requests `cloud.get_info`.
+Requests `cloud.get_info`. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Bulb+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -607,7 +616,7 @@ Requests `cloud.get_info`.
 #### cloud.bind(username, password, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Add device to TP-Link cloud.
 
-Sends `cloud.bind` command.
+Sends `cloud.bind` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Bulb+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -623,7 +632,7 @@ Sends `cloud.bind` command.
 #### cloud.unbind([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Remove device from TP-Link cloud.
 
-Sends `cloud.unbind` command.
+Sends `cloud.unbind` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Bulb+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -637,7 +646,7 @@ Sends `cloud.unbind` command.
 #### cloud.getFirmwareList([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get device's TP-Link cloud firmware list.
 
-Sends `cloud.get_intl_fw_list` command.
+Sends `cloud.get_intl_fw_list` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Bulb+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -651,7 +660,7 @@ Sends `cloud.get_intl_fw_list` command.
 #### cloud.setServerUrl(server, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Sets device's TP-Link cloud server URL.
 
-Sends `cloud.set_server_url` command.
+Sends `cloud.set_server_url` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Bulb+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -687,6 +696,7 @@ Gets device's current energy stats.
 Requests `emeter.get_realtime`. Older devices return `current`, `voltage`, etc,
 while newer devices return `current_ma`, `voltage_mv` etc
 This will return a normalized response including both old and new style properies for backwards compatibility.
+Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -700,7 +710,7 @@ This will return a normalized response including both old and new style properie
 #### emeter.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Daily Emeter Statisics.
 
-Sends `emeter.get_daystat` command.
+Sends `emeter.get_daystat` command. Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -716,7 +726,7 @@ Sends `emeter.get_daystat` command.
 #### emeter.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Monthly Emeter Statisics.
 
-Sends `emeter.get_monthstat` command.
+Sends `emeter.get_monthstat` command. Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -731,7 +741,7 @@ Sends `emeter.get_monthstat` command.
 #### emeter.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Erase Emeter Statistics.
 
-Sends `emeter.erase_runtime_stat` command.
+Sends `emeter.erase_runtime_stat` command. Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Bulb+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -815,7 +825,7 @@ Sends `lightingservice.transition_light_state` command.
 #### schedule.getNextAction([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Next Schedule Rule Action.
 
-Requests `schedule.get_next_action`.
+Requests `schedule.get_next_action`. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -829,7 +839,7 @@ Requests `schedule.get_next_action`.
 #### schedule.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Schedule Rules.
 
-Requests `schedule.get_rules`.
+Requests `schedule.get_rules`. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -843,7 +853,7 @@ Requests `schedule.get_rules`.
 #### schedule.getRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Schedule Rule.
 
-Requests `schedule.get_rules` and return rule matching Id
+Requests `schedule.get_rules` and return rule matching Id. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response of rule  
@@ -898,7 +908,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 #### schedule.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Deletes All Schedule Rules.
 
-Sends `schedule.delete_all_rules` command.
+Sends `schedule.delete_all_rules` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -912,7 +922,7 @@ Sends `schedule.delete_all_rules` command.
 #### schedule.deleteRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Deletes Schedule Rule.
 
-Sends `schedule.delete_rule` command.
+Sends `schedule.delete_rule` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -927,7 +937,7 @@ Sends `schedule.delete_rule` command.
 #### schedule.setOverallEnable(enable, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Enables or Disables Schedule Rules.
 
-Sends `schedule.set_overall_enable` command.
+Sends `schedule.set_overall_enable` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -942,7 +952,7 @@ Sends `schedule.set_overall_enable` command.
 #### schedule.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Daily Usage Statisics.
 
-Sends `schedule.get_daystat` command.
+Sends `schedule.get_daystat` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -958,7 +968,7 @@ Sends `schedule.get_daystat` command.
 #### schedule.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Monthly Usage Statisics.
 
-Sends `schedule.get_monthstat` command.
+Sends `schedule.get_monthstat` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -973,7 +983,7 @@ Sends `schedule.get_monthstat` command.
 #### schedule.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Erase Usage Statistics.
 
-Sends `schedule.erase_runtime_stat` command.
+Sends `schedule.erase_runtime_stat` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Bulb+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -996,7 +1006,7 @@ Sends `schedule.erase_runtime_stat` command.
 #### time.getTime([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's time.
 
-Requests `timesetting.get_time`.
+Requests `timesetting.get_time`. Does not support ChildId.
 
 **Kind**: instance method of [<code>time</code>](#Bulb+time)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1010,7 +1020,7 @@ Requests `timesetting.get_time`.
 #### time.getTimezone([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's timezone.
 
-Requests `timesetting.get_timezone`.
+Requests `timesetting.get_timezone`. Does not support ChildId.
 
 **Kind**: instance method of [<code>time</code>](#Bulb+time)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1056,6 +1066,13 @@ Returns array with min and max supported color temperatures
 
 ### bulb.alias ⇒ <code>string</code>
 Cached value of `sys_info.alias`.
+
+**Kind**: instance property of [<code>Bulb</code>](#Bulb)  
+**Overrides**: [<code>alias</code>](#Device+alias)  
+<a name="Device+id"></a>
+
+### bulb.id ⇒ <code>string</code>
+Cached value of `sys_info.deviceId`.
 
 **Kind**: instance property of [<code>Bulb</code>](#Bulb)  
 <a name="Device+deviceId"></a>
@@ -1195,10 +1212,14 @@ Sends `payload` to device (using [send](#Client+send))
 
 <a name="Device+sendCommand"></a>
 
-### bulb.sendCommand(command, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### bulb.sendCommand(command, [childIds], [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Sends command(s) to device.
 
 Calls [#send](#send) and processes the response.
+
+- Adds context.child_ids:[] to the command.
+  - If `childIds` parameter is set. _or_
+  - If device was instantiated with a childId it will default to that value.
 
 - If only one operation was sent:
   - Promise fulfills with specific parsed JSON response for command.\
@@ -1216,6 +1237,21 @@ Also, the response's `err_code`(s) are checked, if any are missing or != `0` the
 | Param | Type |
 | --- | --- |
 | command | <code>Object</code> \| <code>string</code> | 
+| [childIds] | <code>Array.&lt;string&gt;</code> \| <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Device+sendCommandWithChildren"></a>
+
+### bulb.sendCommandWithChildren(command, [childIds], [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Adds context.child_ids:[] to the command and sends via [#sendCommand](#sendCommand).
+
+**Kind**: instance method of [<code>Bulb</code>](#Bulb)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| command | <code>Object</code> \| <code>string</code> | 
+| [childIds] | <code>Array.&lt;string&gt;</code> \| <code>string</code> | 
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Device+startPolling"></a>
@@ -1244,7 +1280,7 @@ Stops device polling.
 ### bulb.getSysInfo([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's SysInfo.
 
-Requests `system.sys_info` from device.
+Requests `system.sys_info` from device. Does not support childId.
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1258,7 +1294,7 @@ Requests `system.sys_info` from device.
 ### bulb.setAlias(alias, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Change device's alias (name).
 
-Sends `system.set_dev_alias` command.
+Sends `system.set_dev_alias` command. Supports childId.
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 
@@ -1272,7 +1308,7 @@ Sends `system.set_dev_alias` command.
 ### bulb.setLocation(latitude, longitude, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Set device's location.
 
-Sends `system.set_dev_location` command.
+Sends `system.set_dev_location` command. Does not support childId.
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1288,7 +1324,7 @@ Sends `system.set_dev_location` command.
 ### bulb.getModel([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's model.
 
-Requests `system.sys_info` and returns model name.
+Requests `system.sys_info` and returns model name. Does not support childId.
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1302,7 +1338,7 @@ Requests `system.sys_info` and returns model name.
 ### bulb.reboot(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Reboot device.
 
-Sends `system.reboot` command.
+Sends `system.reboot` command. Does not support childId.
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1317,7 +1353,7 @@ Sends `system.reboot` command.
 ### bulb.reset(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Reset device.
 
-Sends `system.reset` command.
+Sends `system.reset` command. Does not support childId.
 
 **Kind**: instance method of [<code>Bulb</code>](#Bulb)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1393,7 +1429,11 @@ Bulb's lightstate state was updated from device. Fired regardless if status was 
 ## Plug ⇐ [<code>Device</code>](#Device)
 Plug Device.
 
-TP-Link models: HS100, HS105, HS110, HS200.
+TP-Link models: HS100, HS105, HS107, HS110, HS200, HS220, HS300.
+
+Models with multiple outlets (HS107, HS300) will have a children property.
+If Plug is instantiated with a childId it will control the outlet associated with that childId.
+Some functions only apply to the entire device, and are noted below.
 
 Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) and [#getEmeterRealtime](#getEmeterRealtime).
 
@@ -1411,7 +1451,8 @@ See [Device constructor](#Device) for common options.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
-| [options.inUseThreshold] | <code>Number</code> | <code>0</code> | Watts |
+| [options.inUseThreshold] | <code>number</code> | <code>0.1</code> | Watts |
+| [options.childId] | <code>string</code> |  | If passed an integer or string between 0 and 99 it will prepend the deviceId |
 
 <a name="Plug+away"></a>
 
@@ -1431,7 +1472,7 @@ See [Device constructor](#Device) for common options.
 #### away.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Away Rules.
 
-Requests `anti_theft.get_rules`.
+Requests `anti_theft.get_rules`. Support childId.
 
 **Kind**: instance method of [<code>away</code>](#Plug+away)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1445,7 +1486,7 @@ Requests `anti_theft.get_rules`.
 #### away.addRule(options, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Adds Away Rule.
 
-Sends `anti_theft.add_rule` command and returns rule id.
+Sends `anti_theft.add_rule` command and returns rule id. Support childId.
 
 **Kind**: instance method of [<code>away</code>](#Plug+away)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1466,7 +1507,7 @@ Sends `anti_theft.add_rule` command and returns rule id.
 #### away.editRule(options, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Edits Away rule.
 
-Sends `anti_theft.edit_rule` command and returns rule id.
+Sends `anti_theft.edit_rule` command and returns rule id. Support childId.
 
 **Kind**: instance method of [<code>away</code>](#Plug+away)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1488,7 +1529,7 @@ Sends `anti_theft.edit_rule` command and returns rule id.
 #### away.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Deletes All Away Rules.
 
-Sends `anti_theft.delete_all_rules` command.
+Sends `anti_theft.delete_all_rules` command. Support childId.
 
 **Kind**: instance method of [<code>away</code>](#Plug+away)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1502,7 +1543,7 @@ Sends `anti_theft.delete_all_rules` command.
 #### away.deleteRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Deletes Away Rule.
 
-Sends `anti_theft.delete_rule` command.
+Sends `anti_theft.delete_rule` command. Support childId.
 
 **Kind**: instance method of [<code>away</code>](#Plug+away)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1517,7 +1558,7 @@ Sends `anti_theft.delete_rule` command.
 #### away.setOverallEnable(enable, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Enables or Disables Away Rules.
 
-Sends `anti_theft.set_overall_enable` command.
+Sends `anti_theft.set_overall_enable` command. Support childId.
 
 **Kind**: instance method of [<code>away</code>](#Plug+away)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1544,7 +1585,7 @@ Sends `anti_theft.set_overall_enable` command.
 #### cloud.getInfo([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's TP-Link cloud info.
 
-Requests `cloud.get_info`.
+Requests `cloud.get_info`. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Plug+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1558,7 +1599,7 @@ Requests `cloud.get_info`.
 #### cloud.bind(username, password, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Add device to TP-Link cloud.
 
-Sends `cloud.bind` command.
+Sends `cloud.bind` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Plug+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1574,7 +1615,7 @@ Sends `cloud.bind` command.
 #### cloud.unbind([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Remove device from TP-Link cloud.
 
-Sends `cloud.unbind` command.
+Sends `cloud.unbind` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Plug+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1588,7 +1629,7 @@ Sends `cloud.unbind` command.
 #### cloud.getFirmwareList([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get device's TP-Link cloud firmware list.
 
-Sends `cloud.get_intl_fw_list` command.
+Sends `cloud.get_intl_fw_list` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Plug+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1602,7 +1643,7 @@ Sends `cloud.get_intl_fw_list` command.
 #### cloud.setServerUrl(server, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Sets device's TP-Link cloud server URL.
 
-Sends `cloud.set_server_url` command.
+Sends `cloud.set_server_url` command. Does not support childId.
 
 **Kind**: instance method of [<code>cloud</code>](#Plug+cloud)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1638,6 +1679,7 @@ Gets device's current energy stats.
 Requests `emeter.get_realtime`. Older devices return `current`, `voltage`, etc,
 while newer devices return `current_ma`, `voltage_mv` etc
 This will return a normalized response including both old and new style properies for backwards compatibility.
+Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1651,7 +1693,7 @@ This will return a normalized response including both old and new style properie
 #### emeter.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Daily Emeter Statisics.
 
-Sends `emeter.get_daystat` command.
+Sends `emeter.get_daystat` command. Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1667,7 +1709,7 @@ Sends `emeter.get_daystat` command.
 #### emeter.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Monthly Emeter Statisics.
 
-Sends `emeter.get_monthstat` command.
+Sends `emeter.get_monthstat` command. Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1682,7 +1724,7 @@ Sends `emeter.get_monthstat` command.
 #### emeter.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Erase Emeter Statistics.
 
-Sends `emeter.erase_runtime_stat` command.
+Sends `emeter.erase_runtime_stat` command. Supports childId.
 
 **Kind**: instance method of [<code>emeter</code>](#Plug+emeter)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1714,7 +1756,7 @@ Sends `emeter.erase_runtime_stat` command.
 #### schedule.getNextAction([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Next Schedule Rule Action.
 
-Requests `schedule.get_next_action`.
+Requests `schedule.get_next_action`. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1728,7 +1770,7 @@ Requests `schedule.get_next_action`.
 #### schedule.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Schedule Rules.
 
-Requests `schedule.get_rules`.
+Requests `schedule.get_rules`. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1742,7 +1784,7 @@ Requests `schedule.get_rules`.
 #### schedule.getRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets Schedule Rule.
 
-Requests `schedule.get_rules` and return rule matching Id
+Requests `schedule.get_rules` and return rule matching Id. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response of rule  
@@ -1798,7 +1840,7 @@ Sends `schedule.edit_rule` command and returns rule id.
 #### schedule.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Deletes All Schedule Rules.
 
-Sends `schedule.delete_all_rules` command.
+Sends `schedule.delete_all_rules` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1812,7 +1854,7 @@ Sends `schedule.delete_all_rules` command.
 #### schedule.deleteRule(id, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Deletes Schedule Rule.
 
-Sends `schedule.delete_rule` command.
+Sends `schedule.delete_rule` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1827,7 +1869,7 @@ Sends `schedule.delete_rule` command.
 #### schedule.setOverallEnable(enable, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Enables or Disables Schedule Rules.
 
-Sends `schedule.set_overall_enable` command.
+Sends `schedule.set_overall_enable` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1842,7 +1884,7 @@ Sends `schedule.set_overall_enable` command.
 #### schedule.getDayStats(year, month, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Daily Usage Statisics.
 
-Sends `schedule.get_daystat` command.
+Sends `schedule.get_daystat` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1858,7 +1900,7 @@ Sends `schedule.get_daystat` command.
 #### schedule.getMonthStats(year, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Monthly Usage Statisics.
 
-Sends `schedule.get_monthstat` command.
+Sends `schedule.get_monthstat` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1873,7 +1915,7 @@ Sends `schedule.get_monthstat` command.
 #### schedule.eraseStats([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Erase Usage Statistics.
 
-Sends `schedule.erase_runtime_stat` command.
+Sends `schedule.erase_runtime_stat` command. Supports childId.
 
 **Kind**: instance method of [<code>schedule</code>](#Plug+schedule)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1896,7 +1938,7 @@ Sends `schedule.erase_runtime_stat` command.
 #### time.getTime([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's time.
 
-Requests `timesetting.get_time`.
+Requests `timesetting.get_time`. Does not support ChildId.
 
 **Kind**: instance method of [<code>time</code>](#Plug+time)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1910,7 +1952,7 @@ Requests `timesetting.get_time`.
 #### time.getTimezone([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's timezone.
 
-Requests `timesetting.get_timezone`.
+Requests `timesetting.get_timezone`. Does not support ChildId.
 
 **Kind**: instance method of [<code>time</code>](#Plug+time)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1925,31 +1967,32 @@ Requests `timesetting.get_timezone`.
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 
 * [.timer](#Plug+timer)
-    * [.getRules([sendOptions])](#Plug+timer+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getRules([childIds], [sendOptions])](#Plug+timer+getRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.addRule(options, [sendOptions])](#Plug+timer+addRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.editRule(options, [sendOptions])](#Plug+timer+editRule) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.deleteAllRules([sendOptions])](#Plug+timer+deleteAllRules) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 
 <a name="Plug+timer+getRules"></a>
 
-#### timer.getRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+#### timer.getRules([childIds], [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Get Countdown Timer Rule (only one allowed).
 
-Requests `count_down.get_rules`.
+Requests `count_down.get_rules`. Supports childId.
 
 **Kind**: instance method of [<code>timer</code>](#Plug+timer)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
 
-| Param | Type |
-| --- | --- |
-| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+| Param | Type | Description |
+| --- | --- | --- |
+| [childIds] | <code>Array.&lt;string&gt;</code> \| <code>string</code> \| <code>Array.&lt;number&gt;</code> \| <code>number</code> | for multi-outlet devices, which outlet(s) to target |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
 
 <a name="Plug+timer+addRule"></a>
 
 #### timer.addRule(options, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Add Countdown Timer Rule (only one allowed).
 
-Sends count_down.add_rule command.
+Sends count_down.add_rule command. Supports childId.
 
 **Kind**: instance method of [<code>timer</code>](#Plug+timer)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1969,7 +2012,7 @@ Sends count_down.add_rule command.
 #### timer.editRule(options, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Edit Countdown Timer Rule (only one allowed).
 
-Sends count_down.edit_rule command.
+Sends count_down.edit_rule command. Supports childId.
 
 **Kind**: instance method of [<code>timer</code>](#Plug+timer)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -1989,7 +2032,7 @@ Sends count_down.edit_rule command.
 #### timer.deleteAllRules([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Delete Countdown Timer Rule (only one allowed).
 
-Sends count_down.delete_all_rules command.
+Sends count_down.delete_all_rules command. Supports childId.
 
 **Kind**: instance method of [<code>timer</code>](#Plug+timer)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -2006,28 +2049,53 @@ Returns cached results from last retrieval of `system.sys_info`.
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 **Overrides**: [<code>sysInfo</code>](#Device+sysInfo)  
 **Returns**: <code>Object</code> - system.sys_info  
+<a name="Plug+children"></a>
+
+### plug.children ⇒ <code>Map</code>
+Returns children as a map keyed by childId. From cached results from last retrieval of `system.sys_info.children`.
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
+**Returns**: <code>Map</code> - children  
+<a name="Plug+childId"></a>
+
+### plug.childId ⇒ <code>string</code>
+Returns childId.
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
+**Returns**: <code>string</code> - childId  
+<a name="Plug+alias"></a>
+
+### plug.alias ⇒ <code>string</code>
+Cached value of `sys_info.alias` or `sys_info.children[childId].alias` if childId set.
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
+**Overrides**: [<code>alias</code>](#Device+alias)  
+<a name="Plug+id"></a>
+
+### plug.id ⇒ <code>string</code>
+Cached value of `sys_info.deviceId` or `childId` if set.
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
+**Overrides**: [<code>id</code>](#Device+id)  
 <a name="Plug+inUse"></a>
 
 ### plug.inUse ⇒ <code>boolean</code>
 Determines if device is in use based on cached `emeter.get_realtime` results.
 
-If device supports energy monitoring (HS110): `power > inUseThreshold`. `inUseThreshold` is specified in Watts
+If device supports energy monitoring (e.g. HS110): `power > inUseThreshold`. `inUseThreshold` is specified in Watts
 
-Otherwise fallback on relay state:  `relay_state === 1`
+Otherwise fallback on relay state: `relay_state === 1` or `sys_info.children[childId].state === 1`.
+
+Supports childId.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Plug+relayState"></a>
 
 ### plug.relayState ⇒ <code>boolean</code>
-`sys_info.relay_state === 1`
+`sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
-<a name="Device+alias"></a>
-
-### plug.alias ⇒ <code>string</code>
-Cached value of `sys_info.alias`.
-
-**Kind**: instance property of [<code>Plug</code>](#Plug)  
+**Returns**: <code>boolean</code> - On (true) or Off (false)  
 <a name="Device+deviceId"></a>
 
 ### plug.deviceId ⇒ <code>string</code>
@@ -2103,6 +2171,8 @@ Requests common Plug status details in a single request.
 - `emeter.get_realtime`
 - `schedule.get_next_action`
 
+Supports childId.
+
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, Error&gt;</code> - parsed JSON response  
 
@@ -2113,7 +2183,7 @@ Requests common Plug status details in a single request.
 <a name="Plug+getInUse"></a>
 
 ### plug.getInUse([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-Same as [#inUse](#inUse), but requests current `emeter.get_realtime`.
+Same as [#inUse](#inUse), but requests current `emeter.get_realtime`. Supports childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 
@@ -2126,7 +2196,7 @@ Same as [#inUse](#inUse), but requests current `emeter.get_realtime`.
 ### plug.getLedState([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Get Plug LED state (night mode).
 
-Requests `system.sys_info` and returns true if `led_off === 0`.
+Requests `system.sys_info` and returns true if `led_off === 0`. Does not support childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;boolean, ResponseError&gt;</code> - LED State, true === on  
@@ -2138,7 +2208,7 @@ Requests `system.sys_info` and returns true if `led_off === 0`.
 <a name="Plug+setLedState"></a>
 
 ### plug.setLedState(value, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-Turn Plug LED on/off (night mode).
+Turn Plug LED on/off (night mode). Does not support childId.
 
 Sends `system.set_led_off` command.
 
@@ -2154,7 +2224,7 @@ Sends `system.set_led_off` command.
 ### plug.getPowerState([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Get Plug relay state (on/off).
 
-Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
+Requests `system.get_sysinfo` and returns true if On. Calls [#relayState](#relayState). Supports childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 
@@ -2167,7 +2237,7 @@ Requests `system.get_sysinfo` and returns true if `relay_state === 1`.
 ### plug.setPowerState(value, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Turns Plug relay on/off.
 
-Sends `system.set_relay_state` command.
+Sends `system.set_relay_state` command. Supports childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 
@@ -2181,7 +2251,7 @@ Sends `system.set_relay_state` command.
 ### plug.togglePowerState([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Toggles Plug relay state.
 
-Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and return the new power state`.
+Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and returns the new power state`. Supports childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 
@@ -2195,7 +2265,7 @@ Requests `system.get_sysinfo` sets the power state to the opposite `relay_state 
 Blink Plug LED.
 
 Sends `system.set_led_off` command alternating on and off number of `times` at `rate`,
-then sets the led to its pre-blink state.
+then sets the led to its pre-blink state. Does not support childId.
 
 Note: `system.set_led_off` is particulally slow, so blink rate is not guaranteed.
 
@@ -2222,10 +2292,14 @@ Sends `payload` to device (using [send](#Client+send))
 
 <a name="Device+sendCommand"></a>
 
-### plug.sendCommand(command, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### plug.sendCommand(command, [childIds], [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Sends command(s) to device.
 
 Calls [#send](#send) and processes the response.
+
+- Adds context.child_ids:[] to the command.
+  - If `childIds` parameter is set. _or_
+  - If device was instantiated with a childId it will default to that value.
 
 - If only one operation was sent:
   - Promise fulfills with specific parsed JSON response for command.\
@@ -2243,6 +2317,21 @@ Also, the response's `err_code`(s) are checked, if any are missing or != `0` the
 | Param | Type |
 | --- | --- |
 | command | <code>Object</code> \| <code>string</code> | 
+| [childIds] | <code>Array.&lt;string&gt;</code> \| <code>string</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Device+sendCommandWithChildren"></a>
+
+### plug.sendCommandWithChildren(command, [childIds], [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Adds context.child_ids:[] to the command and sends via [#sendCommand](#sendCommand).
+
+**Kind**: instance method of [<code>Plug</code>](#Plug)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type |
+| --- | --- |
+| command | <code>Object</code> \| <code>string</code> | 
+| [childIds] | <code>Array.&lt;string&gt;</code> \| <code>string</code> | 
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
 <a name="Device+startPolling"></a>
@@ -2271,7 +2360,7 @@ Stops device polling.
 ### plug.getSysInfo([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's SysInfo.
 
-Requests `system.sys_info` from device.
+Requests `system.sys_info` from device. Does not support childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -2285,7 +2374,7 @@ Requests `system.sys_info` from device.
 ### plug.setAlias(alias, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
 Change device's alias (name).
 
-Sends `system.set_dev_alias` command.
+Sends `system.set_dev_alias` command. Supports childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 
@@ -2299,7 +2388,7 @@ Sends `system.set_dev_alias` command.
 ### plug.setLocation(latitude, longitude, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Set device's location.
 
-Sends `system.set_dev_location` command.
+Sends `system.set_dev_location` command. Does not support childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -2315,7 +2404,7 @@ Sends `system.set_dev_location` command.
 ### plug.getModel([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Gets device's model.
 
-Requests `system.sys_info` and returns model name.
+Requests `system.sys_info` and returns model name. Does not support childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -2329,7 +2418,7 @@ Requests `system.sys_info` and returns model name.
 ### plug.reboot(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Reboot device.
 
-Sends `system.reboot` command.
+Sends `system.reboot` command. Does not support childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
@@ -2344,7 +2433,7 @@ Sends `system.reboot` command.
 ### plug.reset(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
 Reset device.
 
-Sends `system.reset` command.
+Sends `system.reset` command. Does not support childId.
 
 **Kind**: instance method of [<code>Plug</code>](#Plug)  
 **Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
