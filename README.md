@@ -2,7 +2,7 @@
 
 # tplink-smarthome-api
 
-[![NPM Version](https://img.shieldsio/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
+[![NPM Version](https://img.shields.io/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
 [![Build Status](https://travis-ci.org/plasticrake/tplink-smarthome-api.svg?branch=master)](https://travis-ci.org/plasticrake/tplink-smarthome-api)
 [![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
@@ -399,7 +399,8 @@ Discover TP-Link Smarthome devices on the network.
 - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until [#stopDiscovery](#stopDiscovery) is called).
   - If a device does not respond after `offlineTolerance` number of attempts, [event:Client#device-offline](event:Client#device-offline) is emitted.
 - If `deviceTypes` are specified only matching devices are found.
-- If `macAddresses` are specified only matching device with matching MAC addresses are found.
+- If `macAddresses` are specified only devices with matching MAC addresses are found.
+- If `excludeMacAddresses` are specified devices with matching MAC addresses are excluded.
 - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
   - `devices` are specified as an array of `[{host, [port: 9999]}]`.
 
@@ -418,6 +419,7 @@ Discover TP-Link Smarthome devices on the network.
 | [options.offlineTolerance] | <code>number</code> | <code>3</code> | # of consecutive missed replies to consider offline |
 | [options.deviceTypes] | <code>Array.&lt;string&gt;</code> |  | 'plug','bulb' |
 | [options.macAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive |
+| [options.excludeMacAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive |
 | [options.breakoutChildren] | <code>boolean</code> | <code>true</code> | if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device |
 | [options.deviceOptions] | <code>Object</code> | <code>{}</code> | passed to device constructors |
 | [options.devices] | <code>Array.&lt;Object&gt;</code> |  | known devices to query instead of relying on broadcast |

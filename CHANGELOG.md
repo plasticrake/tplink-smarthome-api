@@ -1,6 +1,15 @@
+<!-- markdownlint-disable MD026 -->
+
 # Change Log
 
 ## Unreleased
+
+### Changes :zap:
+
+- `Client`
+  - `excludedMacAddresses` parameter added to `startDiscovery`
+
+## 1.0.0 / 2019-01-02
 
 ### Changes :zap:
 - `Device`/`Bulb`/`Plug`

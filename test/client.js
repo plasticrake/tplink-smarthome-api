@@ -30,6 +30,19 @@ describe('Client', function () {
       });
     });
 
+    it('should emit device-new when finding a new device with `devices` specified', function (done) {
+      const mac = testDevices['anydevice'].mac;
+      const host = testDevices['anydevice'].deviceOptions.host;
+      expect(mac).to.be.a('string').and.not.empty;
+      expect(host).to.be.a('string').and.not.empty;
+
+      client.startDiscovery({ discoveryInterval: 250, devices: [{ host }] }).on('device-new', (device) => {
+        if (device.mac === mac) {
+          done();
+        }
+      });
+    });
+
     it('should emit device-new when finding a new device with a deviceType filter', function (done) {
       client.startDiscovery({ discoveryInterval: 250, deviceTypes: ['plug'] }).once('device-new', (device) => {
         expect(device).to.be.an.instanceof(Device);
@@ -63,6 +76,20 @@ describe('Client', function () {
       setTimeout(() => {
         expect(spy, `MAC:[${mac}] not found`).to.be.called;
         expect(spy).to.always.be.calledWithMatch({ mac: mac });
+        done();
+      }, 1000);
+    });
+
+    it('should NOT emit device-new for specified excludedMacAddresses', function (done) {
+      let spy = sinon.spy();
+      let mac = testDevices['anydevice'].mac;
+      expect(mac).to.be.a('string').and.not.empty;
+
+      client.startDiscovery({ discoveryInterval: 250, excludeMacAddresses: [mac] }).on('device-new', spy);
+
+      setTimeout(() => {
+        expect(spy).to.be.called;
+        expect(spy).to.not.be.calledWithMatch({ mac });
         done();
       }, 1000);
     });

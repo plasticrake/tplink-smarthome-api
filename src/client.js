@@ -408,7 +408,8 @@ class Client extends EventEmitter {
    * - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until {@link #stopDiscovery} is called).
    *   - If a device does not respond after `offlineTolerance` number of attempts, {@link event:Client#device-offline} is emitted.
    * - If `deviceTypes` are specified only matching devices are found.
-   * - If `macAddresses` are specified only matching device with matching MAC addresses are found.
+   * - If `macAddresses` are specified only devices with matching MAC addresses are found.
+   * - If `excludeMacAddresses` are specified devices with matching MAC addresses are excluded.
    * - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
    *   - `devices` are specified as an array of `[{host, [port: 9999]}]`.
    * @param  {Object}    options
@@ -420,6 +421,7 @@ class Client extends EventEmitter {
    * @param  {number}   [options.offlineTolerance=3]          # of consecutive missed replies to consider offline
    * @param  {string[]} [options.deviceTypes]                 'plug','bulb'
    * @param  {string[]} [options.macAddresses]                MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
+   * @param  {string[]} [options.excludeMacAddresses]         MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
    * @param  {boolean}  [options.breakoutChildren=true]       if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
    * @param  {Object}   [options.deviceOptions={}]            passed to device constructors
    * @param  {Object[]} [options.devices]                     known devices to query instead of relying on broadcast
@@ -444,6 +446,7 @@ class Client extends EventEmitter {
     offlineTolerance = 3,
     deviceTypes,
     macAddresses = [],
+    excludeMacAddresses = [],
     breakoutChildren = true,
     deviceOptions = {},
     devices
@@ -452,6 +455,7 @@ class Client extends EventEmitter {
 
     try {
       macAddresses = macAddresses.map((mac) => normalizeMac(mac));
+      excludeMacAddresses = excludeMacAddresses.map((mac) => normalizeMac(mac));
 
       this.socket = dgram.createSocket('udp4');
 
@@ -474,7 +478,7 @@ class Client extends EventEmitter {
         if (deviceTypes && deviceTypes.length > 0) {
           const deviceType = this.getTypeFromSysInfo(sysInfo);
           if (deviceTypes.indexOf(deviceType) === -1) {
-            this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} (${deviceType}), allowed device types: (%j)`, deviceTypes);
+            this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${deviceType}), allowed device types: (%j)`, deviceTypes);
             return;
           }
         }
@@ -482,7 +486,15 @@ class Client extends EventEmitter {
         if (macAddresses && macAddresses.length > 0) {
           const mac = normalizeMac(sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '');
           if (macAddresses.indexOf(mac) === -1) {
-            this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} (${mac}), allowed macs: (%j)`, macAddresses);
+            this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), allowed macs: (%j)`, macAddresses);
+            return;
+          }
+        }
+
+        if (excludeMacAddresses && excludeMacAddresses.length > 0) {
+          const mac = normalizeMac(sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '');
+          if (excludeMacAddresses.indexOf(mac) >= 0) {
+            this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`);
             return;
           }
         }
