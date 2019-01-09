@@ -8,6 +8,8 @@ const Device = require('../src/device');
 const Plug = require('../src/plug');
 const Bulb = require('../src/bulb');
 
+const { compareMac } = require('../src/utils');
+
 describe('Client', function () {
   this.timeout(5000);
   this.slow(2000);
@@ -38,6 +40,7 @@ describe('Client', function () {
 
       client.startDiscovery({ discoveryInterval: 250, devices: [{ host }] }).on('device-new', (device) => {
         if (device.mac === mac) {
+          client.stopDiscovery();
           done();
         }
       });
@@ -83,15 +86,53 @@ describe('Client', function () {
     it('should NOT emit device-new for specified excludedMacAddresses', function (done) {
       let spy = sinon.spy();
       let mac = testDevices['anydevice'].mac;
-      expect(mac).to.be.a('string').and.not.empty;
+      expect(mac, 'mac blank').to.be.a('string').and.not.empty;
 
       client.startDiscovery({ discoveryInterval: 250, excludeMacAddresses: [mac] }).on('device-new', spy);
 
       setTimeout(() => {
+        client.stopDiscovery();
         expect(spy).to.be.called;
         expect(spy).to.not.be.calledWithMatch({ mac });
         done();
       }, 1000);
+    });
+
+    it('should NOT emit device-new for devices not meeting filterCallback', function (done) {
+      let spy = sinon.spy();
+      let mac = testDevices['anydevice'].mac;
+      expect(mac, 'mac blank').to.be.a('string').and.not.empty;
+
+      client.startDiscovery({ discoveryInterval: 250,
+        filterCallback: (sysInfo) => {
+          return !compareMac(sysInfo.mac, mac);
+        } }).on('device-new', spy);
+
+      setTimeout(() => {
+        client.stopDiscovery();
+        expect(spy).to.be.called;
+        expect(spy).to.not.be.calledWithMatch({ mac });
+        done();
+      }, 1000);
+    });
+
+    it('should NOT emit device-new for devices not meeting filterCallback -- all devices', function (done) {
+      let spy = sinon.spy();
+
+      client.startDiscovery({ discoveryInterval: 250, filterCallback: () => false }).on('device-new', spy);
+
+      setTimeout(() => {
+        client.stopDiscovery();
+        expect(spy).to.not.be.called;
+        done();
+      }, 1000);
+    });
+
+    it('should emit device-new for devices meeting filterCallback -- all devices', function (done) {
+      client.startDiscovery({ discoveryInterval: 250, filterCallback: () => true }).on('device-new', () => {
+        client.stopDiscovery();
+        done();
+      });
     });
 
     let events = ['new', 'online', 'offline'];

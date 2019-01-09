@@ -8,6 +8,7 @@
 
 - `Client`
   - `excludedMacAddresses` parameter added to `startDiscovery`
+  - `filterCallback` parameter added to `startDiscovery`
 
 ## 1.0.0 / 2019-01-02
 

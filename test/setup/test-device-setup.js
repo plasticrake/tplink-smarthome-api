@@ -120,20 +120,20 @@ let simulatedUdpServer;
 async function getSimulatedTestDevices () {
   let client = getTestClient();
 
-  simulatedDevices.push({ device: new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'hs105', data: { alias: 'Mock’s “HS105”' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'hs110', data: { alias: 'Mock😽 HS110' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'hs110v2', data: { alias: 'Mock HS110v2' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'hs200', data: { alias: 'Mock HS200' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'hs220', data: { alias: 'Mock HS220' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'hs300', data: { alias: 'Mock HS300' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'lb100', data: { alias: 'Mock LB100' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'lb120', data: { alias: 'Mock LB120' } }) });
-  simulatedDevices.push({ device: new simulator.Device({ model: 'lb130', data: { alias: 'Mock LB130' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100', mac: 'aa:aa:aa:00:00:01' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs105', data: { alias: 'Mock’s “HS105”', mac: 'aa:aa:aa:00:00:02' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs110', data: { alias: 'Mock😽 HS110', mac: 'aa:aa:aa:00:00:03' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs110v2', data: { alias: 'Mock HS110v2', mac: 'aa:aa:aa:00:00:04' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs200', data: { alias: 'Mock HS200', mac: 'aa:aa:aa:00:00:05' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs220', data: { alias: 'Mock HS220', mac: 'aa:aa:aa:00:00:06' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'hs300', data: { alias: 'Mock HS300', mac: 'aa:aa:aa:00:00:07' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'lb100', data: { alias: 'Mock LB100', mac: 'aa:aa:aa:00:00:08' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'lb120', data: { alias: 'Mock LB120', mac: 'aa:aa:aa:00:00:09' } }) });
+  simulatedDevices.push({ device: new simulator.Device({ model: 'lb130', data: { alias: 'Mock LB130', mac: 'aa:aa:aa:00:00:10' } }) });
 
   simulatedDevices.push({
     testType: 'unreliable',
-    device: new simulator.Device({ model: 'hs100', unreliablePercent: 1, data: { alias: 'Mock Unreliable 100%' } })
+    device: new simulator.Device({ model: 'hs100', unreliablePercent: 1, data: { alias: 'Mock Unreliable 100%', mac: 'aa:aa:aa:00:00:99' } })
   });
 
   let simulatedTestDevices = [];

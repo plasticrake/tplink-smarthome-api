@@ -21,6 +21,7 @@ class ResponseError extends Error {
 function isDate (val) {
   return val instanceof Date;
 }
+
 function isNumber (val) {
   return typeof val === 'number';
 }
@@ -80,7 +81,20 @@ function createScheduleRule ({ start, end = null, daysOfWeek = null }) {
   return sched;
 }
 
+function normalizeMac (mac = '') {
+  return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+}
+
+function compareMac (mac = '', macPattern = '') {
+  let re = new RegExp(
+    macPattern.replace(/[^A-Za-z0-9*]/g, '').replace(/[*]/g, '.').toUpperCase()
+  );
+  return re.test(normalizeMac(mac));
+}
+
 module.exports = {
   ResponseError,
-  createScheduleRule
+  compareMac,
+  createScheduleRule,
+  normalizeMac
 };

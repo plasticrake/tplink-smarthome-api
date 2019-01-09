@@ -8,6 +8,7 @@ const { encrypt, encryptWithHeader, decrypt } = require('tplink-smarthome-crypto
 const Device = require('./device');
 const Plug = require('./plug');
 const Bulb = require('./bulb');
+const { normalizeMac } = require('./utils');
 
 const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 let maxSocketId = 0;
@@ -410,6 +411,7 @@ class Client extends EventEmitter {
    * - If `deviceTypes` are specified only matching devices are found.
    * - If `macAddresses` are specified only devices with matching MAC addresses are found.
    * - If `excludeMacAddresses` are specified devices with matching MAC addresses are excluded.
+   * - if `filterCallback` is specified only devices where the callback returns a truthy value are found.
    * - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
    *   - `devices` are specified as an array of `[{host, [port: 9999]}]`.
    * @param  {Object}    options
@@ -422,6 +424,7 @@ class Client extends EventEmitter {
    * @param  {string[]} [options.deviceTypes]                 'plug','bulb'
    * @param  {string[]} [options.macAddresses]                MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
    * @param  {string[]} [options.excludeMacAddresses]         MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
+   * @param  {function} [options.filterCallback]              called with fn(sysInfo), return truthy value to include device
    * @param  {boolean}  [options.breakoutChildren=true]       if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
    * @param  {Object}   [options.deviceOptions={}]            passed to device constructors
    * @param  {Object[]} [options.devices]                     known devices to query instead of relying on broadcast
@@ -447,6 +450,7 @@ class Client extends EventEmitter {
     deviceTypes,
     macAddresses = [],
     excludeMacAddresses = [],
+    filterCallback,
     breakoutChildren = true,
     deviceOptions = {},
     devices
@@ -495,6 +499,13 @@ class Client extends EventEmitter {
           const mac = normalizeMac(sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '');
           if (excludeMacAddresses.indexOf(mac) >= 0) {
             this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`);
+            return;
+          }
+        }
+
+        if (typeof filterCallback === 'function') {
+          if (!filterCallback(sysInfo)) {
+            this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}], callback`);
             return;
           }
         }
@@ -621,10 +632,6 @@ class Client extends EventEmitter {
 
     return this;
   }
-}
-
-function normalizeMac (mac = '') {
-  return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 }
 
 module.exports = Client;
