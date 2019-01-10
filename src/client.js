@@ -8,7 +8,7 @@ const { encrypt, encryptWithHeader, decrypt } = require('tplink-smarthome-crypto
 const Device = require('./device');
 const Plug = require('./plug');
 const Bulb = require('./bulb');
-const { normalizeMac } = require('./utils');
+const { compareMac } = require('./utils');
 
 const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 let maxSocketId = 0;
@@ -422,8 +422,8 @@ class Client extends EventEmitter {
    * @param  {number}   [options.discoveryTimeout=0]          (ms)
    * @param  {number}   [options.offlineTolerance=3]          # of consecutive missed replies to consider offline
    * @param  {string[]} [options.deviceTypes]                 'plug','bulb'
-   * @param  {string[]} [options.macAddresses]                MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
-   * @param  {string[]} [options.excludeMacAddresses]         MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive
+   * @param  {string[]} [options.macAddresses]                MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported
+   * @param  {string[]} [options.excludeMacAddresses]         MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported
    * @param  {function} [options.filterCallback]              called with fn(sysInfo), return truthy value to include device
    * @param  {boolean}  [options.breakoutChildren=true]       if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
    * @param  {Object}   [options.deviceOptions={}]            passed to device constructors
@@ -458,9 +458,6 @@ class Client extends EventEmitter {
     this.log.debug('client.startDiscovery(%j)', arguments[0]);
 
     try {
-      macAddresses = macAddresses.map((mac) => normalizeMac(mac));
-      excludeMacAddresses = excludeMacAddresses.map((mac) => normalizeMac(mac));
-
       this.socket = dgram.createSocket('udp4');
 
       this.socket.on('message', (msg, rinfo) => {
@@ -488,16 +485,16 @@ class Client extends EventEmitter {
         }
 
         if (macAddresses && macAddresses.length > 0) {
-          const mac = normalizeMac(sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '');
-          if (macAddresses.indexOf(mac) === -1) {
+          const mac = sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '';
+          if (!compareMac(mac, macAddresses)) {
             this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), allowed macs: (%j)`, macAddresses);
             return;
           }
         }
 
         if (excludeMacAddresses && excludeMacAddresses.length > 0) {
-          const mac = normalizeMac(sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '');
-          if (excludeMacAddresses.indexOf(mac) >= 0) {
+          const mac = sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '';
+          if (compareMac(mac, excludeMacAddresses)) {
             this.log.debug(`client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`);
             return;
           }

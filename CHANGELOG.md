@@ -9,6 +9,7 @@
 - `Client`
   - `excludedMacAddresses` parameter added to `startDiscovery`
   - `filterCallback` parameter added to `startDiscovery`
+  - `startDiscovery` parameters `macAddresses` and `excludedMacAddress` now support GLOB style patterns with `?` and `*`
 
 ## 1.0.0 / 2019-01-02
 

@@ -4,16 +4,80 @@
 
 const { expect } = require('./setup');
 
-const { createScheduleRule } = require('../src/utils');
+const { compareMac, createScheduleRule } = require('../src/utils');
 
-let today = new Date();
-let todayYear = today.getFullYear();
-let todayMonth = today.getMonth() + 1;
-let todayDay = today.getDate();
-let todayWday = [ false, false, false, false, false, false, false ];
+const compareMacTests = [
+  {
+    mac: '',
+    pattern: '',
+    expected: true
+  }, {
+    mac: 'aabbcc001122',
+    pattern: '',
+    expected: false
+  }, {
+    mac: '',
+    pattern: 'aabbcc001122',
+    expected: false
+  }, {
+    mac: 'aabbcc001122',
+    pattern: 'aabbcc001122',
+    expected: true
+  }, {
+    mac: 'AA:bbcc001122',
+    pattern: 'aaBB:cc:??:??:??',
+    expected: true
+  }, {
+    mac: 'aabbcc001122',
+    pattern: '001122aabbcc',
+    expected: false
+  }, {
+    mac: 'aabbcc001122',
+    pattern: '????????????',
+    expected: true
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: 'b*:??:??:??:??:??',
+    expected: false
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: '??:??:??:??:??:*2',
+    expected: true
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: '*2',
+    expected: true
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: 'a*',
+    expected: true
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: '*0',
+    expected: false
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: 'b*',
+    expected: false
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: ['b', 'c', 'aa:bb:cc:00:11:22'],
+    expected: true
+  }, {
+    mac: 'aa:bb:cc:00:11:22',
+    pattern: ['b', 'c', 'd'],
+    expected: false
+  }
+];
+
+const today = new Date();
+const todayYear = today.getFullYear();
+const todayMonth = today.getMonth() + 1;
+const todayDay = today.getDate();
+const todayWday = [ false, false, false, false, false, false, false ];
 todayWday[today.getDay()] = true;
 
-let tests = [
+const scheduleTests = [
   {
     name: 'start as Date',
     args: { start: new Date(2017, 9, 14, 20, 4, 40) },
@@ -135,10 +199,20 @@ let tests = [
 describe('Utils', function () {
   this.timeout(1000);
   this.slow(500);
+
+  describe('.compareMac()', function () {
+    compareMacTests.forEach(function (test, i) {
+      it(`should return ${test.expected} for test ${i + 1}`, function () {
+        const result = compareMac(test.mac, test.pattern);
+        expect(result).to.eql(test.expected);
+      });
+    });
+  });
+
   describe('.createScheduleRule()', function () {
-    tests.forEach(function (test) {
+    scheduleTests.forEach(function (test) {
       it(`should accept ${test.name}`, function () {
-        let sched = createScheduleRule(test.args);
+        const sched = createScheduleRule(test.args);
         expect(sched).to.eql(test.expected);
       });
     });
