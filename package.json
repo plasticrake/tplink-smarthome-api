@@ -72,6 +72,7 @@
   },
   "scripts": {
     "preversion": "npm test",
+    "version": "npm run build && npm run docs && git add -A README.md API.md",
     "postversion": "git push && git push --tags",
     "test": "semistandard && cross-env NODE_ENV=test nyc mocha && bats test",
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
