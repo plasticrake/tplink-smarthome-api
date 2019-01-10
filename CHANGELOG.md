@@ -2,7 +2,7 @@
 
 # Change Log
 
-## Unreleased
+## 1.1.0 / 2019-01-10
 
 ### Changes :zap:
 
