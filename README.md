@@ -13,10 +13,10 @@ TP-Link Smart Home API
 
 ## Supported Devices
 
-| Model                                    | Type |
-|------------------------------------------|------|
-| HS100, HS105, HS107, HS110, HS200, HS300 | Plug |
-| LB100, LB110, LB120, LB130, LB200, LB230 | Bulb |
+| Model                                           | Type |
+|-------------------------------------------------|------|
+| HS100, HS105, HS107, HS110, HS200, HS220, HS300 | Plug |
+| LB100, LB110, LB120, LB130, LB200, LB230        | Bulb |
 
 ## Related Projects
 
@@ -401,6 +401,7 @@ Discover TP-Link Smarthome devices on the network.
 - If `deviceTypes` are specified only matching devices are found.
 - If `macAddresses` are specified only devices with matching MAC addresses are found.
 - If `excludeMacAddresses` are specified devices with matching MAC addresses are excluded.
+- if `filterCallback` is specified only devices where the callback returns a truthy value are found.
 - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
   - `devices` are specified as an array of `[{host, [port: 9999]}]`.
 
@@ -418,8 +419,9 @@ Discover TP-Link Smarthome devices on the network.
 | [options.discoveryTimeout] | <code>number</code> | <code>0</code> | (ms) |
 | [options.offlineTolerance] | <code>number</code> | <code>3</code> | # of consecutive missed replies to consider offline |
 | [options.deviceTypes] | <code>Array.&lt;string&gt;</code> |  | 'plug','bulb' |
-| [options.macAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive |
-| [options.excludeMacAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive |
+| [options.macAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported |
+| [options.excludeMacAddresses] | <code>Array.&lt;string&gt;</code> |  | MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported |
+| [options.filterCallback] | <code>function</code> |  | called with fn(sysInfo), return truthy value to include device |
 | [options.breakoutChildren] | <code>boolean</code> | <code>true</code> | if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device |
 | [options.deviceOptions] | <code>Object</code> | <code>{}</code> | passed to device constructors |
 | [options.devices] | <code>Array.&lt;Object&gt;</code> |  | known devices to query instead of relying on broadcast |
