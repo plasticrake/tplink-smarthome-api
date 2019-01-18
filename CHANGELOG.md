@@ -2,6 +2,28 @@
 
 # Change Log
 
+## Unreleased
+
+### Added :heavy_plus_sign:
+
+- `Plug`
+  - add `supportsDimmer` property, returns true if dimmable plug (HS220)
+  - add `dimmer` functions
+    - `dimmer.setBrightness`
+    - `dimmer.getDefaultBehavior`
+    - `dimmer.getDimmerParameters`
+    - `dimmer.setDimmerTransition`
+    - `dimmer.setDoubleClickAction`
+    - `dimmer.setFadeOffTime`
+    - `dimmer.setFadeOnTime`
+    - `dimmer.setGentleOffTime`
+    - `dimmer.setGentleOnTime`
+    - `dimmer.setLongPressAction`
+    - `dimmer.setSwitchState`
+  - `schedule`
+    - add `dimmer` parameter to `addRule`
+    - add `dimmer` parameter to `editRule`
+
 ## 1.1.0 / 2019-01-10
 
 ### Changes :zap:

@@ -3,6 +3,7 @@
 const Device = require('../device');
 const Away = require('./away');
 const Cloud = require('../shared/cloud');
+const Dimmer = require('./dimmer');
 const Emeter = require('../shared/emeter');
 const Schedule = require('./schedule');
 const Timer = require('./timer');
@@ -12,7 +13,7 @@ const { ResponseError } = require('../utils');
 /**
  * Plug Device.
  *
- * TP-Link models: HS100, HS105, HS107, HS110, HS200, HS220, HS300.
+ * TP-Link models: HS100, HS105, HS107, HS110, HS200, HS210, HS220, HS300.
  *
  * Models with multiple outlets (HS107, HS300) will have a children property.
  * If Plug is instantiated with a childId it will control the outlet associated with that childId.
@@ -77,6 +78,20 @@ class Plug extends Device {
      * @borrows Cloud#setServerUrl as Plug.cloud#setServerUrl
      */
     this.cloud = new Cloud(this, 'cnCloud');
+    /**
+     * @borrows Dimmer#setBrightness as Plug.dimmer#setBrightness
+     * @borrows Dimmer#getDefaultBehavior as Plug.dimmer#getDefaultBehavior
+     * @borrows Dimmer#getDimmerParameters as Plug.dimmer#getDimmerParameters
+     * @borrows Dimmer#setDimmerTransition as Plug.dimmer#setDimmerTransition
+     * @borrows Dimmer#setDoubleClickAction as Plug.dimmer#setDoubleClickAction
+     * @borrows Dimmer#setFadeOffTime as Plug.dimmer#setFadeOffTime
+     * @borrows Dimmer#setFadeOnTime as Plug.dimmer#setFadeOnTime
+     * @borrows Dimmer#setGentleOffTime as Plug.dimmer#setGentleOffTime
+     * @borrows Dimmer#setGentleOnTime as Plug.dimmer#setGentleOnTime
+     * @borrows Dimmer#setLongPressAction as Plug.dimmer#setLongPressAction
+     * @borrows Dimmer#setSwitchState as Plug.dimmer#setSwitchState
+     */
+    this.dimmer = new Dimmer(this, 'smartlife.iot.dimmer');
     /**
      * @borrows Emeter#realtime as Plug.emeter#realtime
      * @borrows Emeter#getRealtime as Plug.emeter#getRealtime
@@ -220,7 +235,7 @@ class Plug extends Device {
     return this.relayState;
   }
   /**
-   * `sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
+   * Cached value of `sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
    * @return {boolean} On (true) or Off (false)
    */
   get relayState () {
@@ -238,6 +253,13 @@ class Plug extends Device {
       return;
     }
     this.sysInfo.relay_state = (relayState ? 1 : 0);
+  }
+  /**
+   * Cached value of `sys_info.brightness != null`
+   * @return {boolean}
+   */
+  get supportsDimmer () {
+    return (this.sysInfo.brightness != null);
   }
   /**
    * Requests common Plug status details in a single request.
