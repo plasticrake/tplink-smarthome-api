@@ -35,9 +35,13 @@
 <dt><a href="#Away">Away</a></dt>
 <dd><p>Away</p>
 </dd>
+<dt><a href="#Dimmer">Dimmer</a></dt>
+<dd><p>Dimmer</p>
+<p>TP-Link models: HS220.</p>
+</dd>
 <dt><a href="#Plug">Plug</a> ⇐ <code><a href="#Device">Device</a></code></dt>
 <dd><p>Plug Device.</p>
-<p>TP-Link models: HS100, HS105, HS107, HS110, HS200, HS220, HS300.</p>
+<p>TP-Link models: HS100, HS105, HS107, HS110, HS200, HS210, HS220, HS300.</p>
 <p>Models with multiple outlets (HS107, HS300) will have a children property.
 If Plug is instantiated with a childId it will control the outlet associated with that childId.
 Some functions only apply to the entire device, and are noted below.</p>
@@ -1924,12 +1928,200 @@ Sends `anti_theft.set_overall_enable` command. Support childId.
 | enable | <code>boolean</code> | 
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
 
+<a name="Dimmer"></a>
+
+## Dimmer
+Dimmer
+
+TP-Link models: HS220.
+
+**Kind**: global class  
+
+* [Dimmer](#Dimmer)
+    * [.setBrightness(brightness, [sendOptions])](#Dimmer+setBrightness) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDefaultBehavior([sendOptions])](#Dimmer+getDefaultBehavior) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.getDimmerParameters([sendOptions])](#Dimmer+getDimmerParameters) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.setDimmerTransition(options, [sendOptions])](#Dimmer+setDimmerTransition) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setDoubleClickAction(options, [sendOptions])](#Dimmer+setDoubleClickAction) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.setFadeOffTime(duration, [sendOptions])](#Dimmer+setFadeOffTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setFadeOnTime(fadeTime, [sendOptions])](#Dimmer+setFadeOnTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setGentleOffTime(fadeTime, [sendOptions])](#Dimmer+setGentleOffTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setGentleOnTime(fadeTime, [sendOptions])](#Dimmer+setGentleOnTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setLongPressAction(options, [sendOptions])](#Dimmer+setLongPressAction) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.setSwitchState(state, [sendOptions])](#Dimmer+setSwitchState) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+
+<a name="Dimmer+setBrightness"></a>
+
+### dimmer.setBrightness(brightness, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Sets Plug to the specified `brightness`.
+
+Sends `dimmer.set_brightness` command. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| brightness | <code>Boolean</code> | 0-100 |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Dimmer+getDefaultBehavior"></a>
+
+### dimmer.getDefaultBehavior([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Get Plug/Dimmer default behavior configuration.
+
+Requests `dimmer.get_default_behavior`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Dimmer+getDimmerParameters"></a>
+
+### dimmer.getDimmerParameters([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Get Plug/Dimmer parameters configuration.
+
+Requests `dimmer.get_dimmer_parameters`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Dimmer+setDimmerTransition"></a>
+
+### dimmer.setDimmerTransition(options, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Transitions Plug to the specified `brightness`.
+
+Sends `dimmer.set_dimmer_transition` command. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> |  |
+| [options.brightness] | <code>Boolean</code> | 0-100 |
+| [options.mode] | <code>number</code> | "gentle_on_off", etc. |
+| [options.duration] | <code>number</code> | duration in seconds |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Dimmer+setDoubleClickAction"></a>
+
+### dimmer.setDoubleClickAction(options, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Set Plug/Dimmer `default_behavior` configuration for `double_click`.
+
+Sends `dimmer.set_double_click_action`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+
+| Param | Type |
+| --- | --- |
+| options | <code>Object</code> | 
+| [options.mode] | <code>string</code> | 
+| [options.index] | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Dimmer+setFadeOffTime"></a>
+
+### dimmer.setFadeOffTime(duration, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `fadeOffTime`.
+
+Sends `dimmer.set_fade_off_time`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| duration | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Dimmer+setFadeOnTime"></a>
+
+### dimmer.setFadeOnTime(fadeTime, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `fadeOnTime`.
+
+Sends `dimmer.set_fade_on_time`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fadeTime | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Dimmer+setGentleOffTime"></a>
+
+### dimmer.setGentleOffTime(fadeTime, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `gentleOffTime`.
+
+Sends `dimmer.set_gentle_off_time`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fadeTime | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Dimmer+setGentleOnTime"></a>
+
+### dimmer.setGentleOnTime(fadeTime, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `gentleOnTime`.
+
+Sends `dimmer.set_gentle_on_time`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fadeTime | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Dimmer+setLongPressAction"></a>
+
+### dimmer.setLongPressAction(options, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Set Plug/Dimmer `default_behavior` configuration for `long_press`.
+
+Sends `dimmer.set_long_press_action`. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+
+| Param | Type |
+| --- | --- |
+| options | <code>Object</code> | 
+| [options.mode] | <code>string</code> | 
+| [options.index] | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Dimmer+setSwitchState"></a>
+
+### dimmer.setSwitchState(state, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Sets Plug to the specified on/off state.
+
+Sends `dimmer.set_switch_state` command. Does not support childId.
+
+**Kind**: instance method of [<code>Dimmer</code>](#Dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| state | <code>Boolean</code> | true=on, false=off |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
 <a name="Plug"></a>
 
 ## Plug ⇐ [<code>Device</code>](#Device)
 Plug Device.
 
-TP-Link models: HS100, HS105, HS107, HS110, HS200, HS220, HS300.
+TP-Link models: HS100, HS105, HS107, HS110, HS200, HS210, HS220, HS300.
 
 Models with multiple outlets (HS107, HS300) will have a children property.
 If Plug is instantiated with a childId it will control the outlet associated with that childId.
@@ -1956,6 +2148,18 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
         * [.unbind([sendOptions])](#Plug+cloud+unbind) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.getFirmwareList([sendOptions])](#Plug+cloud+getFirmwareList) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
         * [.setServerUrl(server, [sendOptions])](#Plug+cloud+setServerUrl) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.dimmer](#Plug+dimmer)
+        * [.setBrightness(brightness, [sendOptions])](#Plug+dimmer+setBrightness) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.getDefaultBehavior([sendOptions])](#Plug+dimmer+getDefaultBehavior) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+        * [.getDimmerParameters([sendOptions])](#Plug+dimmer+getDimmerParameters) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+        * [.setDimmerTransition(options, [sendOptions])](#Plug+dimmer+setDimmerTransition) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setDoubleClickAction(options, [sendOptions])](#Plug+dimmer+setDoubleClickAction) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+        * [.setFadeOffTime(duration, [sendOptions])](#Plug+dimmer+setFadeOffTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setFadeOnTime(fadeTime, [sendOptions])](#Plug+dimmer+setFadeOnTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setGentleOffTime(fadeTime, [sendOptions])](#Plug+dimmer+setGentleOffTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setGentleOnTime(fadeTime, [sendOptions])](#Plug+dimmer+setGentleOnTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+        * [.setLongPressAction(options, [sendOptions])](#Plug+dimmer+setLongPressAction) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+        * [.setSwitchState(state, [sendOptions])](#Plug+dimmer+setSwitchState) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
     * [.emeter](#Plug+emeter)
         * [.realtime](#Plug+emeter+realtime) ⇒ <code>Object</code>
         * [.getRealtime([sendOptions])](#Plug+emeter+getRealtime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
@@ -1989,6 +2193,7 @@ Emits events after device status is queried, such as [#getSysInfo](#getSysInfo) 
     * [.id](#Plug+id) ⇒ <code>string</code>
     * [.inUse](#Plug+inUse) ⇒ <code>boolean</code>
     * [.relayState](#Plug+relayState) ⇒ <code>boolean</code>
+    * [.supportsDimmer](#Plug+supportsDimmer) ⇒ <code>boolean</code>
     * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
     * [.description](#Device+description) ⇒ <code>string</code>
     * [.model](#Device+model) ⇒ <code>string</code>
@@ -2239,6 +2444,190 @@ Sends `cloud.set_server_url` command. Does not support childId.
 | server | <code>string</code> | URL |
 | [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
 
+<a name="Plug+dimmer"></a>
+
+### plug.dimmer
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
+
+* [.dimmer](#Plug+dimmer)
+    * [.setBrightness(brightness, [sendOptions])](#Plug+dimmer+setBrightness) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.getDefaultBehavior([sendOptions])](#Plug+dimmer+getDefaultBehavior) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.getDimmerParameters([sendOptions])](#Plug+dimmer+getDimmerParameters) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.setDimmerTransition(options, [sendOptions])](#Plug+dimmer+setDimmerTransition) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setDoubleClickAction(options, [sendOptions])](#Plug+dimmer+setDoubleClickAction) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.setFadeOffTime(duration, [sendOptions])](#Plug+dimmer+setFadeOffTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setFadeOnTime(fadeTime, [sendOptions])](#Plug+dimmer+setFadeOnTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setGentleOffTime(fadeTime, [sendOptions])](#Plug+dimmer+setGentleOffTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setGentleOnTime(fadeTime, [sendOptions])](#Plug+dimmer+setGentleOnTime) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+    * [.setLongPressAction(options, [sendOptions])](#Plug+dimmer+setLongPressAction) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+    * [.setSwitchState(state, [sendOptions])](#Plug+dimmer+setSwitchState) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+
+<a name="Plug+dimmer+setBrightness"></a>
+
+#### dimmer.setBrightness(brightness, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Sets Plug to the specified `brightness`.
+
+Sends `dimmer.set_brightness` command. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| brightness | <code>Boolean</code> | 0-100 |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Plug+dimmer+getDefaultBehavior"></a>
+
+#### dimmer.getDefaultBehavior([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Get Plug/Dimmer default behavior configuration.
+
+Requests `dimmer.get_default_behavior`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+dimmer+getDimmerParameters"></a>
+
+#### dimmer.getDimmerParameters([sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Get Plug/Dimmer parameters configuration.
+
+Requests `dimmer.get_dimmer_parameters`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+
+| Param | Type |
+| --- | --- |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+dimmer+setDimmerTransition"></a>
+
+#### dimmer.setDimmerTransition(options, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Transitions Plug to the specified `brightness`.
+
+Sends `dimmer.set_dimmer_transition` command. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> |  |
+| [options.brightness] | <code>Boolean</code> | 0-100 |
+| [options.mode] | <code>number</code> | "gentle_on_off", etc. |
+| [options.duration] | <code>number</code> | duration in seconds |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Plug+dimmer+setDoubleClickAction"></a>
+
+#### dimmer.setDoubleClickAction(options, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Set Plug/Dimmer `default_behavior` configuration for `double_click`.
+
+Sends `dimmer.set_double_click_action`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+
+| Param | Type |
+| --- | --- |
+| options | <code>Object</code> | 
+| [options.mode] | <code>string</code> | 
+| [options.index] | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+dimmer+setFadeOffTime"></a>
+
+#### dimmer.setFadeOffTime(duration, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `fadeOffTime`.
+
+Sends `dimmer.set_fade_off_time`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| duration | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Plug+dimmer+setFadeOnTime"></a>
+
+#### dimmer.setFadeOnTime(fadeTime, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `fadeOnTime`.
+
+Sends `dimmer.set_fade_on_time`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fadeTime | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Plug+dimmer+setGentleOffTime"></a>
+
+#### dimmer.setGentleOffTime(fadeTime, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `gentleOffTime`.
+
+Sends `dimmer.set_gentle_off_time`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fadeTime | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Plug+dimmer+setGentleOnTime"></a>
+
+#### dimmer.setGentleOnTime(fadeTime, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Set Plug `dimmer_parameters` for `gentleOnTime`.
+
+Sends `dimmer.set_gentle_on_time`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fadeTime | <code>number</code> | duration in ms |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
+<a name="Plug+dimmer+setLongPressAction"></a>
+
+#### dimmer.setLongPressAction(options, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+Set Plug/Dimmer `default_behavior` configuration for `long_press`.
+
+Sends `dimmer.set_long_press_action`. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+
+| Param | Type |
+| --- | --- |
+| options | <code>Object</code> | 
+| [options.mode] | <code>string</code> | 
+| [options.index] | <code>number</code> | 
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) | 
+
+<a name="Plug+dimmer+setSwitchState"></a>
+
+#### dimmer.setSwitchState(state, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+Sets Plug to the specified on/off state.
+
+Sends `dimmer.set_switch_state` command. Does not support childId.
+
+**Kind**: instance method of [<code>dimmer</code>](#Plug+dimmer)  
+**Returns**: <code>Promise.&lt;Object, ResponseError&gt;</code> - parsed JSON response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| state | <code>Boolean</code> | true=on, false=off |
+| [sendOptions] | [<code>SendOptions</code>](#SendOptions) |  |
+
 <a name="Plug+emeter"></a>
 
 ### plug.emeter
@@ -2393,7 +2782,8 @@ Sends `schedule.add_rule` command and returns rule id.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
-| options.powerState | <code>boolean</code> |  |  |
+| [options.powerState] | <code>boolean</code> |  |  |
+| [options.dimmer] | <code>Object</code> |  | dimmer data (dimmable plugs only) |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  |  |
@@ -2414,7 +2804,8 @@ Sends `schedule.edit_rule` command and returns rule id.
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
 | options.id | <code>string</code> |  |  |
-| options.powerState | <code>boolean</code> |  |  |
+| [options.powerState] | <code>boolean</code> |  |  |
+| [options.dimmer] | <code>Object</code> |  | dimmer data (dimmable plugs only) |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  | [description] |
@@ -2678,10 +3069,16 @@ Supports childId.
 <a name="Plug+relayState"></a>
 
 ### plug.relayState ⇒ <code>boolean</code>
-`sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
+Cached value of `sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
 
 **Kind**: instance property of [<code>Plug</code>](#Plug)  
 **Returns**: <code>boolean</code> - On (true) or Off (false)  
+<a name="Plug+supportsDimmer"></a>
+
+### plug.supportsDimmer ⇒ <code>boolean</code>
+Cached value of `sys_info.brightness != null`
+
+**Kind**: instance property of [<code>Plug</code>](#Plug)  
 <a name="Device+deviceId"></a>
 
 ### plug.deviceId ⇒ <code>string</code>
@@ -3113,7 +3510,8 @@ Sends `schedule.add_rule` command and returns rule id.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
-| options.powerState | <code>boolean</code> |  |  |
+| [options.powerState] | <code>boolean</code> |  |  |
+| [options.dimmer] | <code>Object</code> |  | dimmer data (dimmable plugs only) |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  |  |
@@ -3134,7 +3532,8 @@ Sends `schedule.edit_rule` command and returns rule id.
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  |  |
 | options.id | <code>string</code> |  |  |
-| options.powerState | <code>boolean</code> |  |  |
+| [options.powerState] | <code>boolean</code> |  |  |
+| [options.dimmer] | <code>Object</code> |  | dimmer data (dimmable plugs only) |
 | options.start | <code>Date</code> \| <code>number</code> |  | Date or number of minutes |
 | [options.daysOfWeek] | <code>Array.&lt;number&gt;</code> |  | [0,6] = weekend, [1,2,3,4,5] = weekdays |
 | [options.name] | <code>string</code> |  | [description] |

@@ -2,7 +2,7 @@
 
 # Change Log
 
-## Unreleased
+## 1.2.0 / 2019-01-18
 
 ### Added :heavy_plus_sign:
 
@@ -20,6 +20,10 @@
     - `dimmer.setGentleOnTime`
     - `dimmer.setLongPressAction`
     - `dimmer.setSwitchState`
+
+### Changes :zap:
+
+- `Plug`
   - `schedule`
     - add `dimmer` parameter to `addRule`
     - add `dimmer` parameter to `editRule`
