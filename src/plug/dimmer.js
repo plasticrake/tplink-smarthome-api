@@ -88,13 +88,19 @@ class Dimmer {
    * @return {Promise<boolean, ResponseError>}
    */
   async setDoubleClickAction ({ mode, index }, sendOptions = {}) {
+    return this.setAction({ actionName: 'set_double_click_action', mode, index });
+  }
+  /**
+   * @private
+   */
+  async setAction ({ actionName, mode, index }, sendOptions = {}) {
     const action = {};
     if (mode !== undefined) action.mode = mode;
     if (index !== undefined) action.index = index;
 
     return this.device.sendCommand({
       [this.apiModuleName]: {
-        set_double_click_action: action
+        [actionName]: action
       }
     }, null, sendOptions);
   }
@@ -170,15 +176,7 @@ class Dimmer {
    * @return {Promise<boolean, ResponseError>}
    */
   async setLongPressAction ({ mode, index }, sendOptions = {}) {
-    const action = {};
-    if (mode !== undefined) action.mode = mode;
-    if (index !== undefined) action.index = index;
-
-    return this.device.sendCommand({
-      [this.apiModuleName]: {
-        set_long_press_action: action
-      }
-    }, null, sendOptions);
+    return this.setAction({ actionName: 'set_long_press_action', mode, index });
   }
   /**
    * Sets Plug to the specified on/off state.
