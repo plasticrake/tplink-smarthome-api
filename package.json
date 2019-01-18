@@ -71,7 +71,7 @@
     "semistandard": "^13.0.1",
     "sinon": "^7.2.2",
     "sinon-chai": "^3.3.0",
-    "tplink-smarthome-simulator": "^1.7.0"
+    "tplink-smarthome-simulator": "^1.8.0"
   },
   "scripts": {
     "preversion": "npm test",

@@ -5,8 +5,9 @@
 const { expect, sinon, testDevices } = require('../setup');
 
 const awayTests = require('./away');
-const timerTests = require('./timer');
+const dimmerTests = require('./dimmer');
 const scheduleTests = require('./schedule');
+const timerTests = require('./timer');
 
 describe('Plug', function () {
   this.timeout(5000);
@@ -104,6 +105,17 @@ describe('Plug', function () {
         });
       });
 
+      describe('#id get', function () {
+        it('should return a deviceId', function () {
+          if (plug.childId != null) this.skip();
+          expect(plug.id).to.eql(plug.sysInfo.deviceId);
+        });
+        it('should return a childId if set and supported', function () {
+          if (plug.childId == null) this.skip();
+          expect(plug.id).to.eql(plug.childId);
+        });
+      });
+
       describe('#inUse get', function () {
         it('should return status based on Emeter if supported', function () {
           if (!plug.supportsEmeter) return;
@@ -132,6 +144,29 @@ describe('Plug', function () {
 
           plug.sysInfo.relay_state = 1;
           expect(plug.inUse).to.be.true;
+        });
+      });
+
+      describe('#relayState get', function () {
+        it('should return a boolean', function () {
+          expect(plug.relayState).to.be.a('boolean');
+        });
+      });
+
+      describe('#supportsDimmer get', function () {
+        it('should return true for HS220', function () {
+          if (plug.sysInfo.model.includes('HS220')) {
+            expect(plug.supportsDimmer).to.be.true;
+          } else {
+            this.skip();
+          }
+        });
+        it('should return false for non HS220', function () {
+          if (!plug.sysInfo.model.includes('HS220')) {
+            expect(plug.supportsDimmer).to.be.false;
+          } else {
+            this.skip();
+          }
         });
       });
 
@@ -293,6 +328,9 @@ describe('Plug', function () {
       });
 
       awayTests(testDevice);
+      if (testDevice.model === 'hs220') {
+        dimmerTests(testDevice);
+      }
       scheduleTests(testDevice);
       timerTests(testDevice);
     });
