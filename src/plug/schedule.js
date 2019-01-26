@@ -11,7 +11,7 @@ class PlugSchedule extends Schedule {
   /**
    * Adds Schedule rule.
    *
-   * Sends `schedule.add_rule` command and returns rule id.
+   * Sends `schedule.add_rule` command and returns rule id. Supports childId.
    * @param  {Object}        options
    * @param  {boolean}      [options.powerState]
    * @param  {Object}       [options.dimmer] dimmer data (dimmable plugs only)
@@ -41,7 +41,7 @@ class PlugSchedule extends Schedule {
   /**
    * Edits Schedule rule.
    *
-   * Sends `schedule.edit_rule` command and returns rule id.
+   * Sends `schedule.edit_rule` command and returns rule id. Supports childId.
    * @param  {Object}        options
    * @param  {string}        options.id
    * @param  {boolean}      [options.powerState]
