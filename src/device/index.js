@@ -256,13 +256,21 @@ class Device extends EventEmitter {
    *
    * Returns `this` (for chaining) that emits events based on state changes.
    * Refer to specific device sections for event details.
+   * @emits  Device#polling-error
    * @param  {number} interval (ms)
    * @return {Device|Bulb|Plug}          this
    */
   startPolling (interval) {
-    // TODO
-    this.pollingTimer = setInterval(() => {
-      this.getInfo();
+    this.pollingTimer = setInterval(async () => {
+      try {
+        await this.getInfo();
+      } catch (err) {
+        /**
+         * @event Device#polling-error
+         * @property {Error} error
+         */
+        this.emit('polling-error', err);
+      }
     }, interval);
     return this;
   }
