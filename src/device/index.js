@@ -39,19 +39,19 @@ class Device extends EventEmitter {
     this.client = client;
     this.host = host;
     this.port = port;
-    this.defaultSendOptions = Object.assign({}, client.defaultSendOptions, defaultSendOptions);
 
     this.log = logger || this.client.log;
     this.log.debug('device.constructor(%j)', Object.assign({}, arguments[0], { client: 'not shown' }));
 
-    this.lastState = {};
-
-    this._sysInfo = {};
-
-    this.netif = new Netif(this, 'netif');
+    this.defaultSendOptions = Object.assign({}, client.defaultSendOptions, defaultSendOptions);
 
     this.udpConnection = new UdpConnection(this);
     this.tcpConnection = new TcpConnection(this);
+
+    this.lastState = {};
+    this._sysInfo = {};
+
+    this.netif = new Netif(this, 'netif');
   }
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
