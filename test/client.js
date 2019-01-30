@@ -13,6 +13,7 @@ const { compareMac } = require('../src/utils');
 describe('Client', function () {
   this.timeout(5000);
   this.slow(2000);
+  this.retries(2);
 
   describe('#startDiscovery()', function () {
     let client;

@@ -19,6 +19,7 @@ const timeTests = require('../shared/time');
 describe('Device', function () {
   this.timeout(5000);
   this.slow(2000);
+  this.retries(2);
   let client;
 
   before(function () {
