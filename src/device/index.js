@@ -3,6 +3,8 @@
 const castArray = require('lodash.castarray');
 const EventEmitter = require('events');
 
+const TcpConnection = require('../network/tcp-connection');
+const UdpConnection = require('../network/udp-connection');
 const Netif = require('./netif');
 const { ResponseError } = require('../utils');
 
@@ -30,14 +32,15 @@ class Device extends EventEmitter {
     host,
     port = 9999,
     logger,
-    defaultSendOptions = { transport: 'tcp', timeout: 10000 }
+    defaultSendOptions
   }) {
     super();
 
     this.client = client;
     this.host = host;
     this.port = port;
-    this.defaultSendOptions = defaultSendOptions;
+    this.defaultSendOptions = Object.assign({}, client.defaultSendOptions, defaultSendOptions);
+
     this.log = logger || this.client.log;
     this.log.debug('device.constructor(%j)', Object.assign({}, arguments[0], { client: 'not shown' }));
 
@@ -46,6 +49,9 @@ class Device extends EventEmitter {
     this._sysInfo = {};
 
     this.netif = new Netif(this, 'netif');
+
+    this.udpConnection = new UdpConnection(this);
+    this.tcpConnection = new TcpConnection(this);
   }
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
@@ -163,6 +169,13 @@ class Device extends EventEmitter {
     return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   }
   /**
+   * Closes any open network connections including any shared sockets.
+   */
+  closeConnection () {
+    this.udpConnection.close();
+    this.tcpConnection.close();
+  }
+  /**
    * Sends `payload` to device (using {@link Client#send})
    * @param  {Object|string} payload
    * @param  {SendOptions}  [sendOptions]
@@ -170,13 +183,20 @@ class Device extends EventEmitter {
    */
   async send (payload, sendOptions) {
     this.log.debug('[%s] device.send()', this.alias);
-    const thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
-    return this.client.send(payload, this.host, this.port, thisSendOptions)
-      .catch((reason) => {
-        this.log.error('[%s] device.send() %s', this.alias, reason);
-        this.log.debug(payload);
-        throw reason;
-      });
+
+    try {
+      const thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
+      const payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
+
+      if (thisSendOptions.transport === 'udp') {
+        return this.udpConnection.send(payloadString, thisSendOptions);
+      }
+      return this.tcpConnection.send(payloadString, thisSendOptions);
+      // return this.client.send(payloadString, this.host, this.port, thisSendOptions);
+    } catch (err) {
+      this.log.error('[%s] device.send()', this.alias, err);
+      throw err;
+    }
   }
   /**
    * Sends command(s) to device.
@@ -230,19 +250,6 @@ class Device extends EventEmitter {
       }
     }
     return normalizedChildId;
-  }
-
-  /**
-   * Adds context.child_ids:[] to the command and sends via {@link #sendCommand}.
-   * @param  {Object|string} command
-   * @param  {string[]|string} [childIds]
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   */
-  async sendCommandWithChildren (command, childIds, sendOptions) {
-    const commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
-
-    return this.sendCommand(commandObj, sendOptions);
   }
   /**
    * Polls the device every `interval`.

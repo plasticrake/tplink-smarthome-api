@@ -2,6 +2,22 @@
 
 # Change Log
 
+## Unreleased
+
+### Added :heavy_plus_sign:
+
+- `Device`/`Bulb`/`Plug`
+  - add `useSharedSocket` and `sharedSocketTimeout` to `sendOptions`
+  - add `#closeConnection` function
+
+### Changes :zap:
+
+- `Client`/`Device`/`Bulb`/`Plug`
+  - rewrote and improved TCP/UDP networking code
+
+- `Device`/`Bulb`/`Plug`
+  - change `defaultSendOptions` to default to `Client` `defaultSendOptions`
+
 ## 1.2.0 / 2019-01-18
 
 ### Added :heavy_plus_sign:
