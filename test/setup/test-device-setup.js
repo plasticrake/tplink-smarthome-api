@@ -102,7 +102,7 @@ async function getDiscoveryTestDevices () {
             mac: device.mac,
             hw_ver: device.sysInfo.hw_ver,
             deviceOptions: { host: device.host, port: device.port },
-            getDevice: (deviceOptions, sendOptions) => client.getDevice(Object.assign({ host: device.host, port: device.port }, deviceOptions)),
+            getDevice: (deviceOptions, sendOptions) => client.getDevice(Object.assign({ host: device.host, port: device.port, defaultSendOptions: sendOptions }, deviceOptions), sendOptions),
             type: 'real'
           });
         } else {
@@ -150,7 +150,7 @@ async function getSimulatedTestDevices () {
         mac: d.data.system.sysinfo.mac,
         childId: childId,
         deviceOptions: { host: d.address, port: d.port, childId },
-        getDevice: (deviceOptions) => client.getDevice(Object.assign({ host: d.address, port: d.port, childId }, deviceOptions)),
+        getDevice: (deviceOptions, sendOptions) => client.getDevice(Object.assign({ host: d.address, port: d.port, childId, defaultSendOptions: sendOptions }, deviceOptions), sendOptions),
         type: 'simulated'
       });
     };

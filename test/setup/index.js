@@ -8,4 +8,26 @@ const expect = chai.expect;
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-module.exports = { expect, sinon, getTestClient, testDevices, testDeviceCleanup };
+const testSendOptions = [
+  {
+    name: 'tcp',
+    timeout: 100,
+    transport: 'tcp',
+    useSharedSocket: false
+  },
+  {
+    name: 'udp',
+    timeout: 100,
+    transport: 'udp',
+    useSharedSocket: false
+  },
+  {
+    name: 'udp-shared',
+    timeout: 100,
+    transport: 'udp',
+    useSharedSocket: true,
+    sharedSocketTimeout: 10000
+  }
+];
+
+module.exports = { expect, sinon, getTestClient, testDevices, testDeviceCleanup, testSendOptions };

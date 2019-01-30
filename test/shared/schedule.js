@@ -84,13 +84,11 @@ module.exports = function (testDevice) {
       });
     });
 
-    if (testDevice.type !== 'simulated') {
-      describe('#eraseStats()', function () {
-        it('should return day stats', function () {
-          if (testDevice.type !== 'simulated') this.skip();
-          return expect(this.device.schedule.eraseStats()).to.eventually.have.property('err_code', 0);
-        });
+    describe('#eraseStats()', function () {
+      it('should return day stats', function () {
+        if (testDevice.type !== 'simulated') this.skip();
+        return expect(this.device.schedule.eraseStats()).to.eventually.have.property('err_code', 0);
       });
-    }
+    });
   });
 };
