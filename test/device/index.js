@@ -183,7 +183,7 @@ describe('Device', function () {
                 expect(err.response.system.INVALID_MEMBER.err_code).to.be.oneOf([-2, -2000]);
               });
             });
-            it.only('should send multiple commands to a single device at once', async function () {
+            it('should send multiple commands to a single device at once', async function () {
               const promises = [];
               for (let i = 0; i < 20; i++) {
                 promises.push(device.sendCommand('{"system":{"get_sysinfo":{}}}'));
