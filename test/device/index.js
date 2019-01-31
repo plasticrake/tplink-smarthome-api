@@ -2,7 +2,7 @@
 /* eslint no-unused-expressions: ["off"] */
 'use strict';
 
-const { expect, getTestClient, testDevices, testSendOptions } = require('../setup');
+const { expect, getTestClient, sinon, testDevices, testSendOptions } = require('../setup');
 
 const rewire = require('rewire');
 const { Client, ResponseError } = require('../../src');
@@ -17,7 +17,7 @@ const scheduleTests = require('../shared/schedule');
 const timeTests = require('../shared/time');
 
 describe('Device', function () {
-  this.timeout(5000);
+  this.timeout(2000);
   this.slow(2000);
   this.retries(2);
 
@@ -77,7 +77,7 @@ describe('Device', function () {
     });
   });
 
-  testDevices.forEach(function (testDevice) {
+  testDevices.forEach((testDevice) => {
     let device;
     let time;
     let client;
@@ -369,6 +369,58 @@ describe('Device', function () {
             it('(simulator only) should reset', function () {
               if (testDevice.type !== 'simulated') this.skip();
               return expect(device.reset(1)).to.eventually.have.property('err_code', 0);
+            });
+          });
+
+          describe('#startPolling()', function () {
+            let badDevice;
+            afterEach(function () {
+              device.stopPolling();
+              if (badDevice) badDevice.stopPolling();
+            });
+
+            it('should poll device', async function () {
+              const spy = sinon.spy();
+              await (new Promise((resolve) => {
+                device.once('power-update', () => { spy(); resolve(); });
+                device.once('in-use-update', () => { spy(); resolve(); });
+                device.once('lightstate-update', () => { spy(); resolve(); });
+                device.once('emeter-realtime-update', () => { spy(); resolve(); });
+                device.startPolling(50);
+              }));
+              expect(spy).to.be.called;
+            });
+
+            it('should fail to poll unreachable device', async function () {
+              this.timeout(500);
+              badDevice = await testDevice.getDevice(null, testSendOptions);
+              badDevice.host = testDevices['unreachable'].deviceOptions.host;
+
+              const spy = sinon.spy();
+
+              await (new Promise((resolve) => {
+                badDevice.once('power-update', () => { spy(); resolve(); });
+                badDevice.once('in-use-update', () => { spy(); resolve(); });
+                badDevice.once('lightstate-update', () => { spy(); resolve(); });
+                badDevice.once('emeter-realtime-update', () => { spy(); resolve(); });
+                badDevice.startPolling(600);
+                setTimeout(resolve, 400);
+              }));
+
+              expect(spy).to.not.be.called;
+            });
+
+            it('should throw error for unreachable device', async function () {
+              badDevice = await testDevice.getDevice(null, testSendOptions);
+              badDevice.host = testDevices['unreachable'].deviceOptions.host;
+
+              const spy = sinon.spy();
+              await (new Promise((resolve) => {
+                badDevice.once('polling-error', () => { spy(); resolve(); });
+                badDevice.startPolling(200);
+              }));
+
+              expect(spy).to.be.called;
             });
           });
 

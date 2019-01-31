@@ -235,13 +235,13 @@ function testDeviceCleanup () {
 
   testDevices.forEach((td) => {
     const deviceOptions = td.deviceOptions || {};
-    console.log(td.model, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''));
+    console.log(td.model, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''), td.type || '');
   });
 
   ['anydevice', 'anyplug', 'anybulb', 'unreachable', 'unreliable'].forEach((key) => {
     const td = testDevices[key];
     const deviceOptions = td.deviceOptions || {};
-    console.log(key, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''));
+    console.log(key, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''), td.type || '');
   });
 
   run();

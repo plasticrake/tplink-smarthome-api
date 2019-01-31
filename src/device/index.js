@@ -192,9 +192,8 @@ class Device extends EventEmitter {
         return this.udpConnection.send(payloadString, thisSendOptions);
       }
       return this.tcpConnection.send(payloadString, thisSendOptions);
-      // return this.client.send(payloadString, this.host, this.port, thisSendOptions);
     } catch (err) {
-      this.log.error('[%s] device.send()', this.alias, err);
+      this.log.error('[%s] device.send() %s', this.alias, err);
       throw err;
     }
   }
@@ -261,17 +260,20 @@ class Device extends EventEmitter {
    * @return {Device|Bulb|Plug}          this
    */
   startPolling (interval) {
-    this.pollingTimer = setInterval(async () => {
+    const fn = async () => {
       try {
         await this.getInfo();
       } catch (err) {
+        this.log.debug('[%s] device.startPolling(): getInfo(): error:', this.alias, err);
         /**
          * @event Device#polling-error
          * @property {Error} error
          */
         this.emit('polling-error', err);
       }
-    }, interval);
+    };
+    this.pollingTimer = setInterval(fn, interval);
+    fn();
     return this;
   }
   /**
