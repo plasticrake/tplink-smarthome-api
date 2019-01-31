@@ -35,7 +35,7 @@ class Client extends EventEmitter {
    * @param  {SendOptions} [options.defaultSendOptions]
    * @param  {number}      [options.defaultSendOptions.timeout=10000]
    * @param  {string}      [options.defaultSendOptions.transport='tcp']
-   * @param  {boolean}     [options.defaultSendOptions.useSharedSocket=true]
+   * @param  {boolean}     [options.defaultSendOptions.useSharedSocket=false]
    * @param  {number}      [options.defaultSendOptions.sharedSocketTimeout=20000]
    * @param  {string}      [options.logLevel]       level for built in logger ['error','warn','info','debug','trace']
    */
@@ -45,7 +45,7 @@ class Client extends EventEmitter {
       {
         timeout: 10000,
         transport: 'tcp',
-        useSharedSocket: true,
+        useSharedSocket: false,
         sharedSocketTimeout: 20000
       }
       , defaultSendOptions);
