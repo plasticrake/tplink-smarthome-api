@@ -72,6 +72,7 @@ class TcpSocket extends TplinkSocket {
             setSocketTimeout(0);
             decryptedMsg = decrypt(deviceDataBuf.slice(4)).toString('utf8');
             this.log.debug(`[${this.socketId}] TcpSocket: socket:data: ${decryptedMsg}`);
+            this.socket.end();
           } else {
             this.log.debug(`[${this.socketId}] TcpSocket: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen}`);
           }
