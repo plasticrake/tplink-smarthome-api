@@ -14,7 +14,7 @@ class TplinkConnection extends EventEmitter {
     this.queue = new Queue(1, Infinity);
 
     this.on('timeout', () => {
-      this.log.debug(`TplinkConnection(${this.socketType}): timeout()`, this.host, this.port);
+      this.log.debug(`TplinkConnection(${this.description}): timeout()`, this.host, this.port);
       this.queue.add(async () => {
         this.close();
       });
@@ -35,15 +35,21 @@ class TplinkConnection extends EventEmitter {
   /**
    * @private
    */
+  get description () {
+    return `${this.socketType} ${this.host}:${this.port}`;
+  }
+  /**
+   * @private
+   */
   async getSocket (Constructor, useSharedSocket = false) {
-    this.log.debug(`TplinkConnection(${this.socketType}).getSocket(%j)`, { useSharedSocket });
+    this.log.debug(`TplinkConnection(${this.description}).getSocket(%j)`, { useSharedSocket });
 
     if (useSharedSocket && this.sharedSocket != null) {
-      this.log.debug(`TplinkConnection(${this.socketType}).getSocket(): reusing shared socket`);
+      this.log.debug(`TplinkConnection(${this.description}).getSocket(): reusing shared socket`);
       if (this.sharedSocket.socket != null && this.sharedSocket.isBound) {
         return this.sharedSocket;
       }
-      this.log.debug(`TplinkConnection(${this.socketType}).getSocket(): recreating shared socket`);
+      this.log.debug(`TplinkConnection(${this.description}).getSocket(): recreating shared socket`);
     }
 
     const socket = new Constructor(this.client.getNextSocketId(), this.log);
@@ -58,7 +64,7 @@ class TplinkConnection extends EventEmitter {
   }
 
   async send (payload, { timeout, useSharedSocket, sharedSocketTimeout } = { }) {
-    this.log.debug(`TplinkConnection(${this.socketType}).send(%j)`, { payload, timeout, useSharedSocket, sharedSocketTimeout });
+    this.log.debug(`TplinkConnection(${this.description}).send(%j)`, { payload, timeout, useSharedSocket, sharedSocketTimeout });
 
     if (useSharedSocket && sharedSocketTimeout != null) {
       this.setTimeout(sharedSocketTimeout);
@@ -72,7 +78,7 @@ class TplinkConnection extends EventEmitter {
         if (!useSharedSocket) { socket.close(); }
         return response;
       } catch (err) {
-        this.log.error(`${this.socketType} Error: %s`, err);
+        this.log.error(`${this.description} Error: %s`, err);
         if (socket && socket.isBound) socket.close();
         throw err;
       }
@@ -80,10 +86,10 @@ class TplinkConnection extends EventEmitter {
   }
 
   close () {
-    this.log.debug(`TplinkConnection(${this.socketType}).close()`);
+    this.log.debug(`TplinkConnection(${this.description}).close()`);
     this.setTimeout(0);
     if (this.sharedSocket && this.sharedSocket.isBound) {
-      this.log.debug(`TplinkConnection(${this.socketType}).close() closing shared socket`);
+      this.log.debug(`TplinkConnection(${this.description}).close() closing shared socket`);
       this.sharedSocket.close();
     }
   }

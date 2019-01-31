@@ -39,7 +39,6 @@ class TplinkSocket {
         let response = await this.sendAndGetResponse(payload, port, host, timeout);
         return response;
       } catch (err) {
-        this.log.error(`${this.socketType} Error:`, err);
         if (this.isBound) this.close();
         throw err;
       }
