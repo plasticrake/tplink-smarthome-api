@@ -61,6 +61,7 @@
     "bats-support": "git+https://github.com/ztombol/bats-support.git",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "chai-subset": "^1.6.0",
     "chai-things": "^0.2.0",
     "codecov": "^3.1.0",
     "cross-env": "^5.2.0",

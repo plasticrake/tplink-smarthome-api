@@ -138,7 +138,7 @@ class Client extends EventEmitter {
    * @return {Bulb}
    */
   getBulb (deviceOptions) {
-    return new Bulb(Object.assign({}, deviceOptions, { client: this, defaultSendOptions: this.defaultSendOptions }));
+    return new Bulb(Object.assign({}, { defaultSendOptions: this.defaultSendOptions }, deviceOptions, { client: this }));
   }
   /**
    * Creates {@link Plug} object.
@@ -148,7 +148,7 @@ class Client extends EventEmitter {
    * @return {Plug}
    */
   getPlug (deviceOptions) {
-    return new Plug(Object.assign({}, deviceOptions, { client: this, defaultSendOptions: this.defaultSendOptions }));
+    return new Plug(Object.assign({}, { defaultSendOptions: this.defaultSendOptions }, deviceOptions, { client: this }));
   }
   /**
    * Creates a {@link Plug} or {@link Bulb} after querying device to determine type.
@@ -159,6 +159,7 @@ class Client extends EventEmitter {
    * @return {Promise<Plug|Bulb, Error>}
    */
   async getDevice (deviceOptions, sendOptions) {
+    this.log.debug('client.getDevice(%j)', { deviceOptions, sendOptions });
     const sysInfo = await this.getSysInfo(deviceOptions.host, deviceOptions.port, sendOptions);
     return this.getDeviceFromSysInfo(sysInfo, Object.assign({}, deviceOptions, { client: this }));
   }
@@ -171,7 +172,7 @@ class Client extends EventEmitter {
    * @return {Device}
    */
   getCommonDevice (deviceOptions) {
-    return new Device(Object.assign({}, deviceOptions, { client: this, defaultSendOptions: this.defaultSendOptions }));
+    return new Device(Object.assign({}, { client: this, defaultSendOptions: this.defaultSendOptions }, deviceOptions));
   }
   /**
    * @private
