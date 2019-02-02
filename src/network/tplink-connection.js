@@ -78,7 +78,7 @@ class TplinkConnection extends EventEmitter {
         if (!useSharedSocket) { socket.close(); }
         return response;
       } catch (err) {
-        this.log.error(`${this.description} Error: %s`, err);
+        this.log.error(`${this.description} %s`, err);
         if (socket && socket.isBound) socket.close();
         throw err;
       }

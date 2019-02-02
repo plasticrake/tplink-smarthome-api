@@ -36,9 +36,9 @@ class TplinkSocket {
 
     return this.queue.add(async () => {
       try {
-        let response = await this.sendAndGetResponse(payload, port, host, timeout);
-        return response;
+        return this.sendAndGetResponse(payload, port, host, timeout);
       } catch (err) {
+        this.log.debug(`[${this.socketId}] TplinkSocket(${this.socketType}).send()`, err);
         if (this.isBound) this.close();
         throw err;
       }

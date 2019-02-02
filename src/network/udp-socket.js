@@ -5,10 +5,15 @@ const dgram = require('dgram');
 const { encrypt, decrypt } = require('tplink-smarthome-crypto');
 
 const TplinkSocket = require('./tplink-socket');
+const { replaceControlCharacters } = require('../utils');
 
 class UdpSocket extends TplinkSocket {
   get socketType () {
     return 'UDP';
+  }
+
+  logDebug () {
+    this.log.debug(`[${this.socketId}] UdpSocket`, ...arguments);
   }
 
   async createSocket () {
@@ -16,8 +21,14 @@ class UdpSocket extends TplinkSocket {
       return new Promise((resolve, reject) => {
         this.socket = dgram.createSocket('udp4');
 
+        this.socket.on('error', (err) => {
+          this.logDebug(`: createSocket:error`);
+          reject(err);
+        });
+
         this.socket.bind(() => {
-          this.log.debug(`[${this.socketId}] UdpSocket.createSocket(): listening on %j`, this.socket.address());
+          this.logDebug(`.createSocket(): listening on %j`, this.socket.address());
+          this.socket.removeAllListeners('error');
           this.isBound = true;
           resolve(this.socket);
         });
@@ -41,7 +52,7 @@ class UdpSocket extends TplinkSocket {
         if (timer != null) clearTimeout(timer);
         if (timeout > 0) {
           timer = setTimeout(() => {
-            this.log.debug(`[${this.socketId}] UdpSocket: timeout(${timeout})`);
+            this.logDebug(`: timeout(${timeout})`);
             reject(new Error('UDP Timeout'));
           }, timeout);
         }
@@ -55,42 +66,46 @@ class UdpSocket extends TplinkSocket {
       socket.on('message', (msg, rinfo) => {
         let decryptedMsg;
         try {
-          this.log.debug(`[${this.socketId}] UdpSocket: socket:data rinfo: %j`, rinfo);
+          this.logDebug(`: socket:data rinfo: %j`, rinfo);
           setSocketTimeout(0);
 
           decryptedMsg = decrypt(msg).toString('utf8');
-          this.log.debug(`[${this.socketId}] UdpSocket: socket:data message: %s`, decryptedMsg);
-          if (decryptedMsg !== '') {
-            return resolve(JSON.parse(decryptedMsg));
-          }
-          resolve(decryptedMsg);
+          this.logDebug(`: socket:data message:${replaceControlCharacters(decryptedMsg)}`);
+          return resolve(JSON.parse(decryptedMsg));
         } catch (err) {
-          this.log.error('Error processing UDP message: %o\nFrom: [%j] SO_RCVBUF:[%d] msg: [%o] decryptedMsg: [%o]', err, rinfo, socket.getRecvBufferSize(), msg, decryptedMsg);
+          this.log.error(`Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(decryptedMsg)}]`, rinfo, socket.getRecvBufferSize(), msg);
           reject(err);
         }
       });
 
       socket.on('close', () => {
         try {
-          this.log.debug(`[${this.socketId}] UdpSocket: socket:close`);
+          this.logDebug(`: socket:close`);
           setSocketTimeout(0);
         } finally {
           reject(new Error('UDP Socket Closed'));
         }
       });
 
+      socket.on('error', (err) => {
+        this.logDebug(`: socket:error`);
+        reject(err);
+      });
+
       const encyptedPayload = encrypt(payload);
-      this.log.debug(`[${this.socketId}] UdpSocket: socket:send payload.length`, encyptedPayload.length);
+      this.logDebug(`: socket:send payload.length`, encyptedPayload.length);
 
       socket.send(encyptedPayload, 0, encyptedPayload.length, port, host, (err) => {
         if (err) {
           try {
-            this.log.debug(`[${this.socketId}] UdpSocket: socket:send socket:error length: ${encyptedPayload.length} SO_SNDBUF:${socket.getSendBufferSize()} `, err);
+            this.logDebug(`: socket:send socket:error length: ${encyptedPayload.length} SO_SNDBUF:${socket.getSendBufferSize()} `, err);
             if (this.isBound) this.close();
           } finally {
             reject(err);
           }
+          return;
         }
+        this.logDebug(`: socket:send sent`);
       });
     });
   }
