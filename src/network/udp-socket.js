@@ -21,6 +21,15 @@ class UdpSocket extends TplinkSocket {
       return new Promise((resolve, reject) => {
         this.socket = dgram.createSocket('udp4');
 
+        // Polyfill stub for Node < v8.7
+        if (this.socket.getRecvBufferSize === undefined) {
+          this.socket.getRecvBufferSize = function () {};
+        }
+        // Polyfill stub for Node < v8.7
+        if (this.socket.getSendBufferSize === undefined) {
+          this.socket.getSendBufferSize = function () {};
+        }
+
         this.socket.on('error', (err) => {
           this.logDebug(`: createSocket:error`);
           reject(err);
@@ -73,8 +82,8 @@ class UdpSocket extends TplinkSocket {
           this.logDebug(`: socket:data message:${replaceControlCharacters(decryptedMsg)}`);
           return resolve(JSON.parse(decryptedMsg));
         } catch (err) {
-          this.log.error(`Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(decryptedMsg)}]`, rinfo, socket.getRecvBufferSize(), msg);
           reject(err);
+          this.log.error(`Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(decryptedMsg)}]`, rinfo, socket.getRecvBufferSize(), msg);
         }
       });
 
