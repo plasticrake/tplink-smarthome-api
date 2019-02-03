@@ -12,8 +12,8 @@ class TcpSocket extends TplinkSocket {
     return 'TCP';
   }
 
-  logDebug () {
-    this.log.debug(`[${this.socketId}] TcpSocket`, ...arguments);
+  logDebug (...args) {
+    this.log.debug(`[${this.socketId}] TcpSocket` + args.shift(), ...args);
   }
 
   async createSocket () {

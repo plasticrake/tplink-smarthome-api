@@ -12,8 +12,8 @@ class UdpSocket extends TplinkSocket {
     return 'UDP';
   }
 
-  logDebug () {
-    this.log.debug(`[${this.socketId}] UdpSocket`, ...arguments);
+  logDebug (...args) {
+    this.log.debug(`[${this.socketId}] UdpSocket` + args.shift(), ...args);
   }
 
   async createSocket () {
