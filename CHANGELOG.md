@@ -17,6 +17,7 @@
 
 - `Device`/`Bulb`/`Plug`
   - change `defaultSendOptions` to default to `Client` `defaultSendOptions`
+  - `startPoller` now emits `polling-error` (#60)
 
 ## 1.2.0 / 2019-01-18
 
