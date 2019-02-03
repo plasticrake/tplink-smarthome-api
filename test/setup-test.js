@@ -2,7 +2,7 @@
 /* eslint no-unused-expressions: ["off"] */
 'use strict';
 
-const { expect, getTestClient, testDevices, testDeviceCleanup } = require('./setup');
+const { expect, getTestClient, testDevices, testDeviceCleanup, testSendOptions } = require('./setup');
 
 const Client = require('../src/client');
 const Device = require('../src/device');
@@ -19,7 +19,7 @@ describe('Test Environment Setup', function () {
     });
   });
 
-  function deviceIsOk (testDevice) {
+  function deviceIsOk (testDevice, testSendOptions) {
     it(`should have a device`, function () {
       expect(testDevice.getDevice).to.exist.and.be.an.instanceof(Function);
       return expect(testDevice.getDevice()).to.eventually.exist.and.be.an.instanceof(Device);
@@ -27,18 +27,30 @@ describe('Test Environment Setup', function () {
     it(`should have deviceOptions`, function () {
       expect(testDevice.deviceOptions).to.exist.and.to.contain.keys('host', 'port');
     });
+    describe('getTestClient()', function () {
+      testSendOptions.forEach((testSendOptions) => {
+        context(testSendOptions.name, function () {
+          it(`should create device with sendOptions`, async function () {
+            const tso = Object.assign({}, testSendOptions);
+            delete tso.name;
+            const device = await testDevice.getDevice(null, tso);
+            expect(device.defaultSendOptions).to.containSubset(tso);
+          });
+        });
+      });
+    });
   }
 
   describe('testDevices', function () {
     testDevices.forEach((testDevice) => {
       context(testDevice.name, function () {
-        deviceIsOk(testDevice);
+        deviceIsOk(testDevice, testSendOptions);
       });
     });
 
     ['anydevice', 'anyplug', 'anybulb'].forEach((deviceKey) => {
       context(deviceKey, function () {
-        deviceIsOk(testDevices[deviceKey]);
+        deviceIsOk(testDevices[deviceKey], testSendOptions);
       });
     });
 
@@ -48,7 +60,7 @@ describe('Test Environment Setup', function () {
           expect(testDevices[deviceKey].length).to.be.above(0);
         });
         testDevices[deviceKey].forEach((d) => {
-          deviceIsOk(d);
+          deviceIsOk(d, testSendOptions);
         });
       });
     });
@@ -62,12 +74,15 @@ describe('Test Environment Setup', function () {
         expect(testDevice).to.have.property('deviceOptions');
         expect(testDevice.deviceOptions).to.contain.keys('host', 'port');
       });
-      it(`should have getDevice and throw`, function () {
-        expect(testDevice.getDevice).to.exist.and.be.an.instanceof(Function);
-        return expect(testDevice.getDevice()).to.eventually.be.rejected;
+      testSendOptions.forEach((testSendOptions) => {
+        context(testSendOptions.name, function () {
+          it(`should have getDevice and throw`, function () {
+            expect(testDevice.getDevice).to.exist.and.be.an.instanceof(Function);
+            return expect(testDevice.getDevice(null, testSendOptions)).to.eventually.be.rejected;
+          });
+        });
       });
     });
-
     context('unreachable', function () {
       it(`should have deviceOptions`, function () {
         expect(testDevices['unreachable']).to.have.property('deviceOptions');

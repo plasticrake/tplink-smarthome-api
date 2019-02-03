@@ -1,24 +1,26 @@
 'use strict';
 
 const dgram = require('dgram');
-const net = require('net');
 const EventEmitter = require('events');
-const { encrypt, encryptWithHeader, decrypt } = require('tplink-smarthome-crypto');
+const { encrypt, decrypt } = require('tplink-smarthome-crypto');
 
 const Device = require('./device');
 const Plug = require('./plug');
 const Bulb = require('./bulb');
+const TcpConnection = require('./network/tcp-connection');
+const UdpConnection = require('./network/udp-connection');
 const { compareMac } = require('./utils');
 
 const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
-let maxSocketId = 0;
 
 /**
  * Send Options.
  *
  * @typedef {Object} SendOptions
- * @property {number} timeout  (ms)
- * @property {string} transport 'tcp','udp'
+ * @property {number} timeout         (ms)
+ * @property {string} transport       'tcp','udp'
+ * @property {boolean} useSharedSocket    attempt to reuse a shared socket if available, UDP only
+ * @property {boolean} sharedSocketTimeout (ms) how long to wait for another send before closing a shared socket. 0 = never automatically close socket
  */
 
 /**
@@ -31,19 +33,38 @@ class Client extends EventEmitter {
   /**
    * @param  {Object}       options
    * @param  {SendOptions} [options.defaultSendOptions]
-   * @param  {Number}      [options.defaultSendOptions.timeout=10000]  (ms)
-   * @param  {string}      [options.defaultSendOptions.transport=tcp] 'tcp' or 'udp'
+   * @param  {number}      [options.defaultSendOptions.timeout=10000]
+   * @param  {string}      [options.defaultSendOptions.transport='tcp']
+   * @param  {boolean}     [options.defaultSendOptions.useSharedSocket=false]
+   * @param  {number}      [options.defaultSendOptions.sharedSocketTimeout=20000]
    * @param  {string}      [options.logLevel]       level for built in logger ['error','warn','info','debug','trace']
    */
-  constructor ({ defaultSendOptions = { timeout: 10000, transport: 'tcp' }, logLevel, logger } = {}) {
+  constructor ({ defaultSendOptions, logLevel, logger } = {}) {
     super();
-    this.defaultSendOptions = defaultSendOptions;
+    this.defaultSendOptions = Object.assign(
+      {
+        timeout: 10000,
+        transport: 'tcp',
+        useSharedSocket: false,
+        sharedSocketTimeout: 20000
+      }
+      , defaultSendOptions);
+
     this.log = require('./logger')({ level: logLevel, logger: logger });
 
     this.devices = new Map();
     this.discoveryTimer = null;
     this.discoveryPacketSequence = 0;
+    this.maxSocketId = 0;
   }
+
+  /**
+   * @private
+   */
+  getNextSocketId () {
+    return this.maxSocketId++;
+  }
+
   /**
    * {@link https://github.com/plasticrake/tplink-smarthome-crypto Encrypts} `payload` and sends to device.
    * - If `payload` is not a string, it is `JSON.stringify`'d.
@@ -70,165 +91,17 @@ class Client extends EventEmitter {
    * @return {Promise<Object, Error>}
    */
   async send (payload, host, port = 9999, sendOptions) {
-    const thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
+    const thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions, { useSharedSocket: false });
+    const payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
+    let connection;
     if (thisSendOptions.transport === 'udp') {
-      return this.sendUdp(payload, host, port, thisSendOptions.timeout);
+      connection = new UdpConnection({ host, port, log: this.log, client: this });
+    } else {
+      connection = new TcpConnection({ host, port, log: this.log, client: this });
     }
-    return this.sendTcp(payload, host, port, thisSendOptions.timeout);
-  }
-  /**
-   * @private
-   */
-  async sendUdp (payload, host, port = 9999, timeout) {
-    let socketId = maxSocketId += 1;
-    this.log.debug(`[${socketId}] client.sendUdp(%j)`, { payload, host, port, timeout });
-
-    return new Promise((resolve, reject) => {
-      let socket;
-      let isSocketBound = false;
-      try {
-        const payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
-
-        socket = dgram.createSocket('udp4');
-
-        let timer;
-        if (timeout > 0) {
-          timer = setTimeout(() => {
-            this.log.debug(`[${socketId}] client.sendUdp(): timeout(${timeout})`);
-            this.log.error('UDP Timeout');
-            if (isSocketBound) socket.close();
-            reject(new Error('UDP Timeout'));
-          }, timeout);
-        }
-
-        socket.on('message', (msg, rinfo) => {
-          clearTimeout(timer);
-          this.log.debug(`[${socketId}] client.sendUdp(): socket:data %j`, rinfo);
-          if (isSocketBound) socket.close();
-
-          let decryptedMsg;
-          try {
-            decryptedMsg = decrypt(msg).toString('utf8');
-            this.log.debug(`[${socketId}] client.sendUdp(): socket:data message: ${decryptedMsg}`);
-            let msgObj = '';
-            if (decryptedMsg !== '') {
-              msgObj = JSON.parse(decryptedMsg);
-            }
-            resolve(msgObj);
-          } catch (err) {
-            this.log.error('Error parsing JSON: %s\nFrom: [%s UDP] Original: [%s] Decrypted: [%s]', err, rinfo, msg, decryptedMsg);
-            reject(err);
-          }
-        });
-
-        socket.on('error', (err) => {
-          this.log.debug(`[${socketId}] client.sendUdp(): socket:error`, err);
-          if (isSocketBound) socket.close();
-          reject(err);
-        });
-
-        this.log.debug(`[${socketId}] client.sendUdp(): attempting to open. host:${host}, port:${port}`);
-        socket.bind(() => {
-          isSocketBound = true;
-          this.log.debug(`[${socketId}] client.sendUdp(): listening on %j`, socket.address());
-          const msgBuf = encrypt(payloadString);
-          socket.send(msgBuf, 0, msgBuf.length, port, host);
-        });
-      } catch (err) {
-        this.log.error(`UDP Error: %s`, err);
-        if (isSocketBound) socket.close();
-        reject(err);
-      }
-    });
-  }
-  /**
-   * @private
-   */
-  sendTcp (payload, host, port = 9999, timeout) {
-    let socketId = maxSocketId += 1;
-    this.log.debug(`[${socketId}] client.sendTcp(%j)`, { payload, host, port, timeout });
-
-    return new Promise((resolve, reject) => {
-      let socket;
-      let timer;
-      let deviceDataBuf;
-      let segmentCount = 0;
-      try {
-        const payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
-
-        socket = new net.Socket();
-
-        if (timeout > 0) {
-          timer = setTimeout(() => {
-            this.log.debug(`[${socketId}] client.sendTcp(): timeout(${timeout})`);
-            this.log.error('TCP Timeout');
-            socket.destroy();
-            reject(new Error('TCP Timeout'));
-          }, timeout);
-        }
-
-        socket.on('data', (data) => {
-          segmentCount += 1;
-          this.log.debug(`[${socketId}] client.sendTcp(): socket:data ${socket.remoteAddress}:${socket.remotePort} segment:${segmentCount}`);
-
-          if (deviceDataBuf === undefined) {
-            deviceDataBuf = data;
-          } else {
-            deviceDataBuf = Buffer.concat([deviceDataBuf, data], deviceDataBuf.length + data.length);
-          }
-
-          const expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
-          const actualMsgLen = deviceDataBuf.length - 4;
-
-          if (actualMsgLen >= expectedMsgLen) {
-            socket.end();
-          }
-        });
-
-        socket.on('close', () => {
-          this.log.debug(`[${socketId}] client.sendTcp(): socket:close`);
-          clearTimeout(timer);
-
-          if (deviceDataBuf == null) return;
-
-          const expectedMsgLen = deviceDataBuf.slice(0, 4).readInt32BE();
-          const actualMsgLen = deviceDataBuf.length - 4;
-
-          if (actualMsgLen >= expectedMsgLen) {
-            let decryptedMsg;
-            try {
-              decryptedMsg = decrypt(deviceDataBuf.slice(4)).toString('utf8');
-              this.log.debug(`[${socketId}] client.sendTcp(): socket:close message: ${decryptedMsg}`);
-              let msgObj = '';
-              if (decryptedMsg !== '') {
-                msgObj = JSON.parse(decryptedMsg);
-              }
-              resolve(msgObj);
-            } catch (err) {
-              this.log.error(`Error parsing JSON: %s\nFrom: [${socket.remoteAddress} ${socket.remotePort}] TCP ${segmentCount} ${actualMsgLen}/${expectedMsgLen} Original: [%s] Decrypted: [${decryptedMsg}]`, err, deviceDataBuf);
-              reject(err);
-            }
-          }
-        });
-
-        socket.on('error', (err) => {
-          this.log.debug(`[${socketId}] client.sendTcp(): socket:error`);
-          socket.destroy();
-          reject(err);
-        });
-
-        this.log.debug(`[${socketId}] client.sendTcp(): attempting to open. host:${host}, port:${port}`);
-        socket.connect({ port, host }, () => {
-          this.log.debug(`[${socketId}] client.sendTcp(): socket:connect ${socket.remoteAddress} ${socket.remotePort}`);
-          socket.write(encryptWithHeader(payloadString));
-        });
-      } catch (err) {
-        clearTimeout(timer);
-        this.log.error(`TCP Error: ${err}`);
-        socket.destroy();
-        reject(err);
-      }
-    });
+    const response = await connection.send(payloadString, thisSendOptions);
+    connection.close();
+    return response;
   }
   /**
    * Requests `{system:{get_sysinfo:{}}}` from device.
@@ -265,7 +138,7 @@ class Client extends EventEmitter {
    * @return {Bulb}
    */
   getBulb (deviceOptions) {
-    return new Bulb(Object.assign({}, deviceOptions, { client: this, defaultSendOptions: this.defaultSendOptions }));
+    return new Bulb(Object.assign({}, { defaultSendOptions: this.defaultSendOptions }, deviceOptions, { client: this }));
   }
   /**
    * Creates {@link Plug} object.
@@ -275,7 +148,7 @@ class Client extends EventEmitter {
    * @return {Plug}
    */
   getPlug (deviceOptions) {
-    return new Plug(Object.assign({}, deviceOptions, { client: this, defaultSendOptions: this.defaultSendOptions }));
+    return new Plug(Object.assign({}, { defaultSendOptions: this.defaultSendOptions }, deviceOptions, { client: this }));
   }
   /**
    * Creates a {@link Plug} or {@link Bulb} after querying device to determine type.
@@ -286,6 +159,7 @@ class Client extends EventEmitter {
    * @return {Promise<Plug|Bulb, Error>}
    */
   async getDevice (deviceOptions, sendOptions) {
+    this.log.debug('client.getDevice(%j)', { deviceOptions, sendOptions });
     const sysInfo = await this.getSysInfo(deviceOptions.host, deviceOptions.port, sendOptions);
     return this.getDeviceFromSysInfo(sysInfo, Object.assign({}, deviceOptions, { client: this }));
   }
@@ -298,7 +172,7 @@ class Client extends EventEmitter {
    * @return {Device}
    */
   getCommonDevice (deviceOptions) {
-    return new Device(Object.assign({}, deviceOptions, { client: this, defaultSendOptions: this.defaultSendOptions }));
+    return new Device(Object.assign({}, { client: this, defaultSendOptions: this.defaultSendOptions }, deviceOptions));
   }
   /**
    * @private
@@ -558,7 +432,6 @@ class Client extends EventEmitter {
       } else {
         const deviceOptions = Object.assign({}, options, { client: this, host, port, childId });
         const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
-        // device.sysInfo = sysInfo;
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
         this.devices.set(id, device);

@@ -100,9 +100,14 @@ function compareMac (mac = '', macPattern) {
   return (macPatterns.findIndex((p) => p.test(normalizedMac)) !== -1);
 }
 
+function replaceControlCharacters (input, replace = '﹖') {
+  return input.replace(/[\x00-\x1F]/g, replace); // eslint-disable-line no-control-regex
+}
+
 module.exports = {
   ResponseError,
   compareMac,
   createScheduleRule,
-  normalizeMac
+  normalizeMac,
+  replaceControlCharacters
 };

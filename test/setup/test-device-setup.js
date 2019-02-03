@@ -102,7 +102,7 @@ async function getDiscoveryTestDevices () {
             mac: device.mac,
             hw_ver: device.sysInfo.hw_ver,
             deviceOptions: { host: device.host, port: device.port },
-            getDevice: (deviceOptions, sendOptions) => client.getDevice(Object.assign({ host: device.host, port: device.port }, deviceOptions)),
+            getDevice: (deviceOptions, sendOptions) => client.getDevice(Object.assign({ host: device.host, port: device.port, defaultSendOptions: sendOptions }, deviceOptions), sendOptions),
             type: 'real'
           });
         } else {
@@ -150,7 +150,7 @@ async function getSimulatedTestDevices () {
         mac: d.data.system.sysinfo.mac,
         childId: childId,
         deviceOptions: { host: d.address, port: d.port, childId },
-        getDevice: (deviceOptions) => client.getDevice(Object.assign({ host: d.address, port: d.port, childId }, deviceOptions)),
+        getDevice: (deviceOptions, sendOptions) => client.getDevice(Object.assign({ host: d.address, port: d.port, childId, defaultSendOptions: sendOptions }, deviceOptions), sendOptions),
         type: 'simulated'
       });
     };
@@ -235,13 +235,13 @@ function testDeviceCleanup () {
 
   testDevices.forEach((td) => {
     const deviceOptions = td.deviceOptions || {};
-    console.log(td.model, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''));
+    console.log(td.model, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''), td.type || '');
   });
 
   ['anydevice', 'anyplug', 'anybulb', 'unreachable', 'unreliable'].forEach((key) => {
     const td = testDevices[key];
     const deviceOptions = td.deviceOptions || {};
-    console.log(key, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''));
+    console.log(key, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''), td.type || '');
   });
 
   run();
