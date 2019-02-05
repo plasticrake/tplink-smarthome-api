@@ -21,11 +21,13 @@ class Emeter {
    * @private
    */
   set realtime (realtime) {
+    const normalizedRealtime = Object.assign({}, realtime); // will coerce null/undefined to {}
+
     const normalize = function (propName, propName2, multiplier) {
-      if (realtime[propName] != null && realtime[propName2] == null) {
-        realtime[propName2] = Math.floor(realtime[propName] * multiplier);
-      } else if (realtime[propName] == null && realtime[propName2] != null) {
-        realtime[propName] = realtime[propName2] / multiplier;
+      if (normalizedRealtime[propName] != null && normalizedRealtime[propName2] == null) {
+        normalizedRealtime[propName2] = Math.floor(normalizedRealtime[propName] * multiplier);
+      } else if (normalizedRealtime[propName] == null && normalizedRealtime[propName2] != null) {
+        normalizedRealtime[propName] = normalizedRealtime[propName2] / multiplier;
       }
     };
 
@@ -36,7 +38,7 @@ class Emeter {
       normalize('voltage', 'voltage_mv', 1000);
     }
 
-    this._realtime = realtime;
+    this._realtime = normalizedRealtime;
     this.device.emit('emeter-realtime-update', this._realtime);
   }
   /**

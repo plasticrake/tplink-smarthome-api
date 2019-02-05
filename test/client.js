@@ -33,6 +33,19 @@ describe('Client', function () {
       });
     });
 
+    it('should emit emeter-realtime-update', function (done) {
+      client.startDiscovery({ discoveryInterval: 250 }).on('device-new', (device) => {
+        expect(device).to.be.an.instanceof(Device);
+        device.on('emeter-realtime-update', (realtime) => {
+          if (Object.keys(realtime).length > 0) {
+            expect(realtime).to.not.eql({});
+            client.stopDiscovery();
+            done();
+          }
+        });
+      });
+    });
+
     it('should emit device-new when finding a new device with `devices` specified', function (done) {
       const mac = testDevices['anydevice'].mac;
       const host = testDevices['anydevice'].deviceOptions.host;

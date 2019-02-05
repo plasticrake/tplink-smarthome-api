@@ -12,6 +12,9 @@
 
 ### Changes :zap:
 
+- `Client`
+  - `startDiscovery` now queries emeter realtime information and devices may emit `emeter-realtime-update` if supported
+
 - `Client`/`Device`/`Bulb`/`Plug`
   - rewrote and improved TCP/UDP networking code
 

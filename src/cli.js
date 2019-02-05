@@ -41,7 +41,7 @@ const search = function (sysInfo, breakoutChildren, timeout, params) {
 
 const send = async function (host, port, payload) {
   try {
-    console.log(`Sending to ${host}:${port}...`);
+    console.log(`Sending to ${host}:${port || ''} via ${client.defaultSendOptions.transport}...`);
     const data = await client.send(payload, host, port);
     console.log('response:');
     console.dir(data, { colors: program.color === 'on', depth: 10 });
@@ -52,7 +52,7 @@ const send = async function (host, port, payload) {
 
 const sendCommand = async function (host, port, childId, payload) {
   try {
-    console.log(`Sending to ${host}:${port}...`);
+    console.log(`Sending to ${host}:${port || ''} via ${client.defaultSendOptions.transport}...`);
     const device = await client.getDevice({ host, port });
     const results = await device.sendCommand(payload);
     console.log('response:');
@@ -64,7 +64,7 @@ const sendCommand = async function (host, port, childId, payload) {
 
 const sendCommandDynamic = async function (host, port, command, commandParams = [], childId = null) {
   try {
-    console.log(`Sending ${command} command to ${host}:${port} ${childId ? 'childId: ' + childId : ''}...`);
+    console.log(`Sending ${command} command to ${host}:${port || ''} ${childId ? 'childId: ' + childId : ''} via ${client.defaultSendOptions.transport}...`);
     const device = await client.getDevice({ host, port, childId });
     const results = await device[command](...commandParams);
     console.log('response:');
@@ -76,7 +76,7 @@ const sendCommandDynamic = async function (host, port, command, commandParams = 
 
 const details = async function (host, port, timeout) {
   try {
-    console.log(`Getting details from ${host}:${port}...`);
+    console.log(`Getting details from ${host}:${port || ''}...`);
     const device = await client.getDevice({ host, port });
     console.dir({
       alias: device.alias,
@@ -95,7 +95,7 @@ const details = async function (host, port, timeout) {
 };
 
 const blink = function (host, port, times, rate, timeout) {
-  console.log(`Sending blink commands to ${host}:${port}...`);
+  console.log(`Sending blink commands to ${host}:${port || ''}...`);
   client.getDevice({ host, port }).then((device) => {
     return device.blink(times, rate).then(() => {
       console.log('Blinking complete');
