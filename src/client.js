@@ -11,7 +11,7 @@ const TcpConnection = require('./network/tcp-connection');
 const UdpConnection = require('./network/udp-connection');
 const { compareMac } = require('./utils');
 
-const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
+const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}},"emeter":{"get_realtime":{}},"smartlife.iot.common.emeter":{"get_realtime":{}}}');
 
 /**
  * Send Options.
@@ -313,6 +313,7 @@ class Client extends EventEmitter {
    * @emits  Client#plug-new
    * @emits  Client#plug-online
    * @emits  Client#plug-offline
+   * @emits  Client#discovery-invalid
    */
   startDiscovery ({
     address,
@@ -339,11 +340,13 @@ class Client extends EventEmitter {
 
         this.log.debug(`client.startDiscovery(): socket:message From: ${rinfo.address} ${rinfo.port} Message: ${decryptedMsg}`);
 
-        let jsonMsg;
+        let response;
         let sysInfo;
+        let emeterRealtime;
         try {
-          jsonMsg = JSON.parse(decryptedMsg);
-          sysInfo = jsonMsg.system.get_sysinfo;
+          response = JSON.parse(decryptedMsg);
+          sysInfo = response.system.get_sysinfo;
+          emeterRealtime = parseEmeter(response);
         } catch (err) {
           this.log.debug(`client.startDiscovery(): Error parsing JSON: %s\nFrom: ${rinfo.address} ${rinfo.port} Original: [%s] Decrypted: [${decryptedMsg}]`, err, msg);
           this.emit('discovery-invalid', { rinfo, response: msg, decryptedResponse: decrypt(msg) });
@@ -381,7 +384,7 @@ class Client extends EventEmitter {
           }
         }
 
-        this.createOrUpdateDeviceFromSysInfo({ sysInfo, host: rinfo.address, port: rinfo.port, breakoutChildren, options: deviceOptions });
+        this.createOrUpdateDeviceFromSysInfo({ sysInfo, emeterRealtime, host: rinfo.address, port: rinfo.port, breakoutChildren, options: deviceOptions });
       });
 
       this.socket.on('error', (err) => {
@@ -419,21 +422,24 @@ class Client extends EventEmitter {
   /**
    * @private
    */
-  createOrUpdateDeviceFromSysInfo ({ sysInfo, host, port, options, breakoutChildren }) {
-    const process = (sysInfo, id, childId) => {
+  createOrUpdateDeviceFromSysInfo ({ sysInfo, emeterRealtime, host, port, options, breakoutChildren }) {
+    const process = (id, childId) => {
+      let device;
       if (this.devices.has(id)) {
-        const device = this.devices.get(id);
+        device = this.devices.get(id);
         device.host = host;
         device.port = port;
         device.sysInfo = sysInfo;
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
+        if (device.emeter) device.emeter.realtime = emeterRealtime;
         this.emit('online', device);
       } else {
         const deviceOptions = Object.assign({}, options, { client: this, host, port, childId });
-        const device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
+        device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
+        if (device.emeter) device.emeter.realtime = emeterRealtime;
         this.devices.set(id, device);
         this.emit('new', device);
       }
@@ -442,10 +448,10 @@ class Client extends EventEmitter {
     if (breakoutChildren && sysInfo.children && sysInfo.children.length > 0) {
       sysInfo.children.forEach((child) => {
         const childId = (child.id.length === 2 ? sysInfo.deviceId + child.id : child.id);
-        process(sysInfo, childId, childId);
+        process(childId, childId);
       });
     } else {
-      process(sysInfo, sysInfo.deviceId);
+      process(sysInfo.deviceId);
     }
   }
   /**
@@ -502,6 +508,21 @@ class Client extends EventEmitter {
 
     return this;
   }
+}
+/**
+ * @private
+ */
+function parseEmeter (response) {
+  try {
+    if (response.emeter.get_realtime.err_code === 0) {
+      return response.emeter.get_realtime;
+    }
+  } catch (err) {}
+  try {
+    if (response['smartlife.iot.common.emeter'].get_realtime.err_code === 0) {
+      return response['smartlife.iot.common.emeter'].get_realtime;
+    }
+  } catch (err) {}
 }
 
 module.exports = Client;
