@@ -188,6 +188,9 @@ class Plug extends Device {
     if (this._childId && this._children) {
       this._child = this._children.get(this._childId);
     }
+    if (this._childId && this._child == null) {
+      throw new Error('Could not find child with childId ' + childId);
+    }
   }
   /**
    * Cached value of `sys_info.alias` or `sys_info.children[childId].alias` if childId set.

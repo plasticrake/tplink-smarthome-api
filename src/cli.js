@@ -52,8 +52,8 @@ const send = async function (host, port, payload) {
 
 const sendCommand = async function (host, port, childId, payload) {
   try {
-    console.log(`Sending to ${host}:${port || ''} via ${client.defaultSendOptions.transport}...`);
-    const device = await client.getDevice({ host, port });
+    console.log(`Sending to ${host}:${port || ''} ${childId ? 'childId: ' + childId : ''} via ${client.defaultSendOptions.transport}...`);
+    const device = await client.getDevice({ host, port, childId });
     const results = await device.sendCommand(payload);
     console.log('response:');
     console.dir(results, { colors: program.color === 'on', depth: 10 });
@@ -163,10 +163,11 @@ program
 program
   .command('sendCommand <host> <payload>')
   .description('Send payload to device (using Device#sendCommand)')
+  .option('-c, --childId [childId]', 'childId')
   .action(function (host, payload, options) {
     client = setupClient();
     const [hostOnly, port] = host.split(':');
-    sendCommand(hostOnly, port, payload);
+    sendCommand(hostOnly, port, options.childId, payload);
   });
 
 program
