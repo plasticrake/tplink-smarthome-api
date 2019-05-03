@@ -13,10 +13,10 @@ TP-Link Smart Home API
 
 ## Supported Devices
 
-| Model                                           | Type |
-|-------------------------------------------------|------|
-| HS100, HS105, HS107, HS110, HS200, HS220, HS300 | Plug |
-| LB100, LB110, LB120, LB130, LB200, LB230        | Bulb |
+| Model                                                  | Type |
+|--------------------------------------------------------|------|
+| HS100, HS103, HS105, HS107, HS110, HS200, HS220, HS300 | Plug |
+| LB100, LB110, LB120, LB130, LB200, LB230               | Bulb |
 
 ## Related Projects
 
