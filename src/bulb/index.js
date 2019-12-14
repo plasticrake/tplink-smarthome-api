@@ -33,13 +33,13 @@ class Bulb extends Device {
     this.supportsEmeter = true;
 
     this.apiModuleNamespace = {
-      'system': 'smartlife.iot.common.system',
-      'cloud': 'smartlife.iot.common.cloud',
-      'schedule': 'smartlife.iot.common.schedule',
-      'timesetting': 'smartlife.iot.common.timesetting',
-      'emeter': 'smartlife.iot.common.emeter',
-      'netif': 'netif',
-      'lightingservice': 'smartlife.iot.smartbulb.lightingservice'
+      system: 'smartlife.iot.common.system',
+      cloud: 'smartlife.iot.common.cloud',
+      schedule: 'smartlife.iot.common.schedule',
+      timesetting: 'smartlife.iot.common.timesetting',
+      emeter: 'smartlife.iot.common.emeter',
+      netif: 'netif',
+      lightingservice: 'smartlife.iot.smartbulb.lightingservice'
     };
 
     /**
@@ -93,6 +93,7 @@ class Bulb extends Device {
 
     if (sysInfo) { this.sysInfo = sysInfo; }
   }
+
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
@@ -100,6 +101,7 @@ class Bulb extends Device {
   get sysInfo () {
     return super.sysInfo;
   }
+
   /**
    * @private
    */
@@ -108,6 +110,7 @@ class Bulb extends Device {
     // TODO / XXX Verify that sysInfo.light_state can be set here to trigger events
     this.lighting.lightState = sysInfo.light_state;
   }
+
   /**
    * Cached value of `sys_info.is_dimmable === 1`
    * @return {boolean}
@@ -115,6 +118,7 @@ class Bulb extends Device {
   get supportsBrightness () {
     return (this.sysInfo.is_dimmable === 1);
   }
+
   /**
    * Cached value of `sys_info.is_color === 1`
    * @return {boolean}
@@ -122,6 +126,7 @@ class Bulb extends Device {
   get supportsColor () {
     return (this.sysInfo.is_color === 1);
   }
+
   /**
    * Cached value of `sys_info.is_variable_color_temp === 1`
    * @return {boolean}
@@ -129,6 +134,7 @@ class Bulb extends Device {
   get supportsColorTemperature () {
     return (this.sysInfo.is_variable_color_temp === 1);
   }
+
   /**
    * Returns array with min and max supported color temperatures
    * @return {?{min: Number, max: Number}} range
@@ -140,6 +146,7 @@ class Bulb extends Device {
       default: return { min: 2700, max: 6500 };
     }
   }
+
   /**
    * Requests common Bulb status details in a single request.
    * - `system.get_sysinfo`
@@ -165,6 +172,7 @@ class Bulb extends Device {
       lighting: { lightState: this.lighting.lightState }
     };
   }
+
   /**
    * Gets on/off state of Bulb.
    *
@@ -176,6 +184,7 @@ class Bulb extends Device {
     const lightState = await this.lighting.getLightState(sendOptions);
     return (lightState.on_off === 1);
   }
+
   /**
    * Sets on/off state of Bulb.
    *
@@ -187,6 +196,7 @@ class Bulb extends Device {
   async setPowerState (value, sendOptions) {
     return this.lighting.setLightState({ on_off: (value ? 1 : 0) }, sendOptions);
   }
+
   /**
    * Toggles state of Bulb.
    *

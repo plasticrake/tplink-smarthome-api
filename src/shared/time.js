@@ -8,6 +8,7 @@ class Time {
     this.device = device;
     this.apiModuleName = apiModuleName;
   }
+
   /**
    * Gets device's time.
    *
@@ -20,6 +21,7 @@ class Time {
       [this.apiModuleName]: { get_time: {} }
     }, null, sendOptions);
   }
+
   /**
    * Gets device's timezone.
    *

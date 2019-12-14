@@ -45,12 +45,12 @@ class Plug extends Device {
     this.log.debug('plug.constructor()');
 
     this.apiModuleNamespace = {
-      'system': 'system',
-      'cloud': 'cnCloud',
-      'schedule': 'schedule',
-      'timesetting': 'time',
-      'emeter': 'emeter',
-      'netif': 'netif'
+      system: 'system',
+      cloud: 'cnCloud',
+      schedule: 'schedule',
+      timesetting: 'time',
+      emeter: 'emeter',
+      netif: 'netif'
     };
 
     this.inUseThreshold = options.inUseThreshold || 0.1;
@@ -132,6 +132,7 @@ class Plug extends Device {
       this.lastState.relayState = this.relayState;
     }
   }
+
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
@@ -139,6 +140,7 @@ class Plug extends Device {
   get sysInfo () {
     return super.sysInfo;
   }
+
   /**
    * @private
    */
@@ -149,6 +151,7 @@ class Plug extends Device {
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
+
   /**
    * Returns children as a map keyed by childId. From cached results from last retrieval of `system.sys_info.children`.
    * @return {Map} children
@@ -156,6 +159,7 @@ class Plug extends Device {
   get children () {
     return this._children;
   }
+
   /**
    * @private
    */
@@ -163,7 +167,7 @@ class Plug extends Device {
     if (Array.isArray(children)) {
       this._children = new Map(children.map((child) => {
         child.id = this.normalizeChildId(child.id);
-        return [ child.id, child ];
+        return [child.id, child];
       }));
     } else if (children instanceof Map) {
       this._children = children;
@@ -173,6 +177,7 @@ class Plug extends Device {
       // this._child = this._children.get(this.normalizeChildId(this._childId));
     }
   }
+
   /**
    * Returns childId.
    * @return {string} childId
@@ -180,6 +185,7 @@ class Plug extends Device {
   get childId () {
     return this._childId;
   }
+
   /**
    * @private
    */
@@ -192,6 +198,7 @@ class Plug extends Device {
       throw new Error('Could not find child with childId ' + childId);
     }
   }
+
   /**
    * Cached value of `sys_info.alias` or `sys_info.children[childId].alias` if childId set.
    * @return {string}
@@ -202,6 +209,7 @@ class Plug extends Device {
     }
     return this.sysInfo.alias;
   }
+
   /**
    * @private
    */
@@ -211,6 +219,7 @@ class Plug extends Device {
     }
     this.sysInfo.alias = alias;
   }
+
   /**
    * Cached value of `sys_info.deviceId` or `childId` if set.
    * @return {string}
@@ -221,6 +230,7 @@ class Plug extends Device {
     }
     return this.sysInfo.deviceId;
   }
+
   /**
    * Determines if device is in use based on cached `emeter.get_realtime` results.
    *
@@ -237,6 +247,7 @@ class Plug extends Device {
     }
     return this.relayState;
   }
+
   /**
    * Cached value of `sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
    * @return {boolean} On (true) or Off (false)
@@ -247,6 +258,7 @@ class Plug extends Device {
     }
     return (this.sysInfo.relay_state === 1);
   }
+
   /**
    * @private
    */
@@ -257,6 +269,7 @@ class Plug extends Device {
     }
     this.sysInfo.relay_state = (relayState ? 1 : 0);
   }
+
   /**
    * Cached value of `sys_info.brightness != null`
    * @return {boolean}
@@ -264,6 +277,7 @@ class Plug extends Device {
   get supportsDimmer () {
     return (this.sysInfo.brightness != null);
   }
+
   /**
    * Requests common Plug status details in a single request.
    * - `system.get_sysinfo`
@@ -290,7 +304,7 @@ class Plug extends Device {
     }
     this.sysInfo = data.system.get_sysinfo;
     this.cloud.info = data.cnCloud.get_info;
-    if (data.emeter.hasOwnProperty('get_realtime')) {
+    if (Object.prototype.hasOwnProperty.call(data.emeter, 'get_realtime')) {
       this.emeter.realtime = data.emeter.get_realtime;
     }
     this.schedule.nextAction = data.schedule.get_next_action;
@@ -301,6 +315,7 @@ class Plug extends Device {
       schedule: { nextAction: this.schedule.nextAction }
     };
   }
+
   /**
    * Same as {@link #inUse}, but requests current `emeter.get_realtime`. Supports childId.
    * @param  {SendOptions} [sendOptions]
@@ -314,6 +329,7 @@ class Plug extends Device {
     }
     return this.inUse;
   }
+
   /**
    * Get Plug LED state (night mode).
    *
@@ -325,6 +341,7 @@ class Plug extends Device {
     const sysInfo = await this.getSysInfo(sendOptions);
     return (sysInfo.led_off === 0);
   }
+
   /**
    * Turn Plug LED on/off (night mode). Does not support childId.
    *
@@ -338,6 +355,7 @@ class Plug extends Device {
     this.sysInfo.set_led_off = (value ? 0 : 1);
     return true;
   }
+
   /**
    * Get Plug relay state (on/off).
    *
@@ -349,6 +367,7 @@ class Plug extends Device {
     await this.getSysInfo(sendOptions);
     return this.relayState;
   }
+
   /**
    * Turns Plug relay on/off.
    *
@@ -363,6 +382,7 @@ class Plug extends Device {
     this.emitEvents();
     return true;
   }
+
   /**
    * Toggles Plug relay state.
    *
@@ -375,6 +395,7 @@ class Plug extends Device {
     await this.setPowerState(!powerState, sendOptions);
     return !powerState;
   }
+
   /**
    * Blink Plug LED.
    *
@@ -408,6 +429,7 @@ class Plug extends Device {
     }
     return true;
   }
+
   /**
    * Plug's relay was turned on.
    * @event Plug#power-on

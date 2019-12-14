@@ -74,7 +74,7 @@ const today = new Date();
 const todayYear = today.getFullYear();
 const todayMonth = today.getMonth() + 1;
 const todayDay = today.getDate();
-const todayWday = [ false, false, false, false, false, false, false ];
+const todayWday = [false, false, false, false, false, false, false];
 todayWday[today.getDay()] = true;
 
 const scheduleTests = [
@@ -87,7 +87,7 @@ const scheduleTests = [
       day: 14,
       month: 10,
       year: 2017,
-      wday: [ false, false, false, false, false, false, true ],
+      wday: [false, false, false, false, false, false, true],
       repeat: false
     }
   },
@@ -110,7 +110,7 @@ const scheduleTests = [
     expected: {
       smin: 1204,
       stime_opt: 0,
-      wday: [ false, true, true, true, true, true, false ],
+      wday: [false, true, true, true, true, true, false],
       repeat: true
     }
   },
@@ -120,7 +120,7 @@ const scheduleTests = [
     expected: {
       smin: 1204,
       stime_opt: 0,
-      wday: [ false, true, true, true, true, true, false ],
+      wday: [false, true, true, true, true, true, false],
       repeat: true
     }
   },
@@ -138,7 +138,7 @@ const scheduleTests = [
       day: 14,
       month: 10,
       year: 2017,
-      wday: [ false, false, false, false, false, false, true ],
+      wday: [false, false, false, false, false, false, true],
       repeat: false
     }
   },
@@ -156,7 +156,7 @@ const scheduleTests = [
       day: 14,
       month: 10,
       year: 2017,
-      wday: [ false, false, false, false, false, false, true ],
+      wday: [false, false, false, false, false, false, true],
       repeat: false
     }
   },
@@ -190,7 +190,7 @@ const scheduleTests = [
       stime_opt: 1,
       emin: 0,
       etime_opt: 2,
-      wday: [ true, false, false, false, false, false, true ],
+      wday: [true, false, false, false, false, false, true],
       repeat: true
     }
   }

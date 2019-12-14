@@ -53,6 +53,7 @@ class Device extends EventEmitter {
 
     this.netif = new Netif(this, 'netif');
   }
+
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
@@ -60,6 +61,7 @@ class Device extends EventEmitter {
   get sysInfo () {
     return this._sysInfo;
   }
+
   /**
    * @private
    */
@@ -67,6 +69,7 @@ class Device extends EventEmitter {
     this.log.debug('[%s] device sysInfo set', (sysInfo.alias || this.alias));
     this._sysInfo = sysInfo;
   }
+
   /**
    * Cached value of `sys_info.alias`.
    * @return {string}
@@ -74,12 +77,14 @@ class Device extends EventEmitter {
   get alias () {
     return this.sysInfo.alias;
   }
+
   /**
    * @private
    */
   set alias (alias) {
     this.sysInfo.alias = alias;
   }
+
   /**
    * Cached value of `sys_info.deviceId`.
    * @return {string}
@@ -87,6 +92,7 @@ class Device extends EventEmitter {
   get id () {
     return this.deviceId;
   }
+
   /**
    * Cached value of `sys_info.deviceId`.
    * @return {string}
@@ -94,6 +100,7 @@ class Device extends EventEmitter {
   get deviceId () {
     return this.sysInfo.deviceId;
   }
+
   /**
    * Cached value of `sys_info.[description|dev_name]`.
    * @return {string}
@@ -101,6 +108,7 @@ class Device extends EventEmitter {
   get description () {
     return this.sysInfo.description || this.sysInfo.dev_name;
   }
+
   /**
    * Cached value of `sys_info.model`.
    * @return {string}
@@ -108,6 +116,7 @@ class Device extends EventEmitter {
   get model () {
     return this.sysInfo.model;
   }
+
   /**
    * Cached value of `sys_info.alias`.
    * @return {string}
@@ -115,6 +124,7 @@ class Device extends EventEmitter {
   get name () {
     return this.alias;
   }
+
   /**
    * Cached value of `sys_info.[type|mic_type]`.
    * @return {string}
@@ -122,6 +132,7 @@ class Device extends EventEmitter {
   get type () {
     return this.sysInfo.type || this.sysInfo.mic_type;
   }
+
   /**
    * Type of device (or `device` if unknown).
    *
@@ -136,6 +147,7 @@ class Device extends EventEmitter {
       default: return 'device';
     }
   }
+
   /**
    * Cached value of `sys_info.sw_ver`.
    * @return {string}
@@ -143,6 +155,7 @@ class Device extends EventEmitter {
   get softwareVersion () {
     return this.sysInfo.sw_ver;
   }
+
   /**
    * Cached value of `sys_info.hw_ver`.
    * @return {string}
@@ -150,6 +163,7 @@ class Device extends EventEmitter {
   get hardwareVersion () {
     return this.sysInfo.hw_ver;
   }
+
   /**
    * Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
    * @return {string}
@@ -157,6 +171,7 @@ class Device extends EventEmitter {
   get mac () {
     return this.sysInfo.mac || this.sysInfo.mic_mac || this.sysInfo.ethernet_mac;
   }
+
   /**
    * Normalized cached value of `sys_info.[mac|mic_mac|ethernet_mac]`
    *
@@ -168,6 +183,7 @@ class Device extends EventEmitter {
     const mac = this.mac || '';
     return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   }
+
   /**
    * Closes any open network connections including any shared sockets.
    */
@@ -175,6 +191,7 @@ class Device extends EventEmitter {
     this.udpConnection.close();
     this.tcpConnection.close();
   }
+
   /**
    * Sends `payload` to device (using {@link Client#send})
    * @param  {Object|string} payload
@@ -197,6 +214,7 @@ class Device extends EventEmitter {
       throw err;
     }
   }
+
   /**
    * Sends command(s) to device.
    *
@@ -233,6 +251,7 @@ class Device extends EventEmitter {
     const results = processResponse(commandObj, response);
     return results;
   }
+
   /**
    * @private
    */
@@ -250,6 +269,7 @@ class Device extends EventEmitter {
     }
     return normalizedChildId;
   }
+
   /**
    * Polls the device every `interval`.
    *
@@ -276,6 +296,7 @@ class Device extends EventEmitter {
     fn();
     return this;
   }
+
   /**
    * Stops device polling.
    */
@@ -283,6 +304,7 @@ class Device extends EventEmitter {
     clearInterval(this.pollingTimer);
     this.pollingTimer = null;
   }
+
   /**
    * Gets device's SysInfo.
    *
@@ -295,6 +317,7 @@ class Device extends EventEmitter {
     this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', null, sendOptions);
     return this.sysInfo;
   }
+
   /**
    * Change device's alias (name).
    *
@@ -310,6 +333,7 @@ class Device extends EventEmitter {
     this.alias = alias;
     return true;
   }
+
   /**
    * Set device's location.
    *
@@ -328,6 +352,7 @@ class Device extends EventEmitter {
       }
     }, null, sendOptions);
   }
+
   /**
    * Gets device's model.
    *
@@ -339,6 +364,7 @@ class Device extends EventEmitter {
     const sysInfo = await this.getSysInfo(sendOptions);
     return sysInfo.model;
   }
+
   /**
    * Reboot device.
    *
@@ -352,6 +378,7 @@ class Device extends EventEmitter {
       [this.apiModuleNamespace.system]: { reboot: { delay } }
     }, null, sendOptions);
   }
+
   /**
    * Reset device.
    *

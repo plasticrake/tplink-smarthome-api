@@ -8,6 +8,7 @@ class Netif {
     this.device = device;
     this.apiModuleName = apiModuleName;
   }
+
   /**
    * Requests `netif.get_scaninfo` (list of WiFi networks).
    *

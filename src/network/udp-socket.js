@@ -31,12 +31,12 @@ class UdpSocket extends TplinkSocket {
         }
 
         this.socket.on('error', (err) => {
-          this.logDebug(`: createSocket:error`);
+          this.logDebug(': createSocket:error');
           reject(err);
         });
 
         this.socket.bind(() => {
-          this.logDebug(`.createSocket(): listening on %j`, this.socket.address());
+          this.logDebug('.createSocket(): listening on %j', this.socket.address());
           this.socket.removeAllListeners('error');
           this.isBound = true;
           resolve(this.socket);
@@ -75,7 +75,7 @@ class UdpSocket extends TplinkSocket {
       socket.on('message', (msg, rinfo) => {
         let decryptedMsg;
         try {
-          this.logDebug(`: socket:data rinfo: %j`, rinfo);
+          this.logDebug(': socket:data rinfo: %j', rinfo);
           setSocketTimeout(0);
 
           decryptedMsg = decrypt(msg).toString('utf8');
@@ -89,7 +89,7 @@ class UdpSocket extends TplinkSocket {
 
       socket.on('close', () => {
         try {
-          this.logDebug(`: socket:close`);
+          this.logDebug(': socket:close');
           setSocketTimeout(0);
         } finally {
           reject(new Error('UDP Socket Closed'));
@@ -97,12 +97,12 @@ class UdpSocket extends TplinkSocket {
       });
 
       socket.on('error', (err) => {
-        this.logDebug(`: socket:error`);
+        this.logDebug(': socket:error');
         reject(err);
       });
 
       const encyptedPayload = encrypt(payload);
-      this.logDebug(`: socket:send payload.length`, encyptedPayload.length);
+      this.logDebug(': socket:send payload.length', encyptedPayload.length);
 
       socket.send(encyptedPayload, 0, encyptedPayload.length, port, host, (err) => {
         if (err) {
@@ -114,7 +114,7 @@ class UdpSocket extends TplinkSocket {
           }
           return;
         }
-        this.logDebug(`: socket:send sent`);
+        this.logDebug(': socket:send sent');
       });
     });
   }

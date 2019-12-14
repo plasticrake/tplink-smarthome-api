@@ -19,16 +19,14 @@ class TplinkSocket {
       throw new Error('Socket Already Created');
     }
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.socket = await func();
-        resolve(this.socket);
-      } catch (err) {
-        this.log.error(`${this.socketType} Error (createSocket): %s`, err);
-        this.isBound = false;
-        reject(err);
-      }
-    });
+    try {
+      this.socket = await func();
+      return this.socket;
+    } catch (err) {
+      this.log.error(`${this.socketType} Error (createSocket): %s`, err);
+      this.isBound = false;
+      throw err;
+    }
   }
 
   async send (payload, port, host, { timeout } = { }) {

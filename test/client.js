@@ -47,8 +47,8 @@ describe('Client', function () {
     });
 
     it('should emit device-new when finding a new device with `devices` specified', function (done) {
-      const mac = testDevices['anydevice'].mac;
-      const host = testDevices['anydevice'].deviceOptions.host;
+      const mac = testDevices.anydevice.mac;
+      const host = testDevices.anydevice.deviceOptions.host;
       expect(mac).to.be.a('string').and.not.empty;
       expect(host).to.be.a('string').and.not.empty;
 
@@ -84,8 +84,8 @@ describe('Client', function () {
     });
 
     it('should ONLY emit device-new for specified macAddresses', function (done) {
-      let spy = sinon.spy();
-      let mac = testDevices['anydevice'].mac;
+      const spy = sinon.spy();
+      const mac = testDevices.anydevice.mac;
       expect(mac).to.be.a('string').and.not.empty;
 
       client.startDiscovery({ discoveryInterval: 250, macAddresses: [mac] }).on('device-new', spy);
@@ -98,8 +98,8 @@ describe('Client', function () {
     });
 
     it('should NOT emit device-new for specified excludedMacAddresses', function (done) {
-      let spy = sinon.spy();
-      let mac = testDevices['anydevice'].mac;
+      const spy = sinon.spy();
+      const mac = testDevices.anydevice.mac;
       expect(mac, 'mac blank').to.be.a('string').and.not.empty;
 
       client.startDiscovery({ discoveryInterval: 250, excludeMacAddresses: [mac] }).on('device-new', spy);
@@ -113,14 +113,16 @@ describe('Client', function () {
     });
 
     it('should NOT emit device-new for devices not meeting filterCallback', function (done) {
-      let spy = sinon.spy();
-      let mac = testDevices['anydevice'].mac;
+      const spy = sinon.spy();
+      const mac = testDevices.anydevice.mac;
       expect(mac, 'mac blank').to.be.a('string').and.not.empty;
 
-      client.startDiscovery({ discoveryInterval: 250,
+      client.startDiscovery({
+        discoveryInterval: 250,
         filterCallback: (sysInfo) => {
           return !compareMac(sysInfo.mac, mac);
-        } }).on('device-new', spy);
+        }
+      }).on('device-new', spy);
 
       setTimeout(() => {
         client.stopDiscovery();
@@ -131,7 +133,7 @@ describe('Client', function () {
     });
 
     it('should NOT emit device-new for devices not meeting filterCallback -- all devices', function (done) {
-      let spy = sinon.spy();
+      const spy = sinon.spy();
 
       client.startDiscovery({ discoveryInterval: 250, filterCallback: () => false }).on('device-new', spy);
 
@@ -149,8 +151,8 @@ describe('Client', function () {
       });
     });
 
-    let events = ['new', 'online', 'offline'];
-    let eventTests = [];
+    const events = ['new', 'online', 'offline'];
+    const eventTests = [];
     [
       { typeName: 'device', type: Device },
       { typeName: 'plug', type: Plug },
@@ -162,11 +164,11 @@ describe('Client', function () {
     });
 
     eventTests.forEach((et) => {
-      let eventName = `${et.typeName}-${et.event}`;
+      const eventName = `${et.typeName}-${et.event}`;
 
       it(`should emit ${eventName} when finding a(n) ${et.event} ${et.typeName}`, function (done) {
         if (et.event === 'offline') {
-          let invalidDevice = client.getDeviceFromType(et.typeName);
+          const invalidDevice = client.getDeviceFromType(et.typeName);
           invalidDevice.status = 'online';
           invalidDevice.seenOnDiscovery = 0;
           invalidDevice.sysInfo.type = et.typeName;
@@ -193,7 +195,7 @@ describe('Client', function () {
     });
 
     it('should emit discovery-invalid for the unreliable test device', function (done) {
-      let device = testDevices['unreliable'];
+      const device = testDevices.unreliable;
       if (!device.deviceOptions || !device.deviceOptions.port) this.skip();
 
       client.startDiscovery({ discoveryInterval: 250 }).on('discovery-invalid', ({ rinfo, response, decryptedResponse }) => {
@@ -256,7 +258,7 @@ describe('Client', function () {
 
         before(async function () {
           client = getTestClient(testSendOptions);
-          device = await client.getDevice(testDevices['anydevice'].deviceOptions);
+          device = await client.getDevice(testDevices.anydevice.deviceOptions);
         });
 
         after(function () {
@@ -269,7 +271,7 @@ describe('Client', function () {
 
         it('should be rejected with an invalid IP address', async function () {
           let error;
-          let deviceOptions = testDevices['unreachable'].deviceOptions;
+          const deviceOptions = testDevices.unreachable.deviceOptions;
           let device;
           try {
             device = await client.getDevice(deviceOptions, { timeout: 500 });
@@ -290,8 +292,8 @@ describe('Client', function () {
 
         before(function () {
           client = getTestClient(testSendOptions);
-          plug = client.getPlug(testDevices['anyplug'].deviceOptions);
-          unreachablePlug = client.getPlug(testDevices['unreachable'].deviceOptions);
+          plug = client.getPlug(testDevices.anyplug.deviceOptions);
+          unreachablePlug = client.getPlug(testDevices.unreachable.deviceOptions);
         });
 
         after(function () {
@@ -316,8 +318,8 @@ describe('Client', function () {
 
         before(function () {
           client = getTestClient(testSendOptions);
-          bulb = client.getBulb(testDevices['anybulb'].deviceOptions);
-          unreachableBulb = client.getBulb(testDevices['unreachable'].deviceOptions);
+          bulb = client.getBulb(testDevices.anybulb.deviceOptions);
+          unreachableBulb = client.getBulb(testDevices.unreachable.deviceOptions);
         });
 
         after(function () {
@@ -339,7 +341,7 @@ describe('Client', function () {
       let options;
       before(function () {
         client = getTestClient(testSendOptions);
-        options = testDevices['anydevice'].deviceOptions;
+        options = testDevices.anydevice.deviceOptions;
       });
       [{ transport: 'tcp' }, { transport: 'udp' }].forEach((sendOptions) => {
         it(`should return info with string payload ${sendOptions.transport}`, function () {
@@ -347,7 +349,7 @@ describe('Client', function () {
             .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
         });
         it(`should return info with object payload${sendOptions.transport}`, function () {
-          return expect(client.send({ 'system': { 'get_sysinfo': {} } }, options.host, options.port, sendOptions))
+          return expect(client.send({ system: { get_sysinfo: {} } }, options.host, options.port, sendOptions))
             .to.eventually.have.nested.property('system.get_sysinfo.err_code', 0);
         });
       });

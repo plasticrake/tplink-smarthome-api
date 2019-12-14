@@ -11,6 +11,7 @@ class Away {
     this.apiModuleName = apiModuleName;
     this.childId = childId;
   }
+
   /**
    * Gets Away Rules.
    *
@@ -23,6 +24,7 @@ class Away {
       [this.apiModuleName]: { get_rules: {} }
     }, this.childId, sendOptions);
   }
+
   /**
    * Gets Away Rule.
    *
@@ -39,6 +41,7 @@ class Away {
     }
     return rule;
   }
+
   /**
    * Adds Away Rule.
    *
@@ -63,6 +66,7 @@ class Away {
       [this.apiModuleName]: { add_rule: rule }
     }, this.childId, sendOptions);
   }
+
   /**
    * Edits Away rule.
    *
@@ -89,6 +93,7 @@ class Away {
       [this.apiModuleName]: { edit_rule: rule }
     }, this.childId, sendOptions);
   }
+
   /**
    * Deletes All Away Rules.
    *
@@ -101,6 +106,7 @@ class Away {
       [this.apiModuleName]: { delete_all_rules: {} }
     }, this.childId, sendOptions);
   }
+
   /**
    * Deletes Away Rule.
    *
@@ -114,6 +120,7 @@ class Away {
       [this.apiModuleName]: { delete_rule: { id } }
     }, this.childId, sendOptions);
   }
+
   /**
    * Enables or Disables Away Rules.
    *

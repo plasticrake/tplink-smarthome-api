@@ -8,6 +8,7 @@ class Cloud {
     this.device = device;
     this.apiModuleName = apiModuleName;
   }
+
   /**
    * Gets device's TP-Link cloud info.
    *
@@ -21,6 +22,7 @@ class Cloud {
     }, null, sendOptions);
     return this.info;
   }
+
   /**
    * Add device to TP-Link cloud.
    *
@@ -35,6 +37,7 @@ class Cloud {
       [this.apiModuleName]: { bind: { username, password } }
     }, null, sendOptions);
   }
+
   /**
    * Remove device from TP-Link cloud.
    *
@@ -47,6 +50,7 @@ class Cloud {
       [this.apiModuleName]: { unbind: {} }
     }, null, sendOptions);
   }
+
   /**
    * Get device's TP-Link cloud firmware list.
    *
@@ -59,6 +63,7 @@ class Cloud {
       [this.apiModuleName]: { get_intl_fw_list: {} }
     }, null, sendOptions);
   }
+
   /**
    * Sets device's TP-Link cloud server URL.
    *

@@ -9,6 +9,7 @@ class Timer {
     this.apiModuleName = apiModuleName;
     this.childId = childId;
   }
+
   /**
    * Get Countdown Timer Rule (only one allowed).
    *
@@ -22,6 +23,7 @@ class Timer {
       [this.apiModuleName]: { get_rules: {} }
     }, this.childId, sendOptions);
   }
+
   /**
    * Add Countdown Timer Rule (only one allowed).
    *
@@ -48,6 +50,7 @@ class Timer {
       }
     }, this.childId, sendOptions);
   }
+
   /**
    * Edit Countdown Timer Rule (only one allowed).
    *
@@ -74,6 +77,7 @@ class Timer {
       }
     }, this.childId, sendOptions);
   }
+
   /**
    * Delete Countdown Timer Rule (only one allowed).
    *

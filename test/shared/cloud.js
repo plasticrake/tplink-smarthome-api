@@ -11,7 +11,7 @@ const password = process.env.TEST_CLOUD_PASSWORD || 'password';
 const serverUrl = process.env.TEST_CLOUD_SERVER_URL || 'tplink.com';
 
 async function bindCloud (device, force = false) {
-  let ci = await device.cloud.getInfo();
+  const ci = await device.cloud.getInfo();
   if (ci.binded === 1 && force) {
     expect(await device.cloud.unbind()).to.have.property('err_code', 0);
     ci.binded = 0;
@@ -22,7 +22,7 @@ async function bindCloud (device, force = false) {
 }
 
 async function unbindCloud (device, force = false) {
-  let ci = await device.cloud.getInfo();
+  const ci = await device.cloud.getInfo();
   if (ci.binded === 0 && force) {
     expect(await device.cloud.bind(username, password)).to.have.property('err_code', 0);
     ci.binded = 1;
@@ -41,7 +41,7 @@ module.exports = function (testDevice) {
 
     before(async function getOriginalCloudInfo () {
       if (!testDevice.getDevice) return this.skip();
-      let device = await testDevice.getDevice();
+      const device = await testDevice.getDevice();
       originalCloudInfo = await device.cloud.getInfo();
     });
 
@@ -63,7 +63,7 @@ module.exports = function (testDevice) {
     describe('#getInfo()', function () {
       // Does not require to be logged in to cloud
       it('should return cloud info', async function () {
-        let ci = await this.device.cloud.getInfo();
+        const ci = await this.device.cloud.getInfo();
         expect(ci).to.have.property('err_code', 0);
         expect(ci).to.include.keys('username', 'server');
       });

@@ -10,6 +10,7 @@ class Emeter {
     this.childId = childId;
     this._realtime = {};
   }
+
   /**
    * Returns cached results from last retrieval of `emeter.get_realtime`.
    * @return {Object}
@@ -17,6 +18,7 @@ class Emeter {
   get realtime () {
     return this._realtime;
   }
+
   /**
    * @private
    */
@@ -41,6 +43,7 @@ class Emeter {
     this._realtime = normalizedRealtime;
     this.device.emit('emeter-realtime-update', this._realtime);
   }
+
   /**
    * Gets device's current energy stats.
    *
@@ -57,6 +60,7 @@ class Emeter {
     }, this.childId, sendOptions);
     return this.realtime;
   }
+
   /**
    * Get Daily Emeter Statisics.
    *
@@ -71,6 +75,7 @@ class Emeter {
       [this.apiModuleName]: { get_daystat: { year, month } }
     }, this.childId, sendOptions);
   }
+
   /**
    * Get Monthly Emeter Statisics.
    *
@@ -84,6 +89,7 @@ class Emeter {
       [this.apiModuleName]: { get_monthstat: { year } }
     }, this.childId, sendOptions);
   }
+
   /**
    * Erase Emeter Statistics.
    *

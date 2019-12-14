@@ -10,6 +10,7 @@ class TcpConnection extends TplinkConnection {
   get socketType () {
     return 'TCP';
   }
+
   /**
    * @private
    */

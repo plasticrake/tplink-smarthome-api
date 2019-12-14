@@ -33,6 +33,7 @@ class BulbSchedule extends Schedule {
 
     return Schedule.prototype.addRule.call(this, rule, null, sendOptions); // super.addRule(rule); // workaround babel bug
   }
+
   /**
    * Edits Schedule rule.
    *

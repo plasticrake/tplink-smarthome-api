@@ -103,6 +103,7 @@ class Client extends EventEmitter {
     connection.close();
     return response;
   }
+
   /**
    * Requests `{system:{get_sysinfo:{}}}` from device.
    *
@@ -116,6 +117,7 @@ class Client extends EventEmitter {
     const data = await this.send('{"system":{"get_sysinfo":{}}}', host, port, sendOptions);
     return data.system.get_sysinfo;
   }
+
   /**
    * @private
    */
@@ -130,6 +132,7 @@ class Client extends EventEmitter {
       super.emit(eventName, ...args);
     }
   }
+
   /**
    * Creates Bulb object.
    *
@@ -140,6 +143,7 @@ class Client extends EventEmitter {
   getBulb (deviceOptions) {
     return new Bulb(Object.assign({}, { defaultSendOptions: this.defaultSendOptions }, deviceOptions, { client: this }));
   }
+
   /**
    * Creates {@link Plug} object.
    *
@@ -150,6 +154,7 @@ class Client extends EventEmitter {
   getPlug (deviceOptions) {
     return new Plug(Object.assign({}, { defaultSendOptions: this.defaultSendOptions }, deviceOptions, { client: this }));
   }
+
   /**
    * Creates a {@link Plug} or {@link Bulb} after querying device to determine type.
    *
@@ -163,6 +168,7 @@ class Client extends EventEmitter {
     const sysInfo = await this.getSysInfo(deviceOptions.host, deviceOptions.port, sendOptions);
     return this.getDeviceFromSysInfo(sysInfo, Object.assign({}, deviceOptions, { client: this }));
   }
+
   /**
    * Create {@link Device} object.
    * - Device object only supports common Device methods.
@@ -174,6 +180,7 @@ class Client extends EventEmitter {
   getCommonDevice (deviceOptions) {
     return new Device(Object.assign({}, { client: this, defaultSendOptions: this.defaultSendOptions }, deviceOptions));
   }
+
   /**
    * @private
    */
@@ -187,6 +194,7 @@ class Client extends EventEmitter {
       default: return this.getPlug(deviceOptions);
     }
   }
+
   /**
    * Creates device corresponding to the provided `sysInfo`.
    *
@@ -203,6 +211,7 @@ class Client extends EventEmitter {
       default: return this.getPlug(thisDeviceOptions);
     }
   }
+
   /**
    * Guess the device type from provided `sysInfo`.
    *
@@ -218,6 +227,7 @@ class Client extends EventEmitter {
       default: return 'device';
     }
   }
+
   /**
    * First response from device.
    * @event Client#device-new
@@ -419,6 +429,7 @@ class Client extends EventEmitter {
 
     return this;
   }
+
   /**
    * @private
    */
@@ -454,6 +465,7 @@ class Client extends EventEmitter {
       process(sysInfo.deviceId);
     }
   }
+
   /**
    * Stops discovery and closes UDP socket.
    */
@@ -466,6 +478,7 @@ class Client extends EventEmitter {
       this.socket.close();
     }
   }
+
   /**
    * @private
    */

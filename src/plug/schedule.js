@@ -38,6 +38,7 @@ class PlugSchedule extends Schedule {
 
     return Schedule.prototype.addRule.call(this, rule, sendOptions); // super.addRule(rule); // workaround babel bug
   }
+
   /**
    * Edits Schedule rule.
    *

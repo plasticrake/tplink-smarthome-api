@@ -10,6 +10,7 @@ class UdpConnection extends TplinkConnection {
   get socketType () {
     return 'UDP';
   }
+
   /**
    * @private
    */

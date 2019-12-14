@@ -14,7 +14,7 @@ describe('Bulb', function () {
 
   testSendOptions.forEach((testSendOptions) => {
     context(testSendOptions.name, function () {
-      testDevices['bulb'].forEach((testDevice) => {
+      testDevices.bulb.forEach((testDevice) => {
         context(testDevice.name, function () {
           let bulb;
           before(async function () {
@@ -68,7 +68,7 @@ describe('Bulb', function () {
 
           describe('#getColorTemperatureRange get', function () {
             it('should return is_variable_color_temp from cached sysInfo if supported (LB120/LB130)', function () {
-              let range = bulb.getColorTemperatureRange;
+              const range = bulb.getColorTemperatureRange;
               if (bulb.supportsColorTemperature) {
                 expect(range).to.to.have.property('min').a('number').within(2500, 9000);
                 expect(range).to.to.have.property('max').a('number').within(2500, 9000);
@@ -84,7 +84,7 @@ describe('Bulb', function () {
               }
             });
             it('should return undefined if not supported (LB100)', function () {
-              let range = bulb.getColorTemperatureRange;
+              const range = bulb.getColorTemperatureRange;
               if (!bulb.supportsColorTemperature) {
                 expect(range).to.be.undefined;
                 expect(testDevice.model).to.not.match(/lb1[23]0/);
@@ -94,7 +94,7 @@ describe('Bulb', function () {
 
           describe('#getInfo()', function () {
             it('should return info', async function () {
-              let results = await bulb.getInfo();
+              const results = await bulb.getInfo();
               expect(results).to.have.property('sysInfo');
               expect(results).to.have.nested.property('cloud.info');
               expect(results).to.have.nested.property('emeter.realtime');

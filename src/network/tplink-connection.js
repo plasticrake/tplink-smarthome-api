@@ -20,24 +20,28 @@ class TplinkConnection extends EventEmitter {
       });
     });
   }
+
   /**
    * @private
    */
   get host () {
     return this.device.host;
   }
+
   /**
    * @private
    */
   get port () {
     return this.device.port;
   }
+
   /**
    * @private
    */
   get description () {
     return `${this.socketType} ${this.host}:${this.port}`;
   }
+
   /**
    * @private
    */
@@ -74,7 +78,7 @@ class TplinkConnection extends EventEmitter {
     return this.queue.add(async () => {
       try {
         socket = await this.getSocket(useSharedSocket);
-        let response = await socket.send(payload, this.port, this.host, { timeout });
+        const response = await socket.send(payload, this.port, this.host, { timeout });
         if (!useSharedSocket) { socket.close(); }
         return response;
       } catch (err) {
@@ -93,6 +97,7 @@ class TplinkConnection extends EventEmitter {
       this.sharedSocket.close();
     }
   }
+
   /**
    * @private
    */

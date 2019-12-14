@@ -86,7 +86,7 @@ class TcpSocket extends TplinkSocket {
             this.logDebug(`: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} ...`);
           }
         } catch (err) {
-          this.logDebug(`: socket:data error`);
+          this.logDebug(': socket:data error');
           console.dir(data);
           reject(err);
         }
@@ -107,14 +107,14 @@ class TcpSocket extends TplinkSocket {
             throw err;
           }
         } catch (err) {
-          this.logDebug(`: socket:close error`);
+          this.logDebug(': socket:close error');
           reject(err);
         }
       });
 
       socket.on('error', (err) => {
         try {
-          this.logDebug(`: socket:error`, err);
+          this.logDebug(': socket:error', err);
           setSocketTimeout(0);
           this.destroy();
         } finally {
@@ -123,7 +123,7 @@ class TcpSocket extends TplinkSocket {
       });
 
       const encyptedPayload = encryptWithHeader(payload);
-      this.logDebug(`: socket:send payload.length`, encyptedPayload.length);
+      this.logDebug(': socket:send payload.length', encyptedPayload.length);
 
       this.logDebug(`: socket:send attempting to connect. host:${host}, port:${port}`);
       socket.connect({ port, host }, () => {
@@ -131,9 +131,9 @@ class TcpSocket extends TplinkSocket {
           this.logDebug(`: socket:connect ${socket.localAddress} ${socket.localPort} ${socket.remoteAddress} ${socket.remotePort}`);
           this.isBound = true;
           const writeRet = socket.write(encyptedPayload);
-          this.logDebug(`: socket:connect:write`, (writeRet ? 'flushed' : 'queued'));
+          this.logDebug(': socket:connect:write', (writeRet ? 'flushed' : 'queued'));
         } catch (err) {
-          this.logDebug(`: socket:connect error`);
+          this.logDebug(': socket:connect error');
           reject(err);
         }
       });

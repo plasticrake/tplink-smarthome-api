@@ -10,6 +10,7 @@ class Schedule {
     this.apiModuleName = apiModuleName;
     this.childId = childId;
   }
+
   /**
    * Gets Next Schedule Rule Action.
    *
@@ -23,6 +24,7 @@ class Schedule {
     }, this.childId, sendOptions);
     return this.nextaction;
   }
+
   /**
    * Gets Schedule Rules.
    *
@@ -35,6 +37,7 @@ class Schedule {
       [this.apiModuleName]: { get_rules: {} }
     }, this.childId, sendOptions);
   }
+
   /**
    * Gets Schedule Rule.
    *
@@ -51,6 +54,7 @@ class Schedule {
     }
     return rule;
   }
+
   /**
    * Adds Schedule rule.
    *
@@ -64,6 +68,7 @@ class Schedule {
       [this.apiModuleName]: { add_rule: rule }
     }, this.childId, sendOptions);
   }
+
   /**
    * Edits Schedule Rule.
    *
@@ -77,6 +82,7 @@ class Schedule {
       [this.apiModuleName]: { edit_rule: rule }
     }, this.childId, sendOptions);
   }
+
   /**
    * Deletes All Schedule Rules.
    *
@@ -89,6 +95,7 @@ class Schedule {
       [this.apiModuleName]: { delete_all_rules: {} }
     }, this.childId, sendOptions);
   }
+
   /**
    * Deletes Schedule Rule.
    *
@@ -102,6 +109,7 @@ class Schedule {
       [this.apiModuleName]: { delete_rule: { id } }
     }, this.childId, sendOptions);
   }
+
   /**
    * Enables or Disables Schedule Rules.
    *
@@ -115,6 +123,7 @@ class Schedule {
       [this.apiModuleName]: { set_overall_enable: { enable: (enable ? 1 : 0) } }
     }, this.childId, sendOptions);
   }
+
   /**
    * Get Daily Usage Statisics.
    *
@@ -129,6 +138,7 @@ class Schedule {
       [this.apiModuleName]: { get_daystat: { year, month } }
     }, this.childId, sendOptions);
   }
+
   /**
    * Get Monthly Usage Statisics.
    *
@@ -142,6 +152,7 @@ class Schedule {
       [this.apiModuleName]: { get_monthstat: { year } }
     }, this.childId, sendOptions);
   }
+
   /**
    * Erase Usage Statistics.
    *

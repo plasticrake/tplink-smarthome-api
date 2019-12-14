@@ -67,10 +67,10 @@ module.exports = function () {
       });
 
       it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function () {
-        let spyOn = sinon.spy();
-        let spyOff = sinon.spy();
-        let spyChange = sinon.spy();
-        let spyUpdate = sinon.spy();
+        const spyOn = sinon.spy();
+        const spyOff = sinon.spy();
+        const spyChange = sinon.spy();
+        const spyUpdate = sinon.spy();
 
         await this.device.lighting.setLightState({ on_off: 0 });
 
@@ -105,21 +105,21 @@ module.exports = function () {
       this.slow(1000);
       it('should return light state when on', async function () {
         await this.device.lighting.setLightState({ on_off: 1 });
-        let ls = await this.device.lighting.getLightState();
+        const ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
       });
 
       it('should return light state when off', async function () {
         await this.device.lighting.setLightState({ on_off: 0 });
-        let ls = await this.device.lighting.getLightState();
+        const ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 0);
       });
 
       it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function () {
-        let spyOn = sinon.spy();
-        let spyOff = sinon.spy();
-        let spyChange = sinon.spy();
-        let spyUpdate = sinon.spy();
+        const spyOn = sinon.spy();
+        const spyOff = sinon.spy();
+        const spyChange = sinon.spy();
+        const spyUpdate = sinon.spy();
 
         await this.device.lighting.setLightState({ on_off: 0 });
 

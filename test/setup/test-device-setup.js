@@ -48,10 +48,10 @@ const testDevices = [
   { model: 'lb130', deviceType: 'bulb', name: 'LB130(bulb)' }];
 
 // Object.entries polyfill
-let objectEntries = function (obj) {
-  let ownProps = Object.keys(obj);
+const objectEntries = function (obj) {
+  const ownProps = Object.keys(obj);
   let i = ownProps.length;
-  let resArray = new Array(i); // preallocate the Array
+  const resArray = new Array(i); // preallocate the Array
   while (i--) {
     resArray[i] = [ownProps[i], obj[ownProps[i]]];
   }
@@ -66,12 +66,12 @@ objectEntries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
 });
 
 testDevices.simulated = useSimulator;
-testDevices['anydevice'] = { name: 'Device', deviceType: 'device' };
-testDevices['anyplug'] = { name: 'Plug', deviceType: 'plug' };
-testDevices['anybulb'] = { name: 'Bulb', deviceType: 'bulb' };
-testDevices['unreliable'] = { name: 'Unreliable Device', deviceType: 'plug' };
-testDevices['unreachable'] = { name: 'Unreachable Device', deviceOptions: { host: '192.0.2.0', port: 9999, defaultSendOptions: { timeout: 100 } } };
-testDevices['plugchildren'] = [
+testDevices.anydevice = { name: 'Device', deviceType: 'device' };
+testDevices.anyplug = { name: 'Plug', deviceType: 'plug' };
+testDevices.anybulb = { name: 'Bulb', deviceType: 'bulb' };
+testDevices.unreliable = { name: 'Unreliable Device', deviceType: 'plug' };
+testDevices.unreachable = { name: 'Unreachable Device', deviceOptions: { host: '192.0.2.0', port: 9999, defaultSendOptions: { timeout: 100 } } };
+testDevices.plugchildren = [
   { name: 'HS300(plug).0', deviceType: 'plug' },
   { name: 'HS300(plug).1', deviceType: 'plug' },
   { name: 'HS300(plug).2', deviceType: 'plug' },
@@ -89,13 +89,13 @@ async function getTestDevices () {
 
 async function getDiscoveryTestDevices () {
   return new Promise((resolve, reject) => {
-    let discoveredTestDevices = [];
-    let client = getTestClient();
+    const discoveredTestDevices = [];
+    const client = getTestClient();
     client.startDiscovery({ discoveryTimeout: discoveryTimeout });
 
     setTimeout(() => {
       client.stopDiscovery();
-      for (let device of client.devices.values()) {
+      for (const device of client.devices.values()) {
         if (discoveryIpWhitelist.length === 0 || discoveryIpWhitelist.includes(device.host)) {
           discoveredTestDevices.push({
             model: device.model,
@@ -118,7 +118,7 @@ const simulatedDevices = [];
 let simulatedUdpServer;
 
 async function getSimulatedTestDevices () {
-  let client = getTestClient();
+  const client = getTestClient();
 
   simulatedDevices.push({ device: new simulator.Device({ model: 'hs100', data: { alias: 'Mock HS100', mac: 'aa:aa:aa:00:00:01' } }) });
   simulatedDevices.push({ device: new simulator.Device({ model: 'hs105', data: { alias: 'Mock’s “HS105”', mac: 'aa:aa:aa:00:00:02' } }) });
@@ -136,13 +136,13 @@ async function getSimulatedTestDevices () {
     device: new simulator.Device({ model: 'hs100', unreliablePercent: 1, data: { alias: 'Mock Unreliable 100%', mac: 'aa:aa:aa:00:00:99' } })
   });
 
-  let simulatedTestDevices = [];
+  const simulatedTestDevices = [];
   for (var i = 0; i < simulatedDevices.length; i++) {
-    let d = simulatedDevices[i].device;
-    let testType = simulatedDevices[i].testType;
+    const d = simulatedDevices[i].device;
+    const testType = simulatedDevices[i].testType;
     await d.start();
 
-    let process = (childId) => {
+    const process = (childId) => {
       simulatedTestDevices.push({
         testType: testType,
         model: d.model,
@@ -202,9 +202,9 @@ function testDeviceCleanup () {
     if (device) {
       addDevice(testDevice, device);
 
-      if (!testDevices['anydevice'].mac) { addDevice(testDevices['anydevice'], device); }
-      if (testDevice.deviceType === 'plug' && !testDevices['anyplug'].mac) { addDevice(testDevices['anyplug'], device); }
-      if (testDevice.deviceType === 'bulb' && !testDevices['anybulb'].mac) { addDevice(testDevices['anybulb'], device); }
+      if (!testDevices.anydevice.mac) { addDevice(testDevices.anydevice, device); }
+      if (testDevice.deviceType === 'plug' && !testDevices.anyplug.mac) { addDevice(testDevices.anyplug, device); }
+      if (testDevice.deviceType === 'bulb' && !testDevices.anybulb.mac) { addDevice(testDevices.anybulb, device); }
     }
   });
 
@@ -218,7 +218,7 @@ function testDeviceCleanup () {
       };
       realDevice.getOtherChildrenState = async function () {
         return Promise.all(this.getOtherChildren().map(async (childDevice) => {
-          let d = await childDevice.getDevice();
+          const d = await childDevice.getDevice();
           return { mac: d.mac, childId: d.childId, relayState: d.relayState, alias: d.alias };
         }));
       };
@@ -226,12 +226,12 @@ function testDeviceCleanup () {
       addDevice(testDeviceChild, realDevice);
       testDeviceChild.name += `.${i}`;
       testDevices.push(testDeviceChild);
-      addDevice(testDevices['plugchildren'][i], testDeviceChild);
+      addDevice(testDevices.plugchildren[i], testDeviceChild);
     });
   });
 
   const unreliableDevice = realTestDevices.find((realDevice) => (realDevice.testType === 'unreliable'));
-  if (unreliableDevice) addDevice(testDevices['unreliable'], unreliableDevice);
+  if (unreliableDevice) addDevice(testDevices.unreliable, unreliableDevice);
 
   testDevices.forEach((td) => {
     const deviceOptions = td.deviceOptions || {};

@@ -15,6 +15,7 @@ class Lighting {
 
     this._lastState = { powerOn: null, lightState: null };
   }
+
   /**
    * Returns cached results from last retrieval of `lightingservice.get_light_state`.
    * @return {Object}
@@ -22,6 +23,7 @@ class Lighting {
   get lightState () {
     return _lightState;
   }
+
   /**
    * @private
    */
@@ -29,6 +31,7 @@ class Lighting {
     _lightState = lightState;
     this.emitEvents();
   }
+
   /**
    * Bulb was turned on (`lightstate.on_off`).
    * @event Bulb#lightstate-on
@@ -71,6 +74,7 @@ class Lighting {
     }
     this.device.emit('lightstate-update', _lightState);
   }
+
   /**
    * Get Bulb light state.
    *
@@ -84,6 +88,7 @@ class Lighting {
     }, null, sendOptions);
     return this.lightState;
   }
+
   /**
    * Sets Bulb light state (on/off, brightness, color, etc).
    *

@@ -14,11 +14,11 @@ module.exports = function (testDevice) {
 
     before(async function () {
       if (!testDevice.getDevice) return this.skip();
-      let today = new Date();
+      const today = new Date();
       month = today.getMonth() + 1;
       year = today.getFullYear();
 
-      let device = await testDevice.getDevice();
+      const device = await testDevice.getDevice();
       await device.schedule.deleteAllRules();
     });
 
@@ -36,10 +36,10 @@ module.exports = function (testDevice) {
 
     describe('#deleteAllRules()', function () {
       it('should delete all rules', async function () {
-        let deleteResponse = await this.device.schedule.deleteAllRules();
+        const deleteResponse = await this.device.schedule.deleteAllRules();
         expect(deleteResponse).to.have.property('err_code', 0);
 
-        let getResponse = await this.device.schedule.getRules();
+        const getResponse = await this.device.schedule.getRules();
         expect(getResponse).to.have.property('err_code', 0);
         expect(getResponse.rule_list).to.have.property('length', 0);
       });
@@ -48,17 +48,17 @@ module.exports = function (testDevice) {
     describe('#deleteRule()', function () {
       it('should delete a rule', async function () {
         // need to suport both Bulb and Plug
-        let lightState = { saturation: 21, hue: 129, brightness: 17, color_temp: 0, mode: 'customize_preset', on_off: 1 };
-        let addResponse = await this.device.schedule.addRule({ powerState: true, lightState, start: 60 });
+        const lightState = { saturation: 21, hue: 129, brightness: 17, color_temp: 0, mode: 'customize_preset', on_off: 1 };
+        const addResponse = await this.device.schedule.addRule({ powerState: true, lightState, start: 60 });
         expect(addResponse, 'addRule').to.have.property('err_code', 0);
         expect(addResponse, 'addRule').to.have.property('id');
 
-        let deleteResponse = await this.device.schedule.deleteRule(addResponse.id);
+        const deleteResponse = await this.device.schedule.deleteRule(addResponse.id);
         expect(deleteResponse).to.have.property('err_code', 0);
 
-        let getResponse = await this.device.schedule.getRules();
+        const getResponse = await this.device.schedule.getRules();
         expect(getResponse).to.have.property('err_code', 0);
-        let rule = getResponse.rule_list.find((r) => r.id === addResponse.id);
+        const rule = getResponse.rule_list.find((r) => r.id === addResponse.id);
         expect(rule).to.be.undefined;
       });
     });

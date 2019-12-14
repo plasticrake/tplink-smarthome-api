@@ -17,11 +17,11 @@ module.exports = function (testDevice) {
 
     before(async function () {
       if (!testDevice.getDevice) return this.skip();
-      let today = new Date();
+      const today = new Date();
       month = today.getMonth() + 1;
       year = today.getFullYear();
 
-      let device = await testDevice.getDevice();
+      const device = await testDevice.getDevice();
       await device.getSysInfo();
       supportsEmeter = device.supportsEmeter;
     });
@@ -29,7 +29,7 @@ module.exports = function (testDevice) {
     describe('#realtime get', function () {
       it('should return realtime after getRealtime called', async function () {
         if (supportsEmeter) {
-          let er = await this.device.emeter.getRealtime();
+          const er = await this.device.emeter.getRealtime();
           expect(this.device.emeter.realtime).to.eql(er);
         } else {
           expect(this.device.emeter.realtime).to.eql({});
@@ -47,7 +47,7 @@ module.exports = function (testDevice) {
       it('should emit emeter-realtime-update if supported', async function () {
         if (!supportsEmeter) return;
 
-        let spy = sinon.spy();
+        const spy = sinon.spy();
 
         this.device.on('emeter-realtime-update', spy);
         await this.device.emeter.getRealtime();
@@ -58,7 +58,7 @@ module.exports = function (testDevice) {
       });
       it('should return Realtime normalized with old and new API', async function () {
         if (supportsEmeter) {
-          let response = await this.device.emeter.getRealtime();
+          const response = await this.device.emeter.getRealtime();
           expect(response).to.have.property('err_code', 0);
           if (response.current != null || response.current_ma != null) {
             expect(response).to.have.property('current');

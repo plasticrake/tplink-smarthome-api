@@ -53,7 +53,7 @@ function createScheduleDate (date, startOrEnd) {
 }
 
 function createWday (daysOfWeek) {
-  const wday = [ false, false, false, false, false, false, false ];
+  const wday = [false, false, false, false, false, false, false];
   daysOfWeek.forEach((dw) => {
     wday[dw] = true;
   });

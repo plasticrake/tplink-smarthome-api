@@ -16,7 +16,7 @@ describe('Plug', function () {
 
   testSendOptions.forEach((testSendOptions) => {
     context(testSendOptions.name, function () {
-      testDevices['plugchildren'].forEach((testDevice) => {
+      testDevices.plugchildren.forEach((testDevice) => {
         context(testDevice.name, function () {
           let plug;
           let otherChildrenPreState;
@@ -58,7 +58,7 @@ describe('Plug', function () {
             });
 
             it('should change the alias and not affect other children', async function () {
-              let testAlias = `Testing ${Math.floor(Math.random() * (100 + 1))}`;
+              const testAlias = `Testing ${Math.floor(Math.random() * (100 + 1))}`;
               expect((await plug.setAlias(testAlias))).to.be.true;
               await plug.getSysInfo();
               expect(plug.alias).to.equal(testAlias);
@@ -79,7 +79,7 @@ describe('Plug', function () {
         });
       });
 
-      testDevices['plug'].forEach((testDevice) => {
+      testDevices.plug.forEach((testDevice) => {
         context(testDevice.name, function () {
           let plug;
           before(async function () {
@@ -181,7 +181,7 @@ describe('Plug', function () {
 
           describe('#getInfo()', function () {
             it('should return info', async function () {
-              let results = await plug.getInfo();
+              const results = await plug.getInfo();
               expect(results).to.have.property('sysInfo');
               expect(results).to.have.nested.property('cloud.info');
               expect(results).to.have.nested.property('emeter.realtime');
@@ -201,8 +201,8 @@ describe('Plug', function () {
             });
 
             it('should emit power-on / power-update', async function () {
-              let spy = sinon.spy();
-              let spyPowerUpdate = sinon.spy();
+              const spy = sinon.spy();
+              const spyPowerUpdate = sinon.spy();
 
               plug.on('power-on', spy);
               plug.on('power-update', spyPowerUpdate);
@@ -215,8 +215,8 @@ describe('Plug', function () {
             });
 
             it('should emit power-off / power-update', async function () {
-              let spy = sinon.spy();
-              let spyPowerUpdate = sinon.spy();
+              const spy = sinon.spy();
+              const spyPowerUpdate = sinon.spy();
 
               plug.on('power-off', spy);
               plug.on('power-update', spyPowerUpdate);
@@ -230,9 +230,9 @@ describe('Plug', function () {
 
             it('should emit in-use / not-in-use / in-use-update for plugs without Emeter support', async function () {
               if (plug.supportsEmeter) return;
-              let spyInUse = sinon.spy();
-              let spyNotInUse = sinon.spy();
-              let spyInUseUpdate = sinon.spy();
+              const spyInUse = sinon.spy();
+              const spyNotInUse = sinon.spy();
+              const spyInUseUpdate = sinon.spy();
 
               plug.on('in-use', spyInUse);
               plug.on('not-in-use', spyNotInUse);
@@ -261,7 +261,7 @@ describe('Plug', function () {
             });
 
             it('should emit power-update', async function () {
-              let spy = sinon.spy();
+              const spy = sinon.spy();
 
               plug.on('power-update', spy);
               await plug.getPowerState();
@@ -272,7 +272,7 @@ describe('Plug', function () {
 
             it('should emit in-use-update for plugs without Emeter support', async function () {
               if (plug.supportsEmeter) return;
-              let spyInUseUpdate = sinon.spy();
+              const spyInUseUpdate = sinon.spy();
 
               await plug.setPowerState(false);
 

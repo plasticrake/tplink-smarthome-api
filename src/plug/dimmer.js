@@ -10,6 +10,7 @@ class Dimmer {
     this.device = device;
     this.apiModuleName = apiModuleName;
   }
+
   /**
    * Sets Plug to the specified `brightness`.
    *
@@ -25,6 +26,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Get Plug/Dimmer default behavior configuration.
    *
@@ -39,6 +41,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Get Plug/Dimmer parameters configuration.
    *
@@ -53,6 +56,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Transitions Plug to the specified `brightness`.
    *
@@ -77,6 +81,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Set Plug/Dimmer `default_behavior` configuration for `double_click`.
    *
@@ -90,6 +95,7 @@ class Dimmer {
   async setDoubleClickAction ({ mode, index }, sendOptions = {}) {
     return this.setAction({ actionName: 'set_double_click_action', mode, index });
   }
+
   /**
    * @private
    */
@@ -104,6 +110,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Set Plug `dimmer_parameters` for `fadeOffTime`.
    *
@@ -119,6 +126,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Set Plug `dimmer_parameters` for `fadeOnTime`.
    *
@@ -134,6 +142,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Set Plug `dimmer_parameters` for `gentleOffTime`.
    *
@@ -149,6 +158,7 @@ class Dimmer {
       }
     }, null, sendOptions);
   }
+
   /**
    * Set Plug `dimmer_parameters` for `gentleOnTime`.
    *
@@ -178,6 +188,7 @@ class Dimmer {
   async setLongPressAction ({ mode, index }, sendOptions = {}) {
     return this.setAction({ actionName: 'set_long_press_action', mode, index });
   }
+
   /**
    * Sets Plug to the specified on/off state.
    *

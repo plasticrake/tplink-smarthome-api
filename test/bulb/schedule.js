@@ -13,7 +13,7 @@ module.exports = function (testDevice) {
 
     before(async function () {
       if (!testDevice.getDevice) return this.skip();
-      let device = await testDevice.getDevice();
+      const device = await testDevice.getDevice();
       await device.schedule.deleteAllRules();
     });
 
@@ -30,17 +30,17 @@ module.exports = function (testDevice) {
 
     describe('#addRule()', function () {
       it('should add non repeating rule', async function () {
-        let response = await this.device.schedule.addRule({ lightState, start: 60 });
+        const response = await this.device.schedule.addRule({ lightState, start: 60 });
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
       it('should add repeating rule', async function () {
-        let response = await this.device.schedule.addRule({ lightState, start: 120, daysOfWeek: [0, 6] });
+        const response = await this.device.schedule.addRule({ lightState, start: 120, daysOfWeek: [0, 6] });
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
       it('should add disabled rule', async function () {
-        let response = await this.device.schedule.addRule({ lightState, start: 120, name: 'disabled', enable: false });
+        const response = await this.device.schedule.addRule({ lightState, start: 120, name: 'disabled', enable: false });
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
@@ -50,15 +50,15 @@ module.exports = function (testDevice) {
       it('should edit a rule', async function () {
         this.timeout(7000);
         this.slow(4000);
-        let addResponse = await this.device.schedule.addRule({ lightState, start: 60 });
+        const addResponse = await this.device.schedule.addRule({ lightState, start: 60 });
         expect(addResponse).to.have.property('err_code', 0);
         expect(addResponse).to.have.property('id');
 
         lightState.hue = 100;
-        let editResponse = await this.device.schedule.editRule({ id: addResponse.id, lightState, start: 120 });
+        const editResponse = await this.device.schedule.editRule({ id: addResponse.id, lightState, start: 120 });
         expect(editResponse).to.have.property('err_code', 0);
 
-        let getResponse = await this.device.schedule.getRule(addResponse.id);
+        const getResponse = await this.device.schedule.getRule(addResponse.id);
         expect(getResponse).to.have.property('err_code', 0);
         expect(getResponse).to.have.property('id', addResponse.id);
         expect(getResponse.s_light.hue).to.eql(100);

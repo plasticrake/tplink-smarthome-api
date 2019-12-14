@@ -186,7 +186,7 @@ program
     blink(hostOnly, port, times, rate);
   });
 
-[ { fnName: 'getSysInfo', supportsChildId: true },
+[{ fnName: 'getSysInfo', supportsChildId: true },
   { fnName: 'getInfo', supportsChildId: true },
   { fnName: 'setAlias', supportsChildId: true },
   { fnName: 'getModel', supportsChildId: true },
