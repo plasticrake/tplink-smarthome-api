@@ -1,0 +1,71 @@
+{
+  "version": "0.1",
+
+  "language": "en",
+  "words": [
+    "adamsandle",
+    "baust",
+    "georgovassilis",
+    "plasticrake",
+    "wzaatar",
+
+    "castarray",
+    "codecov",
+    "defaultto",
+    "groupby",
+    "homebridge",
+    "isequal",
+    "jsonparse",
+    "lifx",
+    "loglevel",
+    "markdownlint",
+    "semistandard",
+
+    "polyfill",
+    "preallocate",
+    "rssi",
+    "ssid",
+    "subnet",
+    "wifi",
+
+    "RCVBUF",
+    "SNDBUF",
+
+    "binded",
+    "daystat",
+    "emeter",
+    "emin",
+    "kasa",
+    "lightingservice",
+    "lightstate",
+    "monthstat",
+    "netif",
+    "nextaction",
+    "realtime",
+    "sact",
+    "scaninfo",
+    "sched",
+    "smartbulb",
+    "smarthome",
+    "smartlife",
+    "smartplugswitch",
+    "smin",
+    "stime",
+    "sysinfo",
+    "timesetting",
+    "tplink",
+    "wday"
+  ],
+  "languageSettings": [{
+    "languageId": "markdown",
+    "local": "*",
+    "dictionaries": ["node","typescript"]
+  }],
+  "ignorePaths": [
+    "node_modules",
+    "package-lock.json",
+    "README.md",
+    "API.md"
+  ],
+  "ignoreRegExpList": ["\/[\/*] eslint[- ].*/gi"]
+}

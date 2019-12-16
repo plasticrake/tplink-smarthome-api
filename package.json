@@ -68,6 +68,7 @@
     "chai-things": "^0.2.0",
     "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
+    "cspell": "^4.0.37",
     "dotenv": "^8.2.0",
     "jsdoc-to-markdown": "^5.0.3",
     "mocha": "^6.2.2",
@@ -86,7 +87,8 @@
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
     "build": "babel src -d lib",
     "prepare": "npm run build",
-    "docs": "jsdoc2md 'src/**/*.js' > API.md && jsdoc2md --template=jsdoc2md/README.hbs 'src/**/*.js' > README.md"
+    "docs": "jsdoc2md 'src/**/*.js' > API.md && jsdoc2md --template=jsdoc2md/README.hbs 'src/**/*.js' > README.md",
+    "spellcheck": "cspell '{examples,jsdoc2md,src,test}/**/*' *.md"
   },
   "bin": {
     "tplink-smarthome-api": "lib/cli.js"
