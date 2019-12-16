@@ -47,8 +47,8 @@ describe('Client', function () {
     });
 
     it('should emit device-new when finding a new device with `devices` specified', function (done) {
-      const mac = testDevices.anydevice.mac;
-      const host = testDevices.anydevice.deviceOptions.host;
+      const mac = testDevices.anyDevice.mac;
+      const host = testDevices.anyDevice.deviceOptions.host;
       expect(mac).to.be.a('string').and.not.empty;
       expect(host).to.be.a('string').and.not.empty;
 
@@ -85,7 +85,7 @@ describe('Client', function () {
 
     it('should ONLY emit device-new for specified macAddresses', function (done) {
       const spy = sinon.spy();
-      const mac = testDevices.anydevice.mac;
+      const mac = testDevices.anyDevice.mac;
       expect(mac).to.be.a('string').and.not.empty;
 
       client.startDiscovery({ discoveryInterval: 250, macAddresses: [mac] }).on('device-new', spy);
@@ -99,7 +99,7 @@ describe('Client', function () {
 
     it('should NOT emit device-new for specified excludedMacAddresses', function (done) {
       const spy = sinon.spy();
-      const mac = testDevices.anydevice.mac;
+      const mac = testDevices.anyDevice.mac;
       expect(mac, 'mac blank').to.be.a('string').and.not.empty;
 
       client.startDiscovery({ discoveryInterval: 250, excludeMacAddresses: [mac] }).on('device-new', spy);
@@ -114,7 +114,7 @@ describe('Client', function () {
 
     it('should NOT emit device-new for devices not meeting filterCallback', function (done) {
       const spy = sinon.spy();
-      const mac = testDevices.anydevice.mac;
+      const mac = testDevices.anyDevice.mac;
       expect(mac, 'mac blank').to.be.a('string').and.not.empty;
 
       client.startDiscovery({
@@ -258,7 +258,7 @@ describe('Client', function () {
 
         before(async function () {
           client = getTestClient(testSendOptions);
-          device = await client.getDevice(testDevices.anydevice.deviceOptions);
+          device = await client.getDevice(testDevices.anyDevice.deviceOptions);
         });
 
         after(function () {
@@ -292,7 +292,7 @@ describe('Client', function () {
 
         before(function () {
           client = getTestClient(testSendOptions);
-          plug = client.getPlug(testDevices.anyplug.deviceOptions);
+          plug = client.getPlug(testDevices.anyPlug.deviceOptions);
           unreachablePlug = client.getPlug(testDevices.unreachable.deviceOptions);
         });
 
@@ -318,7 +318,7 @@ describe('Client', function () {
 
         before(function () {
           client = getTestClient(testSendOptions);
-          bulb = client.getBulb(testDevices.anybulb.deviceOptions);
+          bulb = client.getBulb(testDevices.anyBulb.deviceOptions);
           unreachableBulb = client.getBulb(testDevices.unreachable.deviceOptions);
         });
 
@@ -341,7 +341,7 @@ describe('Client', function () {
       let options;
       before(function () {
         client = getTestClient(testSendOptions);
-        options = testDevices.anydevice.deviceOptions;
+        options = testDevices.anyDevice.deviceOptions;
       });
       [{ transport: 'tcp' }, { transport: 'udp' }].forEach((sendOptions) => {
         it(`should return info with string payload ${sendOptions.transport}`, function () {

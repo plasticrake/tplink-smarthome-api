@@ -101,13 +101,13 @@ class UdpSocket extends TplinkSocket {
         reject(err);
       });
 
-      const encyptedPayload = encrypt(payload);
-      this.logDebug(': socket:send payload.length', encyptedPayload.length);
+      const encryptedPayload = encrypt(payload);
+      this.logDebug(': socket:send payload.length', encryptedPayload.length);
 
-      socket.send(encyptedPayload, 0, encyptedPayload.length, port, host, (err) => {
+      socket.send(encryptedPayload, 0, encryptedPayload.length, port, host, (err) => {
         if (err) {
           try {
-            this.logDebug(`: socket:send socket:error length: ${encyptedPayload.length} SO_SNDBUF:${socket.getSendBufferSize()} `, err);
+            this.logDebug(`: socket:send socket:error length: ${encryptedPayload.length} SO_SNDBUF:${socket.getSendBufferSize()} `, err);
             if (this.isBound) this.close();
           } finally {
             reject(err);

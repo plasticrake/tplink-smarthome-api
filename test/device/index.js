@@ -1,5 +1,6 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
+// spell-checker:ignore MYTESTMAC MYTESTMICMAC MYTESTETHERNETMAC
 'use strict';
 
 const { expect, getTestClient, sinon, testDevices, testSendOptions } = require('../setup');
@@ -140,7 +141,7 @@ describe('Device', function () {
               expect(response).to.have.nested.property('INVALID_MODULE.err_code');
               expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
             });
-            it('should send mutiple invalid commands and receive response', async function () {
+            it('should send multiple invalid commands and receive response', async function () {
               const response = await device.send('{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}');
               expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
               expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([-2, -2000]);
@@ -148,7 +149,7 @@ describe('Device', function () {
           });
 
           describe('#sendCommand', function () {
-            it('should send a single valid comand and receive response', async function () {
+            it('should send a single valid command and receive response', async function () {
               const response = await device.sendCommand('{"system":{"get_sysinfo":{}}}');
               return expect(response).to.have.property('err_code', 0);
             });

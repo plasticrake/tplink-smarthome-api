@@ -20,7 +20,7 @@ module.exports = function () {
         expect(await this.device.lighting.getLightState()).to.have.property('on_off', 0);
       });
 
-      it('should change brightness if suported', async function () {
+      it('should change brightness if supported', async function () {
         if (!this.device.supportsBrightness) return;
 
         expect(await this.device.lighting.setLightState({ on_off: 1, brightness: 20 })).to.be.true;
@@ -34,7 +34,7 @@ module.exports = function () {
         expect(ls).to.have.property('brightness', 60);
       });
 
-      it('should change color temperature if suported', async function () {
+      it('should change color temperature if supported', async function () {
         if (!this.device.supportsColorTemperature) return;
 
         expect(await this.device.lighting.setLightState({ on_off: 1, color_temp: 4000 })).to.be.true;
@@ -48,7 +48,7 @@ module.exports = function () {
         expect(ls).to.have.property('color_temp', 5000);
       });
 
-      it('should change color if suported', async function () {
+      it('should change color if supported', async function () {
         if (!this.device.supportsColor) return;
 
         expect(await this.device.lighting.setLightState({ on_off: 1, hue: 100, saturation: 40, brightness: 20 })).to.be.true;

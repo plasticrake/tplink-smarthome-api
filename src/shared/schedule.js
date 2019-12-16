@@ -125,7 +125,7 @@ class Schedule {
   }
 
   /**
-   * Get Daily Usage Statisics.
+   * Get Daily Usage Statistics.
    *
    * Sends `schedule.get_daystat` command. Supports childId.
    * @param  {number}       year
@@ -140,7 +140,7 @@ class Schedule {
   }
 
   /**
-   * Get Monthly Usage Statisics.
+   * Get Monthly Usage Statistics.
    *
    * Sends `schedule.get_monthstat` command. Supports childId.
    * @param  {number}       year

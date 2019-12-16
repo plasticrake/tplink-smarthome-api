@@ -16,7 +16,7 @@ describe('Plug', function () {
 
   testSendOptions.forEach((testSendOptions) => {
     context(testSendOptions.name, function () {
-      testDevices.plugchildren.forEach((testDevice) => {
+      testDevices.plugChildren.forEach((testDevice) => {
         context(testDevice.name, function () {
           let plug;
           let otherChildrenPreState;

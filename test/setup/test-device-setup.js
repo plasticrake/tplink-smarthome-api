@@ -1,4 +1,5 @@
 /* eslint-env mocha */
+// spell-checker:ignore Mock’s
 'use strict';
 
 const groupBy = require('lodash.groupby');
@@ -66,12 +67,12 @@ objectEntries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
 });
 
 testDevices.simulated = useSimulator;
-testDevices.anydevice = { name: 'Device', deviceType: 'device' };
-testDevices.anyplug = { name: 'Plug', deviceType: 'plug' };
-testDevices.anybulb = { name: 'Bulb', deviceType: 'bulb' };
+testDevices.anyDevice = { name: 'Device', deviceType: 'device' };
+testDevices.anyPlug = { name: 'Plug', deviceType: 'plug' };
+testDevices.anyBulb = { name: 'Bulb', deviceType: 'bulb' };
 testDevices.unreliable = { name: 'Unreliable Device', deviceType: 'plug' };
 testDevices.unreachable = { name: 'Unreachable Device', deviceOptions: { host: '192.0.2.0', port: 9999, defaultSendOptions: { timeout: 100 } } };
-testDevices.plugchildren = [
+testDevices.plugChildren = [
   { name: 'HS300(plug).0', deviceType: 'plug' },
   { name: 'HS300(plug).1', deviceType: 'plug' },
   { name: 'HS300(plug).2', deviceType: 'plug' },
@@ -202,9 +203,9 @@ function testDeviceCleanup () {
     if (device) {
       addDevice(testDevice, device);
 
-      if (!testDevices.anydevice.mac) { addDevice(testDevices.anydevice, device); }
-      if (testDevice.deviceType === 'plug' && !testDevices.anyplug.mac) { addDevice(testDevices.anyplug, device); }
-      if (testDevice.deviceType === 'bulb' && !testDevices.anybulb.mac) { addDevice(testDevices.anybulb, device); }
+      if (!testDevices.anyDevice.mac) { addDevice(testDevices.anyDevice, device); }
+      if (testDevice.deviceType === 'plug' && !testDevices.anyPlug.mac) { addDevice(testDevices.anyPlug, device); }
+      if (testDevice.deviceType === 'bulb' && !testDevices.anyBulb.mac) { addDevice(testDevices.anyBulb, device); }
     }
   });
 
@@ -226,7 +227,7 @@ function testDeviceCleanup () {
       addDevice(testDeviceChild, realDevice);
       testDeviceChild.name += `.${i}`;
       testDevices.push(testDeviceChild);
-      addDevice(testDevices.plugchildren[i], testDeviceChild);
+      addDevice(testDevices.plugChildren[i], testDeviceChild);
     });
   });
 
@@ -238,7 +239,7 @@ function testDeviceCleanup () {
     console.log(td.model, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''), td.type || '');
   });
 
-  ['anydevice', 'anyplug', 'anybulb', 'unreachable', 'unreliable'].forEach((key) => {
+  ['anyDevice', 'anyPlug', 'anyBulb', 'unreachable', 'unreliable'].forEach((key) => {
     const td = testDevices[key];
     const deviceOptions = td.deviceOptions || {};
     console.log(key, td.deviceType, td.name, deviceOptions.host, deviceOptions.port, td.mac, (deviceOptions.childId || ''), td.type || '');

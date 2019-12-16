@@ -48,13 +48,13 @@ describe('Test Environment Setup', function () {
       });
     });
 
-    ['anydevice', 'anyplug', 'anybulb'].forEach((deviceKey) => {
+    ['anyDevice', 'anyPlug', 'anyBulb'].forEach((deviceKey) => {
       context(deviceKey, function () {
         deviceIsOk(testDevices[deviceKey], testSendOptions);
       });
     });
 
-    ['plugchildren'].forEach((deviceKey) => {
+    ['plugChildren'].forEach((deviceKey) => {
       context(deviceKey, function () {
         it('should be an array with at least one item', function () {
           expect(testDevices[deviceKey].length).to.be.above(0);

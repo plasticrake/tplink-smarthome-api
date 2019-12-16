@@ -290,7 +290,7 @@ class Plug extends Device {
    * @return {Promise<Object, Error>} parsed JSON response
    */
   async getInfo (sendOptions) {
-    // TODO force TCP unless overriden here
+    // TODO force TCP unless overridden here
     let data;
     try {
       data = await this.sendCommand('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', this.childId, sendOptions);
@@ -402,7 +402,7 @@ class Plug extends Device {
    * Sends `system.set_led_off` command alternating on and off number of `times` at `rate`,
    * then sets the led to its pre-blink state. Does not support childId.
    *
-   * Note: `system.set_led_off` is particulally slow, so blink rate is not guaranteed.
+   * Note: `system.set_led_off` is particularly slow, so blink rate is not guaranteed.
    * @param  {number}      [times=5]
    * @param  {number}      [rate=1000]
    * @param  {SendOptions} [sendOptions]

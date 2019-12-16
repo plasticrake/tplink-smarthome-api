@@ -137,7 +137,7 @@ class Device extends EventEmitter {
    * Type of device (or `device` if unknown).
    *
    * Based on cached value of `sys_info.[type|mic_type]`
-   * @return {string} 'plub'|'bulb'|'device'
+   * @return {string} 'plug'|'bulb'|'device'
    */
   get deviceType () {
     const type = this.type;
@@ -239,7 +239,7 @@ class Device extends EventEmitter {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async sendCommand (command, childIds = this.childId, sendOptions) {
-    // TODO allow certain err codes (particually emeter for non HS110 devices)
+    // TODO allow certain err codes (particularly emeter for non HS110 devices)
     const commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
 
     if (childIds) {

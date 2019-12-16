@@ -122,15 +122,15 @@ class TcpSocket extends TplinkSocket {
         }
       });
 
-      const encyptedPayload = encryptWithHeader(payload);
-      this.logDebug(': socket:send payload.length', encyptedPayload.length);
+      const encryptedPayload = encryptWithHeader(payload);
+      this.logDebug(': socket:send payload.length', encryptedPayload.length);
 
       this.logDebug(`: socket:send attempting to connect. host:${host}, port:${port}`);
       socket.connect({ port, host }, () => {
         try {
           this.logDebug(`: socket:connect ${socket.localAddress} ${socket.localPort} ${socket.remoteAddress} ${socket.remotePort}`);
           this.isBound = true;
-          const writeRet = socket.write(encyptedPayload);
+          const writeRet = socket.write(encryptedPayload);
           this.logDebug(': socket:connect:write', (writeRet ? 'flushed' : 'queued'));
         } catch (err) {
           this.logDebug(': socket:connect error');

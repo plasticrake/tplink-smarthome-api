@@ -31,7 +31,7 @@ module.exports = function (testDevice) {
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
-      it('should add rule with dimmer (devices that support dimmeer)', async function () {
+      it('should add rule with dimmer (devices that support dimmer)', async function () {
         if (!this.device.supportsDimmer) this.skip();
         const inputRule = { dimmer: { on_off: 1, brightness: 54, transition_period: 1000 }, start: 120, name: 'dimmer' };
         const response = await this.device.schedule.addRule(inputRule);
@@ -62,7 +62,7 @@ module.exports = function (testDevice) {
         expect(getResponse).to.have.property('enable', 0);
       });
 
-      it('should edit a rule with dimmer (devices that support dimmeer)', async function () {
+      it('should edit a rule with dimmer (devices that support dimmer)', async function () {
         if (!this.device.supportsDimmer) this.skip();
         this.timeout(7000);
         this.slow(4000);

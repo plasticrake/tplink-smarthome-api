@@ -47,7 +47,7 @@ module.exports = function (testDevice) {
 
     describe('#deleteRule()', function () {
       it('should delete a rule', async function () {
-        // need to suport both Bulb and Plug
+        // need to support both Bulb and Plug
         const lightState = { saturation: 21, hue: 129, brightness: 17, color_temp: 0, mode: 'customize_preset', on_off: 1 };
         const addResponse = await this.device.schedule.addRule({ powerState: true, lightState, start: 60 });
         expect(addResponse, 'addRule').to.have.property('err_code', 0);

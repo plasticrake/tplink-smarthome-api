@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Eemter
+ * Emeter
  */
 class Emeter {
   constructor (device, apiModuleName, childId = null) {
@@ -49,7 +49,7 @@ class Emeter {
    *
    * Requests `emeter.get_realtime`. Older devices return `current`, `voltage`, etc,
    * while newer devices return `current_ma`, `voltage_mv` etc
-   * This will return a normalized response including both old and new style properies for backwards compatibility.
+   * This will return a normalized response including both old and new style properties for backwards compatibility.
    * Supports childId.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
@@ -62,7 +62,7 @@ class Emeter {
   }
 
   /**
-   * Get Daily Emeter Statisics.
+   * Get Daily Emeter Statistics.
    *
    * Sends `emeter.get_daystat` command. Supports childId.
    * @param  {number}       year
@@ -77,7 +77,7 @@ class Emeter {
   }
 
   /**
-   * Get Monthly Emeter Statisics.
+   * Get Monthly Emeter Statistics.
    *
    * Sends `emeter.get_monthstat` command. Supports childId.
    * @param  {number}       year
