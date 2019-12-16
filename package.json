@@ -39,7 +39,7 @@
   ],
   "main": "lib/index.js",
   "engines": {
-    "node": ">=6.4.0",
+    "node": ">=10",
     "npm": ">=3"
   },
   "dependencies": {

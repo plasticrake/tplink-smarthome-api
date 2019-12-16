@@ -2,8 +2,8 @@ language: node_js
 node_js:
   - "node"
   - "lts/*"
-  - "6"
-  - "6.4"
+  - "11"
+  - "10"
 cache:
   directories:
     - "node_modules"
