@@ -2,7 +2,7 @@
 
 # Change Log
 
-## Unreleased
+## 1.3.0 / 2019-12-14
 
 ### Added :heavy_plus_sign:
 
@@ -89,7 +89,7 @@
 
 ### Fixed :bug:
 
-- Plug#getInfo and Emeter#realtime for devices without energy monitoring (Regression introducted in 0.23.0)
+- Plug#getInfo and Emeter#realtime for devices without energy monitoring (Regression introduced in 0.23.0)
 
 ## 0.23.0 / 2018-08-16
 
@@ -143,7 +143,7 @@
   - Many methods were moved to mirror the TPLink API.
     - Example: `Plug#getScheduleRules()` is now `Plug.schedule#getRules()`
     - Example: `Bulb#getCloudInfo()` is now `Bulb.cloud#getInfo()`
-    - See API documenation for details.
+    - See API documentation for details.
 
 ### Added :heavy_plus_sign:
 
@@ -171,7 +171,7 @@
 
 ### Fixed :bug:
 
-- `encrypt` and `encyptWithHeader` now work properly with non-ascii characters
+- `encrypt` and `encryptWithHeader` now work properly with non-ascii characters
 
 ## 0.17.0 / 2017-10-10
 
