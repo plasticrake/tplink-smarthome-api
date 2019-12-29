@@ -107,11 +107,14 @@ class Dimmer {
    * @return {Promise<boolean, ResponseError>}
    */
   async setDoubleClickAction({ mode, index }, sendOptions = {}) {
-    return this.setAction({
-      actionName: 'set_double_click_action',
-      mode,
-      index,
-    });
+    return this.setAction(
+      {
+        actionName: 'set_double_click_action',
+        mode,
+        index,
+      },
+      sendOptions
+    );
   }
 
   /**
@@ -224,7 +227,10 @@ class Dimmer {
    * @return {Promise<boolean, ResponseError>}
    */
   async setLongPressAction({ mode, index }, sendOptions = {}) {
-    return this.setAction({ actionName: 'set_long_press_action', mode, index });
+    return this.setAction(
+      { actionName: 'set_long_press_action', mode, index },
+      sendOptions
+    );
   }
 
   /**
