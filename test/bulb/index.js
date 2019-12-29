@@ -1,30 +1,29 @@
 /* eslint-env mocha */
 /* eslint no-unused-expressions: ["off"] */
-'use strict';
 
 const { expect, testDevices, testSendOptions } = require('../setup');
 
 const lightingTests = require('./lighting');
 const scheduleTests = require('./schedule');
 
-describe('Bulb', function () {
+describe('Bulb', function() {
   this.timeout(5000);
   this.slow(2000);
   this.retries(2);
 
-  testSendOptions.forEach((testSendOptions) => {
-    context(testSendOptions.name, function () {
-      testDevices.bulb.forEach((testDevice) => {
-        context(testDevice.name, function () {
+  testSendOptions.forEach(testSendOptions => {
+    context(testSendOptions.name, function() {
+      testDevices.bulb.forEach(testDevice => {
+        context(testDevice.name, function() {
           let bulb;
-          before(async function () {
+          before(async function() {
             // beforeEach() doesn't work with assigning to `this`
             if (testDevice.getDevice) {
               bulb = await testDevice.getDevice(null, testSendOptions);
               this.device = bulb;
             }
           });
-          beforeEach(async function () {
+          beforeEach(async function() {
             // before() doesn't skip nested describes
             if (!testDevice.getDevice) {
               return this.skip();
@@ -33,9 +32,11 @@ describe('Bulb', function () {
             this.device = bulb;
           });
 
-          describe('#supportsBrightness get', function () {
-            it('should return is_dimmable from cached sysInfo', function () {
-              expect(bulb.supportsBrightness).to.eql(bulb.sysInfo.is_dimmable === 1);
+          describe('#supportsBrightness get', function() {
+            it('should return is_dimmable from cached sysInfo', function() {
+              expect(bulb.supportsBrightness).to.eql(
+                bulb.sysInfo.is_dimmable === 1
+              );
 
               bulb.sysInfo.is_dimmable = 0;
               expect(bulb.supportsBrightness).to.be.false;
@@ -44,8 +45,8 @@ describe('Bulb', function () {
             });
           });
 
-          describe('#supportsColor get', function () {
-            it('should return is_color from cached sysInfo', function () {
+          describe('#supportsColor get', function() {
+            it('should return is_color from cached sysInfo', function() {
               expect(bulb.supportsColor).to.eql(bulb.sysInfo.is_color === 1);
 
               bulb.sysInfo.is_color = 0;
@@ -55,9 +56,11 @@ describe('Bulb', function () {
             });
           });
 
-          describe('#supportsColorTemperature get', function () {
-            it('should return is_variable_color_temp from cached sysInfo', function () {
-              expect(bulb.supportsColorTemperature).to.eql(bulb.sysInfo.is_variable_color_temp === 1);
+          describe('#supportsColorTemperature get', function() {
+            it('should return is_variable_color_temp from cached sysInfo', function() {
+              expect(bulb.supportsColorTemperature).to.eql(
+                bulb.sysInfo.is_variable_color_temp === 1
+              );
 
               bulb.sysInfo.is_variable_color_temp = 0;
               expect(bulb.supportsColorTemperature).to.be.false;
@@ -66,12 +69,18 @@ describe('Bulb', function () {
             });
           });
 
-          describe('#getColorTemperatureRange get', function () {
-            it('should return is_variable_color_temp from cached sysInfo if supported (LB120/LB130)', function () {
+          describe('#getColorTemperatureRange get', function() {
+            it('should return is_variable_color_temp from cached sysInfo if supported (LB120/LB130)', function() {
               const range = bulb.getColorTemperatureRange;
               if (bulb.supportsColorTemperature) {
-                expect(range).to.to.have.property('min').a('number').within(2500, 9000);
-                expect(range).to.to.have.property('max').a('number').within(2500, 9000);
+                expect(range)
+                  .to.to.have.property('min')
+                  .a('number')
+                  .within(2500, 9000);
+                expect(range)
+                  .to.to.have.property('max')
+                  .a('number')
+                  .within(2500, 9000);
 
                 expect(testDevice.model).to.match(/lb1[23]0/);
                 if (testDevice.model === 'lb120') {
@@ -83,7 +92,7 @@ describe('Bulb', function () {
                 }
               }
             });
-            it('should return undefined if not supported (LB100)', function () {
+            it('should return undefined if not supported (LB100)', function() {
               const range = bulb.getColorTemperatureRange;
               if (!bulb.supportsColorTemperature) {
                 expect(range).to.be.undefined;
@@ -92,8 +101,8 @@ describe('Bulb', function () {
             });
           });
 
-          describe('#getInfo()', function () {
-            it('should return info', async function () {
+          describe('#getInfo()', function() {
+            it('should return info', async function() {
               const results = await bulb.getInfo();
               expect(results).to.have.property('sysInfo');
               expect(results).to.have.nested.property('cloud.info');
@@ -106,36 +115,36 @@ describe('Bulb', function () {
           lightingTests(testDevice);
           scheduleTests(testDevice);
 
-          describe('#setPowerState()', function () {
-            it('should turn on', function () {
+          describe('#setPowerState()', function() {
+            it('should turn on', function() {
               return expect(bulb.setPowerState(true)).to.eventually.be.true;
             });
 
-            it('should turn off', function () {
+            it('should turn off', function() {
               return expect(bulb.setPowerState(false)).to.eventually.be.true;
             });
           });
 
-          describe('#getPowerState()', function () {
-            it('should return power state when on', async function () {
+          describe('#getPowerState()', function() {
+            it('should return power state when on', async function() {
               await bulb.setPowerState(true);
               expect(await bulb.getPowerState()).to.be.true;
             });
 
-            it('should return power state when off', async function () {
+            it('should return power state when off', async function() {
               await bulb.setPowerState(false);
               expect(await bulb.getPowerState()).to.be.false;
             });
           });
 
-          describe('#togglePowerState()', function () {
-            it('should turn on', async function () {
+          describe('#togglePowerState()', function() {
+            it('should turn on', async function() {
               expect(await bulb.setPowerState(false)).to.be.true;
               expect(await bulb.togglePowerState()).to.be.true;
               expect(await bulb.getPowerState()).to.be.true;
             });
 
-            it('should turn off', async function () {
+            it('should turn off', async function() {
               expect(await bulb.setPowerState(true)).to.be.true;
               expect(await bulb.togglePowerState()).to.be.false;
               expect(await bulb.getPowerState()).to.be.false;

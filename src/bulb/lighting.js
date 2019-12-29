@@ -1,5 +1,4 @@
 /* eslint camelcase: ["off"] */
-'use strict';
 
 const isEqual = require('lodash.isequal');
 
@@ -9,7 +8,7 @@ let _lightState = {};
  * Lighting
  */
 class Lighting {
-  constructor (device, apiModuleName) {
+  constructor(device, apiModuleName) {
     this.device = device;
     this.apiModuleName = apiModuleName;
 
@@ -20,14 +19,14 @@ class Lighting {
    * Returns cached results from last retrieval of `lightingservice.get_light_state`.
    * @return {Object}
    */
-  get lightState () {
+  get lightState() {
     return _lightState;
   }
 
   /**
    * @private
    */
-  set lightState (lightState) {
+  set lightState(lightState) {
     _lightState = lightState;
     this.emitEvents();
   }
@@ -55,9 +54,9 @@ class Lighting {
   /**
    * @private
    */
-  emitEvents () {
+  emitEvents() {
     if (!_lightState) return;
-    const powerOn = (_lightState.on_off === 1);
+    const powerOn = _lightState.on_off === 1;
 
     if (this._lastState.powerOn !== powerOn) {
       this._lastState.powerOn = powerOn;
@@ -82,10 +81,14 @@ class Lighting {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getLightState (sendOptions) {
-    this.lightState = await this.device.sendCommand({
-      [this.apiModuleName]: { get_light_state: {} }
-    }, null, sendOptions);
+  async getLightState(sendOptions) {
+    this.lightState = await this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_light_state: {} },
+      },
+      null,
+      sendOptions
+    );
     return this.lightState;
   }
 
@@ -105,20 +108,38 @@ class Lighting {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setLightState ({ transition_period, on_off, mode, hue, saturation, brightness, color_temp, ignore_default = true }, sendOptions) {
+  async setLightState(
+    {
+      transition_period,
+      on_off,
+      mode,
+      hue,
+      saturation,
+      brightness,
+      color_temp,
+      ignore_default = true,
+    },
+    sendOptions
+  ) {
     const state = {};
-    if (ignore_default !== undefined) state.ignore_default = (ignore_default ? 1 : 0);
-    if (transition_period !== undefined) state.transition_period = transition_period;
-    if (on_off !== undefined) state.on_off = (on_off ? 1 : 0);
+    if (ignore_default !== undefined)
+      state.ignore_default = ignore_default ? 1 : 0;
+    if (transition_period !== undefined)
+      state.transition_period = transition_period;
+    if (on_off !== undefined) state.on_off = on_off ? 1 : 0;
     if (mode !== undefined) state.mode = mode;
     if (hue !== undefined) state.hue = hue;
     if (saturation !== undefined) state.saturation = saturation;
     if (brightness !== undefined) state.brightness = brightness;
     if (color_temp !== undefined) state.color_temp = color_temp;
 
-    this.lightState = await this.device.sendCommand({
-      [this.apiModuleName]: { transition_light_state: state }
-    }, null, sendOptions);
+    this.lightState = await this.device.sendCommand(
+      {
+        [this.apiModuleName]: { transition_light_state: state },
+      },
+      null,
+      sendOptions
+    );
     return true;
   }
 }

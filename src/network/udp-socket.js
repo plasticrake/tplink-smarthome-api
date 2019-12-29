@@ -1,5 +1,3 @@
-'use strict';
-
 const dgram = require('dgram');
 
 const { encrypt, decrypt } = require('tplink-smarthome-crypto');
@@ -8,35 +6,38 @@ const TplinkSocket = require('./tplink-socket');
 const { replaceControlCharacters } = require('../utils');
 
 class UdpSocket extends TplinkSocket {
-  get socketType () {
+  get socketType() {
     return 'UDP';
   }
 
-  logDebug (...args) {
-    this.log.debug(`[${this.socketId}] UdpSocket` + args.shift(), ...args);
+  logDebug(...args) {
+    this.log.debug(`[${this.socketId}] UdpSocket${args.shift()}`, ...args);
   }
 
-  async createSocket () {
+  async createSocket() {
     return super.createSocket(() => {
       return new Promise((resolve, reject) => {
         this.socket = dgram.createSocket('udp4');
 
         // Polyfill stub for Node < v8.7
         if (this.socket.getRecvBufferSize === undefined) {
-          this.socket.getRecvBufferSize = function () {};
+          this.socket.getRecvBufferSize = function() {};
         }
         // Polyfill stub for Node < v8.7
         if (this.socket.getSendBufferSize === undefined) {
-          this.socket.getSendBufferSize = function () {};
+          this.socket.getSendBufferSize = function() {};
         }
 
-        this.socket.on('error', (err) => {
+        this.socket.on('error', err => {
           this.logDebug(': createSocket:error');
           reject(err);
         });
 
         this.socket.bind(() => {
-          this.logDebug('.createSocket(): listening on %j', this.socket.address());
+          this.logDebug(
+            '.createSocket(): listening on %j',
+            this.socket.address()
+          );
           this.socket.removeAllListeners('error');
           this.isBound = true;
           resolve(this.socket);
@@ -45,7 +46,7 @@ class UdpSocket extends TplinkSocket {
     });
   }
 
-  close () {
+  close() {
     super.close(() => {
       this.socket.close();
     });
@@ -54,10 +55,10 @@ class UdpSocket extends TplinkSocket {
   /**
    * @private
    */
-  async sendAndGetResponse (payload, port, host, timeout) {
+  async sendAndGetResponse(payload, port, host, timeout) {
     return new Promise((resolve, reject) => {
       let timer;
-      const setSocketTimeout = (timeout) => {
+      const setSocketTimeout = timeout => {
         if (timer != null) clearTimeout(timer);
         if (timeout > 0) {
           timer = setTimeout(() => {
@@ -68,7 +69,7 @@ class UdpSocket extends TplinkSocket {
       };
       setSocketTimeout(timeout);
 
-      const socket = this.socket;
+      const { socket } = this;
       socket.removeAllListeners('message');
       socket.removeAllListeners('close');
 
@@ -79,11 +80,20 @@ class UdpSocket extends TplinkSocket {
           setSocketTimeout(0);
 
           decryptedMsg = decrypt(msg).toString('utf8');
-          this.logDebug(`: socket:data message:${replaceControlCharacters(decryptedMsg)}`);
+          this.logDebug(
+            `: socket:data message:${replaceControlCharacters(decryptedMsg)}`
+          );
           return resolve(JSON.parse(decryptedMsg));
         } catch (err) {
           reject(err);
-          this.log.error(`Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(decryptedMsg)}]`, rinfo, socket.getRecvBufferSize(), msg);
+          this.log.error(
+            `Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(
+              decryptedMsg
+            )}]`,
+            rinfo,
+            socket.getRecvBufferSize(),
+            msg
+          );
         }
       });
 
@@ -96,7 +106,7 @@ class UdpSocket extends TplinkSocket {
         }
       });
 
-      socket.on('error', (err) => {
+      socket.on('error', err => {
         this.logDebug(': socket:error');
         reject(err);
       });
@@ -104,18 +114,30 @@ class UdpSocket extends TplinkSocket {
       const encryptedPayload = encrypt(payload);
       this.logDebug(': socket:send payload.length', encryptedPayload.length);
 
-      socket.send(encryptedPayload, 0, encryptedPayload.length, port, host, (err) => {
-        if (err) {
-          try {
-            this.logDebug(`: socket:send socket:error length: ${encryptedPayload.length} SO_SNDBUF:${socket.getSendBufferSize()} `, err);
-            if (this.isBound) this.close();
-          } finally {
-            reject(err);
+      socket.send(
+        encryptedPayload,
+        0,
+        encryptedPayload.length,
+        port,
+        host,
+        err => {
+          if (err) {
+            try {
+              this.logDebug(
+                `: socket:send socket:error length: ${
+                  encryptedPayload.length
+                } SO_SNDBUF:${socket.getSendBufferSize()} `,
+                err
+              );
+              if (this.isBound) this.close();
+            } finally {
+              reject(err);
+            }
+            return;
           }
-          return;
+          this.logDebug(': socket:send sent');
         }
-        this.logDebug(': socket:send sent');
-      });
+      );
     });
   }
 }

@@ -1,12 +1,10 @@
-'use strict';
-
 const { createScheduleRule } = require('../utils');
 
 /**
  * Away
  */
 class Away {
-  constructor (device, apiModuleName, childId = null) {
+  constructor(device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
     this.childId = childId;
@@ -19,10 +17,14 @@ class Away {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getRules (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_rules: {} }
-    }, this.childId, sendOptions);
+  async getRules(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_rules: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -33,9 +35,9 @@ class Away {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response of rule
    */
-  async getRule (id, sendOptions) {
+  async getRule(id, sendOptions) {
     const rules = await this.getRules(sendOptions);
-    const rule = rules.rule_list.find((r) => r.id === id);
+    const rule = rules.rule_list.find(r => r.id === id);
     if (rule) {
       rule.err_code = rules.err_code;
     }
@@ -56,15 +58,23 @@ class Away {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async addRule ({ start, end, daysOfWeek, frequency = 5, name = '', enable = true }, sendOptions) {
-    const rule = Object.assign({
+  async addRule(
+    { start, end, daysOfWeek, frequency = 5, name = '', enable = true },
+    sendOptions
+  ) {
+    const rule = {
       frequency,
       name,
-      enable: (enable ? 1 : 0)
-    }, createScheduleRule({ start, end, daysOfWeek }));
-    return this.device.sendCommand({
-      [this.apiModuleName]: { add_rule: rule }
-    }, this.childId, sendOptions);
+      enable: enable ? 1 : 0,
+      ...createScheduleRule({ start, end, daysOfWeek }),
+    };
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { add_rule: rule },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -82,16 +92,24 @@ class Away {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async editRule ({ id, start, end, daysOfWeek, frequency = 5, name = '', enable = true }, sendOptions) {
-    const rule = Object.assign({
+  async editRule(
+    { id, start, end, daysOfWeek, frequency = 5, name = '', enable = true },
+    sendOptions
+  ) {
+    const rule = {
       id,
       frequency,
       name,
-      enable: (enable ? 1 : 0)
-    }, createScheduleRule({ start, end, daysOfWeek }));
-    return this.device.sendCommand({
-      [this.apiModuleName]: { edit_rule: rule }
-    }, this.childId, sendOptions);
+      enable: enable ? 1 : 0,
+      ...createScheduleRule({ start, end, daysOfWeek }),
+    };
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { edit_rule: rule },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -101,10 +119,14 @@ class Away {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async deleteAllRules (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { delete_all_rules: {} }
-    }, this.childId, sendOptions);
+  async deleteAllRules(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { delete_all_rules: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -115,10 +137,14 @@ class Away {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async deleteRule (id, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { delete_rule: { id } }
-    }, this.childId, sendOptions);
+  async deleteRule(id, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { delete_rule: { id } },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -129,10 +155,16 @@ class Away {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async setOverallEnable (enable, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { set_overall_enable: { enable: (enable ? 1 : 0) } }
-    }, this.childId, sendOptions);
+  async setOverallEnable(enable, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: {
+          set_overall_enable: { enable: enable ? 1 : 0 },
+        },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 }
 

@@ -1,5 +1,3 @@
-'use strict';
-
 const castArray = require('lodash.castarray');
 const EventEmitter = require('events');
 
@@ -26,13 +24,13 @@ class Device extends EventEmitter {
    * @param  {Object}      [options.logger]
    * @param  {SendOptions} [options.defaultSendOptions]
    */
-  constructor ({
+  constructor({
     client,
     sysInfo,
     host,
     port = 9999,
     logger,
-    defaultSendOptions
+    defaultSendOptions,
   }) {
     super();
 
@@ -41,9 +39,15 @@ class Device extends EventEmitter {
     this.port = port;
 
     this.log = logger || this.client.log;
-    this.log.debug('device.constructor(%j)', Object.assign({}, arguments[0], { client: 'not shown' }));
+    this.log.debug('device.constructor(%j)', {
+      ...arguments[0],
+      client: 'not shown',
+    });
 
-    this.defaultSendOptions = Object.assign({}, client.defaultSendOptions, defaultSendOptions);
+    this.defaultSendOptions = {
+      ...client.defaultSendOptions,
+      ...defaultSendOptions,
+    };
 
     this.udpConnection = new UdpConnection(this);
     this.tcpConnection = new TcpConnection(this);
@@ -58,15 +62,15 @@ class Device extends EventEmitter {
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
    */
-  get sysInfo () {
+  get sysInfo() {
     return this._sysInfo;
   }
 
   /**
    * @private
    */
-  set sysInfo (sysInfo) {
-    this.log.debug('[%s] device sysInfo set', (sysInfo.alias || this.alias));
+  set sysInfo(sysInfo) {
+    this.log.debug('[%s] device sysInfo set', sysInfo.alias || this.alias);
     this._sysInfo = sysInfo;
   }
 
@@ -74,14 +78,14 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.alias`.
    * @return {string}
    */
-  get alias () {
+  get alias() {
     return this.sysInfo.alias;
   }
 
   /**
    * @private
    */
-  set alias (alias) {
+  set alias(alias) {
     this.sysInfo.alias = alias;
   }
 
@@ -89,7 +93,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.deviceId`.
    * @return {string}
    */
-  get id () {
+  get id() {
     return this.deviceId;
   }
 
@@ -97,7 +101,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.deviceId`.
    * @return {string}
    */
-  get deviceId () {
+  get deviceId() {
     return this.sysInfo.deviceId;
   }
 
@@ -105,7 +109,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.[description|dev_name]`.
    * @return {string}
    */
-  get description () {
+  get description() {
     return this.sysInfo.description || this.sysInfo.dev_name;
   }
 
@@ -113,7 +117,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.model`.
    * @return {string}
    */
-  get model () {
+  get model() {
     return this.sysInfo.model;
   }
 
@@ -121,7 +125,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.alias`.
    * @return {string}
    */
-  get name () {
+  get name() {
     return this.alias;
   }
 
@@ -129,7 +133,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.[type|mic_type]`.
    * @return {string}
    */
-  get type () {
+  get type() {
     return this.sysInfo.type || this.sysInfo.mic_type;
   }
 
@@ -139,12 +143,15 @@ class Device extends EventEmitter {
    * Based on cached value of `sys_info.[type|mic_type]`
    * @return {string} 'plug'|'bulb'|'device'
    */
-  get deviceType () {
-    const type = this.type;
+  get deviceType() {
+    const { type } = this;
     switch (true) {
-      case (/plug/i).test(type): return 'plug';
-      case (/bulb/i).test(type): return 'bulb';
-      default: return 'device';
+      case /plug/i.test(type):
+        return 'plug';
+      case /bulb/i.test(type):
+        return 'bulb';
+      default:
+        return 'device';
     }
   }
 
@@ -152,7 +159,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.sw_ver`.
    * @return {string}
    */
-  get softwareVersion () {
+  get softwareVersion() {
     return this.sysInfo.sw_ver;
   }
 
@@ -160,7 +167,7 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.hw_ver`.
    * @return {string}
    */
-  get hardwareVersion () {
+  get hardwareVersion() {
     return this.sysInfo.hw_ver;
   }
 
@@ -168,8 +175,10 @@ class Device extends EventEmitter {
    * Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
    * @return {string}
    */
-  get mac () {
-    return this.sysInfo.mac || this.sysInfo.mic_mac || this.sysInfo.ethernet_mac;
+  get mac() {
+    return (
+      this.sysInfo.mac || this.sysInfo.mic_mac || this.sysInfo.ethernet_mac
+    );
   }
 
   /**
@@ -179,7 +188,7 @@ class Device extends EventEmitter {
    * `aa:bb:cc:00:11:22` will be normalized to `AABBCC001122`
    * @return {string}
    */
-  get macNormalized () {
+  get macNormalized() {
     const mac = this.mac || '';
     return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   }
@@ -187,7 +196,7 @@ class Device extends EventEmitter {
   /**
    * Closes any open network connections including any shared sockets.
    */
-  closeConnection () {
+  closeConnection() {
     this.udpConnection.close();
     this.tcpConnection.close();
   }
@@ -198,12 +207,16 @@ class Device extends EventEmitter {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
-  async send (payload, sendOptions) {
+  async send(payload, sendOptions) {
     this.log.debug('[%s] device.send()', this.alias);
 
     try {
-      const thisSendOptions = Object.assign({}, this.defaultSendOptions, sendOptions);
-      const payloadString = (!(typeof payload === 'string' || payload instanceof String) ? JSON.stringify(payload) : payload);
+      const thisSendOptions = { ...this.defaultSendOptions, ...sendOptions };
+      const payloadString = !(
+        typeof payload === 'string' || payload instanceof String
+      )
+        ? JSON.stringify(payload)
+        : payload;
 
       if (thisSendOptions.transport === 'udp') {
         return this.udpConnection.send(payloadString, thisSendOptions);
@@ -238,12 +251,18 @@ class Device extends EventEmitter {
    * @param  {SendOptions}     [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async sendCommand (command, childIds = this.childId, sendOptions) {
+  async sendCommand(command, childIds = this.childId, sendOptions) {
     // TODO allow certain err codes (particularly emeter for non HS110 devices)
-    const commandObj = ((typeof command === 'string' || command instanceof String) ? JSON.parse(command) : command);
+    const commandObj =
+      typeof command === 'string' || command instanceof String
+        ? JSON.parse(command)
+        : command;
 
     if (childIds) {
-      const childIdsArray = castArray(childIds).map(this.normalizeChildId, this);
+      const childIdsArray = castArray(childIds).map(
+        this.normalizeChildId,
+        this
+      );
       commandObj.context = { child_ids: childIdsArray };
     }
 
@@ -255,15 +274,19 @@ class Device extends EventEmitter {
   /**
    * @private
    */
-  normalizeChildId (childId) {
+  normalizeChildId(childId) {
     let normalizedChildId = childId;
-    if (Number.isInteger(childId) && (childId >= 0 && childId < 100)) {
-      normalizedChildId = normalizedChildId + '';
+    if (Number.isInteger(childId) && childId >= 0 && childId < 100) {
+      normalizedChildId += '';
     }
-    if (typeof normalizedChildId === 'string' || normalizedChildId instanceof String) {
+    if (
+      typeof normalizedChildId === 'string' ||
+      normalizedChildId instanceof String
+    ) {
       if (normalizedChildId.length === 1) {
-        return (this.deviceId || '') + '0' + normalizedChildId;
-      } else if (normalizedChildId.length === 2) {
+        return `${this.deviceId || ''}0${normalizedChildId}`;
+      }
+      if (normalizedChildId.length === 2) {
         return (this.deviceId || '') + normalizedChildId;
       }
     }
@@ -279,12 +302,16 @@ class Device extends EventEmitter {
    * @param  {number} interval (ms)
    * @return {Device|Bulb|Plug}          this
    */
-  startPolling (interval) {
+  startPolling(interval) {
     const fn = async () => {
       try {
         await this.getInfo();
       } catch (err) {
-        this.log.debug('[%s] device.startPolling(): getInfo(): error:', this.alias, err);
+        this.log.debug(
+          '[%s] device.startPolling(): getInfo(): error:',
+          this.alias,
+          err
+        );
         /**
          * @event Device#polling-error
          * @property {Error} error
@@ -300,7 +327,7 @@ class Device extends EventEmitter {
   /**
    * Stops device polling.
    */
-  stopPolling () {
+  stopPolling() {
     clearInterval(this.pollingTimer);
     this.pollingTimer = null;
   }
@@ -312,9 +339,13 @@ class Device extends EventEmitter {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getSysInfo (sendOptions) {
+  async getSysInfo(sendOptions) {
     this.log.debug('[%s] device.getSysInfo()', this.alias);
-    this.sysInfo = await this.sendCommand('{"system":{"get_sysinfo":{}}}', null, sendOptions);
+    this.sysInfo = await this.sendCommand(
+      '{"system":{"get_sysinfo":{}}}',
+      null,
+      sendOptions
+    );
     return this.sysInfo;
   }
 
@@ -326,10 +357,14 @@ class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setAlias (alias, sendOptions) {
-    await this.sendCommand({
-      [this.apiModuleNamespace.system]: { set_dev_alias: { alias: alias } }
-    }, this.childId, sendOptions);
+  async setAlias(alias, sendOptions) {
+    await this.sendCommand(
+      {
+        [this.apiModuleNamespace.system]: { set_dev_alias: { alias } },
+      },
+      this.childId,
+      sendOptions
+    );
     this.alias = alias;
     return true;
   }
@@ -343,14 +378,18 @@ class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async setLocation (latitude, longitude, sendOptions) {
+  async setLocation(latitude, longitude, sendOptions) {
     const latitude_i = Math.round(latitude * 10000); // eslint-disable-line camelcase
     const longitude_i = Math.round(longitude * 10000); // eslint-disable-line camelcase
-    return this.sendCommand({
-      [this.apiModuleNamespace.system]: {
-        set_dev_location: { latitude, longitude, latitude_i, longitude_i }
-      }
-    }, null, sendOptions);
+    return this.sendCommand(
+      {
+        [this.apiModuleNamespace.system]: {
+          set_dev_location: { latitude, longitude, latitude_i, longitude_i },
+        },
+      },
+      null,
+      sendOptions
+    );
   }
 
   /**
@@ -360,7 +399,7 @@ class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getModel (sendOptions) {
+  async getModel(sendOptions) {
     const sysInfo = await this.getSysInfo(sendOptions);
     return sysInfo.model;
   }
@@ -373,10 +412,14 @@ class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async reboot (delay, sendOptions) {
-    return this.sendCommand({
-      [this.apiModuleNamespace.system]: { reboot: { delay } }
-    }, null, sendOptions);
+  async reboot(delay, sendOptions) {
+    return this.sendCommand(
+      {
+        [this.apiModuleNamespace.system]: { reboot: { delay } },
+      },
+      null,
+      sendOptions
+    );
   }
 
   /**
@@ -387,33 +430,55 @@ class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async reset (delay, sendOptions) {
-    return this.sendCommand({
-      [this.apiModuleNamespace.system]: { reset: { delay } }
-    }, null, sendOptions);
+  async reset(delay, sendOptions) {
+    return this.sendCommand(
+      {
+        [this.apiModuleNamespace.system]: { reset: { delay } },
+      },
+      null,
+      sendOptions
+    );
   }
 }
 
 /**
  * @private
  */
-function processResponse (command, response) {
-  const multipleResponses = (Object.keys(response).length > 1);
+function processResponse(command, response) {
+  const multipleResponses = Object.keys(response).length > 1;
   const commandResponses = recur(command, response);
 
   const errors = [];
-  commandResponses.forEach((r) => {
+  commandResponses.forEach(r => {
     if (r.response.err_code == null) {
-      errors.push({ msg: 'err_code missing', response: r.response, section: r.section });
+      errors.push({
+        msg: 'err_code missing',
+        response: r.response,
+        section: r.section,
+      });
     } else if (r.response.err_code !== 0) {
-      errors.push({ msg: 'err_code not zero', response: r.response, section: r.section });
+      errors.push({
+        msg: 'err_code not zero',
+        response: r.response,
+        section: r.section,
+      });
     }
   });
 
   if (errors.length === 1 && !multipleResponses) {
-    throw new ResponseError(errors[0].msg, errors[0].response, command, errors[0].section);
+    throw new ResponseError(
+      errors[0].msg,
+      errors[0].response,
+      command,
+      errors[0].section
+    );
   } else if (errors.length > 0) {
-    throw new ResponseError('err_code', response, command, errors.map((e) => e.section));
+    throw new ResponseError(
+      'err_code',
+      response,
+      command,
+      errors.map(e => e.section)
+    );
   }
 
   if (commandResponses.length === 1) {
@@ -421,10 +486,12 @@ function processResponse (command, response) {
   }
   return response;
 
-  function recur (command, response, depth = 0, section, results = []) {
+  function recur(command, response, depth = 0, section, results = []) {
     const keys = Object.keys(command);
-    if (keys.length === 0) { results.push(response); }
-    for (var i = 0; i < keys.length; i++) {
+    if (keys.length === 0) {
+      results.push(response);
+    }
+    for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (depth === 1) {
         if (response[key]) {

@@ -1,5 +1,3 @@
-'use strict';
-
 const Device = require('../device');
 const Cloud = require('../shared/cloud');
 const Emeter = require('../shared/emeter');
@@ -27,7 +25,7 @@ class Bulb extends Device {
    * @see Device
    * @param  {Object} options
    */
-  constructor ({ client, sysInfo, host, port, logger, defaultSendOptions }) {
+  constructor({ client, sysInfo, host, port, logger, defaultSendOptions }) {
     super({ client, host, port, logger, defaultSendOptions }); // sysInfo omitted
 
     this.supportsEmeter = true;
@@ -39,7 +37,7 @@ class Bulb extends Device {
       timesetting: 'smartlife.iot.common.timesetting',
       emeter: 'smartlife.iot.common.emeter',
       netif: 'netif',
-      lightingservice: 'smartlife.iot.smartbulb.lightingservice'
+      lightingservice: 'smartlife.iot.smartbulb.lightingservice',
     };
 
     /**
@@ -68,7 +66,10 @@ class Bulb extends Device {
      * @borrows Lighting#getLightState as Bulb.lighting#getLightState
      * @borrows Lighting#setLightState as Bulb.lighting#setLightState
      */
-    this.lighting = new Lighting(this, 'smartlife.iot.smartbulb.lightingservice');
+    this.lighting = new Lighting(
+      this,
+      'smartlife.iot.smartbulb.lightingservice'
+    );
     /**
      * @borrows Schedule#getNextAction as Bulb.schedule#getNextAction
      * @borrows Schedule#getRules as Bulb.schedule#getRules
@@ -89,23 +90,28 @@ class Bulb extends Device {
      */
     this.time = new Time(this, 'smartlife.iot.common.timesetting');
 
-    this.lastState = Object.assign(this.lastState, { powerOn: null, inUse: null });
+    this.lastState = Object.assign(this.lastState, {
+      powerOn: null,
+      inUse: null,
+    });
 
-    if (sysInfo) { this.sysInfo = sysInfo; }
+    if (sysInfo) {
+      this.sysInfo = sysInfo;
+    }
   }
 
   /**
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
    */
-  get sysInfo () {
+  get sysInfo() {
     return super.sysInfo;
   }
 
   /**
    * @private
    */
-  set sysInfo (sysInfo) {
+  set sysInfo(sysInfo) {
     super.sysInfo = sysInfo;
     // TODO / XXX Verify that sysInfo.light_state can be set here to trigger events
     this.lighting.lightState = sysInfo.light_state;
@@ -115,35 +121,37 @@ class Bulb extends Device {
    * Cached value of `sys_info.is_dimmable === 1`
    * @return {boolean}
    */
-  get supportsBrightness () {
-    return (this.sysInfo.is_dimmable === 1);
+  get supportsBrightness() {
+    return this.sysInfo.is_dimmable === 1;
   }
 
   /**
    * Cached value of `sys_info.is_color === 1`
    * @return {boolean}
    */
-  get supportsColor () {
-    return (this.sysInfo.is_color === 1);
+  get supportsColor() {
+    return this.sysInfo.is_color === 1;
   }
 
   /**
    * Cached value of `sys_info.is_variable_color_temp === 1`
    * @return {boolean}
    */
-  get supportsColorTemperature () {
-    return (this.sysInfo.is_variable_color_temp === 1);
+  get supportsColorTemperature() {
+    return this.sysInfo.is_variable_color_temp === 1;
   }
 
   /**
    * Returns array with min and max supported color temperatures
    * @return {?{min: Number, max: Number}} range
    */
-  get getColorTemperatureRange () {
+  get getColorTemperatureRange() {
     if (!this.supportsColorTemperature) return;
     switch (true) {
-      case (/LB130/i).test(this.sysInfo.model): return { min: 2500, max: 9000 };
-      default: return { min: 2700, max: 6500 };
+      case /LB130/i.test(this.sysInfo.model):
+        return { min: 2500, max: 9000 };
+      default:
+        return { min: 2700, max: 6500 };
     }
   }
 
@@ -156,20 +164,25 @@ class Bulb extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
-  async getInfo (sendOptions) {
+  async getInfo(sendOptions) {
     // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
-    const data = await this.send(`{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}},"${this.apiModuleNamespace.lightingservice}":{"get_light_state":{}},"${this.apiModuleNamespace.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModuleNamespace.cloud}":{"get_info":{}}}`, sendOptions);
+    const data = await this.send(
+      `{"${this.apiModuleNamespace.emeter}":{"get_realtime":{}},"${this.apiModuleNamespace.lightingservice}":{"get_light_state":{}},"${this.apiModuleNamespace.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModuleNamespace.cloud}":{"get_info":{}}}`,
+      sendOptions
+    );
     this.sysInfo = data.system.get_sysinfo;
     this.cloud.info = data[this.apiModuleNamespace.cloud].get_info;
     this.emeter.realtime = data[this.apiModuleNamespace.emeter].get_realtime;
-    this.schedule.nextAction = data[this.apiModuleNamespace.schedule].get_next_action;
-    this.lighting.lightState = data[this.apiModuleNamespace.lightingservice].get_light_state;
+    this.schedule.nextAction =
+      data[this.apiModuleNamespace.schedule].get_next_action;
+    this.lighting.lightState =
+      data[this.apiModuleNamespace.lightingservice].get_light_state;
     return {
       sysInfo: this.sysInfo,
       cloud: { info: this.cloud.info },
       emeter: { realtime: this.emeter.realtime },
       schedule: { nextAction: this.schedule.nextAction },
-      lighting: { lightState: this.lighting.lightState }
+      lighting: { lightState: this.lighting.lightState },
     };
   }
 
@@ -180,9 +193,9 @@ class Bulb extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async getPowerState (sendOptions) {
+  async getPowerState(sendOptions) {
     const lightState = await this.lighting.getLightState(sendOptions);
-    return (lightState.on_off === 1);
+    return lightState.on_off === 1;
   }
 
   /**
@@ -193,8 +206,8 @@ class Bulb extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setPowerState (value, sendOptions) {
-    return this.lighting.setLightState({ on_off: (value ? 1 : 0) }, sendOptions);
+  async setPowerState(value, sendOptions) {
+    return this.lighting.setLightState({ on_off: value ? 1 : 0 }, sendOptions);
   }
 
   /**
@@ -204,7 +217,7 @@ class Bulb extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async togglePowerState (sendOptions) {
+  async togglePowerState(sendOptions) {
     const powerState = await this.getPowerState(sendOptions);
     await this.setPowerState(!powerState, sendOptions);
     return !powerState;

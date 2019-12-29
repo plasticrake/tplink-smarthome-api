@@ -1,11 +1,10 @@
 /* eslint camelcase: ["off"] */
-'use strict';
 
 /**
  * Schedule
  */
 class Schedule {
-  constructor (device, apiModuleName, childId = null) {
+  constructor(device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
     this.childId = childId;
@@ -18,10 +17,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getNextAction (sendOptions) {
-    this.nextaction = this.device.sendCommand({
-      [this.apiModuleName]: { get_next_action: {} }
-    }, this.childId, sendOptions);
+  async getNextAction(sendOptions) {
+    this.nextaction = this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_next_action: {} },
+      },
+      this.childId,
+      sendOptions
+    );
     return this.nextaction;
   }
 
@@ -32,10 +35,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getRules (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_rules: {} }
-    }, this.childId, sendOptions);
+  async getRules(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_rules: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -46,9 +53,9 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response of rule
    */
-  async getRule (id, sendOptions) {
+  async getRule(id, sendOptions) {
     const rules = await this.getRules(sendOptions);
-    const rule = rules.rule_list.find((r) => r.id === id);
+    const rule = rules.rule_list.find(r => r.id === id);
     if (rule) {
       rule.err_code = rules.err_code;
     }
@@ -63,10 +70,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async addRule (rule, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { add_rule: rule }
-    }, this.childId, sendOptions);
+  async addRule(rule, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { add_rule: rule },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -77,10 +88,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async editRule (rule, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { edit_rule: rule }
-    }, this.childId, sendOptions);
+  async editRule(rule, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { edit_rule: rule },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -90,10 +105,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async deleteAllRules (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { delete_all_rules: {} }
-    }, this.childId, sendOptions);
+  async deleteAllRules(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { delete_all_rules: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -104,10 +123,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async deleteRule (id, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { delete_rule: { id } }
-    }, this.childId, sendOptions);
+  async deleteRule(id, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { delete_rule: { id } },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -118,10 +141,16 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async setOverallEnable (enable, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { set_overall_enable: { enable: (enable ? 1 : 0) } }
-    }, this.childId, sendOptions);
+  async setOverallEnable(enable, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: {
+          set_overall_enable: { enable: enable ? 1 : 0 },
+        },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -133,10 +162,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getDayStats (year, month, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_daystat: { year, month } }
-    }, this.childId, sendOptions);
+  async getDayStats(year, month, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_daystat: { year, month } },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -147,10 +180,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getMonthStats (year, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_monthstat: { year } }
-    }, this.childId, sendOptions);
+  async getMonthStats(year, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_monthstat: { year } },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -160,10 +197,14 @@ class Schedule {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async eraseStats (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { erase_runtime_stat: { } }
-    }, this.childId, sendOptions);
+  async eraseStats(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { erase_runtime_stat: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 }
 
