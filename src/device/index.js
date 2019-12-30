@@ -7,31 +7,103 @@ const Netif = require('./netif');
 const { ResponseError } = require('../utils');
 
 /**
+ * @private
+ */
+const recur = function recur(
+  command,
+  response,
+  depth = 0,
+  section,
+  results = []
+) {
+  const keys = Object.keys(command);
+  if (keys.length === 0) {
+    results.push(response);
+  }
+  for (let i = 0; i < keys.length; i += 1) {
+    const key = keys[i];
+    if (depth === 1) {
+      if (response[key]) {
+        results.push({ section, response: response[key] });
+      } else {
+        return results.push({ section, response });
+      }
+    } else if (depth < 1) {
+      if (response[key] !== undefined) {
+        recur(command[key], response[key], depth + 1, key, results);
+      }
+    }
+  }
+  return results;
+};
+
+/**
+ * @private
+ */
+const processResponse = function processResponse(command, response) {
+  const multipleResponses = Object.keys(response).length > 1;
+  const commandResponses = recur(command, response);
+
+  const errors = [];
+  commandResponses.forEach(r => {
+    if (r.response.err_code == null) {
+      errors.push({
+        msg: 'err_code missing',
+        response: r.response,
+        section: r.section,
+      });
+    } else if (r.response.err_code !== 0) {
+      errors.push({
+        msg: 'err_code not zero',
+        response: r.response,
+        section: r.section,
+      });
+    }
+  });
+
+  if (errors.length === 1 && !multipleResponses) {
+    throw new ResponseError(
+      errors[0].msg,
+      errors[0].response,
+      command,
+      errors[0].section
+    );
+  } else if (errors.length > 0) {
+    throw new ResponseError(
+      'err_code',
+      response,
+      command,
+      errors.map(e => e.section)
+    );
+  }
+
+  if (commandResponses.length === 1) {
+    return commandResponses[0].response;
+  }
+  return response;
+};
+
+/**
  * TP-Link Device.
  *
  * Shared behavior for {@link Plug} and {@link Bulb}.
+ * @abstract
  * @extends EventEmitter
  * @emits  Device#emeter-realtime-update
  */
 class Device extends EventEmitter {
+  #sysInfo;
+
   /**
    * Created by {@link Client#getCommonDevice} - Do not instantiate directly
    * @param  {Object}       options
    * @param  {Client}       options.client
-   * @param  {Object}       options.sysInfo
    * @param  {string}       options.host
    * @param  {number}      [options.port=9999]
    * @param  {Object}      [options.logger]
    * @param  {SendOptions} [options.defaultSendOptions]
    */
-  constructor({
-    client,
-    sysInfo,
-    host,
-    port = 9999,
-    logger,
-    defaultSendOptions,
-  }) {
+  constructor({ client, host, port = 9999, logger, defaultSendOptions }) {
     super();
 
     this.client = client;
@@ -40,6 +112,7 @@ class Device extends EventEmitter {
 
     this.log = logger || this.client.log;
     this.log.debug('device.constructor(%j)', {
+      // eslint-disable-next-line prefer-rest-params
       ...arguments[0],
       client: 'not shown',
     });
@@ -53,7 +126,7 @@ class Device extends EventEmitter {
     this.tcpConnection = new TcpConnection(this);
 
     this.lastState = {};
-    this._sysInfo = {};
+    this.#sysInfo = {};
 
     this.netif = new Netif(this, 'netif');
   }
@@ -63,7 +136,7 @@ class Device extends EventEmitter {
    * @return {Object} system.sys_info
    */
   get sysInfo() {
-    return this._sysInfo;
+    return this.#sysInfo;
   }
 
   /**
@@ -71,7 +144,7 @@ class Device extends EventEmitter {
    */
   set sysInfo(sysInfo) {
     this.log.debug('[%s] device sysInfo set', sysInfo.alias || this.alias);
-    this._sysInfo = sysInfo;
+    this.#sysInfo = sysInfo;
   }
 
   /**
@@ -211,7 +284,10 @@ class Device extends EventEmitter {
     this.log.debug('[%s] device.send()', this.alias);
 
     try {
-      const thisSendOptions = { ...this.defaultSendOptions, ...sendOptions };
+      const thisSendOptions = {
+        ...this.defaultSendOptions,
+        ...sendOptions,
+      };
       const payloadString = !(
         typeof payload === 'string' || payload instanceof String
       )
@@ -438,75 +514,6 @@ class Device extends EventEmitter {
       null,
       sendOptions
     );
-  }
-}
-
-/**
- * @private
- */
-function processResponse(command, response) {
-  const multipleResponses = Object.keys(response).length > 1;
-  const commandResponses = recur(command, response);
-
-  const errors = [];
-  commandResponses.forEach(r => {
-    if (r.response.err_code == null) {
-      errors.push({
-        msg: 'err_code missing',
-        response: r.response,
-        section: r.section,
-      });
-    } else if (r.response.err_code !== 0) {
-      errors.push({
-        msg: 'err_code not zero',
-        response: r.response,
-        section: r.section,
-      });
-    }
-  });
-
-  if (errors.length === 1 && !multipleResponses) {
-    throw new ResponseError(
-      errors[0].msg,
-      errors[0].response,
-      command,
-      errors[0].section
-    );
-  } else if (errors.length > 0) {
-    throw new ResponseError(
-      'err_code',
-      response,
-      command,
-      errors.map(e => e.section)
-    );
-  }
-
-  if (commandResponses.length === 1) {
-    return commandResponses[0].response;
-  }
-  return response;
-
-  function recur(command, response, depth = 0, section, results = []) {
-    const keys = Object.keys(command);
-    if (keys.length === 0) {
-      results.push(response);
-    }
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if (depth === 1) {
-        if (response[key]) {
-          results.push({ section, response: response[key] });
-        } else {
-          return results.push({ section, response });
-        }
-      } else if (depth < 1) {
-        section = key;
-        if (response[key] !== undefined) {
-          recur(command[key], response[key], depth + 1, section, results);
-        }
-      }
-    }
-    return results;
   }
 }
 

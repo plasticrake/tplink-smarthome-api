@@ -146,7 +146,7 @@ class Bulb extends Device {
    * @return {?{min: Number, max: Number}} range
    */
   get getColorTemperatureRange() {
-    if (!this.supportsColorTemperature) return;
+    if (!this.supportsColorTemperature) return undefined;
     switch (true) {
       case /LB130/i.test(this.sysInfo.model):
         return { min: 2500, max: 9000 };

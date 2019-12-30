@@ -1,12 +1,11 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
+/* eslint-disable no-unused-expressions */
 
 const {
   expect,
   sinon,
   getTestClient,
   testDevices,
-  testSendOptions,
+  testSendOptionsSets,
 } = require('./setup');
 
 const Device = require('../src/device');
@@ -253,8 +252,10 @@ describe('Client', function() {
         })
         .on('device-new', device => {
           if (device.model.match(/^HS300/)) {
-            expect(device.sysInfo.children.length).to.be.above(1);
-            expect(device.sysInfo.children.length).to.eql(device.children.size);
+            expect(device.children).to.have.property('size', 6);
+            expect(device.sysInfo.children).to.have.lengthOf(
+              device.children.size
+            );
             if (devices[device.deviceId] == null) {
               devices[device.deviceId] = {};
               devices[device.deviceId].children = [];
@@ -283,21 +284,23 @@ describe('Client', function() {
         })
         .on('device-new', device => {
           if (device.model.match(/^HS300/)) {
-            expect(device.sysInfo.children.length).to.be.above(1);
-            expect(device.sysInfo.children.length).to.eql(device.children.size);
+            expect(device.children).to.have.property('size', 6);
+            expect(device.sysInfo.children).to.have.lengthOf(
+              device.children.size
+            );
             expect(devices[device.deviceId]).to.be.undefined;
             devices[device.deviceId] = device;
           }
         });
       setTimeout(() => {
-        expect(Object.keys(devices).length).to.be.above(0);
+        expect(Object.keys(devices)).length.to.be.above(0);
         done();
       }, 1000);
     });
   });
 
-  testSendOptions.forEach(testSendOptions => {
-    context(testSendOptions.name, function() {
+  testSendOptionsSets.forEach(sendOptions => {
+    context(sendOptions.name, function() {
       describe('#getDevice()', function() {
         this.timeout(2000);
         this.slow(1500);
@@ -305,7 +308,7 @@ describe('Client', function() {
         let device;
 
         before(async function() {
-          client = getTestClient(testSendOptions);
+          client = getTestClient(sendOptions);
           device = await client.getDevice(testDevices.anyDevice.deviceOptions);
         });
 
@@ -323,10 +326,11 @@ describe('Client', function() {
         it('should be rejected with an invalid IP address', async function() {
           let error;
           const { deviceOptions } = testDevices.unreachable;
-          let device;
           try {
-            device = await client.getDevice(deviceOptions, { timeout: 500 });
-            device.closeConnection();
+            const dev = await client.getDevice(deviceOptions, {
+              timeout: 500,
+            });
+            dev.closeConnection();
           } catch (err) {
             error = err;
           }
@@ -342,7 +346,7 @@ describe('Client', function() {
         let unreachablePlug;
 
         before(function() {
-          client = getTestClient(testSendOptions);
+          client = getTestClient(sendOptions);
           plug = client.getPlug(testDevices.anyPlug.deviceOptions);
           unreachablePlug = client.getPlug(
             testDevices.unreachable.deviceOptions
@@ -375,7 +379,7 @@ describe('Client', function() {
         let unreachableBulb;
 
         before(function() {
-          client = getTestClient(testSendOptions);
+          client = getTestClient(sendOptions);
           bulb = client.getBulb(testDevices.anyBulb.deviceOptions);
           unreachableBulb = client.getBulb(
             testDevices.unreachable.deviceOptions
@@ -405,17 +409,17 @@ describe('Client', function() {
       let client;
       let options;
       before(function() {
-        client = getTestClient(testSendOptions);
+        client = getTestClient(sendOptions);
         options = testDevices.anyDevice.deviceOptions;
       });
-      [{ transport: 'tcp' }, { transport: 'udp' }].forEach(sendOptions => {
-        it(`should return info with string payload ${sendOptions.transport}`, function() {
+      ['tcp', 'udp'].forEach(transport => {
+        it(`should return info with string payload ${transport}`, function() {
           return expect(
             client.send(
               '{"system":{"get_sysinfo":{}}}',
               options.host,
               options.port,
-              sendOptions
+              { sendOptions: { transport } }
             )
           ).to.eventually.have.nested.property(
             'system.get_sysinfo.err_code',
@@ -428,7 +432,7 @@ describe('Client', function() {
               { system: { get_sysinfo: {} } },
               options.host,
               options.port,
-              sendOptions
+              { sendOptions: { transport } }
             )
           ).to.eventually.have.nested.property(
             'system.get_sysinfo.err_code',

@@ -1,9 +1,6 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
-
 const { expect } = require('../setup');
 
-module.exports = function(testDevice) {
+module.exports = function() {
   describe('Time', function() {
     this.timeout(5000);
     this.slow(2000);

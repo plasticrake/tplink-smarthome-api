@@ -1,4 +1,6 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
+
+/* eslint-disable no-console */
 
 const castArray = require('lodash.castarray');
 const program = require('commander');
@@ -10,7 +12,7 @@ const { Client, ResponseError } = require('./');
 let logLevel;
 let client;
 
-const outputError = function(err) {
+const outputError = function outputError(err) {
   if (err instanceof ResponseError) {
     console.log('Response Error:');
     console.log(err.response);
@@ -20,16 +22,21 @@ const outputError = function(err) {
   }
 };
 
-const search = function(sysInfo, breakoutChildren, timeout, params) {
+const search = function search(
+  sysInfo,
+  breakoutChildren,
+  discoveryTimeout,
+  params
+) {
   try {
     console.log('Searching...');
 
     const commandParams = {
       discoveryInterval: 2000,
-      discoveryTimeout: timeout,
+      discoveryTimeout,
       breakoutChildren,
       ...params,
-    }; // {discoveryInterval: 2000, discoveryTimeout: timeout, ...params};
+    };
     console.log(`startDiscovery(${util.inspect(commandParams)})`);
     client.startDiscovery(commandParams).on('device-new', device => {
       console.log(
@@ -47,7 +54,7 @@ const search = function(sysInfo, breakoutChildren, timeout, params) {
   }
 };
 
-const send = async function(host, port, payload) {
+const send = async function send(host, port, payload) {
   try {
     console.log(
       `Sending to ${host}:${port || ''} via ${
@@ -62,7 +69,7 @@ const send = async function(host, port, payload) {
   }
 };
 
-const sendCommand = async function(host, port, childId, payload) {
+const sendCommand = async function sendCommand(host, port, childId, payload) {
   try {
     console.log(
       `Sending to ${host}:${port || ''} ${
@@ -78,7 +85,7 @@ const sendCommand = async function(host, port, childId, payload) {
   }
 };
 
-const sendCommandDynamic = async function(
+const sendCommandDynamic = async function sendCommandDynamic(
   host,
   port,
   command,
@@ -100,7 +107,7 @@ const sendCommandDynamic = async function(
   }
 };
 
-const details = async function(host, port, timeout) {
+const details = async function details(host, port) {
   try {
     console.log(`Getting details from ${host}:${port || ''}...`);
     const device = await client.getDevice({ host, port });
@@ -123,7 +130,7 @@ const details = async function(host, port, timeout) {
   }
 };
 
-const blink = function(host, port, times, rate, timeout) {
+const blink = function blink(host, port, times, rate) {
   console.log(`Sending blink commands to ${host}:${port || ''}...`);
   client
     .getDevice({ host, port })
@@ -141,7 +148,7 @@ const toInt = s => {
   return parseInt(s, 10);
 };
 
-const setupClient = function() {
+const setupClient = function setupClient() {
   const defaultSendOptions = {};
   if (program.udp) defaultSendOptions.transport = 'udp';
   if (program.timeout) defaultSendOptions.timeout = program.timeout;
@@ -156,8 +163,9 @@ const setParamTypes = function setParamTypes(params, types) {
           return +el;
         case 'boolean':
           return el === 'true' || el === '1';
+        default:
+          return el;
       }
-      return el;
     });
   }
   return params;
@@ -184,24 +192,25 @@ program
     'output children (multi-outlet plugs)',
     true
   )
-  .action(function(params, options) {
+  .action((params, options) => {
     client = setupClient();
+    let paramsObj;
     if (params) {
       console.dir(params);
-      params = JSON.parse(params);
+      paramsObj = JSON.parse(params);
     }
     search(
       options.sysinfo,
       options.breakoutChildren || false,
       program.timeout,
-      params
+      paramsObj
     );
   });
 
 program
   .command('send <host> <payload>')
   .description('Send payload to device (using Client.send)')
-  .action(function(host, payload, options) {
+  .action((host, payload) => {
     client = setupClient();
     const [hostOnly, port] = host.split(':');
     send(hostOnly, port, payload);
@@ -211,21 +220,21 @@ program
   .command('sendCommand <host> <payload>')
   .description('Send payload to device (using Device#sendCommand)')
   .option('-c, --childId [childId]', 'childId')
-  .action(function(host, payload, options) {
+  .action((host, payload, options) => {
     client = setupClient();
     const [hostOnly, port] = host.split(':');
     sendCommand(hostOnly, port, options.childId, payload);
   });
 
-program.command('details <host>').action(function(host, options) {
+program.command('details <host>').action(host => {
   client = setupClient();
   const [hostOnly, port] = host.split(':');
-  details(hostOnly, port, program.timeout);
+  details(hostOnly, port);
 });
 
 program
   .command('blink <host> [times] [rate]')
-  .action(function(host, times = 5, rate = 500, options) {
+  .action((host, times = 5, rate = 500) => {
     client = setupClient();
     const [hostOnly, port] = host.split(':');
     blink(hostOnly, port, times, rate);
@@ -258,7 +267,7 @@ program
   if (supportsChildId) {
     cmd = cmd.option('-c, --childId [childId]', 'childId');
   }
-  cmd.action(function(host, params, options) {
+  cmd.action((host, params, options) => {
     client = setupClient();
     const [hostOnly, port] = host.split(':');
     sendCommandDynamic(
@@ -273,26 +282,26 @@ program
 
 program
   .command('encrypt <outputEncoding> <input> [firstKey=0xAB]')
-  .action(function(outputEncoding, input, firstKey = 0xab) {
+  .action((outputEncoding, input, firstKey = 0xab) => {
     const outputBuf = tplinkCrypto.encrypt(input, firstKey);
     console.log(outputBuf.toString(outputEncoding));
   });
 program
   .command('encryptWithHeader <outputEncoding> <input> [firstKey=0xAB]')
-  .action(function(outputEncoding, input, firstKey = 0xab) {
+  .action((outputEncoding, input, firstKey = 0xab) => {
     const outputBuf = tplinkCrypto.encryptWithHeader(input, firstKey);
     console.log(outputBuf.toString(outputEncoding));
   });
 program
   .command('decrypt <inputEncoding> <input> [firstKey=0xAB]')
-  .action(function(inputEncoding, input, firstKey = 0xab) {
+  .action((inputEncoding, input, firstKey = 0xab) => {
     const inputBuf = Buffer.from(input, inputEncoding);
     const outputBuf = tplinkCrypto.decrypt(inputBuf, firstKey);
     console.log(outputBuf.toString());
   });
 program
   .command('decryptWithHeader <inputEncoding> <input> [firstKey=0xAB]')
-  .action(function(inputEncoding, input, firstKey = 0xab) {
+  .action((inputEncoding, input, firstKey = 0xab) => {
     const inputBuf = Buffer.from(input, inputEncoding);
     const outputBuf = tplinkCrypto.decryptWithHeader(inputBuf, firstKey);
     console.log(outputBuf.toString());

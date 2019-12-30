@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 const dotenv = require('dotenv');
 const { expect } = require('../setup');
 
@@ -45,7 +43,10 @@ module.exports = function(testDevice) {
     let originalCloudInfo;
 
     before(async function getOriginalCloudInfo() {
-      if (!testDevice.getDevice) return this.skip();
+      if (!testDevice.getDevice) {
+        this.skip();
+        return;
+      }
       const device = await testDevice.getDevice();
       originalCloudInfo = await device.cloud.getInfo();
     });

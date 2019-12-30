@@ -1,6 +1,4 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
-
+/* eslint-disable no-await-in-loop */
 const { expect } = require('../setup');
 
 // const { ResponseError } = require('../../src');
@@ -12,7 +10,7 @@ module.exports = function(testDevice) {
 
     beforeEach(function() {
       if (testDevice.model !== 'hs220') {
-        return this.skip();
+        this.skip();
       }
     });
 

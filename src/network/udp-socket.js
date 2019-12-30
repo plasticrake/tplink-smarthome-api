@@ -6,6 +6,7 @@ const TplinkSocket = require('./tplink-socket');
 const { replaceControlCharacters } = require('../utils');
 
 class UdpSocket extends TplinkSocket {
+  // eslint-disable-next-line class-methods-use-this
   get socketType() {
     return 'UDP';
   }
@@ -21,11 +22,11 @@ class UdpSocket extends TplinkSocket {
 
         // Polyfill stub for Node < v8.7
         if (this.socket.getRecvBufferSize === undefined) {
-          this.socket.getRecvBufferSize = function() {};
+          this.socket.getRecvBufferSize = () => {};
         }
         // Polyfill stub for Node < v8.7
         if (this.socket.getSendBufferSize === undefined) {
-          this.socket.getSendBufferSize = function() {};
+          this.socket.getSendBufferSize = () => {};
         }
 
         this.socket.on('error', err => {
@@ -58,13 +59,13 @@ class UdpSocket extends TplinkSocket {
   async sendAndGetResponse(payload, port, host, timeout) {
     return new Promise((resolve, reject) => {
       let timer;
-      const setSocketTimeout = timeout => {
+      const setSocketTimeout = socketTimeout => {
         if (timer != null) clearTimeout(timer);
-        if (timeout > 0) {
+        if (socketTimeout > 0) {
           timer = setTimeout(() => {
-            this.logDebug(`: timeout(${timeout})`);
+            this.logDebug(`: socketTimeout(${socketTimeout})`);
             reject(new Error('UDP Timeout'));
-          }, timeout);
+          }, socketTimeout);
         }
       };
       setSocketTimeout(timeout);
@@ -85,7 +86,6 @@ class UdpSocket extends TplinkSocket {
           );
           return resolve(JSON.parse(decryptedMsg));
         } catch (err) {
-          reject(err);
           this.log.error(
             `Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(
               decryptedMsg
@@ -94,6 +94,7 @@ class UdpSocket extends TplinkSocket {
             socket.getRecvBufferSize(),
             msg
           );
+          return reject(err);
         }
       });
 

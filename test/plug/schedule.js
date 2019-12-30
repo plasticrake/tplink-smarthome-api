@@ -1,6 +1,3 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
-
 const { expect } = require('../setup');
 
 module.exports = function(testDevice) {
@@ -9,7 +6,10 @@ module.exports = function(testDevice) {
     this.slow(2000);
 
     before(async function() {
-      if (!testDevice.getDevice) return this.skip();
+      if (!testDevice.getDevice) {
+        this.skip();
+        return;
+      }
       const device = await testDevice.getDevice();
       await device.schedule.deleteAllRules();
     });

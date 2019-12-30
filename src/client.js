@@ -5,6 +5,7 @@ const { encrypt, decrypt } = require('tplink-smarthome-crypto');
 const Device = require('./device');
 const Plug = require('./plug');
 const Bulb = require('./bulb');
+const createLogger = require('./logger');
 const TcpConnection = require('./network/tcp-connection');
 const UdpConnection = require('./network/udp-connection');
 const { compareMac } = require('./utils');
@@ -12,6 +13,27 @@ const { compareMac } = require('./utils');
 const discoveryMsgBuf = encrypt(
   '{"system":{"get_sysinfo":{}},"emeter":{"get_realtime":{}},"smartlife.iot.common.emeter":{"get_realtime":{}}}'
 );
+
+/**
+ * @private
+ */
+function parseEmeter(response) {
+  try {
+    if (response.emeter.get_realtime.err_code === 0) {
+      return response.emeter.get_realtime;
+    }
+  } catch (err) {
+    // do nothing
+  }
+  try {
+    if (response['smartlife.iot.common.emeter'].get_realtime.err_code === 0) {
+      return response['smartlife.iot.common.emeter'].get_realtime;
+    }
+  } catch (err) {
+    // do nothing
+  }
+  return null;
+}
 
 /**
  * Send Options.
@@ -49,7 +71,7 @@ class Client extends EventEmitter {
       ...defaultSendOptions,
     };
 
-    this.log = require('./logger')({ level: logLevel, logger });
+    this.log = createLogger({ level: logLevel, logger });
 
     this.devices = new Map();
     this.discoveryTimer = null;
@@ -61,7 +83,8 @@ class Client extends EventEmitter {
    * @private
    */
   getNextSocketId() {
-    return this.maxSocketId++;
+    this.maxSocketId += 1;
+    return this.maxSocketId;
   }
 
   /**
@@ -226,10 +249,13 @@ class Client extends EventEmitter {
    * @private
    */
   getDeviceFromType(typeName, deviceOptions) {
+    let name;
     if (typeof typeName === 'function') {
-      typeName = typeName.name;
+      name = typeName.name;
+    } else {
+      name = typeName;
     }
-    switch (typeName.toLowerCase()) {
+    switch (name.toLowerCase()) {
       case 'plug':
         return this.getPlug(deviceOptions);
       case 'bulb':
@@ -266,6 +292,7 @@ class Client extends EventEmitter {
    * @param  {Object} sysInfo
    * @return {string}         'plug','bulb','device'
    */
+  // eslint-disable-next-line class-methods-use-this
   getTypeFromSysInfo(sysInfo) {
     const type = sysInfo.type || sysInfo.mic_type || '';
     switch (true) {
@@ -390,6 +417,7 @@ class Client extends EventEmitter {
     deviceOptions = {},
     devices,
   } = {}) {
+    // eslint-disable-next-line prefer-rest-params
     this.log.debug('client.startDiscovery(%j)', arguments[0]);
 
     try {
@@ -485,9 +513,9 @@ class Client extends EventEmitter {
 
       this.socket.bind(port, address, () => {
         this.isSocketBound = true;
-        const address = this.socket.address();
+        const sockAddress = this.socket.address();
         this.log.debug(
-          `client.socket: UDP ${address.family} listening on ${address.address}:${address.port}`
+          `client.socket: UDP ${sockAddress.family} listening on ${sockAddress.address}:${sockAddress.port}`
         );
         this.socket.setBroadcast(true);
 
@@ -573,20 +601,19 @@ class Client extends EventEmitter {
   /**
    * @private
    */
-  sendDiscovery(address, devices, offlineTolerance) {
+  sendDiscovery(address, devices = [], offlineTolerance) {
     this.log.debug(
       'client.sendDiscovery(%s, %j, %s)',
-      arguments[0],
-      arguments[1],
-      arguments[2]
+      address,
+      devices,
+      offlineTolerance
     );
     try {
-      devices = devices || [];
-
       this.devices.forEach(device => {
         if (device.status !== 'offline') {
           const diff = this.discoveryPacketSequence - device.seenOnDiscovery;
           if (diff >= offlineTolerance) {
+            // eslint-disable-next-line no-param-reassign
             device.status = 'offline';
             this.emit('offline', device);
           }
@@ -626,24 +653,7 @@ class Client extends EventEmitter {
       this.log.error('client.sendDiscovery: %s', err);
       this.emit('error', err);
     }
-
-    return this;
   }
-}
-/**
- * @private
- */
-function parseEmeter(response) {
-  try {
-    if (response.emeter.get_realtime.err_code === 0) {
-      return response.emeter.get_realtime;
-    }
-  } catch (err) {}
-  try {
-    if (response['smartlife.iot.common.emeter'].get_realtime.err_code === 0) {
-      return response['smartlife.iot.common.emeter'].get_realtime;
-    }
-  } catch (err) {}
 }
 
 module.exports = Client;

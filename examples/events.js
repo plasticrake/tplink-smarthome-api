@@ -1,10 +1,10 @@
 const util = require('util');
 
-const { Client } = require('..');
+const { Client } = require('tplink-smarthome-api');
 
 const client = new Client();
 
-const logEvent = function(eventName, device, state) {
+const logEvent = function logEvent(eventName, device, state) {
   const stateString = state != null ? util.inspect(state) : '';
   console.log(
     `${new Date().toISOString()} ${eventName} ${device.model} ${device.host}:${

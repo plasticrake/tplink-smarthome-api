@@ -2,17 +2,19 @@
 
 const isEqual = require('lodash.isequal');
 
-let _lightState = {};
-
 /**
  * Lighting
  */
 class Lighting {
+  lastState;
+
+  #lightState = {};
+
   constructor(device, apiModuleName) {
     this.device = device;
     this.apiModuleName = apiModuleName;
 
-    this._lastState = { powerOn: null, lightState: null };
+    this.lastState = { powerOn: null, lightState: null };
   }
 
   /**
@@ -20,14 +22,14 @@ class Lighting {
    * @return {Object}
    */
   get lightState() {
-    return _lightState;
+    return this.#lightState;
   }
 
   /**
    * @private
    */
   set lightState(lightState) {
-    _lightState = lightState;
+    this.#lightState = lightState;
     this.emitEvents();
   }
 
@@ -55,23 +57,23 @@ class Lighting {
    * @private
    */
   emitEvents() {
-    if (!_lightState) return;
-    const powerOn = _lightState.on_off === 1;
+    if (!this.#lightState) return;
+    const powerOn = this.#lightState.on_off === 1;
 
-    if (this._lastState.powerOn !== powerOn) {
-      this._lastState.powerOn = powerOn;
+    if (this.lastState.powerOn !== powerOn) {
+      this.lastState.powerOn = powerOn;
       if (powerOn) {
-        this.device.emit('lightstate-on', _lightState);
+        this.device.emit('lightstate-on', this.#lightState);
       } else {
-        this.device.emit('lightstate-off', _lightState);
+        this.device.emit('lightstate-off', this.#lightState);
       }
     }
 
-    if (!isEqual(this._lastState.lightState, _lightState)) {
-      this._lastState.lightState = _lightState;
-      this.device.emit('lightstate-change', _lightState);
+    if (!isEqual(this.lastState.lightState, this.#lightState)) {
+      this.lastState.lightState = this.#lightState;
+      this.device.emit('lightstate-change', this.#lightState);
     }
-    this.device.emit('lightstate-update', _lightState);
+    this.device.emit('lightstate-update', this.#lightState);
   }
 
   /**

@@ -5,6 +5,7 @@ class UdpConnection extends TplinkConnection {
   /**
    * @private
    */
+  // eslint-disable-next-line class-methods-use-this
   get socketType() {
     return 'UDP';
   }

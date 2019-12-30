@@ -15,7 +15,7 @@ chai.use(chaiAsPromised);
 chai.use(chaiSubset);
 chai.use(sinonChai);
 
-const testSendOptions = [
+const testSendOptionsSets = [
   {
     name: 'tcp',
     timeout: 100,
@@ -43,5 +43,5 @@ module.exports = {
   getTestClient,
   testDevices,
   testDeviceCleanup,
-  testSendOptions,
+  testSendOptionsSets,
 };

@@ -1,6 +1,3 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
-
 const { expect } = require('./setup');
 
 const { compareMac, createScheduleRule } = require('../src/utils');

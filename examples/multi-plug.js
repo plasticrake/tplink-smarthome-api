@@ -1,12 +1,12 @@
 const util = require('util');
 
-const { Client } = require('../src');
+const { Client } = require('tplink-smarthome-api');
 
 const client = new Client({
   defaultSendOptions: { timeout: 20000, transport: 'tcp' },
 });
 
-const logEvent = function(eventName, device, state) {
+const logEvent = function logEvent(eventName, device, state) {
   const stateString = state != null ? util.inspect(state) : '';
   console.log(
     `${new Date().toISOString()} ${eventName} ${device.model} ${device.host}:${
@@ -15,7 +15,7 @@ const logEvent = function(eventName, device, state) {
   );
 };
 
-const monitorEvents = function(device) {
+const monitorEvents = function monitorEvents(device) {
   // Device (Common) Events
   device.on('emeter-realtime-update', emeterRealtime => {
     logEvent('emeter-realtime-update', device, emeterRealtime);

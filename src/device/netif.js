@@ -20,6 +20,7 @@ class Netif {
    */
   async getScanInfo(refresh = false, timeoutInSeconds = 10, sendOptions = {}) {
     if (sendOptions.timeout == null) {
+      // eslint-disable-next-line no-param-reassign
       sendOptions.timeout =
         timeoutInSeconds * 1000 * 2 +
         (this.device.defaultSendOptions.timeout || 5000);

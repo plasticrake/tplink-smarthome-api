@@ -29,6 +29,12 @@ const { ResponseError } = require('../utils');
  * @emits  Plug#emeter-realtime-update
  */
 class Plug extends Device {
+  #children;
+
+  #child;
+
+  #childId;
+
   /**
    * Created by {@link Client} - Do not instantiate directly.
    *
@@ -160,7 +166,7 @@ class Plug extends Device {
    * @return {Map} children
    */
   get children() {
-    return this._children;
+    return this.#children;
   }
 
   /**
@@ -168,18 +174,19 @@ class Plug extends Device {
    */
   set children(children) {
     if (Array.isArray(children)) {
-      this._children = new Map(
+      this.#children = new Map(
         children.map(child => {
+          // eslint-disable-next-line no-param-reassign
           child.id = this.normalizeChildId(child.id);
           return [child.id, child];
         })
       );
     } else if (children instanceof Map) {
-      this._children = children;
+      this.#children = children;
     }
-    if (this._childId && this._children) {
-      this.childId = this._childId;
-      // this._child = this._children.get(this.normalizeChildId(this._childId));
+    if (this.#childId && this.#children) {
+      this.childId = this.#childId;
+      // this.#child = this.#children.get(this.normalizeChildId(this.#childId));
     }
   }
 
@@ -188,18 +195,18 @@ class Plug extends Device {
    * @return {string} childId
    */
   get childId() {
-    return this._childId;
+    return this.#childId;
   }
 
   /**
    * @private
    */
   set childId(childId) {
-    this._childId = this.normalizeChildId(childId);
-    if (this._childId && this._children) {
-      this._child = this._children.get(this._childId);
+    this.#childId = this.normalizeChildId(childId);
+    if (this.#childId && this.#children) {
+      this.#child = this.#children.get(this.#childId);
     }
-    if (this._childId && this._child == null) {
+    if (this.#childId && this.#child == null) {
       throw new Error(`Could not find child with childId ${childId}`);
     }
   }
@@ -210,7 +217,7 @@ class Plug extends Device {
    */
   get alias() {
     if (this.childId) {
-      return this._child.alias;
+      return this.#child.alias;
     }
     return this.sysInfo.alias;
   }
@@ -220,7 +227,7 @@ class Plug extends Device {
    */
   set alias(alias) {
     if (this.childId) {
-      this._child.alias = alias;
+      this.#child.alias = alias;
     }
     this.sysInfo.alias = alias;
   }
@@ -259,7 +266,7 @@ class Plug extends Device {
    */
   get relayState() {
     if (this.childId) {
-      return this._child.state === 1;
+      return this.#child.state === 1;
     }
     return this.sysInfo.relay_state === 1;
   }
@@ -269,7 +276,7 @@ class Plug extends Device {
    */
   set relayState(relayState) {
     if (this.childId) {
-      this._child.state = relayState ? 1 : 0;
+      this.#child.state = relayState ? 1 : 0;
       return;
     }
     this.sysInfo.relay_state = relayState ? 1 : 0;
@@ -440,12 +447,14 @@ class Plug extends Device {
     let lastBlink = Date.now();
 
     let currLedState = false;
-    for (let i = 0; i < times * 2; i++) {
+    for (let i = 0; i < times * 2; i += 1) {
       currLedState = !currLedState;
       lastBlink = Date.now();
+      // eslint-disable-next-line no-await-in-loop
       await this.setLedState(currLedState, sendOptions);
       const timeToWait = rate / 2 - (Date.now() - lastBlink);
       if (timeToWait > 0) {
+        // eslint-disable-next-line no-await-in-loop
         await delay(timeToWait);
       }
     }

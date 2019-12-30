@@ -1,7 +1,6 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
+/* eslint-disable no-unused-expressions */
 
-const { expect, sinon, testDevices, testSendOptions } = require('../setup');
+const { expect, sinon, testDevices, testSendOptionsSets } = require('../setup');
 
 const awayTests = require('./away');
 const dimmerTests = require('./dimmer');
@@ -13,7 +12,7 @@ describe('Plug', function() {
   this.slow(2000);
   this.retries(2);
 
-  testSendOptions.forEach(testSendOptions => {
+  testSendOptionsSets.forEach(testSendOptions => {
     context(testSendOptions.name, function() {
       testDevices.plugChildren.forEach(testDevice => {
         context(testDevice.name, function() {
@@ -29,7 +28,8 @@ describe('Plug', function() {
           beforeEach(async function() {
             // before() doesn't skip nested describes
             if (!testDevice.getDevice) {
-              return this.skip();
+              this.skip();
+              return;
             }
             plug = await testDevice.getDevice(null, testSendOptions);
             this.device = plug;
@@ -93,7 +93,8 @@ describe('Plug', function() {
           beforeEach(async function() {
             // before() doesn't skip nested describes
             if (!testDevice.getDevice) {
-              return this.skip();
+              this.skip();
+              return;
             }
             plug = await testDevice.getDevice(null, testSendOptions);
             this.device = plug;

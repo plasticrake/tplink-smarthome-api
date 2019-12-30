@@ -1,5 +1,4 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
+/* eslint-disable no-underscore-dangle, no-unused-expressions */
 // spell-checker:ignore MYTESTMAC MYTESTMICMAC MYTESTETHERNETMAC
 
 const rewire = require('rewire');
@@ -8,7 +7,7 @@ const {
   getTestClient,
   sinon,
   testDevices,
-  testSendOptions,
+  testSendOptionsSets,
 } = require('../setup');
 
 const { Client, ResponseError } = require('../../src');
@@ -209,7 +208,7 @@ describe('Device', function() {
     let time;
     let client;
 
-    testSendOptions.forEach(testSendOptions => {
+    testSendOptionsSets.forEach(testSendOptions => {
       context(testSendOptions.name, function() {
         context(testDevice.name, function() {
           // beforeEach() doesn't work with assigning to `this`
@@ -224,7 +223,8 @@ describe('Device', function() {
           beforeEach(async function() {
             // before() doesn't skip nested describes
             if (!testDevice.getDevice) {
-              return this.skip();
+              this.skip();
+              return;
             }
             device = await testDevice.getDevice(null, testSendOptions);
             this.device = device;
@@ -234,16 +234,17 @@ describe('Device', function() {
             it('should inherit defaultSendOptions from Client', function() {
               const timeout = 9999;
               const transport = 'udp';
-              const client = new Client({
+              const clientTest = new Client({
                 defaultSendOptions: { timeout, transport },
               });
-              const anotherDevice = client.getDeviceFromType(device.type);
-              expect(client.defaultSendOptions.timeout, 'client').to.equal(
+              const anotherDevice = clientTest.getDeviceFromType(device.type);
+              expect(clientTest.defaultSendOptions.timeout, 'client').to.equal(
                 timeout
               );
-              expect(client.defaultSendOptions.transport, 'client').to.equal(
-                transport
-              );
+              expect(
+                clientTest.defaultSendOptions.transport,
+                'client'
+              ).to.equal(transport);
               expect(
                 anotherDevice.defaultSendOptions.timeout,
                 'device'
@@ -372,7 +373,7 @@ describe('Device', function() {
             });
             it('should send multiple commands to a single device at once', async function() {
               const promises = [];
-              for (let i = 0; i < 20; i++) {
+              for (let i = 0; i < 20; i += 1) {
                 promises.push(
                   device.sendCommand('{"system":{"get_sysinfo":{}}}')
                 );
@@ -380,7 +381,7 @@ describe('Device', function() {
 
               const responses = await Promise.all(promises);
 
-              for (let i = 0; i < 20; i++) {
+              for (let i = 0; i < 20; i += 1) {
                 expect(responses[i]).to.have.property('err_code', 0);
               }
             });

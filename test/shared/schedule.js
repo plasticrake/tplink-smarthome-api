@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /* eslint no-unused-expressions: [off] */
 
 const { expect } = require('../setup');
@@ -12,7 +11,10 @@ module.exports = function(testDevice) {
     let year;
 
     before(async function() {
-      if (!testDevice.getDevice) return this.skip();
+      if (!testDevice.getDevice) {
+        this.skip();
+        return;
+      }
       const today = new Date();
       month = today.getMonth() + 1;
       year = today.getFullYear();

@@ -1,12 +1,9 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
-
 const {
   expect,
   getTestClient,
   testDevices,
   testDeviceCleanup,
-  testSendOptions,
+  testSendOptionsSets,
 } = require('./setup');
 
 const Client = require('../src/client');
@@ -24,7 +21,7 @@ describe('Test Environment Setup', function() {
     });
   });
 
-  function deviceIsOk(testDevice, testSendOptions) {
+  function deviceIsOk(testDevice) {
     it('should have a device', function() {
       expect(testDevice.getDevice).to.exist.and.be.an.instanceof(Function);
       return expect(
@@ -38,7 +35,7 @@ describe('Test Environment Setup', function() {
       );
     });
     describe('getTestClient()', function() {
-      testSendOptions.forEach(testSendOptions => {
+      testSendOptionsSets.forEach(testSendOptions => {
         context(testSendOptions.name, function() {
           it('should create device with sendOptions', async function() {
             const tso = { ...testSendOptions };
@@ -54,13 +51,13 @@ describe('Test Environment Setup', function() {
   describe('testDevices', function() {
     testDevices.forEach(testDevice => {
       context(testDevice.name, function() {
-        deviceIsOk(testDevice, testSendOptions);
+        deviceIsOk(testDevice);
       });
     });
 
     ['anyDevice', 'anyPlug', 'anyBulb'].forEach(deviceKey => {
       context(deviceKey, function() {
-        deviceIsOk(testDevices[deviceKey], testSendOptions);
+        deviceIsOk(testDevices[deviceKey]);
       });
     });
 
@@ -70,7 +67,7 @@ describe('Test Environment Setup', function() {
           expect(testDevices[deviceKey].length).to.be.above(0);
         });
         testDevices[deviceKey].forEach(d => {
-          deviceIsOk(d, testSendOptions);
+          deviceIsOk(d);
         });
       });
     });
@@ -84,7 +81,7 @@ describe('Test Environment Setup', function() {
         expect(testDevice).to.have.property('deviceOptions');
         expect(testDevice.deviceOptions).to.contain.keys('host', 'port');
       });
-      testSendOptions.forEach(testSendOptions => {
+      testSendOptionsSets.forEach(testSendOptions => {
         context(testSendOptions.name, function() {
           it('should have getDevice and throw', function() {
             expect(testDevice.getDevice).to.exist.and.be.an.instanceof(

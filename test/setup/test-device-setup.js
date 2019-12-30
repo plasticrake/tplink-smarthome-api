@@ -1,4 +1,5 @@
-/* eslint-env mocha */
+/* eslint-disable no-console */
+
 // spell-checker:ignore Mock’s
 
 const groupBy = require('lodash.groupby');
@@ -7,6 +8,10 @@ const dotenv = require('dotenv');
 
 const simulator = require('tplink-smarthome-simulator');
 const { Client } = require('../../src');
+
+const envIsTrue = function envIsTrue(value) {
+  return !(value == null || value === 0 || value === 'false');
+};
 
 dotenv.config();
 const clientOptions = { logLevel: process.env.TEST_CLIENT_LOGLEVEL };
@@ -27,13 +32,9 @@ const clientDefaultOptions = (() => {
   return Object.assign(opt, clientOptions);
 })();
 
-function envIsTrue(value) {
-  return !(value == null || value === 0 || value === 'false');
-}
-
-function getTestClient(options = {}) {
+const getTestClient = function getTestClient(options = {}) {
   return new Client({ ...clientDefaultOptions, ...options });
-}
+};
 
 const testDevices = [
   { model: 'hs100', deviceType: 'plug', name: 'HS100(plug)' },
@@ -53,21 +54,10 @@ const testDevices = [
   { model: 'lb130', deviceType: 'bulb', name: 'LB130(bulb)' },
 ];
 
-// Object.entries polyfill
-const objectEntries = function(obj) {
-  const ownProps = Object.keys(obj);
-  let i = ownProps.length;
-  const resArray = new Array(i); // preallocate the Array
-  while (i--) {
-    resArray[i] = [ownProps[i], obj[ownProps[i]]];
-  }
-  return resArray;
-};
-
-objectEntries(groupBy(testDevices, 'deviceType')).forEach(([key, value]) => {
+Object.entries(groupBy(testDevices, 'deviceType')).forEach(([key, value]) => {
   testDevices[key] = value;
 });
-objectEntries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
+Object.entries(groupBy(testDevices, 'model')).forEach(([key, value]) => {
   testDevices[key] = value;
 });
 
@@ -93,58 +83,10 @@ testDevices.plugChildren = [
   { name: 'HS300(plug).5', deviceType: 'plug' },
 ];
 
-async function getTestDevices() {
-  if (useSimulator) {
-    return getSimulatedTestDevices();
-  }
-  return getDiscoveryTestDevices();
-}
-
-async function getDiscoveryTestDevices() {
-  return new Promise((resolve, reject) => {
-    const discoveredTestDevices = [];
-    const client = getTestClient();
-    client.startDiscovery({ discoveryTimeout });
-
-    setTimeout(() => {
-      client.stopDiscovery();
-      for (const device of client.devices.values()) {
-        if (
-          discoveryIpWhitelist.length === 0 ||
-          discoveryIpWhitelist.includes(device.host)
-        ) {
-          discoveredTestDevices.push({
-            model: device.model,
-            mac: device.mac,
-            hw_ver: device.sysInfo.hw_ver,
-            deviceOptions: { host: device.host, port: device.port },
-            getDevice: (deviceOptions, sendOptions) =>
-              client.getDevice(
-                {
-                  host: device.host,
-                  port: device.port,
-                  defaultSendOptions: sendOptions,
-                  ...deviceOptions,
-                },
-                sendOptions
-              ),
-            type: 'real',
-          });
-        } else {
-          console.log(
-            `Excluding ${device.host}:${device.port} from test, not in whitelist`
-          );
-        }
-      }
-      return resolve(discoveredTestDevices);
-    }, discoveryTimeout);
-  });
-}
-
 const simulatedDevices = [];
 let simulatedUdpServer;
 
-async function getSimulatedTestDevices() {
+const getSimulatedTestDevices = async function getSimulatedTestDevices() {
   const client = getTestClient();
 
   simulatedDevices.push({
@@ -218,9 +160,10 @@ async function getSimulatedTestDevices() {
   });
 
   const simulatedTestDevices = [];
-  for (let i = 0; i < simulatedDevices.length; i++) {
+  for (let i = 0; i < simulatedDevices.length; i += 1) {
     const d = simulatedDevices[i].device;
     const { testType } = simulatedDevices[i];
+    // eslint-disable-next-line no-await-in-loop
     await d.start();
 
     const process = childId => {
@@ -258,7 +201,56 @@ async function getSimulatedTestDevices() {
   simulatedUdpServer = await simulator.UdpServer.start();
 
   return simulatedTestDevices;
-}
+};
+
+const getDiscoveryTestDevices = async function getDiscoveryTestDevices() {
+  return new Promise(resolve => {
+    const discoveredTestDevices = [];
+    const client = getTestClient();
+    client.startDiscovery({ discoveryTimeout });
+
+    setTimeout(() => {
+      client.stopDiscovery();
+
+      for (const device of client.devices.values()) {
+        if (
+          discoveryIpWhitelist.length === 0 ||
+          discoveryIpWhitelist.includes(device.host)
+        ) {
+          discoveredTestDevices.push({
+            model: device.model,
+            mac: device.mac,
+            hw_ver: device.sysInfo.hw_ver,
+            deviceOptions: { host: device.host, port: device.port },
+            getDevice: (deviceOptions, sendOptions) =>
+              client.getDevice(
+                {
+                  host: device.host,
+                  port: device.port,
+                  defaultSendOptions: sendOptions,
+                  ...deviceOptions,
+                },
+                sendOptions
+              ),
+            type: 'real',
+          });
+        } else {
+          console.log(
+            `Excluding ${device.host}:${device.port} from test, not in whitelist`
+          );
+        }
+      }
+      return resolve(discoveredTestDevices);
+    }, discoveryTimeout);
+  });
+};
+
+const getTestDevices = async function getTestDevices() {
+  if (useSimulator) {
+    return getSimulatedTestDevices();
+  }
+  return getDiscoveryTestDevices();
+};
 
 function testDeviceCleanup() {
   simulatedDevices.forEach(sd => {
@@ -273,14 +265,19 @@ function testDeviceCleanup() {
   console.log('clientDefaultOptions: %j', clientDefaultOptions);
   const realTestDevices = await getTestDevices();
 
-  const addDevice = (target, device) => {
-    target.mac = device.mac;
-    target.deviceOptions = device.deviceOptions;
-    target.getDevice = device.getDevice;
-    target.type = device.type;
-    target.childId = device.childId;
-    target.getOtherChildren = device.getOtherChildren;
-    target.getOtherChildrenState = device.getOtherChildrenState;
+  const addDevice = function addDevice(target, device) {
+    [
+      'mac',
+      'deviceOptions',
+      'getDevice',
+      'type',
+      'childId',
+      'getOtherChildren',
+      'getOtherChildrenState',
+    ].forEach(prop => {
+      // eslint-disable-next-line no-param-reassign
+      target[prop] = device[prop];
+    });
   };
 
   testDevices.forEach(testDevice => {
@@ -316,11 +313,14 @@ function testDeviceCleanup() {
         .forEach((realDevice, i) => {
           const testDeviceChild = JSON.parse(JSON.stringify(testDevice));
 
+          // eslint-disable-next-line no-param-reassign
           realDevice.getOtherChildren = function() {
             return testDevices.filter(
               oc => oc.mac === this.mac && oc.childId !== this.childId
             );
           };
+
+          // eslint-disable-next-line no-param-reassign
           realDevice.getOtherChildrenState = async function() {
             return Promise.all(
               this.getOtherChildren().map(async childDevice => {

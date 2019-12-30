@@ -1,6 +1,3 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
-
 const { expect } = require('../setup');
 
 module.exports = function() {

@@ -1,5 +1,4 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
+/* eslint-disable no-unused-expressions */
 
 const { expect, sinon } = require('../setup');
 
@@ -15,7 +14,10 @@ module.exports = function(testDevice) {
     let supportsEmeter;
 
     before(async function() {
-      if (!testDevice.getDevice) return this.skip();
+      if (!testDevice.getDevice) {
+        this.skip();
+        return;
+      }
       const today = new Date();
       month = today.getMonth() + 1;
       year = today.getFullYear();
@@ -99,6 +101,7 @@ module.exports = function(testDevice) {
             this.device.emeter.getRealtime()
           ).to.eventually.be.rejectedWith(ResponseError);
         }
+        return null;
       });
     });
 

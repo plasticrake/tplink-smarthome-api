@@ -1,7 +1,6 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
+/* eslint-disable no-unused-expressions */
 
-const { expect, testDevices, testSendOptions } = require('../setup');
+const { expect, testDevices, testSendOptionsSets } = require('../setup');
 
 const lightingTests = require('./lighting');
 const scheduleTests = require('./schedule');
@@ -11,7 +10,7 @@ describe('Bulb', function() {
   this.slow(2000);
   this.retries(2);
 
-  testSendOptions.forEach(testSendOptions => {
+  testSendOptionsSets.forEach(testSendOptions => {
     context(testSendOptions.name, function() {
       testDevices.bulb.forEach(testDevice => {
         context(testDevice.name, function() {
@@ -26,7 +25,8 @@ describe('Bulb', function() {
           beforeEach(async function() {
             // before() doesn't skip nested describes
             if (!testDevice.getDevice) {
-              return this.skip();
+              this.skip();
+              return;
             }
             bulb = await testDevice.getDevice(null, testSendOptions);
             this.device = bulb;

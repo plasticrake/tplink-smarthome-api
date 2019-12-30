@@ -6,6 +6,7 @@ const TplinkSocket = require('./tplink-socket');
 const { replaceControlCharacters } = require('../utils');
 
 class TcpSocket extends TplinkSocket {
+  // eslint-disable-next-line class-methods-use-this
   get socketType() {
     return 'TCP';
   }
@@ -16,7 +17,7 @@ class TcpSocket extends TplinkSocket {
 
   async createSocket() {
     return super.createSocket(() => {
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         this.socket = new net.Socket();
         resolve(this.socket);
       });
@@ -39,17 +40,17 @@ class TcpSocket extends TplinkSocket {
       let decryptedMsg;
 
       let timer;
-      const setSocketTimeout = timeout => {
+      const setSocketTimeout = socketTimeout => {
         if (timer != null) clearTimeout(timer);
-        if (timeout > 0) {
+        if (socketTimeout > 0) {
           timer = setTimeout(() => {
-            this.logDebug(`: timeout(${timeout})`);
+            this.logDebug(`: socketTimeout(${socketTimeout})`);
             try {
               this.destroy();
             } finally {
               reject(new Error('TCP Timeout'));
             }
-          }, timeout);
+          }, socketTimeout);
         }
       };
       setSocketTimeout(timeout);
@@ -96,7 +97,7 @@ class TcpSocket extends TplinkSocket {
           }
         } catch (err) {
           this.logDebug(': socket:data error');
-          console.dir(data);
+          this.logDebug(data);
           reject(err);
         }
       });
@@ -126,7 +127,7 @@ class TcpSocket extends TplinkSocket {
           }
         } catch (err) {
           this.logDebug(': socket:close error');
-          reject(err);
+          return reject(err);
         }
       });
 

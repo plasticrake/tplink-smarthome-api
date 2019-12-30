@@ -2,11 +2,12 @@
  * Emeter
  */
 class Emeter {
+  #realtime = {};
+
   constructor(device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
     this.childId = childId;
-    this._realtime = {};
   }
 
   /**
@@ -14,7 +15,7 @@ class Emeter {
    * @return {Object}
    */
   get realtime() {
-    return this._realtime;
+    return this.#realtime;
   }
 
   /**
@@ -23,7 +24,7 @@ class Emeter {
   set realtime(realtime) {
     const normalizedRealtime = { ...realtime }; // will coerce null/undefined to {}
 
-    const normalize = function(propName, propName2, multiplier) {
+    const normalize = (propName, propName2, multiplier) => {
       if (
         normalizedRealtime[propName] != null &&
         normalizedRealtime[propName2] == null
@@ -47,8 +48,8 @@ class Emeter {
       normalize('voltage', 'voltage_mv', 1000);
     }
 
-    this._realtime = normalizedRealtime;
-    this.device.emit('emeter-realtime-update', this._realtime);
+    this.#realtime = normalizedRealtime;
+    this.device.emit('emeter-realtime-update', this.#realtime);
   }
 
   /**

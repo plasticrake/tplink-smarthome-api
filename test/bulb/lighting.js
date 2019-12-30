@@ -1,5 +1,4 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
+/* eslint-disable no-unused-expressions */
 
 const { expect, sinon } = require('../setup');
 
@@ -183,8 +182,8 @@ module.exports = function() {
 
         await this.device.lighting.getLightState();
         await this.device.lighting.getLightState();
-        this.device.lighting._lastState.lightState.on_off = 1;
-        this.device.lighting._lastState.powerOn = true;
+        this.device.lighting.lastState.lightState.on_off = 1;
+        this.device.lighting.lastState.powerOn = true;
         await this.device.lighting.getLightState();
         await this.device.lighting.getLightState();
 

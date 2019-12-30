@@ -1,5 +1,4 @@
-/* eslint-env mocha */
-/* eslint no-unused-expressions: ["off"] */
+/* eslint-disable no-unused-expressions */
 
 const { expect } = require('../setup');
 
