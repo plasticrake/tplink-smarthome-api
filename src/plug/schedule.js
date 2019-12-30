@@ -1,5 +1,4 @@
 /* eslint camelcase: ["off"] */
-'use strict';
 
 const Schedule = require('../shared/schedule');
 const { createScheduleRule } = require('../utils');
@@ -22,14 +21,18 @@ class PlugSchedule extends Schedule {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async addRule ({ powerState, dimmer, start, daysOfWeek, name = '', enable = true }, sendOptions) {
-    const rule = Object.assign({
-      sact: (powerState ? 1 : 0),
+  async addRule(
+    { powerState, dimmer, start, daysOfWeek, name = '', enable = true },
+    sendOptions
+  ) {
+    const rule = {
+      sact: powerState ? 1 : 0,
       name,
-      enable: (enable ? 1 : 0),
+      enable: enable ? 1 : 0,
       emin: 0,
-      etime_opt: -1
-    }, createScheduleRule({ start, daysOfWeek }));
+      etime_opt: -1,
+      ...createScheduleRule({ start, daysOfWeek }),
+    };
 
     if (dimmer !== undefined) {
       rule.sact = 3;
@@ -54,15 +57,19 @@ class PlugSchedule extends Schedule {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async editRule ({ id, powerState, dimmer, start, daysOfWeek, name = '', enable = true }, sendOptions) {
-    const rule = Object.assign({
+  async editRule(
+    { id, powerState, dimmer, start, daysOfWeek, name = '', enable = true },
+    sendOptions
+  ) {
+    const rule = {
       id,
-      sact: (powerState ? 1 : 0),
+      sact: powerState ? 1 : 0,
       name,
-      enable: (enable ? 1 : 0),
+      enable: enable ? 1 : 0,
       emin: 0,
-      etime_opt: -1
-    }, createScheduleRule({ start, daysOfWeek }));
+      etime_opt: -1,
+      ...createScheduleRule({ start, daysOfWeek }),
+    };
 
     if (dimmer !== undefined) {
       rule.sact = 3;

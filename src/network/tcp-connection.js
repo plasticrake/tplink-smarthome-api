@@ -1,5 +1,3 @@
-'use strict';
-
 const TplinkConnection = require('./tplink-connection');
 const TcpSocket = require('./tcp-socket');
 
@@ -7,18 +5,19 @@ class TcpConnection extends TplinkConnection {
   /**
    * @private
    */
-  get socketType () {
+  // eslint-disable-next-line class-methods-use-this
+  get socketType() {
     return 'TCP';
   }
 
   /**
    * @private
    */
-  async getSocket () {
+  async getSocket() {
     return super.getSocket(TcpSocket);
   }
 
-  async send (payload, { timeout } = { }) {
+  async send(payload, { timeout } = {}) {
     return super.send(payload, { timeout });
   }
 }

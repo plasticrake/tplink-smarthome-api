@@ -1,10 +1,8 @@
-'use strict';
-
 /**
  * Timer
  */
 class Timer {
-  constructor (device, apiModuleName, childId = null) {
+  constructor(device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
     this.childId = childId;
@@ -18,10 +16,14 @@ class Timer {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getRules (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_rules: {} }
-    }, this.childId, sendOptions);
+  async getRules(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_rules: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -37,18 +39,25 @@ class Timer {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async addRule ({ delay, powerState, name = 'timer', enable = true, deleteExisting = true }, sendOptions) {
+  async addRule(
+    { delay, powerState, name = 'timer', enable = true, deleteExisting = true },
+    sendOptions
+  ) {
     if (deleteExisting) await this.deleteAllRules(sendOptions);
-    return this.device.sendCommand({
-      [this.apiModuleName]: {
-        add_rule: {
-          enable: (enable ? 1 : 0),
-          delay,
-          act: (powerState ? 1 : 0),
-          name
-        }
-      }
-    }, this.childId, sendOptions);
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: {
+          add_rule: {
+            enable: enable ? 1 : 0,
+            delay,
+            act: powerState ? 1 : 0,
+            name,
+          },
+        },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -64,18 +73,25 @@ class Timer {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async editRule ({ id, delay, powerState, name = 'timer', enable = true }, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: {
-        edit_rule: {
-          id,
-          enable: (enable ? 1 : 0),
-          delay,
-          act: (powerState ? 1 : 0),
-          name
-        }
-      }
-    }, this.childId, sendOptions);
+  async editRule(
+    { id, delay, powerState, name = 'timer', enable = true },
+    sendOptions
+  ) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: {
+          edit_rule: {
+            id,
+            enable: enable ? 1 : 0,
+            delay,
+            act: powerState ? 1 : 0,
+            name,
+          },
+        },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -85,10 +101,14 @@ class Timer {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async deleteAllRules (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { delete_all_rules: {} }
-    }, this.childId, sendOptions);
+  async deleteAllRules(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { delete_all_rules: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 }
 

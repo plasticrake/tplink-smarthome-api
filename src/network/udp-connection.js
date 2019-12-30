@@ -1,5 +1,3 @@
-'use strict';
-
 const TplinkConnection = require('./tplink-connection');
 const UdpSocket = require('./udp-socket');
 
@@ -7,19 +5,24 @@ class UdpConnection extends TplinkConnection {
   /**
    * @private
    */
-  get socketType () {
+  // eslint-disable-next-line class-methods-use-this
+  get socketType() {
     return 'UDP';
   }
 
   /**
    * @private
    */
-  async getSocket (useSharedSocket) {
+  async getSocket(useSharedSocket) {
     return super.getSocket(UdpSocket, useSharedSocket);
   }
 
-  async send (payload, { timeout, useSharedSocket, sharedSocketTimeout } = { }) {
-    return super.send(payload, { timeout, useSharedSocket, sharedSocketTimeout });
+  async send(payload, { timeout, useSharedSocket, sharedSocketTimeout } = {}) {
+    return super.send(payload, {
+      timeout,
+      useSharedSocket,
+      sharedSocketTimeout,
+    });
   }
 }
 

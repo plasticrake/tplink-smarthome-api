@@ -1,25 +1,45 @@
 const util = require('util');
 
-const { Client } = require('../src');
+const { Client } = require('tplink-smarthome-api');
 
-const client = new Client({ defaultSendOptions: { timeout: 20000, transport: 'tcp' } });
+const client = new Client({
+  defaultSendOptions: { timeout: 20000, transport: 'tcp' },
+});
 
-const logEvent = function (eventName, device, state) {
-  const stateString = (state != null ? util.inspect(state) : '');
-  console.log(`${(new Date()).toISOString()} ${eventName} ${device.model} ${device.host}:${device.port} ${device.childId} ${stateString}`);
+const logEvent = function logEvent(eventName, device, state) {
+  const stateString = state != null ? util.inspect(state) : '';
+  console.log(
+    `${new Date().toISOString()} ${eventName} ${device.model} ${device.host}:${
+      device.port
+    } ${device.childId} ${stateString}`
+  );
 };
 
-const monitorEvents = function (device) {
+const monitorEvents = function monitorEvents(device) {
   // Device (Common) Events
-  device.on('emeter-realtime-update', (emeterRealtime) => { logEvent('emeter-realtime-update', device, emeterRealtime); });
+  device.on('emeter-realtime-update', emeterRealtime => {
+    logEvent('emeter-realtime-update', device, emeterRealtime);
+  });
 
   // Plug Events
-  device.on('power-on', () => { logEvent('power-on', device); });
-  device.on('power-off', () => { logEvent('power-off', device); });
-  device.on('power-update', (powerOn) => { logEvent('power-update', device, powerOn); });
-  device.on('in-use', () => { logEvent('in-use', device); });
-  device.on('not-in-use', () => { logEvent('not-in-use', device); });
-  device.on('in-use-update', (inUse) => { logEvent('in-use-update', device, inUse); });
+  device.on('power-on', () => {
+    logEvent('power-on', device);
+  });
+  device.on('power-off', () => {
+    logEvent('power-off', device);
+  });
+  device.on('power-update', powerOn => {
+    logEvent('power-update', device, powerOn);
+  });
+  device.on('in-use', () => {
+    logEvent('in-use', device);
+  });
+  device.on('not-in-use', () => {
+    logEvent('not-in-use', device);
+  });
+  device.on('in-use-update', inUse => {
+    logEvent('in-use-update', device, inUse);
+  });
 
   device.startPolling(5000);
 };
@@ -34,14 +54,16 @@ const monitorEvents = function (device) {
     return;
   }
 
-  device.children.forEach((child) => {
+  device.children.forEach(child => {
     console.log(child);
   });
 
-  await Promise.all(Array.from(device.children.keys(), async (childId) => {
-    const childPlug = await client.getDevice({ host: '10.0.1.136', childId });
-    monitorEvents(childPlug);
-  }));
+  await Promise.all(
+    Array.from(device.children.keys(), async childId => {
+      const childPlug = await client.getDevice({ host: '10.0.1.136', childId });
+      monitorEvents(childPlug);
+    })
+  );
 
   monitorEvents(device);
 })();

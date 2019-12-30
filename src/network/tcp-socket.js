@@ -1,5 +1,3 @@
-'use strict';
-
 const net = require('net');
 
 const { encryptWithHeader, decrypt } = require('tplink-smarthome-crypto');
@@ -8,24 +6,25 @@ const TplinkSocket = require('./tplink-socket');
 const { replaceControlCharacters } = require('../utils');
 
 class TcpSocket extends TplinkSocket {
-  get socketType () {
+  // eslint-disable-next-line class-methods-use-this
+  get socketType() {
     return 'TCP';
   }
 
-  logDebug (...args) {
-    this.log.debug(`[${this.socketId}] TcpSocket` + args.shift(), ...args);
+  logDebug(...args) {
+    this.log.debug(`[${this.socketId}] TcpSocket${args.shift()}`, ...args);
   }
 
-  async createSocket () {
+  async createSocket() {
     return super.createSocket(() => {
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         this.socket = new net.Socket();
         resolve(this.socket);
       });
     });
   }
 
-  close () {
+  close() {
     super.close(() => {
       this.socket.end();
     });
@@ -34,44 +33,49 @@ class TcpSocket extends TplinkSocket {
   /**
    * @private
    */
-  async sendAndGetResponse (payload, port, host, timeout) {
+  async sendAndGetResponse(payload, port, host, timeout) {
     return new Promise((resolve, reject) => {
       let deviceDataBuf;
       let segmentCount = 0;
       let decryptedMsg;
 
       let timer;
-      const setSocketTimeout = (timeout) => {
+      const setSocketTimeout = socketTimeout => {
         if (timer != null) clearTimeout(timer);
-        if (timeout > 0) {
+        if (socketTimeout > 0) {
           timer = setTimeout(() => {
-            this.logDebug(`: timeout(${timeout})`);
+            this.logDebug(`: socketTimeout(${socketTimeout})`);
             try {
               this.destroy();
             } finally {
               reject(new Error('TCP Timeout'));
             }
-          }, timeout);
+          }, socketTimeout);
         }
       };
       setSocketTimeout(timeout);
 
-      const socket = this.socket;
+      const { socket } = this;
       socket.removeAllListeners('data');
       socket.removeAllListeners('error');
 
-      socket.on('data', (data) => {
+      socket.on('data', data => {
         try {
           segmentCount += 1;
 
           if (deviceDataBuf === undefined) {
             deviceDataBuf = data;
           } else {
-            deviceDataBuf = Buffer.concat([deviceDataBuf, data], deviceDataBuf.length + data.length);
+            deviceDataBuf = Buffer.concat(
+              [deviceDataBuf, data],
+              deviceDataBuf.length + data.length
+            );
           }
 
           if (deviceDataBuf.length < 4) {
-            this.logDebug(`: socket:data: segment:${segmentCount} bufferLength:${deviceDataBuf.length} ...`);
+            this.logDebug(
+              `: socket:data: segment:${segmentCount} bufferLength:${deviceDataBuf.length} ...`
+            );
             return;
           }
           const expectedResponseLen = deviceDataBuf.slice(0, 4).readInt32BE();
@@ -80,39 +84,54 @@ class TcpSocket extends TplinkSocket {
           if (actualResponseLen >= expectedResponseLen) {
             setSocketTimeout(0);
             decryptedMsg = decrypt(deviceDataBuf.slice(4)).toString('utf8');
-            this.logDebug(`: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} [${replaceControlCharacters(decryptedMsg)}]`);
+            this.logDebug(
+              `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} [${replaceControlCharacters(
+                decryptedMsg
+              )}]`
+            );
             this.socket.end();
           } else {
-            this.logDebug(`: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} ...`);
+            this.logDebug(
+              `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} ...`
+            );
           }
         } catch (err) {
           this.logDebug(': socket:data error');
-          console.dir(data);
+          this.logDebug(data);
           reject(err);
         }
       });
 
-      socket.once('close', (hadError) => {
+      socket.once('close', hadError => {
         try {
           this.logDebug(`: socket:close, hadError:${hadError}`);
           setSocketTimeout(0);
           this.isBound = false;
           if (hadError || segmentCount === 0) {
-            throw new Error(`TCP Socket Closed. segment:${segmentCount} hadError:${hadError}`);
+            throw new Error(
+              `TCP Socket Closed. segment:${segmentCount} hadError:${hadError}`
+            );
           }
           try {
             return resolve(JSON.parse(decryptedMsg));
           } catch (err) {
-            this.log.error(`Error parsing JSON: From: [${socket.remoteAddress} ${socket.remotePort}] TCP segment:${segmentCount} data:%O decrypted:[${replaceControlCharacters(decryptedMsg)}]`, deviceDataBuf);
+            this.log.error(
+              `Error parsing JSON: From: [${socket.remoteAddress} ${
+                socket.remotePort
+              }] TCP segment:${segmentCount} data:%O decrypted:[${replaceControlCharacters(
+                decryptedMsg
+              )}]`,
+              deviceDataBuf
+            );
             throw err;
           }
         } catch (err) {
           this.logDebug(': socket:close error');
-          reject(err);
+          return reject(err);
         }
       });
 
-      socket.on('error', (err) => {
+      socket.on('error', err => {
         try {
           this.logDebug(': socket:error', err);
           setSocketTimeout(0);
@@ -125,13 +144,20 @@ class TcpSocket extends TplinkSocket {
       const encryptedPayload = encryptWithHeader(payload);
       this.logDebug(': socket:send payload.length', encryptedPayload.length);
 
-      this.logDebug(`: socket:send attempting to connect. host:${host}, port:${port}`);
+      this.logDebug(
+        `: socket:send attempting to connect. host:${host}, port:${port}`
+      );
       socket.connect({ port, host }, () => {
         try {
-          this.logDebug(`: socket:connect ${socket.localAddress} ${socket.localPort} ${socket.remoteAddress} ${socket.remotePort}`);
+          this.logDebug(
+            `: socket:connect ${socket.localAddress} ${socket.localPort} ${socket.remoteAddress} ${socket.remotePort}`
+          );
           this.isBound = true;
           const writeRet = socket.write(encryptedPayload);
-          this.logDebug(': socket:connect:write', (writeRet ? 'flushed' : 'queued'));
+          this.logDebug(
+            ': socket:connect:write',
+            writeRet ? 'flushed' : 'queued'
+          );
         } catch (err) {
           this.logDebug(': socket:connect error');
           reject(err);

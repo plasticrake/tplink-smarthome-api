@@ -1,10 +1,8 @@
-'use strict';
-
 /**
  * Cloud
  */
 class Cloud {
-  constructor (device, apiModuleName) {
+  constructor(device, apiModuleName) {
     this.device = device;
     this.apiModuleName = apiModuleName;
   }
@@ -16,10 +14,14 @@ class Cloud {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getInfo (sendOptions) {
-    this.info = await this.device.sendCommand({
-      [this.apiModuleName]: { get_info: {} }
-    }, null, sendOptions);
+  async getInfo(sendOptions) {
+    this.info = await this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_info: {} },
+      },
+      null,
+      sendOptions
+    );
     return this.info;
   }
 
@@ -32,10 +34,14 @@ class Cloud {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async bind (username, password, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { bind: { username, password } }
-    }, null, sendOptions);
+  async bind(username, password, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { bind: { username, password } },
+      },
+      null,
+      sendOptions
+    );
   }
 
   /**
@@ -45,10 +51,14 @@ class Cloud {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async unbind (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { unbind: {} }
-    }, null, sendOptions);
+  async unbind(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { unbind: {} },
+      },
+      null,
+      sendOptions
+    );
   }
 
   /**
@@ -58,10 +68,14 @@ class Cloud {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getFirmwareList (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_intl_fw_list: {} }
-    }, null, sendOptions);
+  async getFirmwareList(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_intl_fw_list: {} },
+      },
+      null,
+      sendOptions
+    );
   }
 
   /**
@@ -72,10 +86,14 @@ class Cloud {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async setServerUrl (server, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { set_server_url: { server } }
-    }, null, sendOptions);
+  async setServerUrl(server, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { set_server_url: { server } },
+      },
+      null,
+      sendOptions
+    );
   }
 }
 

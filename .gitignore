@@ -35,6 +35,8 @@ node_modules
 # dotenv
 .env
 
+.vscode
+
 /lib
 
 /docs

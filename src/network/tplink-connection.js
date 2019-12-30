@@ -1,10 +1,8 @@
-'use strict';
-
 const Queue = require('promise-queue');
 const EventEmitter = require('events');
 
 class TplinkConnection extends EventEmitter {
-  constructor (device) {
+  constructor(device) {
     super();
     this.device = device;
     this.client = device.client;
@@ -14,7 +12,11 @@ class TplinkConnection extends EventEmitter {
     this.queue = new Queue(1, Infinity);
 
     this.on('timeout', () => {
-      this.log.debug(`TplinkConnection(${this.description}): timeout()`, this.host, this.port);
+      this.log.debug(
+        `TplinkConnection(${this.description}): timeout()`,
+        this.host,
+        this.port
+      );
       this.queue.add(async () => {
         this.close();
       });
@@ -24,36 +26,42 @@ class TplinkConnection extends EventEmitter {
   /**
    * @private
    */
-  get host () {
+  get host() {
     return this.device.host;
   }
 
   /**
    * @private
    */
-  get port () {
+  get port() {
     return this.device.port;
   }
 
   /**
    * @private
    */
-  get description () {
+  get description() {
     return `${this.socketType} ${this.host}:${this.port}`;
   }
 
   /**
    * @private
    */
-  async getSocket (Constructor, useSharedSocket = false) {
-    this.log.debug(`TplinkConnection(${this.description}).getSocket(%j)`, { useSharedSocket });
+  async getSocket(Constructor, useSharedSocket = false) {
+    this.log.debug(`TplinkConnection(${this.description}).getSocket(%j)`, {
+      useSharedSocket,
+    });
 
     if (useSharedSocket && this.sharedSocket != null) {
-      this.log.debug(`TplinkConnection(${this.description}).getSocket(): reusing shared socket`);
+      this.log.debug(
+        `TplinkConnection(${this.description}).getSocket(): reusing shared socket`
+      );
       if (this.sharedSocket.socket != null && this.sharedSocket.isBound) {
         return this.sharedSocket;
       }
-      this.log.debug(`TplinkConnection(${this.description}).getSocket(): recreating shared socket`);
+      this.log.debug(
+        `TplinkConnection(${this.description}).getSocket(): recreating shared socket`
+      );
     }
 
     const socket = new Constructor(this.client.getNextSocketId(), this.log);
@@ -67,8 +75,13 @@ class TplinkConnection extends EventEmitter {
     return socket;
   }
 
-  async send (payload, { timeout, useSharedSocket, sharedSocketTimeout } = { }) {
-    this.log.debug(`TplinkConnection(${this.description}).send(%j)`, { payload, timeout, useSharedSocket, sharedSocketTimeout });
+  async send(payload, { timeout, useSharedSocket, sharedSocketTimeout } = {}) {
+    this.log.debug(`TplinkConnection(${this.description}).send(%j)`, {
+      payload,
+      timeout,
+      useSharedSocket,
+      sharedSocketTimeout,
+    });
 
     if (useSharedSocket && sharedSocketTimeout != null) {
       this.setTimeout(sharedSocketTimeout);
@@ -78,8 +91,12 @@ class TplinkConnection extends EventEmitter {
     return this.queue.add(async () => {
       try {
         socket = await this.getSocket(useSharedSocket);
-        const response = await socket.send(payload, this.port, this.host, { timeout });
-        if (!useSharedSocket) { socket.close(); }
+        const response = await socket.send(payload, this.port, this.host, {
+          timeout,
+        });
+        if (!useSharedSocket) {
+          socket.close();
+        }
         return response;
       } catch (err) {
         this.log.error(`${this.description} %s`, err);
@@ -89,11 +106,13 @@ class TplinkConnection extends EventEmitter {
     });
   }
 
-  close () {
+  close() {
     this.log.debug(`TplinkConnection(${this.description}).close()`);
     this.setTimeout(0);
     if (this.sharedSocket && this.sharedSocket.isBound) {
-      this.log.debug(`TplinkConnection(${this.description}).close() closing shared socket`);
+      this.log.debug(
+        `TplinkConnection(${this.description}).close() closing shared socket`
+      );
       this.sharedSocket.close();
     }
   }
@@ -101,7 +120,7 @@ class TplinkConnection extends EventEmitter {
   /**
    * @private
    */
-  setTimeout (timeout) {
+  setTimeout(timeout) {
     if (this.timer) {
       clearTimeout(this.timer);
     }

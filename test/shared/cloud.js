@@ -1,30 +1,33 @@
-/* eslint-env mocha */
-'use strict';
-
+const dotenv = require('dotenv');
 const { expect } = require('../setup');
 
-const dotenv = require('dotenv');
 dotenv.config();
 
 const username = process.env.TEST_CLOUD_USERNAME || 'username';
 const password = process.env.TEST_CLOUD_PASSWORD || 'password';
 const serverUrl = process.env.TEST_CLOUD_SERVER_URL || 'tplink.com';
 
-async function bindCloud (device, force = false) {
+async function bindCloud(device, force = false) {
   const ci = await device.cloud.getInfo();
   if (ci.binded === 1 && force) {
     expect(await device.cloud.unbind()).to.have.property('err_code', 0);
     ci.binded = 0;
   }
   if (ci.binded === 0) {
-    expect(await device.cloud.bind(username, password)).to.have.property('err_code', 0);
+    expect(await device.cloud.bind(username, password)).to.have.property(
+      'err_code',
+      0
+    );
   }
 }
 
-async function unbindCloud (device, force = false) {
+async function unbindCloud(device, force = false) {
   const ci = await device.cloud.getInfo();
   if (ci.binded === 0 && force) {
-    expect(await device.cloud.bind(username, password)).to.have.property('err_code', 0);
+    expect(await device.cloud.bind(username, password)).to.have.property(
+      'err_code',
+      0
+    );
     ci.binded = 1;
   }
   if (ci.binded === 1) {
@@ -32,20 +35,23 @@ async function unbindCloud (device, force = false) {
   }
 }
 
-module.exports = function (testDevice) {
-  describe('Cloud', function () {
+module.exports = function(testDevice) {
+  describe('Cloud', function() {
     this.timeout(7000);
     this.slow(3000);
 
     let originalCloudInfo;
 
-    before(async function getOriginalCloudInfo () {
-      if (!testDevice.getDevice) return this.skip();
+    before(async function getOriginalCloudInfo() {
+      if (!testDevice.getDevice) {
+        this.skip();
+        return;
+      }
       const device = await testDevice.getDevice();
       originalCloudInfo = await device.cloud.getInfo();
     });
 
-    after(async function resetCloudToOriginal () {
+    after(async function resetCloudToOriginal() {
       if (!testDevice.getDevice) this.skip();
       const currentCloudInfo = await this.device.cloud.getInfo();
       if (originalCloudInfo.server !== currentCloudInfo.server) {
@@ -60,36 +66,44 @@ module.exports = function (testDevice) {
       }
     });
 
-    describe('#getInfo()', function () {
+    describe('#getInfo()', function() {
       // Does not require to be logged in to cloud
-      it('should return cloud info', async function () {
+      it('should return cloud info', async function() {
         const ci = await this.device.cloud.getInfo();
         expect(ci).to.have.property('err_code', 0);
         expect(ci).to.include.keys('username', 'server');
       });
     });
-    describe('#bind()', function () {
-      it('should add device to cloud', async function () {
+    describe('#bind()', function() {
+      it('should add device to cloud', async function() {
         return bindCloud(this.device, true);
       });
     });
-    describe('#unbind()', function () {
-      it('should remove device from cloud', async function () {
+    describe('#unbind()', function() {
+      it('should remove device from cloud', async function() {
         return unbindCloud(this.device, true);
       });
     });
-    describe('#getFirmwareList()', function () {
+    describe('#getFirmwareList()', function() {
       // Does not require to be logged in to cloud
-      it('should get firmware list from cloud', async function () {
+      it('should get firmware list from cloud', async function() {
         this.timeout(5000);
-        expect(await this.device.cloud.getFirmwareList()).to.have.property('err_code', 0);
+        expect(await this.device.cloud.getFirmwareList()).to.have.property(
+          'err_code',
+          0
+        );
       });
     });
-    describe('#setServerUrl()', function () {
+    describe('#setServerUrl()', function() {
       // Does not require to be logged in to cloud
-      it('should change cloud server url', async function () {
-        expect(await this.device.cloud.setServerUrl(serverUrl)).to.have.property('err_code', 0);
-        expect(await this.device.cloud.getInfo()).to.have.property('server', serverUrl);
+      it('should change cloud server url', async function() {
+        expect(
+          await this.device.cloud.setServerUrl(serverUrl)
+        ).to.have.property('err_code', 0);
+        expect(await this.device.cloud.getInfo()).to.have.property(
+          'server',
+          serverUrl
+        );
       });
     });
   });

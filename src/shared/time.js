@@ -1,10 +1,8 @@
-'use strict';
-
 /**
  * Time
  */
 class Time {
-  constructor (device, apiModuleName) {
+  constructor(device, apiModuleName) {
     this.device = device;
     this.apiModuleName = apiModuleName;
   }
@@ -16,10 +14,14 @@ class Time {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getTime (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_time: {} }
-    }, null, sendOptions);
+  async getTime(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_time: {} },
+      },
+      null,
+      sendOptions
+    );
   }
 
   /**
@@ -29,10 +31,14 @@ class Time {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getTimezone (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_timezone: {} }
-    }, null, sendOptions);
+  async getTimezone(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_timezone: {} },
+      },
+      null,
+      sendOptions
+    );
   }
 }
 

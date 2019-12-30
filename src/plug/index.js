@@ -1,5 +1,3 @@
-'use strict';
-
 const Device = require('../device');
 const Away = require('./away');
 const Cloud = require('../shared/cloud');
@@ -31,6 +29,12 @@ const { ResponseError } = require('../utils');
  * @emits  Plug#emeter-realtime-update
  */
 class Plug extends Device {
+  #children;
+
+  #child;
+
+  #childId;
+
   /**
    * Created by {@link Client} - Do not instantiate directly.
    *
@@ -39,7 +43,7 @@ class Plug extends Device {
    * @param  {number} [options.inUseThreshold=0.1] Watts
    * @param  {string} [options.childId] If passed an integer or string between 0 and 99 it will prepend the deviceId
    */
-  constructor (options) {
+  constructor(options) {
     super(options);
 
     this.log.debug('plug.constructor()');
@@ -50,12 +54,14 @@ class Plug extends Device {
       schedule: 'schedule',
       timesetting: 'time',
       emeter: 'emeter',
-      netif: 'netif'
+      netif: 'netif',
     };
 
     this.inUseThreshold = options.inUseThreshold || 0.1;
 
-    if (options.sysInfo) { this.sysInfo = options.sysInfo; }
+    if (options.sysInfo) {
+      this.sysInfo = options.sysInfo;
+    }
 
     this.childId = options.childId || null;
 
@@ -137,17 +143,20 @@ class Plug extends Device {
    * Returns cached results from last retrieval of `system.sys_info`.
    * @return {Object} system.sys_info
    */
-  get sysInfo () {
+  get sysInfo() {
     return super.sysInfo;
   }
 
   /**
    * @private
    */
-  set sysInfo (sysInfo) {
+  set sysInfo(sysInfo) {
     super.sysInfo = sysInfo;
-    this.supportsEmeter = (sysInfo.feature && typeof sysInfo.feature === 'string' ? sysInfo.feature.indexOf('ENE') >= 0 : false);
-    this.children = (sysInfo.children ? sysInfo.children : null);
+    this.supportsEmeter =
+      sysInfo.feature && typeof sysInfo.feature === 'string'
+        ? sysInfo.feature.indexOf('ENE') >= 0
+        : false;
+    this.children = sysInfo.children ? sysInfo.children : null;
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
@@ -156,25 +165,28 @@ class Plug extends Device {
    * Returns children as a map keyed by childId. From cached results from last retrieval of `system.sys_info.children`.
    * @return {Map} children
    */
-  get children () {
-    return this._children;
+  get children() {
+    return this.#children;
   }
 
   /**
    * @private
    */
-  set children (children) {
+  set children(children) {
     if (Array.isArray(children)) {
-      this._children = new Map(children.map((child) => {
-        child.id = this.normalizeChildId(child.id);
-        return [child.id, child];
-      }));
+      this.#children = new Map(
+        children.map(child => {
+          // eslint-disable-next-line no-param-reassign
+          child.id = this.normalizeChildId(child.id);
+          return [child.id, child];
+        })
+      );
     } else if (children instanceof Map) {
-      this._children = children;
+      this.#children = children;
     }
-    if (this._childId && this._children) {
-      this.childId = this._childId;
-      // this._child = this._children.get(this.normalizeChildId(this._childId));
+    if (this.#childId && this.#children) {
+      this.childId = this.#childId;
+      // this.#child = this.#children.get(this.normalizeChildId(this.#childId));
     }
   }
 
@@ -182,20 +194,20 @@ class Plug extends Device {
    * Returns childId.
    * @return {string} childId
    */
-  get childId () {
-    return this._childId;
+  get childId() {
+    return this.#childId;
   }
 
   /**
    * @private
    */
-  set childId (childId) {
-    this._childId = this.normalizeChildId(childId);
-    if (this._childId && this._children) {
-      this._child = this._children.get(this._childId);
+  set childId(childId) {
+    this.#childId = this.normalizeChildId(childId);
+    if (this.#childId && this.#children) {
+      this.#child = this.#children.get(this.#childId);
     }
-    if (this._childId && this._child == null) {
-      throw new Error('Could not find child with childId ' + childId);
+    if (this.#childId && this.#child == null) {
+      throw new Error(`Could not find child with childId ${childId}`);
     }
   }
 
@@ -203,9 +215,9 @@ class Plug extends Device {
    * Cached value of `sys_info.alias` or `sys_info.children[childId].alias` if childId set.
    * @return {string}
    */
-  get alias () {
+  get alias() {
     if (this.childId) {
-      return this._child.alias;
+      return this.#child.alias;
     }
     return this.sysInfo.alias;
   }
@@ -213,9 +225,9 @@ class Plug extends Device {
   /**
    * @private
    */
-  set alias (alias) {
+  set alias(alias) {
     if (this.childId) {
-      this._child.alias = alias;
+      this.#child.alias = alias;
     }
     this.sysInfo.alias = alias;
   }
@@ -224,7 +236,7 @@ class Plug extends Device {
    * Cached value of `sys_info.deviceId` or `childId` if set.
    * @return {string}
    */
-  get id () {
+  get id() {
     if (this.childId) {
       return this.childId;
     }
@@ -241,9 +253,9 @@ class Plug extends Device {
    * Supports childId.
    * @return {boolean}
    */
-  get inUse () {
+  get inUse() {
     if (this.supportsEmeter) {
-      return (this.emeter.realtime.power > this.inUseThreshold);
+      return this.emeter.realtime.power > this.inUseThreshold;
     }
     return this.relayState;
   }
@@ -252,30 +264,30 @@ class Plug extends Device {
    * Cached value of `sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
    * @return {boolean} On (true) or Off (false)
    */
-  get relayState () {
+  get relayState() {
     if (this.childId) {
-      return (this._child.state === 1);
+      return this.#child.state === 1;
     }
-    return (this.sysInfo.relay_state === 1);
+    return this.sysInfo.relay_state === 1;
   }
 
   /**
    * @private
    */
-  set relayState (relayState) {
+  set relayState(relayState) {
     if (this.childId) {
-      this._child.state = (relayState ? 1 : 0);
+      this.#child.state = relayState ? 1 : 0;
       return;
     }
-    this.sysInfo.relay_state = (relayState ? 1 : 0);
+    this.sysInfo.relay_state = relayState ? 1 : 0;
   }
 
   /**
    * Cached value of `sys_info.brightness != null`
    * @return {boolean}
    */
-  get supportsDimmer () {
-    return (this.sysInfo.brightness != null);
+  get supportsDimmer() {
+    return this.sysInfo.brightness != null;
   }
 
   /**
@@ -289,14 +301,22 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
-  async getInfo (sendOptions) {
+  async getInfo(sendOptions) {
     // TODO force TCP unless overridden here
     let data;
     try {
-      data = await this.sendCommand('{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}', this.childId, sendOptions);
+      data = await this.sendCommand(
+        '{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}',
+        this.childId,
+        sendOptions
+      );
     } catch (err) {
       // Ignore emeter section errors as not all devices support it
-      if (err instanceof ResponseError && err.errorModules.length === 1 && err.errorModules[0] === 'emeter') {
+      if (
+        err instanceof ResponseError &&
+        err.errorModules.length === 1 &&
+        err.errorModules[0] === 'emeter'
+      ) {
         data = err.response;
       } else {
         throw err;
@@ -312,7 +332,7 @@ class Plug extends Device {
       sysInfo: this.sysInfo,
       cloud: { info: this.cloud.info },
       emeter: { realtime: this.emeter.realtime },
-      schedule: { nextAction: this.schedule.nextAction }
+      schedule: { nextAction: this.schedule.nextAction },
     };
   }
 
@@ -321,7 +341,7 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async getInUse (sendOptions) {
+  async getInUse(sendOptions) {
     if (this.supportsEmeter) {
       await this.emeter.getRealtime(sendOptions);
     } else {
@@ -337,9 +357,9 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>} LED State, true === on
    */
-  async getLedState (sendOptions) {
+  async getLedState(sendOptions) {
     const sysInfo = await this.getSysInfo(sendOptions);
-    return (sysInfo.led_off === 0);
+    return sysInfo.led_off === 0;
   }
 
   /**
@@ -350,9 +370,13 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setLedState (value, sendOptions) {
-    await this.sendCommand(`{"system":{"set_led_off":{"off":${(value ? 0 : 1)}}}}`, null, sendOptions);
-    this.sysInfo.set_led_off = (value ? 0 : 1);
+  async setLedState(value, sendOptions) {
+    await this.sendCommand(
+      `{"system":{"set_led_off":{"off":${value ? 0 : 1}}}}`,
+      null,
+      sendOptions
+    );
+    this.sysInfo.set_led_off = value ? 0 : 1;
     return true;
   }
 
@@ -363,7 +387,7 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async getPowerState (sendOptions) {
+  async getPowerState(sendOptions) {
     await this.getSysInfo(sendOptions);
     return this.relayState;
   }
@@ -376,8 +400,12 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setPowerState (value, sendOptions) {
-    await this.sendCommand(`{"system":{"set_relay_state":{"state":${(value ? 1 : 0)}}}}`, this.childId, sendOptions);
+  async setPowerState(value, sendOptions) {
+    await this.sendCommand(
+      `{"system":{"set_relay_state":{"state":${value ? 1 : 0}}}}`,
+      this.childId,
+      sendOptions
+    );
     this.relayState = value;
     this.emitEvents();
     return true;
@@ -390,7 +418,7 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async togglePowerState (sendOptions) {
+  async togglePowerState(sendOptions) {
     const powerState = await this.getPowerState(sendOptions);
     await this.setPowerState(!powerState, sendOptions);
     return !powerState;
@@ -408,19 +436,25 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async blink (times = 5, rate = 1000, sendOptions) {
-    const delay = (t) => { return new Promise((resolve) => { setTimeout(resolve, t); }); };
+  async blink(times = 5, rate = 1000, sendOptions) {
+    const delay = t => {
+      return new Promise(resolve => {
+        setTimeout(resolve, t);
+      });
+    };
 
     const origLedState = await this.getLedState(sendOptions);
     let lastBlink = Date.now();
 
     let currLedState = false;
-    for (var i = 0; i < times * 2; i++) {
+    for (let i = 0; i < times * 2; i += 1) {
       currLedState = !currLedState;
       lastBlink = Date.now();
+      // eslint-disable-next-line no-await-in-loop
       await this.setLedState(currLedState, sendOptions);
-      const timeToWait = (rate / 2) - (Date.now() - lastBlink);
+      const timeToWait = rate / 2 - (Date.now() - lastBlink);
       if (timeToWait > 0) {
+        // eslint-disable-next-line no-await-in-loop
         await delay(timeToWait);
       }
     }
@@ -464,13 +498,21 @@ class Plug extends Device {
   /**
    * @private
    */
-  emitEvents () {
-    if (!this.emitEventsEnabled) { return; }
+  emitEvents() {
+    if (!this.emitEventsEnabled) {
+      return;
+    }
 
-    const inUse = this.inUse;
-    const relayState = this.relayState;
+    const { inUse } = this;
+    const { relayState } = this;
 
-    this.log.debug('[%s] plug.emitEvents() inUse: %s relayState: %s lastState: %j', this.alias, inUse, relayState, this.lastState);
+    this.log.debug(
+      '[%s] plug.emitEvents() inUse: %s relayState: %s lastState: %j',
+      this.alias,
+      inUse,
+      relayState,
+      this.lastState
+    );
     if (this.lastState.inUse !== inUse) {
       this.lastState.inUse = inUse;
       if (inUse) {

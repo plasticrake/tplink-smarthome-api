@@ -1,35 +1,43 @@
-'use strict';
-
 /**
  * Emeter
  */
 class Emeter {
-  constructor (device, apiModuleName, childId = null) {
+  #realtime = {};
+
+  constructor(device, apiModuleName, childId = null) {
     this.device = device;
     this.apiModuleName = apiModuleName;
     this.childId = childId;
-    this._realtime = {};
   }
 
   /**
    * Returns cached results from last retrieval of `emeter.get_realtime`.
    * @return {Object}
    */
-  get realtime () {
-    return this._realtime;
+  get realtime() {
+    return this.#realtime;
   }
 
   /**
    * @private
    */
-  set realtime (realtime) {
-    const normalizedRealtime = Object.assign({}, realtime); // will coerce null/undefined to {}
+  set realtime(realtime) {
+    const normalizedRealtime = { ...realtime }; // will coerce null/undefined to {}
 
-    const normalize = function (propName, propName2, multiplier) {
-      if (normalizedRealtime[propName] != null && normalizedRealtime[propName2] == null) {
-        normalizedRealtime[propName2] = Math.floor(normalizedRealtime[propName] * multiplier);
-      } else if (normalizedRealtime[propName] == null && normalizedRealtime[propName2] != null) {
-        normalizedRealtime[propName] = normalizedRealtime[propName2] / multiplier;
+    const normalize = (propName, propName2, multiplier) => {
+      if (
+        normalizedRealtime[propName] != null &&
+        normalizedRealtime[propName2] == null
+      ) {
+        normalizedRealtime[propName2] = Math.floor(
+          normalizedRealtime[propName] * multiplier
+        );
+      } else if (
+        normalizedRealtime[propName] == null &&
+        normalizedRealtime[propName2] != null
+      ) {
+        normalizedRealtime[propName] =
+          normalizedRealtime[propName2] / multiplier;
       }
     };
 
@@ -40,8 +48,8 @@ class Emeter {
       normalize('voltage', 'voltage_mv', 1000);
     }
 
-    this._realtime = normalizedRealtime;
-    this.device.emit('emeter-realtime-update', this._realtime);
+    this.#realtime = normalizedRealtime;
+    this.device.emit('emeter-realtime-update', this.#realtime);
   }
 
   /**
@@ -54,10 +62,14 @@ class Emeter {
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getRealtime (sendOptions) {
-    this.realtime = await this.device.sendCommand({
-      [this.apiModuleName]: { get_realtime: {} }
-    }, this.childId, sendOptions);
+  async getRealtime(sendOptions) {
+    this.realtime = await this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_realtime: {} },
+      },
+      this.childId,
+      sendOptions
+    );
     return this.realtime;
   }
 
@@ -70,10 +82,14 @@ class Emeter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getDayStats (year, month, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_daystat: { year, month } }
-    }, this.childId, sendOptions);
+  async getDayStats(year, month, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_daystat: { year, month } },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -84,10 +100,14 @@ class Emeter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getMonthStats (year, sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { get_monthstat: { year } }
-    }, this.childId, sendOptions);
+  async getMonthStats(year, sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_monthstat: { year } },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 
   /**
@@ -97,10 +117,14 @@ class Emeter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async eraseStats (sendOptions) {
-    return this.device.sendCommand({
-      [this.apiModuleName]: { erase_emeter_stat: {} }
-    }, this.childId, sendOptions);
+  async eraseStats(sendOptions) {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { erase_emeter_stat: {} },
+      },
+      this.childId,
+      sendOptions
+    );
   }
 }
 
