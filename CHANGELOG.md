@@ -2,6 +2,16 @@
 
 # Change Log
 
+## 2.0.0 / 2020-01-01
+
+### Added :heavy_plus_sign:
+
+- Export `Bulb`, `Device`, `Plug`
+
+### Breaking Changes :boom:
+
+- Drop support for Node.js versions older than v10
+
 ## 1.3.0 / 2019-12-14
 
 ### Added :heavy_plus_sign:
@@ -13,9 +23,11 @@
 ### Changes :zap:
 
 - `Client`
+
   - `startDiscovery` now queries emeter realtime information and devices may emit `emeter-realtime-update` if supported
 
 - `Client`/`Device`/`Bulb`/`Plug`
+
   - rewrote and improved TCP/UDP networking code
 
 - `Device`/`Bulb`/`Plug`

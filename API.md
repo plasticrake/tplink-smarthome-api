@@ -1499,46 +1499,46 @@ Error during discovery.
 
 <a name="Device"></a>
 
-## Device ⇐ <code>EventEmitter</code>
+## *Device ⇐ <code>EventEmitter</code>*
 TP-Link Device.
 
 Shared behavior for [Plug](#Plug) and [Bulb](#Bulb).
 
-**Kind**: global class  
+**Kind**: global abstract class  
 **Extends**: <code>EventEmitter</code>  
 **Emits**: <code>Device#event:emeter-realtime-update</code>  
 
-* [Device](#Device) ⇐ <code>EventEmitter</code>
-    * [new Device(options)](#new_Device_new)
-    * [.sysInfo](#Device+sysInfo) ⇒ <code>Object</code>
-    * [.alias](#Device+alias) ⇒ <code>string</code>
-    * [.id](#Device+id) ⇒ <code>string</code>
-    * [.deviceId](#Device+deviceId) ⇒ <code>string</code>
-    * [.description](#Device+description) ⇒ <code>string</code>
-    * [.model](#Device+model) ⇒ <code>string</code>
-    * [.name](#Device+name) ⇒ <code>string</code>
-    * [.type](#Device+type) ⇒ <code>string</code>
-    * [.deviceType](#Device+deviceType) ⇒ <code>string</code>
-    * [.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>
-    * [.hardwareVersion](#Device+hardwareVersion) ⇒ <code>string</code>
-    * [.mac](#Device+mac) ⇒ <code>string</code>
-    * [.macNormalized](#Device+macNormalized) ⇒ <code>string</code>
-    * [.closeConnection()](#Device+closeConnection)
-    * [.send(payload, [sendOptions])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
-    * [.sendCommand(command, [childIds], [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
-    * [.stopPolling()](#Device+stopPolling)
-    * [.getSysInfo([sendOptions])](#Device+getSysInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.setAlias(alias, [sendOptions])](#Device+setAlias) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
-    * [.setLocation(latitude, longitude, [sendOptions])](#Device+setLocation) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.getModel([sendOptions])](#Device+getModel) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.reboot(delay, [sendOptions])](#Device+reboot) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * [.reset(delay, [sendOptions])](#Device+reset) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
-    * ["polling-error"](#Device+event_polling-error)
+* *[Device](#Device) ⇐ <code>EventEmitter</code>*
+    * *[new Device(options)](#new_Device_new)*
+    * *[.sysInfo](#Device+sysInfo) ⇒ <code>Object</code>*
+    * *[.alias](#Device+alias) ⇒ <code>string</code>*
+    * *[.id](#Device+id) ⇒ <code>string</code>*
+    * *[.deviceId](#Device+deviceId) ⇒ <code>string</code>*
+    * *[.description](#Device+description) ⇒ <code>string</code>*
+    * *[.model](#Device+model) ⇒ <code>string</code>*
+    * *[.name](#Device+name) ⇒ <code>string</code>*
+    * *[.type](#Device+type) ⇒ <code>string</code>*
+    * *[.deviceType](#Device+deviceType) ⇒ <code>string</code>*
+    * *[.softwareVersion](#Device+softwareVersion) ⇒ <code>string</code>*
+    * *[.hardwareVersion](#Device+hardwareVersion) ⇒ <code>string</code>*
+    * *[.mac](#Device+mac) ⇒ <code>string</code>*
+    * *[.macNormalized](#Device+macNormalized) ⇒ <code>string</code>*
+    * *[.closeConnection()](#Device+closeConnection)*
+    * *[.send(payload, [sendOptions])](#Device+send) ⇒ <code>Promise.&lt;Object, Error&gt;</code>*
+    * *[.sendCommand(command, [childIds], [sendOptions])](#Device+sendCommand) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
+    * *[.startPolling(interval)](#Device+startPolling) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)*
+    * *[.stopPolling()](#Device+stopPolling)*
+    * *[.getSysInfo([sendOptions])](#Device+getSysInfo) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
+    * *[.setAlias(alias, [sendOptions])](#Device+setAlias) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>*
+    * *[.setLocation(latitude, longitude, [sendOptions])](#Device+setLocation) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
+    * *[.getModel([sendOptions])](#Device+getModel) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
+    * *[.reboot(delay, [sendOptions])](#Device+reboot) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
+    * *[.reset(delay, [sendOptions])](#Device+reset) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
+    * *["polling-error"](#Device+event_polling-error)*
 
 <a name="new_Device_new"></a>
 
-### new Device(options)
+### *new Device(options)*
 Created by [getCommonDevice](#Client+getCommonDevice) - Do not instantiate directly
 
 
@@ -1546,7 +1546,6 @@ Created by [getCommonDevice](#Client+getCommonDevice) - Do not instantiate direc
 | --- | --- | --- |
 | options | <code>Object</code> |  | 
 | options.client | [<code>Client</code>](#Client) |  | 
-| options.sysInfo | <code>Object</code> |  | 
 | options.host | <code>string</code> |  | 
 | [options.port] | <code>number</code> | <code>9999</code> | 
 | [options.logger] | <code>Object</code> |  | 
@@ -1554,56 +1553,56 @@ Created by [getCommonDevice](#Client+getCommonDevice) - Do not instantiate direc
 
 <a name="Device+sysInfo"></a>
 
-### device.sysInfo ⇒ <code>Object</code>
+### *device.sysInfo ⇒ <code>Object</code>*
 Returns cached results from last retrieval of `system.sys_info`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 **Returns**: <code>Object</code> - system.sys_info  
 <a name="Device+alias"></a>
 
-### device.alias ⇒ <code>string</code>
+### *device.alias ⇒ <code>string</code>*
 Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+id"></a>
 
-### device.id ⇒ <code>string</code>
+### *device.id ⇒ <code>string</code>*
 Cached value of `sys_info.deviceId`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+deviceId"></a>
 
-### device.deviceId ⇒ <code>string</code>
+### *device.deviceId ⇒ <code>string</code>*
 Cached value of `sys_info.deviceId`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+description"></a>
 
-### device.description ⇒ <code>string</code>
+### *device.description ⇒ <code>string</code>*
 Cached value of `sys_info.[description|dev_name]`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+model"></a>
 
-### device.model ⇒ <code>string</code>
+### *device.model ⇒ <code>string</code>*
 Cached value of `sys_info.model`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+name"></a>
 
-### device.name ⇒ <code>string</code>
+### *device.name ⇒ <code>string</code>*
 Cached value of `sys_info.alias`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+type"></a>
 
-### device.type ⇒ <code>string</code>
+### *device.type ⇒ <code>string</code>*
 Cached value of `sys_info.[type|mic_type]`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+deviceType"></a>
 
-### device.deviceType ⇒ <code>string</code>
+### *device.deviceType ⇒ <code>string</code>*
 Type of device (or `device` if unknown).
 
 Based on cached value of `sys_info.[type|mic_type]`
@@ -1612,25 +1611,25 @@ Based on cached value of `sys_info.[type|mic_type]`
 **Returns**: <code>string</code> - 'plug'|'bulb'|'device'  
 <a name="Device+softwareVersion"></a>
 
-### device.softwareVersion ⇒ <code>string</code>
+### *device.softwareVersion ⇒ <code>string</code>*
 Cached value of `sys_info.sw_ver`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+hardwareVersion"></a>
 
-### device.hardwareVersion ⇒ <code>string</code>
+### *device.hardwareVersion ⇒ <code>string</code>*
 Cached value of `sys_info.hw_ver`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+mac"></a>
 
-### device.mac ⇒ <code>string</code>
+### *device.mac ⇒ <code>string</code>*
 Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
 
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+macNormalized"></a>
 
-### device.macNormalized ⇒ <code>string</code>
+### *device.macNormalized ⇒ <code>string</code>*
 Normalized cached value of `sys_info.[mac|mic_mac|ethernet_mac]`
 
 Removes all non alphanumeric characters and makes uppercase
@@ -1639,13 +1638,13 @@ Removes all non alphanumeric characters and makes uppercase
 **Kind**: instance property of [<code>Device</code>](#Device)  
 <a name="Device+closeConnection"></a>
 
-### device.closeConnection()
+### *device.closeConnection()*
 Closes any open network connections including any shared sockets.
 
 **Kind**: instance method of [<code>Device</code>](#Device)  
 <a name="Device+send"></a>
 
-### device.send(payload, [sendOptions]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>
+### *device.send(payload, [sendOptions]) ⇒ <code>Promise.&lt;Object, Error&gt;</code>*
 Sends `payload` to device (using [send](#Client+send))
 
 **Kind**: instance method of [<code>Device</code>](#Device)  
@@ -1658,7 +1657,7 @@ Sends `payload` to device (using [send](#Client+send))
 
 <a name="Device+sendCommand"></a>
 
-### device.sendCommand(command, [childIds], [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### *device.sendCommand(command, [childIds], [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
 Sends command(s) to device.
 
 Calls [#send](#send) and processes the response.
@@ -1688,7 +1687,7 @@ Also, the response's `err_code`(s) are checked, if any are missing or != `0` the
 
 <a name="Device+startPolling"></a>
 
-### device.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)
+### *device.startPolling(interval) ⇒ [<code>Device</code>](#Device) \| [<code>Bulb</code>](#Bulb) \| [<code>Plug</code>](#Plug)*
 Polls the device every `interval`.
 
 Returns `this` (for chaining) that emits events based on state changes.
@@ -1704,13 +1703,13 @@ Refer to specific device sections for event details.
 
 <a name="Device+stopPolling"></a>
 
-### device.stopPolling()
+### *device.stopPolling()*
 Stops device polling.
 
 **Kind**: instance method of [<code>Device</code>](#Device)  
 <a name="Device+getSysInfo"></a>
 
-### device.getSysInfo([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### *device.getSysInfo([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
 Gets device's SysInfo.
 
 Requests `system.sys_info` from device. Does not support childId.
@@ -1724,7 +1723,7 @@ Requests `system.sys_info` from device. Does not support childId.
 
 <a name="Device+setAlias"></a>
 
-### device.setAlias(alias, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>
+### *device.setAlias(alias, [sendOptions]) ⇒ <code>Promise.&lt;boolean, ResponseError&gt;</code>*
 Change device's alias (name).
 
 Sends `system.set_dev_alias` command. Supports childId.
@@ -1738,7 +1737,7 @@ Sends `system.set_dev_alias` command. Supports childId.
 
 <a name="Device+setLocation"></a>
 
-### device.setLocation(latitude, longitude, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### *device.setLocation(latitude, longitude, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
 Set device's location.
 
 Sends `system.set_dev_location` command. Does not support childId.
@@ -1754,7 +1753,7 @@ Sends `system.set_dev_location` command. Does not support childId.
 
 <a name="Device+getModel"></a>
 
-### device.getModel([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### *device.getModel([sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
 Gets device's model.
 
 Requests `system.sys_info` and returns model name. Does not support childId.
@@ -1768,7 +1767,7 @@ Requests `system.sys_info` and returns model name. Does not support childId.
 
 <a name="Device+reboot"></a>
 
-### device.reboot(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### *device.reboot(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
 Reboot device.
 
 Sends `system.reboot` command. Does not support childId.
@@ -1783,7 +1782,7 @@ Sends `system.reboot` command. Does not support childId.
 
 <a name="Device+reset"></a>
 
-### device.reset(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>
+### *device.reset(delay, [sendOptions]) ⇒ <code>Promise.&lt;Object, ResponseError&gt;</code>*
 Reset device.
 
 Sends `system.reset` command. Does not support childId.
@@ -1798,7 +1797,7 @@ Sends `system.reset` command. Does not support childId.
 
 <a name="Device+event_polling-error"></a>
 
-### "polling-error"
+### *"polling-error"*
 **Kind**: event emitted by [<code>Device</code>](#Device)  
 **Properties**
 
