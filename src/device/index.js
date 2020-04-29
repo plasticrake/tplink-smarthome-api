@@ -379,21 +379,15 @@ class Device extends EventEmitter {
    * @return {Device|Bulb|Plug}          this
    */
   startPolling(interval) {
-    const fn = async () => {
-      try {
-        await this.getInfo();
-      } catch (err) {
-        this.log.debug(
-          '[%s] device.startPolling(): getInfo(): error:',
-          this.alias,
-          err
-        );
+    const fn = () => {
+      this.getInfo().catch((err) => {
+        this.log.debug('[%s] device.startPolling(): getInfo(): error:', this.alias, err);
         /**
          * @event Device#polling-error
          * @property {Error} error
          */
         this.emit('polling-error', err);
-      }
+      })
     };
     this.pollingTimer = setInterval(fn, interval);
     fn();
