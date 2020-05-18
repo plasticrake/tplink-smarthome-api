@@ -39,8 +39,7 @@
   ],
   "main": "lib/index.js",
   "engines": {
-    "node": ">=10",
-    "npm": ">=3"
+    "node": ">=10"
   },
   "dependencies": {
     "commander": "^4.0.1",
@@ -53,14 +52,13 @@
     "tplink-smarthome-crypto": "^2.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.7.7",
-    "@babel/node": "^7.7.7",
-    "@babel/plugin-proposal-class-properties": "^7.7.4",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/register": "^7.7.7",
-    "babel-eslint": "^10.0.3",
-    "babel-plugin-istanbul": "^6.0.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/chai": "^4.2.11",
+    "@types/lodash.castarray": "^4.4.6",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
     "bats": "^1.1.0",
     "bats-assert": "git+https://github.com/ztombol/bats-assert.git",
     "bats-support": "git+https://github.com/ztombol/bats-support.git",
@@ -73,10 +71,12 @@
     "cspell": "^4.0.43",
     "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-config-airbnb-typescript": "^7.2.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-tsdoc": "^0.2.4",
     "jsdoc-to-markdown": "^5.0.3",
     "mocha": "^6.2.2",
     "nyc": "^15.0.0",
@@ -84,17 +84,21 @@
     "rewire": "^4.0.1",
     "sinon": "^8.0.1",
     "sinon-chai": "^3.4.0",
-    "tplink-smarthome-simulator": "^1.10.0"
+    "source-map-support": "^0.5.19",
+    "tplink-smarthome-simulator": "^1.10.0",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
   },
   "scripts": {
+    "clean": "rimraf lib/",
     "preversion": "npm test",
     "version": "npm run build && npm run docs && git add -A README.md API.md",
     "postversion": "git push && git push --tags",
-    "lint": "eslint --ignore-path .gitignore .",
+    "lint": "eslint --ignore-path .gitignore . --ext .js,.jsx,.ts,.tsx",
     "pretest": "npm run lint",
     "test": "cross-env NODE_ENV=test nyc mocha && bats test",
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
-    "build": "babel src -d lib",
+    "build": "tsc",
     "prepare": "npm run build",
     "docs": "jsdoc2md 'src/**/*.js' > API.md && jsdoc2md --template=jsdoc2md/README.hbs 'src/**/*.js' > README.md",
     "spellcheck": "cspell '{examples,jsdoc2md,src,test}/**/*' *.md"
