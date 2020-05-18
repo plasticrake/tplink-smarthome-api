@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2018",
+    "lib": ["es2018"],
+    "allowJs": true, // temporary relaxing
+    "alwaysStrict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "strict": true
+  }
+}
