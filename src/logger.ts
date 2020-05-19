@@ -1,28 +1,44 @@
-/* eslint-disable no-console */
-const log = require('loglevel');
+import log from 'loglevel';
 
-module.exports = ({ level = 'warn', logger } = {}) => {
-  const levels = ['trace', 'debug', 'info', 'warn', 'error', 'silent'];
+enum LogLevel {
+  'trace',
+  'debug',
+  'info',
+  'warn',
+  'error',
+  'silent',
+}
 
-  if (level == null || level === '') {
-    // eslint-disable-next-line no-param-reassign
-    level = 'warn';
-  }
+type LogLevelStrings = keyof typeof LogLevel;
 
-  if (levels.indexOf(level) === -1) {
-    console.error('invalid log level: %s', level);
-  }
+type Logger = Record<Exclude<LogLevelStrings, 'silent'>, log.LoggingMethod>;
+
+export default function logger({
+  level = 'warn',
+  // eslint-disable-next-line no-shadow
+  logger,
+}: { level?: LogLevelStrings; logger?: Logger } = {}): log.RootLogger {
+  const levels: Exclude<LogLevelStrings, 'silent'>[] = [
+    'trace',
+    'debug',
+    'info',
+    'warn',
+    'error',
+  ];
+
   log.setLevel(level);
+
   // if logger passed in, call logger functions instead of our loglevel functions
-  if (logger != null) {
-    levels.forEach(loggerLevel => {
-      if (typeof logger[loggerLevel] === 'function') {
-        log[loggerLevel] = (...args) => {
-          logger[loggerLevel](...args);
+  if (logger !== undefined) {
+    levels.forEach((loggerLevel: Exclude<LogLevelStrings, 'silent'>) => {
+      if (logger[loggerLevel] !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        log[loggerLevel] = (...msg: any[]): void => {
+          logger[loggerLevel](...msg);
         };
       }
     });
   }
 
   return log;
-};
+}
