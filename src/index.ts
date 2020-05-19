@@ -1,16 +1,7 @@
-const Bulb = require('./bulb');
-const Device = require('./device');
-const Client = require('./client');
-const Plug = require('./plug');
-const { ResponseError } = require('./utils');
+import Bulb from './bulb';
+import Device from './device';
+import Client from './client';
+import Plug from './plug';
+import { ResponseError } from './utils';
 
-/**
- * @module tplink-smarthome-api
- */
-module.exports = {
-  Bulb,
-  Client,
-  Device,
-  Plug,
-  ResponseError,
-};
+export { Bulb, Device, Client, Plug, ResponseError };
