@@ -1,88 +1,231 @@
-const dgram = require('dgram');
-const EventEmitter = require('events');
-const { encrypt, decrypt } = require('tplink-smarthome-crypto');
+import { encrypt, decrypt } from 'tplink-smarthome-crypto';
+import type { DeepRequired, MarkOptional } from 'ts-essentials';
+import type log from 'loglevel';
 
-const Device = require('./device');
-const Plug = require('./plug');
-const Bulb = require('./bulb');
-const createLogger = require('./logger');
-const TcpConnection = require('./network/tcp-connection');
-const UdpConnection = require('./network/udp-connection');
-const { compareMac } = require('./utils');
+import { Socket, createSocket } from 'dgram';
+import { EventEmitter } from 'events';
+
+import Device from './device';
+import Plug from './plug';
+import Bulb from './bulb';
+import createLogger from './logger';
+import type { Logger } from './logger';
+import TcpConnection from './network/tcp-connection';
+import UdpConnection from './network/udp-connection';
+import { compareMac, isObjectLike } from './utils';
 
 const discoveryMsgBuf = encrypt(
   '{"system":{"get_sysinfo":{}},"emeter":{"get_realtime":{}},"smartlife.iot.common.emeter":{"get_realtime":{}}}'
 );
 
+type DeviceDiscovery = { status: string; seenOnDiscovery: number };
+type AnyDevice = (Plug | Bulb) & Partial<DeviceDiscovery>;
+
+type SysinfoResponse = { system: { get_sysinfo: Sysinfo } };
+type EmeterResponse = PlugEmeterResponse | BulbEmeterResponse;
+type PlugEmeterResponse = {
+  emeter?: { get_realtime?: { err_code: number } & EmeterRealtime };
+};
+type BulbEmeterResponse = {
+  'smartlife.iot.common.emeter'?: {
+    get_realtime?: { err_code: number } & EmeterRealtime;
+  };
+};
+type DiscoveryResponse = SysinfoResponse & EmeterResponse;
+
+type EmeterRealtime = EmeterRealtimeV1 | EmeterRealtimeV2;
+type EmeterRealtimeV1 = {
+  voltage: number;
+  current: number;
+  power: number;
+  total: number;
+};
+type EmeterRealtimeV2 = {
+  voltage_mv: number;
+  current_ma: number;
+  power_mw: number;
+  total_wh: number;
+};
+
+type DeviceOptions = {
+  host: string;
+  port?: number;
+  client: Client;
+  defaultSendOptions?: SendOptions;
+};
+
+type BulbDeviceOptions = DeviceOptions;
+type PlugDeviceOptions = {
+  host: string;
+  port?: number;
+  client: Client;
+  defaultSendOptions?: SendOptions;
+  inUseThreshold?: number;
+  childId?: string;
+};
+type AnyDeviceOptions = BulbDeviceOptions | PlugDeviceOptions;
+
+type SysinfoType =
+  | 'IOT.SMARTPLUGSWITCH'
+  | 'IOT.SMARTBULB'
+  | 'IOT.RANGEEXTENDER.SMARTPLUG';
+type CommonSysinfo = { type: SysinfoType; alias: string; deviceId: string };
+type BulbSysinfo = CommonSysinfo & {
+  mic_type: 'IOT.SMARTBULB';
+  mic_mac: string;
+};
+type SysinfoChildren = { children?: [{ id: string }] };
+type PlugSysinfo = CommonSysinfo &
+  SysinfoChildren &
+  ({ type: 'IOT.SMARTPLUGSWITCH' } | { type: 'IOT.RANGEEXTENDER.SMARTPLUG' }) &
+  ({ mac: string } | { ethernet_mac: string });
+type Sysinfo = BulbSysinfo | PlugSysinfo;
+
+type DiscoveryDevice = { host: string; port?: number };
+
+function hasSysinfoResponse(candidate: unknown): candidate is SysinfoResponse {
+  return (
+    isObjectLike(candidate) &&
+    'system' in candidate &&
+    isObjectLike(candidate.system) &&
+    'get_sysinfo' in candidate.system
+  );
+}
+
+function hasPlugEmeterResponse(
+  candidate: unknown
+): candidate is DeepRequired<PlugEmeterResponse> {
+  return (
+    isObjectLike(candidate) &&
+    'emeter' in candidate &&
+    isObjectLike(candidate.emeter) &&
+    'get_realtime' in candidate.emeter &&
+    isObjectLike(candidate.emeter.get_realtime) &&
+    'err_code' in candidate.emeter.get_realtime &&
+    typeof candidate.emeter.get_realtime.err_code === 'number'
+  );
+}
+
+function hasBulbEmeterResponse(
+  candidate: unknown
+): candidate is DeepRequired<BulbEmeterResponse> {
+  return (
+    isObjectLike(candidate) &&
+    'smartlife.iot.common.emeter' in candidate &&
+    isObjectLike(candidate['smartlife.iot.common.emeter']) &&
+    'get_realtime' in candidate['smartlife.iot.common.emeter'] &&
+    isObjectLike(candidate['smartlife.iot.common.emeter'].get_realtime) &&
+    'err_code' in candidate['smartlife.iot.common.emeter'].get_realtime &&
+    typeof candidate['smartlife.iot.common.emeter'].get_realtime.err_code ===
+      'number'
+  );
+}
+
+function hasSysinfoChildren(
+  candidate: Sysinfo
+): candidate is Sysinfo & Required<SysinfoChildren> {
+  return (
+    isObjectLike(candidate) &&
+    'children' in candidate &&
+    candidate.children !== undefined &&
+    candidate.children.length > 0
+  );
+}
+
 /**
- * @private
+ * @internal
  */
-function parseEmeter(response) {
-  try {
+function parseEmeter(response: DiscoveryResponse): EmeterRealtime | null {
+  if (hasPlugEmeterResponse(response)) {
     if (response.emeter.get_realtime.err_code === 0) {
       return response.emeter.get_realtime;
     }
-  } catch (err) {
-    // do nothing
   }
-  try {
+  if (hasBulbEmeterResponse(response)) {
     if (response['smartlife.iot.common.emeter'].get_realtime.err_code === 0) {
       return response['smartlife.iot.common.emeter'].get_realtime;
     }
-  } catch (err) {
-    // do nothing
   }
+
   return null;
 }
 
 /**
  * Send Options.
  *
- * @typedef {Object} SendOptions
- * @property {number} timeout         (ms)
- * @property {string} transport       'tcp','udp'
- * @property {boolean} useSharedSocket    attempt to reuse a shared socket if available, UDP only
- * @property {boolean} sharedSocketTimeout (ms) how long to wait for another send before closing a shared socket. 0 = never automatically close socket
+ * @typeParam timeout - (ms)
+ * @typeParam transport - 'tcp','udp'
+ * @typeParam useSharedSocket - attempt to reuse a shared socket if available, UDP only
+ * @typeParam sharedSocketTimeout - (ms) how long to wait for another send before closing a shared socket. 0 = never automatically close socket
  */
+type SendOptions = {
+  timeout: number;
+  transport: 'tcp' | 'udp';
+  useSharedSocket: boolean;
+  sharedSocketTimeout: number;
+};
 
 /**
  * Client that sends commands to specified devices or discover devices on the local subnet.
  * - Contains factory methods to create devices.
  * - Events are emitted after {@link #startDiscovery} is called.
- * @extends EventEmitter
  */
-class Client extends EventEmitter {
+export default class Client extends EventEmitter {
+  defaultSendOptions: SendOptions = {
+    timeout: 10000,
+    transport: 'tcp',
+    useSharedSocket: false,
+    sharedSocketTimeout: 20000,
+  };
+
+  log: log.RootLogger;
+
+  devices: Map<string, AnyDevice> = new Map();
+
+  discoveryTimer: NodeJS.Timeout | null = null;
+
+  discoveryPacketSequence = 0;
+
+  maxSocketId = 0;
+
+  socket?: Socket;
+
+  isSocketBound = false;
+
   /**
-   * @param  {Object}       options
-   * @param  {SendOptions} [options.defaultSendOptions]
-   * @param  {number}      [options.defaultSendOptions.timeout=10000]
-   * @param  {string}      [options.defaultSendOptions.transport='tcp']
-   * @param  {boolean}     [options.defaultSendOptions.useSharedSocket=false]
-   * @param  {number}      [options.defaultSendOptions.sharedSocketTimeout=20000]
-   * @param  {string}      [options.logLevel]       level for built in logger ['error','warn','info','debug','trace']
+   * @param  options
+   * @param  options.defaultSendOptions
+   * @param  options.defaultSendOptions.timeout - default: 10000
+   * @param  options.defaultSendOptions.transport - default: 'tcp'
+   * @param  options.defaultSendOptions.useSharedSocket - default: false
+   * @param  options.defaultSendOptions.sharedSocketTimeout - default: 20000
+   * @param  options.logLevel - default: warn - level for built in logger ['error','warn','info','debug','trace']
    */
-  constructor({ defaultSendOptions, logLevel, logger } = {}) {
+  constructor({
+    defaultSendOptions,
+    logLevel = 'warn',
+    logger,
+  }: {
+    defaultSendOptions?: SendOptions;
+    logLevel?: log.LogLevelDesc;
+    logger?: Logger;
+  } = {}) {
     super();
     this.defaultSendOptions = {
-      timeout: 10000,
-      transport: 'tcp',
-      useSharedSocket: false,
-      sharedSocketTimeout: 20000,
+      ...this.defaultSendOptions,
       ...defaultSendOptions,
     };
 
-    this.log = createLogger({ level: logLevel, logger });
-
-    this.devices = new Map();
-    this.discoveryTimer = null;
-    this.discoveryPacketSequence = 0;
-    this.maxSocketId = 0;
+    this.log = createLogger({ logger });
+    if (logLevel !== undefined) {
+      this.log.setLevel(logLevel);
+    }
   }
 
   /**
-   * @private
+   * @internal
    */
-  getNextSocketId() {
+  getNextSocketId(): number {
     this.maxSocketId += 1;
     return this.maxSocketId;
   }
@@ -110,20 +253,28 @@ class Client extends EventEmitter {
    * @param  {string}         host
    * @param  {number}        [port=9999]
    * @param  {SendOptions}   [sendOptions]
-   * @return {Promise<Object, Error>}
+   * @returns
    */
-  async send(payload, host, port = 9999, sendOptions) {
+  async send(
+    payload: object | string,
+    host: string,
+    port = 9999,
+    sendOptions: SendOptions
+  ): Promise<unknown> {
     const thisSendOptions = {
       ...this.defaultSendOptions,
       ...sendOptions,
       useSharedSocket: false,
     };
+
     const payloadString = !(
       typeof payload === 'string' || payload instanceof String
     )
       ? JSON.stringify(payload)
       : payload;
-    let connection;
+
+    let connection: UdpConnection | TcpConnection;
+
     if (thisSendOptions.transport === 'udp') {
       connection = new UdpConnection({
         host,
@@ -150,9 +301,13 @@ class Client extends EventEmitter {
    * @param  {string}       host
    * @param  {number}      [port=9999]
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, Error>} parsed JSON response
+   * @returns {Promise<Object, Error>} parsed JSON response
    */
-  async getSysInfo(host, port = 9999, sendOptions) {
+  async getSysInfo(
+    host: string,
+    port = 9999,
+    sendOptions: SendOptions
+  ): Promise<Sysinfo> {
     this.log.debug('client.getSysInfo(%j)', { host, port, sendOptions });
     const data = await this.send(
       '{"system":{"get_sysinfo":{}}}',
@@ -160,22 +315,32 @@ class Client extends EventEmitter {
       port,
       sendOptions
     );
-    return data.system.get_sysinfo;
+    if (hasSysinfoResponse(data)) {
+      return data.system.get_sysinfo;
+    }
+    throw new Error(`Unexpected Response: ${data}`);
   }
 
   /**
    * @private
    */
-  emit(eventName, ...args) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  emit(eventName: string, ...args: any[]): boolean {
     // Add device- / plug- / bulb- to eventName
+    let ret = false;
     if (args[0] instanceof Device) {
-      super.emit(`device-${eventName}`, ...args);
-      if (args[0].deviceType !== 'device') {
-        super.emit(`${args[0].deviceType}-${eventName}`, ...args);
+      if (super.emit(`device-${eventName}`, ...args)) {
+        ret = true;
       }
-    } else {
-      super.emit(eventName, ...args);
+      if (args[0].deviceType !== 'device') {
+        if (super.emit(`${args[0].deviceType}-${eventName}`, ...args)) {
+          ret = true;
+        }
+      }
+    } else if (super.emit(eventName, ...args)) {
+      ret = true;
     }
+    return ret;
   }
 
   /**
@@ -183,9 +348,9 @@ class Client extends EventEmitter {
    *
    * See [Device constructor]{@link Device} and [Bulb constructor]{@link Bulb} for valid options.
    * @param  {Object} deviceOptions passed to [Bulb constructor]{@link Bulb}
-   * @return {Bulb}
+   * @returns {Bulb}
    */
-  getBulb(deviceOptions) {
+  getBulb(deviceOptions: MarkOptional<BulbDeviceOptions, 'client'>): Bulb {
     return new Bulb({
       defaultSendOptions: this.defaultSendOptions,
       ...deviceOptions,
@@ -198,9 +363,9 @@ class Client extends EventEmitter {
    *
    * See [Device constructor]{@link Device} and [Plug constructor]{@link Plug} for valid options.
    * @param  {Object} deviceOptions passed to [Plug constructor]{@link Plug}
-   * @return {Plug}
+   * @returns {Plug}
    */
-  getPlug(deviceOptions) {
+  getPlug(deviceOptions: MarkOptional<PlugDeviceOptions, 'client'>): Plug {
     return new Plug({
       defaultSendOptions: this.defaultSendOptions,
       ...deviceOptions,
@@ -214,9 +379,12 @@ class Client extends EventEmitter {
    * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options.
    * @param  {Object}      deviceOptions passed to [Device constructor]{@link Device}
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Plug|Bulb, Error>}
+   * @returns {Promise<Plug|Bulb, Error>}
    */
-  async getDevice(deviceOptions, sendOptions) {
+  async getDevice(
+    deviceOptions: MarkOptional<AnyDeviceOptions, 'client'>,
+    sendOptions: SendOptions
+  ): Promise<Plug | Bulb> {
     this.log.debug('client.getDevice(%j)', { deviceOptions, sendOptions });
     const sysInfo = await this.getSysInfo(
       deviceOptions.host,
@@ -235,20 +403,26 @@ class Client extends EventEmitter {
    * - See [Device constructor]{@link Device} for valid options.
    * - Instead use {@link #getDevice} to create a fully featured object.
    * @param  {Object} deviceOptions passed to [Device constructor]{@link Device}
-   * @return {Device}
+   * @returns {Device}
    */
-  getCommonDevice(deviceOptions) {
-    return new Device({
+  getCommonDevice(
+    deviceOptions: MarkOptional<DeviceOptions, 'client'>
+  ): Device {
+    const pDeviceOptions: DeviceOptions = {
       client: this,
       defaultSendOptions: this.defaultSendOptions,
       ...deviceOptions,
-    });
+    };
+    return new Device(pDeviceOptions);
   }
 
   /**
-   * @private
+   * @internal
    */
-  getDeviceFromType(typeName, deviceOptions) {
+  getDeviceFromType(
+    typeName: string | Function,
+    deviceOptions: AnyDeviceOptions
+  ): Plug | Bulb {
     let name;
     if (typeof typeName === 'function') {
       name = typeName.name;
@@ -271,9 +445,12 @@ class Client extends EventEmitter {
    * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options
    * @param  {Object} sysInfo
    * @param  {Object} deviceOptions passed to device constructor
-   * @return {Plug|Bulb}
+   * @returns {Plug|Bulb}
    */
-  getDeviceFromSysInfo(sysInfo, deviceOptions) {
+  getDeviceFromSysInfo(
+    sysInfo: Sysinfo,
+    deviceOptions: AnyDeviceOptions
+  ): Plug | Bulb {
     const thisDeviceOptions = { ...deviceOptions, sysInfo };
     switch (this.getTypeFromSysInfo(sysInfo)) {
       case 'plug':
@@ -290,11 +467,13 @@ class Client extends EventEmitter {
    *
    * Based on sys_info.[type|mic_type]
    * @param  {Object} sysInfo
-   * @return {string}         'plug','bulb','device'
+   * @returns {string}         'plug','bulb','device'
    */
   // eslint-disable-next-line class-methods-use-this
-  getTypeFromSysInfo(sysInfo) {
-    const type = sysInfo.type || sysInfo.mic_type || '';
+  getTypeFromSysInfo(
+    sysInfo: { type: string } | { mic_type: string }
+  ): 'plug' | 'bulb' | 'device' {
+    const type = 'type' in sysInfo ? sysInfo.type : sysInfo.mic_type;
     switch (true) {
       case /plug/i.test(type):
         return 'plug';
@@ -387,9 +566,9 @@ class Client extends EventEmitter {
    * @param  {string[]} [options.excludeMacAddresses]         MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported
    * @param  {function} [options.filterCallback]              called with fn(sysInfo), return truthy value to include device
    * @param  {boolean}  [options.breakoutChildren=true]       if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
-   * @param  {Object}   [options.deviceOptions={}]            passed to device constructors
+   * @param  {Object}   [options.deviceOptions]               passed to device constructors
    * @param  {Object[]} [options.devices]                     known devices to query instead of relying on broadcast
-   * @return {Client}                                         this
+   * @returns {Client}                                        this
    * @emits  Client#error
    * @emits  Client#device-new
    * @emits  Client#device-online
@@ -414,25 +593,40 @@ class Client extends EventEmitter {
     excludeMacAddresses = [],
     filterCallback,
     breakoutChildren = true,
-    deviceOptions = {},
+    deviceOptions,
     devices,
-  } = {}) {
+  }: {
+    address?: string;
+    port?: number;
+    broadcast?: string;
+    discoveryInterval?: number;
+    discoveryTimeout?: number;
+    offlineTolerance?: number;
+    deviceTypes?: string[];
+    macAddresses?: string[];
+    excludeMacAddresses?: string[];
+    filterCallback?: Function;
+    breakoutChildren?: boolean;
+    deviceOptions?: AnyDeviceOptions;
+    devices?: DiscoveryDevice[];
+  } = {}): this {
     // eslint-disable-next-line prefer-rest-params
     this.log.debug('client.startDiscovery(%j)', arguments[0]);
 
     try {
-      this.socket = dgram.createSocket('udp4');
+      const socket = createSocket('udp4');
+      this.socket = socket;
 
-      this.socket.on('message', (msg, rinfo) => {
+      socket.on('message', (msg, rinfo) => {
         const decryptedMsg = decrypt(msg).toString('utf8');
 
         this.log.debug(
           `client.startDiscovery(): socket:message From: ${rinfo.address} ${rinfo.port} Message: ${decryptedMsg}`
         );
 
-        let response;
-        let sysInfo;
-        let emeterRealtime;
+        let response: DiscoveryResponse;
+        let sysInfo: Sysinfo;
+        let emeterRealtime: EmeterRealtime | null;
         try {
           response = JSON.parse(decryptedMsg);
           sysInfo = response.system.get_sysinfo;
@@ -462,9 +656,13 @@ class Client extends EventEmitter {
           }
         }
 
+        let mac: string;
+        if ('mac' in sysInfo) mac = sysInfo.mac;
+        else if ('mic_mac' in sysInfo) mac = sysInfo.mic_mac;
+        else if ('ethernet_mac' in sysInfo) mac = sysInfo.ethernet_mac;
+        else mac = '';
+
         if (macAddresses && macAddresses.length > 0) {
-          const mac =
-            sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '';
           if (!compareMac(mac, macAddresses)) {
             this.log.debug(
               `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), allowed macs: (%j)`,
@@ -475,8 +673,6 @@ class Client extends EventEmitter {
         }
 
         if (excludeMacAddresses && excludeMacAddresses.length > 0) {
-          const mac =
-            sysInfo.mac || sysInfo.mic_mac || sysInfo.ethernet_mac || '';
           if (compareMac(mac, excludeMacAddresses)) {
             this.log.debug(
               `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`
@@ -504,26 +700,26 @@ class Client extends EventEmitter {
         });
       });
 
-      this.socket.on('error', err => {
+      socket.on('error', (err) => {
         this.log.error('client.startDiscovery: UDP Error: %s', err);
         this.stopDiscovery();
         this.emit('error', err);
         // TODO
       });
 
-      this.socket.bind(port, address, () => {
+      socket.bind(port, address, () => {
         this.isSocketBound = true;
-        const sockAddress = this.socket.address();
+        const sockAddress = socket.address();
         this.log.debug(
           `client.socket: UDP ${sockAddress.family} listening on ${sockAddress.address}:${sockAddress.port}`
         );
-        this.socket.setBroadcast(true);
+        socket.setBroadcast(true);
 
         this.discoveryTimer = setInterval(() => {
-          this.sendDiscovery(broadcast, devices, offlineTolerance);
+          this.sendDiscovery(socket, broadcast, devices, offlineTolerance);
         }, discoveryInterval);
 
-        this.sendDiscovery(broadcast, devices, offlineTolerance);
+        this.sendDiscovery(socket, broadcast, devices, offlineTolerance);
         if (discoveryTimeout > 0) {
           setTimeout(() => {
             this.log.debug(
@@ -542,7 +738,7 @@ class Client extends EventEmitter {
   }
 
   /**
-   * @private
+   * @internal
    */
   createOrUpdateDeviceFromSysInfo({
     sysInfo,
@@ -551,31 +747,49 @@ class Client extends EventEmitter {
     port,
     options,
     breakoutChildren,
-  }) {
-    const process = (id, childId) => {
-      let device;
-      if (this.devices.has(id)) {
-        device = this.devices.get(id);
+  }: {
+    sysInfo: Sysinfo;
+    emeterRealtime: EmeterRealtime | null;
+    host: string;
+    port: number;
+    options?: AnyDeviceOptions;
+    breakoutChildren: boolean;
+  }): void {
+    const process = (id: string, childId?: string): void => {
+      let device: AnyDevice & Partial<DeviceDiscovery>;
+      if (this.devices.has(id) && this.devices.get(id) !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        device = this.devices.get(id)!;
         device.host = host;
         device.port = port;
         device.sysInfo = sysInfo;
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
-        if (device.emeter) device.emeter.realtime = emeterRealtime;
+        if (emeterRealtime !== null && device.emeter) {
+          device.emeter.realtime = emeterRealtime;
+        }
         this.emit('online', device);
       } else {
-        const deviceOptions = { ...options, client: this, host, port, childId };
+        const deviceOptions: AnyDeviceOptions = {
+          ...options,
+          client: this,
+          host,
+          port,
+          childId,
+        };
         device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
-        if (device.emeter) device.emeter.realtime = emeterRealtime;
+        if (emeterRealtime !== null && device.emeter) {
+          device.emeter.realtime = emeterRealtime;
+        }
         this.devices.set(id, device);
         this.emit('new', device);
       }
     };
 
-    if (breakoutChildren && sysInfo.children && sysInfo.children.length > 0) {
-      sysInfo.children.forEach(child => {
+    if (breakoutChildren && hasSysinfoChildren(sysInfo)) {
+      sysInfo.children.forEach((child) => {
         const childId =
           child.id.length === 2 ? sysInfo.deviceId + child.id : child.id;
         process(childId, childId);
@@ -588,20 +802,25 @@ class Client extends EventEmitter {
   /**
    * Stops discovery and closes UDP socket.
    */
-  stopDiscovery() {
+  stopDiscovery(): void {
     this.log.debug('client.stopDiscovery()');
-    clearInterval(this.discoveryTimer);
+    if (this.discoveryTimer !== null) clearInterval(this.discoveryTimer);
     this.discoveryTimer = null;
     if (this.isSocketBound) {
       this.isSocketBound = false;
-      this.socket.close();
+      if (this.socket != null) this.socket.close();
     }
   }
 
   /**
-   * @private
+   * @internal
    */
-  sendDiscovery(address, devices = [], offlineTolerance) {
+  sendDiscovery(
+    socket: Socket,
+    address: string,
+    devices: DiscoveryDevice[] = [],
+    offlineTolerance: number
+  ): void {
     this.log.debug(
       'client.sendDiscovery(%s, %j, %s)',
       address,
@@ -609,9 +828,10 @@ class Client extends EventEmitter {
       offlineTolerance
     );
     try {
-      this.devices.forEach(device => {
+      this.devices.forEach((device) => {
         if (device.status !== 'offline') {
-          const diff = this.discoveryPacketSequence - device.seenOnDiscovery;
+          const diff =
+            this.discoveryPacketSequence - (device.seenOnDiscovery || 0);
           if (diff >= offlineTolerance) {
             // eslint-disable-next-line no-param-reassign
             device.status = 'offline';
@@ -625,17 +845,11 @@ class Client extends EventEmitter {
       if (!this.isSocketBound) {
         return;
       }
-      this.socket.send(
-        discoveryMsgBuf,
-        0,
-        discoveryMsgBuf.length,
-        9999,
-        address
-      );
+      socket.send(discoveryMsgBuf, 0, discoveryMsgBuf.length, 9999, address);
 
-      devices.forEach(d => {
+      devices.forEach((d) => {
         this.log.debug('client.sendDiscovery() direct device:', d);
-        this.socket.send(
+        socket.send(
           discoveryMsgBuf,
           0,
           discoveryMsgBuf.length,
