@@ -51,6 +51,12 @@ type ScheduleRule = {
 
 type ScheduleRuleTime = Date | number | 'sunrise' | 'sunset';
 
+export function isObjectLike(
+  candidate: unknown
+): candidate is Record<string, unknown> {
+  return typeof candidate === 'object' && candidate !== null;
+}
+
 function createScheduleDate(
   date: ScheduleRuleTime,
   startOrEnd: 'start' | 'end'
