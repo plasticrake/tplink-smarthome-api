@@ -191,7 +191,7 @@ const getSimulatedTestDevices = async function getSimulatedTestDevices() {
 
     if (d.children && d.children.length > 0) {
       d.children.forEach(child => {
-        process(child.id);
+        process(child.sysinfo.id);
       });
     } else {
       process();
@@ -341,6 +341,8 @@ function testDeviceCleanup() {
           addDevice(testDevices.plugChildren[i], testDeviceChild);
         });
     });
+
+  console.dir(testDevices);
 
   const unreliableDevice = realTestDevices.find(
     realDevice => realDevice.testType === 'unreliable'

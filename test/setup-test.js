@@ -68,6 +68,10 @@ describe('Test Environment Setup', function() {
         });
         testDevices[deviceKey].forEach(d => {
           deviceIsOk(d);
+
+          it('should have childId', function() {
+            expect(d).to.have.property('childId');
+          });
         });
       });
     });
