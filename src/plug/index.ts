@@ -276,22 +276,34 @@ class Plug extends Device {
   }
 
   /**
-   * Cached value of `sys_info.relay_state === 1` or `sys_info.children[childId].state === 1`. Supports childId.
+   * Cached value of `sysinfo.relay_state === 1` or `sysinfo.children[childId].state === 1`.
+   * Supports childId.
+   * If device supports childId, but childId is not set, then it will return true if any child has `state === 1`.
    * @return {boolean} On (true) or Off (false)
    */
-  get relayState() {
-    if (this.childId) {
+  get relayState(): boolean {
+    if (this.#childId) {
       return this.#child.state === 1;
+    }
+    if (this.#children && this.#children.size > 0) {
+      return (
+        Array.from(this.#children.values()).findIndex((child) => {
+          return child.state === 1;
+        }) !== -1
+      );
     }
     return this.sysInfo.relay_state === 1;
   }
 
-  /**
-   * @private
-   */
-  set relayState(relayState) {
-    if (this.childId) {
+  protected setRelayState(relayState: boolean): void {
+    if (this.#childId) {
       this.#child.state = relayState ? 1 : 0;
+      return;
+    }
+    if (this.#children && this.#children.size > 0) {
+      for (const child of this.#children.values()) {
+        child.state = relayState ? 1 : 0;
+      }
       return;
     }
     this.sysInfo.relay_state = relayState ? 1 : 0;
