@@ -15,6 +15,9 @@
   - `sysInfo` is now required to be passed in the constructor.
 - `Bulb`
   - `#getColorTemperatureRange` now returns `null` instead of `undefined` when the bulb does not support color temperature.
+- `ResponseError`
+  - properties `response` and `command` are now strings instead of objects.
+  - property `errorModules` was renamed to `modules`.
 
 ## 2.0.0 / 2020-01-01
 

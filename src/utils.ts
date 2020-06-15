@@ -10,17 +10,21 @@ import castArray from 'lodash.castarray';
  * @param errorModules - array of modules that returned with errors.
  */
 export class ResponseError extends Error {
+  /**
+   * Set by `Error.captureStackTrace`
+   */
+  readonly stack = '';
+
   constructor(
     message: string,
     readonly response: string,
     readonly command: string,
-    readonly errorModules: string[]
+    readonly modules: string[],
+    readonly methods: string[] = []
   ) {
     super(message);
     this.name = 'ResponseError';
-    this.message = `${message} response: ${JSON.stringify(
-      response
-    )} command: ${JSON.stringify(command)}`;
+    this.message = `${message} response: ${response} command: ${command}`;
     Error.captureStackTrace(this, this.constructor);
   }
 }
