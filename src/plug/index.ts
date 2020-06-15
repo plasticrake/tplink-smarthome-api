@@ -133,6 +133,21 @@ class Plug extends Device {
      */
     this.timer = new Timer(this, 'count_down', this.childId);
 
+  constructor({
+    client,
+    sysInfo,
+    host,
+    port,
+    logger,
+    defaultSendOptions,
+    inUseThreshold = 0.1,
+    childId,
+  }: DeviceConstructorParameters[0] & {
+    sysInfo: PlugSysinfo;
+    inUseThreshold?: number;
+    childId?: string;
+  }) {
+    super({ client, sysInfo, host, port, logger, defaultSendOptions });
     if (this.sysInfo) {
       this.lastState.inUse = this.inUse;
       this.lastState.relayState = this.relayState;
