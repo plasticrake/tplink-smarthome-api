@@ -395,25 +395,6 @@ export default class Client extends EventEmitter {
   }
 
   /**
-   * Create {@link Device} object.
-   * - Device object only supports common Device methods.
-   * - See [Device constructor]{@link Device} for valid options.
-   * - Instead use {@link #getDevice} to create a fully featured object.
-   * @param  {Object} deviceOptions passed to [Device constructor]{@link Device}
-   * @returns {Device}
-   */
-  getCommonDevice(
-    deviceOptions: MarkOptional<DeviceOptions, 'client'>
-  ): Device {
-    const pDeviceOptions: DeviceOptions = {
-      client: this,
-      defaultSendOptions: this.defaultSendOptions,
-      ...deviceOptions,
-    };
-    return new Device(pDeviceOptions);
-  }
-
-  /**
    * @internal
    */
   getDeviceFromType(

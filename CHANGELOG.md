@@ -8,6 +8,7 @@
 
 - `Client`
   - `#send` returns a string instead of an object
+  - removed `#getCommonDevice`
 
 ## 2.0.0 / 2020-01-01
 
