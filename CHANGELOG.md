@@ -15,6 +15,8 @@
   - `sysInfo` is now required to be passed in the constructor.
 - `Bulb`
   - `#getColorTemperatureRange` now returns `null` instead of `undefined` when the bulb does not support color temperature.
+- `Plug`
+  - `#relayState` changed to better reflect state of plugs with children. If device supports childId, but childId is not set, then it will return true if any child has `state === 1`.
 - `ResponseError`
   - properties `response` and `command` are now strings instead of objects.
   - property `errorModules` was renamed to `modules`.
