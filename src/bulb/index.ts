@@ -88,7 +88,17 @@ class Bulb extends Device {
      * @borrows Time#getTime as Bulb.time#getTime
      * @borrows Time#getTimezone as Bulb.time#getTimezone
      */
-    this.time = new Time(this, 'smartlife.iot.common.timesetting');
+  constructor({
+    client,
+    sysInfo,
+    host,
+    port,
+    logger,
+    defaultSendOptions,
+  }: DeviceConstructorParameters[0] & {
+    sysInfo?: BulbSysinfo;
+  }) {
+    super({ client, sysInfo, host, port, logger, defaultSendOptions });
 
     this.lastState = Object.assign(this.lastState, {
       powerOn: null,

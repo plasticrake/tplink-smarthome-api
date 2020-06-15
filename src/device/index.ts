@@ -102,7 +102,14 @@ export default abstract class Device extends EventEmitter {
    * @param  {Object}      [options.logger]
    * @param  {SendOptions} [options.defaultSendOptions]
    */
-  constructor({ client, host, port = 9999, logger, defaultSendOptions }) {
+  constructor({
+    client,
+    sysInfo,
+    host,
+    port = 9999,
+    logger,
+    defaultSendOptions,
+  }: DeviceConstructorParameters[0]) {
     super();
 
     this.client = client;

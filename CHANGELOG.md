@@ -11,6 +11,8 @@
   - removed `#getCommonDevice`
 - `Device`
   - Cannot be instantiated directly. Use `Client` or `new Bulb()` or `new Plug()`;
+- `Bulb`/`Plug`
+  - `sysInfo` is now required to be passed in the constructor.
 
 ## 2.0.0 / 2020-01-01
 
