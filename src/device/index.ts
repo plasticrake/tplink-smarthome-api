@@ -91,8 +91,7 @@ const processResponse = function processResponse(command, response) {
  * @extends EventEmitter
  * @emits  Device#emeter-realtime-update
  */
-class Device extends EventEmitter {
-  #sysInfo;
+export default abstract class Device extends EventEmitter {
 
   /**
    * Created by {@link Client#getCommonDevice} - Do not instantiate directly
