@@ -13,6 +13,8 @@
   - Cannot be instantiated directly. Use `Client` or `new Bulb()` or `new Plug()`;
 - `Bulb`/`Plug`
   - `sysInfo` is now required to be passed in the constructor.
+- `Bulb`
+  - `#getColorTemperatureRange` now returns `null` instead of `undefined` when the bulb does not support color temperature.
 
 ## 2.0.0 / 2020-01-01
 
