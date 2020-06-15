@@ -113,7 +113,7 @@ class TcpSocket extends TplinkSocket {
             );
           }
           try {
-            return resolve(JSON.parse(decryptedMsg));
+            return resolve(decryptedMsg);
           } catch (err) {
             this.log.error(
               `Error parsing JSON: From: [${socket.remoteAddress} ${

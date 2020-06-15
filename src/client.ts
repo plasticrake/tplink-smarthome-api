@@ -249,18 +249,15 @@ export default class Client extends EventEmitter {
    *
    * All responses from device contain an `err_code` (`0` is success).
    *
-   * @param  {Object|string}  payload
-   * @param  {string}         host
-   * @param  {number}        [port=9999]
-   * @param  {SendOptions}   [sendOptions]
-   * @returns
+   * @param   port - default:9999
+   * @returns response
    */
   async send(
     payload: object | string,
     host: string,
     port = 9999,
-    sendOptions: SendOptions
-  ): Promise<unknown> {
+    sendOptions?: SendOptions
+  ): Promise<string> {
     const thisSendOptions = {
       ...this.defaultSendOptions,
       ...sendOptions,

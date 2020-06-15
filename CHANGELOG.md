@@ -2,6 +2,13 @@
 
 # Change Log
 
+## Unreleased
+
+### Breaking Changes :boom:
+
+- `Client`
+  - `#send` returns a string instead of an object
+
 ## 2.0.0 / 2020-01-01
 
 ### Added :heavy_plus_sign:

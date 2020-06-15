@@ -84,7 +84,7 @@ class UdpSocket extends TplinkSocket {
           this.logDebug(
             `: socket:data message:${replaceControlCharacters(decryptedMsg)}`
           );
-          return resolve(JSON.parse(decryptedMsg));
+          return resolve(decryptedMsg);
         } catch (err) {
           this.log.error(
             `Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(
