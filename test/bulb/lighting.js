@@ -1,14 +1,12 @@
 /* eslint-disable no-unused-expressions */
 
-const { expect, sinon } = require('../setup');
+const sinon = require('sinon');
+const { config, expect } = require('../setup');
 
-module.exports = function() {
-  describe('Lighting', function() {
-    this.timeout(5000);
-    this.slow(2000);
-
-    describe('#setLightState()', async function() {
-      it('should turn on', async function() {
+module.exports = function () {
+  describe('Lighting', function () {
+    describe('#setLightState()', async function () {
+      it('should turn on', async function () {
         expect(
           await this.device.lighting.setLightState({
             on_off: true,
@@ -21,7 +19,7 @@ module.exports = function() {
         );
       });
 
-      it('should turn off', async function() {
+      it('should turn off', async function () {
         expect(
           await this.device.lighting.setLightState({
             on_off: false,
@@ -34,7 +32,7 @@ module.exports = function() {
         );
       });
 
-      it('should change brightness if supported', async function() {
+      it('should change brightness if supported', async function () {
         if (!this.device.supportsBrightness) return;
 
         expect(
@@ -58,7 +56,7 @@ module.exports = function() {
         expect(ls).to.have.property('brightness', 60);
       });
 
-      it('should change color temperature if supported', async function() {
+      it('should change color temperature if supported', async function () {
         if (!this.device.supportsColorTemperature) return;
 
         expect(
@@ -82,7 +80,7 @@ module.exports = function() {
         expect(ls).to.have.property('color_temp', 5000);
       });
 
-      it('should change color if supported', async function() {
+      it('should change color if supported', async function () {
         if (!this.device.supportsColor) return;
 
         expect(
@@ -114,7 +112,7 @@ module.exports = function() {
         expect(ls).to.have.property('brightness', 60);
       });
 
-      it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function() {
+      it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function () {
         const spyOn = sinon.spy();
         const spyOff = sinon.spy();
         const spyChange = sinon.spy();
@@ -152,22 +150,22 @@ module.exports = function() {
       });
     });
 
-    describe('#getLightState()', function() {
-      this.timeout(2000);
-      this.slow(1000);
-      it('should return light state when on', async function() {
+    describe('#getLightState()', function () {
+      it('should return light state when on', async function () {
         await this.device.lighting.setLightState({ on_off: 1 });
         const ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 1);
       });
 
-      it('should return light state when off', async function() {
+      it('should return light state when off', async function () {
         await this.device.lighting.setLightState({ on_off: 0 });
         const ls = await this.device.lighting.getLightState();
         expect(ls).to.have.property('on_off', 0);
       });
 
-      it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function() {
+      it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function () {
+        this.timeout(config.defaultTestTimeout * 2);
+        this.slow(config.defaultTestTimeout);
         const spyOn = sinon.spy();
         const spyOff = sinon.spy();
         const spyChange = sinon.spy();

@@ -1,19 +1,17 @@
 /* eslint-disable no-unused-expressions */
 
-const { expect, sinon } = require('../setup');
+const sinon = require('sinon');
+const { expect } = require('../setup');
 
 const { ResponseError } = require('../../src');
 
-module.exports = function(testDevice) {
-  describe('Emeter', function() {
-    this.timeout(5000);
-    this.slow(2000);
-
+module.exports = function (testDevice) {
+  describe('Emeter', function () {
     let month;
     let year;
     let supportsEmeter;
 
-    before(async function() {
+    before('Emeter', async function () {
       if (!testDevice.getDevice) {
         this.skip();
         return;
@@ -27,8 +25,8 @@ module.exports = function(testDevice) {
       supportsEmeter = device.supportsEmeter;
     });
 
-    describe('#realtime get', function() {
-      it('should return realtime after getRealtime called', async function() {
+    describe('#realtime get', function () {
+      it('should return realtime after getRealtime called', async function () {
         if (supportsEmeter) {
           const er = await this.device.emeter.getRealtime();
           expect(this.device.emeter.realtime).to.eql(er);
@@ -37,8 +35,8 @@ module.exports = function(testDevice) {
         }
       });
     });
-    describe('#getRealtime()', function() {
-      it('should return Realtime if supported or throw error', async function() {
+    describe('#getRealtime()', function () {
+      it('should return Realtime if supported or throw error', async function () {
         if (supportsEmeter) {
           return expect(
             this.device.emeter.getRealtime()
@@ -48,7 +46,7 @@ module.exports = function(testDevice) {
           this.device.emeter.getRealtime()
         ).to.eventually.be.rejectedWith(ResponseError);
       });
-      it('should emit emeter-realtime-update if supported', async function() {
+      it('should emit emeter-realtime-update if supported', async function () {
         if (!supportsEmeter) return;
 
         const spy = sinon.spy();
@@ -60,7 +58,7 @@ module.exports = function(testDevice) {
         expect(spy).to.be.calledTwice;
         expect(spy).to.be.calledWithMatch({ err_code: 0 });
       });
-      it('should return Realtime normalized with old and new API', async function() {
+      it('should return Realtime normalized with old and new API', async function () {
         if (supportsEmeter) {
           const response = await this.device.emeter.getRealtime();
           expect(response).to.have.property('err_code', 0);
@@ -105,8 +103,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#getDayStats()', function() {
-      it('should return day stats', function() {
+    describe('#getDayStats()', function () {
+      it('should return day stats', function () {
         if (supportsEmeter) {
           return expect(
             this.device.emeter.getDayStats(year, month)
@@ -118,8 +116,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#getMonthStats()', function() {
-      it('should return day stats', function() {
+    describe('#getMonthStats()', function () {
+      it('should return day stats', function () {
         if (supportsEmeter) {
           return expect(
             this.device.emeter.getMonthStats(year)
@@ -131,8 +129,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#eraseStats()', function() {
-      it('(simulated only) should erase stats', function() {
+    describe('#eraseStats()', function () {
+      it('(simulated only) should erase stats', function () {
         if (testDevice.type !== 'simulated') this.skip();
         if (supportsEmeter) {
           return expect(

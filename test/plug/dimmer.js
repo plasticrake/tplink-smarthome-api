@@ -3,19 +3,10 @@ const { expect } = require('../setup');
 
 // const { ResponseError } = require('../../src');
 
-module.exports = function(testDevice) {
-  describe('Dimmer', function() {
-    this.timeout(5000);
-    this.slow(2000);
-
-    beforeEach(function() {
-      if (testDevice.model !== 'hs220') {
-        this.skip();
-      }
-    });
-
-    describe('#setBrightness()', function() {
-      it('should set brightness', async function() {
+module.exports = function (testDevice) {
+  describe('Dimmer', function () {
+    describe('#setBrightness()', function () {
+      it('should set brightness', async function () {
         expect(
           this.device.dimmer.setBrightness(50)
         ).to.eventually.have.property('err_code', 0);
@@ -31,8 +22,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setDimmerTransition()', function() {
-      it('should set brightness', async function() {
+    describe('#setDimmerTransition()', function () {
+      it('should set brightness', async function () {
         const tran = { brightness: 50, mode: 'gentle_on_off', duration: 1 };
         expect(
           this.device.dimmer.setDimmerTransition(tran)
@@ -50,8 +41,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#getDefaultBehavior()', function() {
-      it('should get default behavior', async function() {
+    describe('#getDefaultBehavior()', function () {
+      it('should get default behavior', async function () {
         const response = await this.device.dimmer.getDefaultBehavior();
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.keys(
@@ -64,8 +55,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setFadeOffTime()', function() {
-      it('should set fadeOffTime', async function() {
+    describe('#setFadeOffTime()', function () {
+      it('should set fadeOffTime', async function () {
         for (const fadeTime of [2100, 3200]) {
           expect(
             await this.device.dimmer.setFadeOffTime(fadeTime)
@@ -77,8 +68,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setFadeOnTime()', function() {
-      it('should set fadeOnTime', async function() {
+    describe('#setFadeOnTime()', function () {
+      it('should set fadeOnTime', async function () {
         for (const fadeTime of [2100, 3200]) {
           expect(
             await this.device.dimmer.setFadeOnTime(fadeTime)
@@ -90,8 +81,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setGentleOffTime()', function() {
-      it('should set GentleOffTime', async function() {
+    describe('#setGentleOffTime()', function () {
+      it('should set GentleOffTime', async function () {
         for (const fadeTime of [2100, 3200]) {
           expect(
             await this.device.dimmer.setGentleOffTime(fadeTime)
@@ -103,8 +94,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setGentleOnTime()', function() {
-      it('should set GentleOnTime', async function() {
+    describe('#setGentleOnTime()', function () {
+      it('should set GentleOnTime', async function () {
         for (const fadeTime of [2100, 3200]) {
           expect(
             await this.device.dimmer.setGentleOnTime(fadeTime)
@@ -116,8 +107,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#getDimmerParameters()', function() {
-      it('should get dimmer parameters', async function() {
+    describe('#getDimmerParameters()', function () {
+      it('should get dimmer parameters', async function () {
         const response = await this.device.dimmer.getDimmerParameters();
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.keys(
@@ -133,8 +124,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setDoubleClickAction()', function() {
-      it('should set double_click action', async function() {
+    describe('#setDoubleClickAction()', function () {
+      it('should set double_click action', async function () {
         for (const action of [
           { mode: 'none' },
           { mode: 'instant_on_off' },
@@ -151,8 +142,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setLongPressAction()', function() {
-      it('should set double_click action', async function() {
+    describe('#setLongPressAction()', function () {
+      it('should set double_click action', async function () {
         for (const action of [
           { mode: 'none' },
           { mode: 'instant_on_off' },
@@ -169,8 +160,8 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#setSwitchState()', function() {
-      it('should set double_click action', async function() {
+    describe('#setSwitchState()', function () {
+      it('should set double_click action', async function () {
         for (const state of [true, false, true]) {
           expect(
             await this.device.dimmer.setSwitchState(state)
@@ -179,52 +170,5 @@ module.exports = function(testDevice) {
         }
       });
     });
-
-    // describe('#addRule()', function () {
-    //   it('should add timer rule', async function () {
-    //     let response = await this.device.timer.addRule({ delay: 20, powerState: false });
-    //     expect(response).to.have.property('err_code', 0);
-    //     expect(response).to.have.property('id').that.is.a('string');
-
-    //     let id = response.id;
-    //     let rules = await this.device.timer.getRules();
-    //     expect(rules.rule_list[0].id).to.eql(id);
-    //   });
-
-    //   it('should delete existing rules and add timer rule when deleteExisting is true', async function () {
-    //     await this.device.timer.addRule({ delay: 20, powerState: false, deleteExisting: true });
-
-    //     let response = await this.device.timer.addRule({ delay: 50, powerState: false, deleteExisting: true });
-    //     expect(response).to.have.property('err_code', 0);
-    //     expect(response).to.have.property('id').that.is.a('string');
-    //   });
-
-    //   it('should fail if a timer rule exists when deleteExisting is false', async function () {
-    //     await this.device.timer.addRule({ delay: 20, powerState: false, deleteExisting: true });
-    //     return expect(this.device.timer.addRule({ delay: 20, powerState: false, deleteExisting: false })).to.eventually.be.rejectedWith(ResponseError);
-    //   });
-    // });
-
-    // describe('#editRule()', function () {
-    //   it('should edit timer rule', async function () {
-    //     let response = await this.device.timer.addRule({ delay: 20, powerState: false });
-    //     expect(response).to.have.property('err_code', 0);
-    //     expect(response).to.have.property('id').that.is.a('string');
-
-    //     let id = response.id;
-
-    //     await this.device.timer.editRule({ id, delay: 50, powerStart: false });
-
-    //     let rules = await this.device.timer.getRules();
-    //     expect(rules.rule_list[0].id).to.eql(id);
-    //     expect(rules.rule_list[0].delay).to.eql(50);
-    //   });
-    // });
-
-    // describe('#deleteAllRules()', function () {
-    //   it('should delete timer rules', function () {
-    //     return expect(this.device.timer.deleteAllRules()).to.eventually.have.property('err_code', 0);
-    //   });
-    // });
   });
 };

@@ -1,11 +1,8 @@
-const { expect } = require('../setup');
+const { config, expect } = require('../setup');
 
-module.exports = function(testDevice) {
-  describe('Schedule', function() {
-    this.timeout(5000);
-    this.slow(2000);
-
-    before(async function() {
+module.exports = function (testDevice) {
+  describe('Schedule', function () {
+    before('Schedule', async function () {
       if (!testDevice.getDevice) {
         this.skip();
         return;
@@ -14,8 +11,8 @@ module.exports = function(testDevice) {
       await device.schedule.deleteAllRules();
     });
 
-    describe('#addRule()', function() {
-      it('should add non repeating rule', async function() {
+    describe('#addRule()', function () {
+      it('should add non repeating rule', async function () {
         const response = await this.device.schedule.addRule({
           powerState: true,
           start: 60,
@@ -23,7 +20,7 @@ module.exports = function(testDevice) {
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
-      it('should add repeating rule', async function() {
+      it('should add repeating rule', async function () {
         const response = await this.device.schedule.addRule({
           powerState: false,
           start: 120,
@@ -32,7 +29,7 @@ module.exports = function(testDevice) {
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
-      it('should add disabled rule', async function() {
+      it('should add disabled rule', async function () {
         const response = await this.device.schedule.addRule({
           powerState: false,
           start: 120,
@@ -42,7 +39,7 @@ module.exports = function(testDevice) {
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
-      it('should add rule with dimmer (devices that support dimmer)', async function() {
+      it('should add rule with dimmer (devices that support dimmer)', async function () {
         if (!this.device.supportsDimmer) this.skip();
         const inputRule = {
           dimmer: { on_off: 1, brightness: 54, transition_period: 1000 },
@@ -58,10 +55,10 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#editRule()', function() {
-      it('should edit a rule', async function() {
-        this.timeout(7000);
-        this.slow(4000);
+    describe('#editRule()', function () {
+      it('should edit a rule', async function () {
+        this.timeout(config.defaultTestTimeout * 2);
+        this.slow(config.defaultTestTimeout);
         const addResponse = await this.device.schedule.addRule({
           powerState: false,
           start: 60,
@@ -85,10 +82,10 @@ module.exports = function(testDevice) {
         expect(getResponse).to.have.property('enable', 0);
       });
 
-      it('should edit a rule with dimmer (devices that support dimmer)', async function() {
+      it('should edit a rule with dimmer (devices that support dimmer)', async function () {
         if (!this.device.supportsDimmer) this.skip();
-        this.timeout(7000);
-        this.slow(4000);
+        this.timeout(config.defaultTestTimeout * 2);
+        this.slow(config.defaultTestTimeout);
 
         const addRule = {
           dimmer: { on_off: 1, brightness: 54, transition_period: 1000 },

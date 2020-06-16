@@ -1,13 +1,10 @@
-const { expect } = require('../setup');
+const { config, expect } = require('../setup');
 
-module.exports = function(testDevice) {
-  describe('Schedule', function() {
-    this.timeout(5000);
-    this.slow(2000);
-
+module.exports = function (testDevice) {
+  describe('Schedule', function () {
     let lightState;
 
-    before(async function() {
+    before('Schedule', async function () {
       if (!testDevice.getDevice) {
         this.skip();
         return;
@@ -16,7 +13,7 @@ module.exports = function(testDevice) {
       await device.schedule.deleteAllRules();
     });
 
-    beforeEach(function() {
+    beforeEach('Schedule', function () {
       lightState = {
         saturation: 0,
         hue: 0,
@@ -27,8 +24,8 @@ module.exports = function(testDevice) {
       };
     });
 
-    describe('#addRule()', function() {
-      it('should add non repeating rule', async function() {
+    describe('#addRule()', function () {
+      it('should add non repeating rule', async function () {
         const response = await this.device.schedule.addRule({
           lightState,
           start: 60,
@@ -36,7 +33,7 @@ module.exports = function(testDevice) {
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
-      it('should add repeating rule', async function() {
+      it('should add repeating rule', async function () {
         const response = await this.device.schedule.addRule({
           lightState,
           start: 120,
@@ -45,7 +42,7 @@ module.exports = function(testDevice) {
         expect(response).to.have.property('err_code', 0);
         expect(response).to.have.property('id');
       });
-      it('should add disabled rule', async function() {
+      it('should add disabled rule', async function () {
         const response = await this.device.schedule.addRule({
           lightState,
           start: 120,
@@ -57,10 +54,11 @@ module.exports = function(testDevice) {
       });
     });
 
-    describe('#editRule()', function() {
-      it('should edit a rule', async function() {
-        this.timeout(7000);
-        this.slow(4000);
+    describe('#editRule()', function () {
+      it('should edit a rule', async function () {
+        this.timeout(config.defaultTestTimeout * 2);
+        this.slow(config.defaultTestTimeout);
+
         const addResponse = await this.device.schedule.addRule({
           lightState,
           start: 60,
