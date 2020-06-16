@@ -1,20 +1,10 @@
-/* eslint-disable no-underscore-dangle, no-unused-expressions */
+/* eslint-disable no-unused-expressions */
 // spell-checker:ignore MYTESTMAC MYTESTMICMAC MYTESTETHERNETMAC
 
-const rewire = require('rewire');
-const {
-  expect,
-  getTestClient,
-  sinon,
-  testDevices,
-  testSendOptionsSets,
-} = require('../setup');
+const sinon = require('sinon');
+const { config, expect, getTestClient, testDevices } = require('../setup');
 
 const { Client, ResponseError } = require('../../src');
-
-const Device = rewire('../../src/device');
-
-const processResponse = Device.__get__('processResponse');
 
 const cloudTests = require('../shared/cloud');
 const emeterTests = require('../shared/emeter');
@@ -22,222 +12,50 @@ const netifTests = require('./netif');
 const scheduleTests = require('../shared/schedule');
 const timeTests = require('../shared/time');
 
-describe('Device', function() {
-  this.timeout(2000);
-  this.slow(2000);
-  this.retries(2);
+describe('Device', function () {
+  this.timeout(config.defaultTestTimeout);
+  this.slow(config.defaultTestTimeout / 2);
+  this.retries(1);
 
-  describe('private', function() {
-    describe('processResponse', function() {
-      it('return fragment for single command emeter.get_realtime', function() {
-        const command = { emeter: { get_realtime: {} } };
-        const response = {
-          emeter: {
-            get_realtime: {
-              current: 0.012933,
-              voltage: 120.793324,
-              power: 0,
-              total: 0.001,
-              err_code: 0,
-            },
-          },
-        };
-        const pr = processResponse(command, response);
-        expect(pr).to.have.keys(
-          'current',
-          'voltage',
-          'power',
-          'total',
-          'err_code'
-        );
-      });
-
-      it('to throw ResponseError for single command emeter.get_realtime not supported', function() {
-        const command = { emeter: { get_realtime: {} } };
-        const response = {
-          emeter: { err_code: -1, err_msg: 'module not support' },
-        };
-        expect(() => processResponse(command, response))
-          .to.throw(ResponseError)
-          .and.to.have.deep.property('response', {
-            err_code: -1,
-            err_msg: 'module not support',
-          });
-      });
-
-      it('return fragment for single command system.set_dev_alias', function() {
-        const command = { system: { set_dev_alias: { alias: 'New Alias' } } };
-        const response = { system: { set_dev_alias: { err_code: 0 } } };
-        const pr = processResponse(command, response);
-        expect(pr).to.have.property('err_code', 0);
-      });
-
-      it('return fragment for single command netif.get_scaninfo', function() {
-        const command = { netif: { get_scaninfo: { refresh: 1, timeout: 3 } } };
-        const response = {
-          netif: {
-            get_scaninfo: {
-              ap_list: [
-                { ssid: 'wifi_network_1', key_type: 1 },
-                { ssid: 'wifi_network_2', key_type: 2 },
-                { ssid: 'wifi_network_3', key_type: 3 },
-              ],
-              err_code: 0,
-            },
-          },
-        };
-        const pr = processResponse(command, response);
-        expect(pr).to.have.property('err_code', 0);
-        expect(pr).to.have.property('ap_list');
-      });
-
-      it('return whole result for multiple commands emeter.get_realtime system.get_sysinfo', function() {
-        const command = {
-          emeter: { get_realtime: {} },
-          system: { get_sysinfo: {} },
-        };
-        const response = {
-          emeter: {
-            get_realtime: {
-              current: 0.01257,
-              voltage: 121.162244,
-              power: 0,
-              total: 0.001,
-              err_code: 0,
-            },
-          },
-          system: {
-            get_sysinfo: {
-              err_code: 0,
-              sw_ver: '1.0.8 Build 151113 Rel.24658',
-              hw_ver: '1.0',
-              type: 'IOT.SMARTPLUGSWITCH',
-              model: 'HS110(US)',
-              mac: '00:00:00:00:00:00',
-              deviceId: '1234',
-              hwId: '1234',
-              fwId: '1234',
-              oemId: '1234',
-              alias: 'sup',
-              dev_name: 'Wi-Fi Smart Plug With Energy Monitoring',
-              icon_hash: '',
-              relay_state: 0,
-              on_time: 0,
-              active_mode: 'schedule',
-              feature: 'TIM:ENE',
-              updating: 0,
-              rssi: -63,
-              led_off: 0,
-              latitude: 0.0,
-              longitude: 0.0,
-            },
-          },
-        };
-        const pr = processResponse(command, response);
-        expect(pr).to.have.keys('emeter', 'system');
-        expect(pr.emeter.get_realtime).to.have.keys(
-          'current',
-          'voltage',
-          'power',
-          'total',
-          'err_code'
-        );
-        expect(pr.system.get_sysinfo).to.include.keys(
-          'err_code',
-          'sw_ver',
-          'hw_ver',
-          'type'
-        );
-      });
-
-      it('to throw ResponseError including whole result for multiple commands emeter.get_realtime system.get_sysinfo', function() {
-        const command = {
-          emeter: { get_realtime: {} },
-          system: { get_sysinfo: {} },
-        };
-        const response = {
-          emeter: { err_code: -1, err_msg: 'module not support' },
-          system: {
-            get_sysinfo: {
-              err_code: 0,
-              sw_ver: '1.0.8 Build 151113 Rel.24658',
-              hw_ver: '1.0',
-              type: 'IOT.SMARTPLUGSWITCH',
-              model: 'HS110(US)',
-              mac: '00:00:00:00:00:00',
-              deviceId: '1234',
-              hwId: '1234',
-              fwId: '1234',
-              oemId: '1234',
-              alias: 'sup',
-              dev_name: 'Wi-Fi Smart Plug With Energy Monitoring',
-              icon_hash: '',
-              relay_state: 0,
-              on_time: 0,
-              active_mode: 'schedule',
-              feature: 'TIM:ENE',
-              updating: 0,
-              rssi: -63,
-              led_off: 0,
-              latitude: 0.0,
-              longitude: 0.0,
-            },
-          },
-        };
-        expect(() => processResponse(command, response))
-          .to.throw(ResponseError)
-          .and.to.have.deep.property('response', response);
-        expect(() => processResponse(command, response))
-          .to.throw(ResponseError)
-          .and.to.have.deep.property('errorModules', ['emeter']);
-      });
-
-      it('to throw ResponseError when err_code missing', function() {
-        const command = { emeter: { get_realtime: {} } };
-        const response = { emeter: { get_realtime: {} } };
-        expect(() => processResponse(command, response)).to.throw(
-          ResponseError,
-          'err_code missing'
-        );
-      });
-    });
-  });
-
-  testDevices.forEach(testDevice => {
+  testDevices.devices.forEach((testDevice) => {
     let device;
     let time;
     let client;
 
-    testSendOptionsSets.forEach(testSendOptions => {
-      context(testSendOptions.name, function() {
-        context(testDevice.name, function() {
+    config.testSendOptionsSets.forEach((testSendOptions) => {
+      context(testSendOptions.name, function () {
+        context(testDevice.name, function () {
           // beforeEach() doesn't work with assigning to `this`
-          before(async function() {
+          before('device', async function () {
             client = getTestClient(testSendOptions);
             if (testDevice.getDevice) {
-              device = await testDevice.getDevice(null, testSendOptions);
+              device = await testDevice.getDevice(undefined, testSendOptions);
               this.device = device;
-              time = device.apiModuleNamespace.timesetting;
+              time = device.apiModule.timesetting;
             }
           });
-          beforeEach(async function() {
+          beforeEach('device', async function () {
             // before() doesn't skip nested describes
             if (!testDevice.getDevice) {
               this.skip();
               return;
             }
-            device = await testDevice.getDevice(null, testSendOptions);
+            device = await testDevice.getDevice(undefined, testSendOptions);
             this.device = device;
           });
 
-          describe('constructor', function() {
-            it('should inherit defaultSendOptions from Client', function() {
+          describe('constructor', function () {
+            it('should inherit defaultSendOptions from Client', function () {
               const timeout = 9999;
               const transport = 'udp';
               const clientTest = new Client({
                 defaultSendOptions: { timeout, transport },
               });
-              const anotherDevice = clientTest.getDeviceFromType(device.type);
+
+              const anotherDevice = clientTest.getDeviceFromSysInfo(
+                device.sysInfo
+              );
+
               expect(clientTest.defaultSendOptions.timeout, 'client').to.equal(
                 timeout
               );
@@ -256,26 +74,30 @@ describe('Device', function() {
             });
           });
 
-          describe('#send', function() {
-            it('should send a single valid command and receive response', async function() {
-              const response = await device.send(
-                '{"system":{"get_sysinfo":{}}}'
+          describe('#send', function () {
+            it('should send a single valid command and receive response', async function () {
+              const response = JSON.parse(
+                await device.send('{"system":{"get_sysinfo":{}}}')
               );
               expect(response).to.have.nested.property(
                 'system.get_sysinfo.err_code',
                 0
               );
             });
-            it('should send multiple valid commands (same module) and receive response', async function() {
-              const response = await device.send(
-                `{"${time}":{"get_time":{},"get_timezone":{}}}`
+            it('should send multiple valid commands (same module) and receive response', async function () {
+              const response = JSON.parse(
+                await device.send(
+                  `{"${time}":{"get_time":{},"get_timezone":{}}}`
+                )
               );
               expect(response[time].get_time.err_code).to.eql(0);
               expect(response[time].get_timezone.err_code).to.eql(0);
             });
-            it('should send multiple valid commands (diff modules) and receive response', async function() {
-              const response = await device.send(
-                `{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`
+            it('should send multiple valid commands (diff modules) and receive response', async function () {
+              const response = JSON.parse(
+                await device.send(
+                  `{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`
+                )
               );
               expect(response).to.have.nested.property(
                 'system.get_sysinfo.err_code',
@@ -283,27 +105,29 @@ describe('Device', function() {
               );
               expect(response[time].get_time.err_code).to.eql(0);
             });
-            it('should send a single invalid command (member) and receive response', async function() {
-              const response = await device.send(
-                '{"system":{"INVALID_MEMBER":{}}}'
+            it('should send a single invalid command (member) and receive response', async function () {
+              const response = JSON.parse(
+                await device.send('{"system":{"INVALID_MEMBER":{}}}')
               );
               expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([
                 -2,
                 -2000,
               ]);
             });
-            it('should send a single invalid command (module) and receive response', async function() {
-              const response = await device.send(
-                '{"INVALID_MODULE":{"INVALID_MEMBER":{}}}'
+            it('should send a single invalid command (module) and receive response', async function () {
+              const response = JSON.parse(
+                await device.send('{"INVALID_MODULE":{"INVALID_MEMBER":{}}}')
               );
               expect(response).to.have.nested.property(
                 'INVALID_MODULE.err_code'
               );
               expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
             });
-            it('should send multiple invalid commands and receive response', async function() {
-              const response = await device.send(
-                '{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}'
+            it('should send multiple invalid commands and receive response', async function () {
+              const response = JSON.parse(
+                await device.send(
+                  '{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}'
+                )
               );
               expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
               expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([
@@ -313,21 +137,22 @@ describe('Device', function() {
             });
           });
 
-          describe('#sendCommand', function() {
-            it('should send a single valid command and receive response', async function() {
+          describe('#sendCommand', function () {
+            it('should send a single valid command and receive response', async function () {
               const response = await device.sendCommand(
                 '{"system":{"get_sysinfo":{}}}'
               );
               return expect(response).to.have.property('err_code', 0);
             });
-            it('should send multiple valid commands (same module) and receive response', async function() {
+            it('should send multiple valid commands (same module) and receive response', async function () {
               const response = await device.sendCommand(
                 `{"${time}":{"get_time":{},"get_timezone":{}}}`
               );
+
               expect(response[time].get_time.err_code).to.eql(0);
               expect(response[time].get_timezone.err_code).to.eql(0);
             });
-            it('should send multiple valid commands (diff modules) and receive response', async function() {
+            it('should send multiple valid commands (diff modules) and receive response', async function () {
               const response = await device.sendCommand(
                 `{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`
               );
@@ -337,41 +162,50 @@ describe('Device', function() {
               );
               expect(response[time].get_time.err_code).to.eql(0);
             });
-            it('should send a single invalid command (member) and reject with ResponseError', function() {
+            it('should send a single invalid command (member) and reject with ResponseError', function () {
               return device
                 .sendCommand('{"system":{"INVALID_MEMBER":{}}}')
-                .catch(err => {
+                .catch((err) => {
                   expect(err).to.be.instanceof(ResponseError);
-                  expect(err.response).to.have.nested.property('err_code');
-                  expect(err.response.err_code).to.be.oneOf([-2, -2000]);
+                  expect(JSON.parse(err.response)).to.have.nested.property(
+                    'err_code'
+                  );
+                  expect(JSON.parse(err.response).err_code).to.be.oneOf([
+                    -2,
+                    -2000,
+                  ]);
                 });
             });
-            it('should send a single invalid command (module) and reject with ResponseError', function() {
+            it('should send a single invalid command (module) and reject with ResponseError', function () {
               return device
                 .sendCommand('{"INVALID_MODULE":{"INVALID_MEMBER":{}}}')
-                .catch(err => {
+                .catch((err) => {
                   expect(err).to.be.instanceof(ResponseError);
-                  expect(err.response).to.have.nested.property('err_code');
-                  expect(err.response.err_code).to.be.oneOf([-1, -2001]);
+                  expect(JSON.parse(err.response)).to.have.nested.property(
+                    'err_code'
+                  );
+                  expect(JSON.parse(err.response).err_code).to.be.oneOf([
+                    -1,
+                    -2001,
+                  ]);
                 });
             });
-            it('should send multiple invalid commands and reject with ResponseError', function() {
+            it('should send multiple invalid commands and reject with ResponseError', function () {
               return device
                 .sendCommand(
                   '{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}'
                 )
-                .catch(err => {
+                .catch((err) => {
                   expect(err).to.be.an.instanceof(ResponseError);
-                  expect(err.response.INVALID_MODULE.err_code).to.be.oneOf([
-                    -1,
-                    -2001,
-                  ]);
                   expect(
-                    err.response.system.INVALID_MEMBER.err_code
+                    JSON.parse(err.response).INVALID_MODULE.err_code
+                  ).to.be.oneOf([-1, -2001]);
+                  expect(
+                    JSON.parse(err.response).system.INVALID_MEMBER.err_code
                   ).to.be.oneOf([-2, -2000]);
                 });
             });
-            it('should send multiple commands to a single device at once', async function() {
+            it('should send multiple commands to a single device at once', async function () {
               const promises = [];
               for (let i = 0; i < 20; i += 1) {
                 promises.push(
@@ -387,18 +221,18 @@ describe('Device', function() {
             });
           });
 
-          describe('#sysInfo get', function() {
-            it('should return sysInfo after getSysInfo called', async function() {
+          describe('#sysInfo get', function () {
+            it('should return sysInfo after getSysInfo called', async function () {
               const si = await device.getSysInfo();
               expect(device.sysInfo).to.eql(si);
             });
           });
 
-          describe('#alias get', function() {
-            it('should return alias from cached sysInfo', function() {
+          describe('#alias get', function () {
+            it('should return alias from cached sysInfo', function () {
               if (device.childId) {
                 const child = device.sysInfo.children.find(
-                  c => c.id === device.childId
+                  (c) => c.id === device.childId
                 );
                 expect(device.alias).to.eql(child.alias);
                 child.alias = 'My Test Alias';
@@ -411,82 +245,68 @@ describe('Device', function() {
             });
           });
 
-          describe('#deviceId get', function() {
-            it('should return deviceId from cached sysInfo', function() {
+          describe('#deviceId get', function () {
+            it('should return deviceId from cached sysInfo', function () {
               expect(device.deviceId).to.eql(device.sysInfo.deviceId);
               device.sysInfo.deviceId = 'My Test deviceId';
               expect(device.deviceId).to.eql(device.sysInfo.deviceId);
             });
           });
 
-          describe('#description get', function() {
-            it('should return description from cached sysInfo', function() {
-              expect(device.description).to.eql(
-                device.sysInfo.description || device.sysInfo.dev_name
-              );
-              device.sysInfo.description = 'My Test deviceName';
+          describe('#description get', function () {
+            it('should return description from cached sysInfo', function () {
               expect(device.description).to.eql(
                 device.sysInfo.description || device.sysInfo.dev_name
               );
             });
           });
 
-          describe('#model get', function() {
-            it('should return model from cached sysInfo', function() {
+          describe('#model get', function () {
+            it('should return model from cached sysInfo', function () {
               expect(device.model).to.eql(device.sysInfo.model);
               device.sysInfo.model = 'My Test model';
               expect(device.model).to.eql(device.sysInfo.model);
             });
           });
 
-          describe('#type get', function() {
-            it('should return type from cached sysInfo', function() {
+          describe('#type get', function () {
+            it('should return type from cached sysInfo', function () {
               expect(device.type).to.eql(
                 device.sysInfo.type || device.sysInfo.mic_type
               );
               device.sysInfo.type = 'My Test type';
-              device.sysInfo.mic_type = undefined;
+              delete device.sysInfo.mic_type;
               expect(device.type).to.eql(device.sysInfo.type);
-              device.sysInfo.type = undefined;
+              delete device.sysInfo.type;
               device.sysInfo.mic_type = 'My Test mic_type';
               expect(device.type).to.eql(device.sysInfo.mic_type);
             });
           });
 
-          describe('#deviceType get', function() {
-            it('should return type of "device" before querying device', function() {
-              const generalDevice = client.getCommonDevice(
-                testDevice.deviceOptions
-              );
-              expect(generalDevice.deviceType).to.equal('device');
-            });
-            it('should return actual type after querying device', async function() {
-              const generalDevice = client.getCommonDevice(
-                testDevice.deviceOptions
-              );
-              await generalDevice.getSysInfo();
-              expect(generalDevice.deviceType).to.eql(testDevice.deviceType);
+          describe('#deviceType get', function () {
+            it('should return deviceType', async function () {
+              expect(device.deviceType).to.eql(testDevice.deviceType);
             });
           });
 
-          describe('#softwareVersion get', function() {
-            it('should return softwareVersion from cached sysInfo', function() {
+          describe('#softwareVersion get', function () {
+            it('should return softwareVersion from cached sysInfo', function () {
               expect(device.softwareVersion).to.eql(device.sysInfo.sw_ver);
               device.sysInfo.sw_ver = 'My Test sw_ver';
               expect(device.softwareVersion).to.eql(device.sysInfo.sw_ver);
             });
           });
 
-          describe('#hardwareVersion get', function() {
-            it('should return hardwareVersion from cached sysInfo', function() {
+          describe('#hardwareVersion get', function () {
+            it('should return hardwareVersion from cached sysInfo', function () {
               expect(device.hardwareVersion).to.eql(device.sysInfo.hw_ver);
               device.sysInfo.hw_ver = 'My Test hw_ver';
               expect(device.hardwareVersion).to.eql(device.sysInfo.hw_ver);
             });
           });
 
-          describe('#mac get', function() {
-            it('should return mac from cached sysInfo', function() {
+          describe('#mac get', function () {
+            it('should return mac from cached sysInfo', function () {
               expect(device.mac).to.eql(
                 device.sysInfo.mac ||
                   device.sysInfo.mic_mac ||
@@ -507,8 +327,8 @@ describe('Device', function() {
             });
           });
 
-          describe('#macNormalized get', function() {
-            it('should return normalized mac from cached sysInfo', function() {
+          describe('#macNormalized get', function () {
+            it('should return normalized mac from cached sysInfo', function () {
               device.sysInfo.mac = 'My Test mac';
               device.sysInfo.mic_mac = undefined;
               device.sysInfo.ethernet_mac = undefined;
@@ -524,8 +344,8 @@ describe('Device', function() {
             });
           });
 
-          describe('#getSysInfo()', function() {
-            it('should return info', function() {
+          describe('#getSysInfo()', function () {
+            it('should return info', function () {
               return expect(device.getSysInfo()).to.eventually.have.property(
                 'err_code',
                 0
@@ -533,21 +353,21 @@ describe('Device', function() {
             });
           });
 
-          describe('#setAlias()', function() {
+          describe('#setAlias()', function () {
             let origAlias;
-            before(async function() {
+            before('setAlias', async function () {
               if (!testDevice.getDevice) return;
               await device.getSysInfo();
               origAlias = device.alias;
             });
-            after(async function() {
+            after(async function () {
               if (!testDevice.getDevice) return;
               expect(await device.setAlias(origAlias)).to.be.true;
               await device.getSysInfo();
               expect(device.alias).to.equal(origAlias);
             });
 
-            it('should change the alias', async function() {
+            it('should change the alias', async function () {
               const testAlias = `Testing ${Math.floor(
                 Math.random() * (100 + 1)
               )}`;
@@ -557,25 +377,25 @@ describe('Device', function() {
             });
           });
 
-          describe('#setLocation()', function() {
-            it('should return model', function() {
+          describe('#setLocation()', function () {
+            it('should return model', function () {
               return expect(
                 device.setLocation(10, 10)
               ).to.eventually.have.property('err_code', 0);
             });
           });
 
-          describe('#getModel()', function() {
-            it('should return model', function() {
+          describe('#getModel()', function () {
+            it('should return model', function () {
               return expect(device.getModel()).to.eventually.match(
                 /^HS\d\d\d|^LB\d\d\d/
               );
             });
           });
 
-          describe('#reboot()', function() {
-            it('(simulator only) should reboot', function() {
-              if (testDevice.type !== 'simulated') this.skip();
+          describe('#reboot()', function () {
+            it('(simulator only) should reboot', function () {
+              if (!testDevice.isSimulated) this.skip();
               return expect(device.reboot(1)).to.eventually.have.property(
                 'err_code',
                 0
@@ -583,9 +403,9 @@ describe('Device', function() {
             });
           });
 
-          describe('#reset()', function() {
-            it('(simulator only) should reset', function() {
-              if (testDevice.type !== 'simulated') this.skip();
+          describe('#reset()', function () {
+            it('(simulator only) should reset', function () {
+              if (!testDevice.isSimulated) this.skip();
               return expect(device.reset(1)).to.eventually.have.property(
                 'err_code',
                 0
@@ -593,16 +413,16 @@ describe('Device', function() {
             });
           });
 
-          describe('#startPolling()', function() {
+          describe('#startPolling()', function () {
             let badDevice;
-            afterEach(function() {
+            afterEach(function () {
               device.stopPolling();
               if (badDevice) badDevice.stopPolling();
             });
 
-            it('should poll device', async function() {
+            it('should poll device', async function () {
               const spy = sinon.spy();
-              await new Promise(resolve => {
+              await new Promise((resolve) => {
                 device.once('power-update', () => {
                   spy();
                   resolve();
@@ -624,14 +444,19 @@ describe('Device', function() {
               expect(spy).to.be.called;
             });
 
-            it('should fail to poll unreachable device', async function() {
+            it('should fail to poll unreachable device', async function () {
               this.timeout(500);
-              badDevice = await testDevice.getDevice(null, testSendOptions);
-              badDevice.host = testDevices.unreachable.deviceOptions.host;
+              badDevice = await testDevice.getDevice(
+                {
+                  host: testDevices.unreachable.deviceOptions.host,
+                  sysInfo: device.sysInfo,
+                },
+                testSendOptions
+              );
 
               const spy = sinon.spy();
 
-              await new Promise(resolve => {
+              await new Promise((resolve) => {
                 badDevice.once('power-update', () => {
                   spy();
                   resolve();
@@ -655,12 +480,15 @@ describe('Device', function() {
               expect(spy).to.not.be.called;
             });
 
-            it('should throw error for unreachable device', async function() {
-              badDevice = await testDevice.getDevice(null, testSendOptions);
+            it('should throw error for unreachable device', async function () {
+              badDevice = await testDevice.getDevice(
+                undefined,
+                testSendOptions
+              );
               badDevice.host = testDevices.unreachable.deviceOptions.host;
 
               const spy = sinon.spy();
-              await new Promise(resolve => {
+              await new Promise((resolve) => {
                 badDevice.once('polling-error', () => {
                   spy();
                   resolve();

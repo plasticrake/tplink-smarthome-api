@@ -1,50 +1,47 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
 
-const {
-  expect,
-  sinon,
-  getTestClient,
-  testDevices,
-  testSendOptionsSets,
-} = require('./setup');
+const sinon = require('sinon');
+const { config, expect, getTestClient, testDevices } = require('./setup');
 
-const Device = require('../src/device');
-const Plug = require('../src/plug');
-const Bulb = require('../src/bulb');
+const { default: Device } = require('../src/device');
+const { default: Plug } = require('../src/plug');
+const { default: Bulb } = require('../src/bulb');
 
 const { compareMac } = require('../src/utils');
 
-describe('Client', function() {
-  this.timeout(5000);
-  this.slow(2000);
-  this.retries(2);
+describe('Client', function () {
+  this.retries(1);
 
-  describe('#startDiscovery()', function() {
+  describe('#startDiscovery()', function () {
+    this.timeout(config.defaultTestTimeout * 2);
+    this.slow(config.defaultTestTimeout);
+
     let client;
-    beforeEach(function() {
+    beforeEach('startDiscovery', function () {
       client = getTestClient({ logLevel: 'silent' });
     });
 
-    afterEach(function() {
+    afterEach('startDiscovery', function () {
       client.stopDiscovery();
     });
 
-    it('should emit device-new when finding a new device', function(done) {
+    it('should emit device-new when finding a new device', function (done) {
       client
         .startDiscovery({ discoveryInterval: 250 })
-        .once('device-new', device => {
+        .once('device-new', (device) => {
           expect(device).to.be.an.instanceof(Device);
           client.stopDiscovery();
           done();
         });
     });
 
-    it('should emit emeter-realtime-update', function(done) {
+    it('should emit emeter-realtime-update', function (done) {
       client
         .startDiscovery({ discoveryInterval: 250 })
-        .on('device-new', device => {
+        .on('device-new', (device) => {
           expect(device).to.be.an.instanceof(Device);
-          device.on('emeter-realtime-update', realtime => {
+          device.on('emeter-realtime-update', (realtime) => {
             if (Object.keys(realtime).length > 0) {
               expect(realtime).to.not.eql({});
               client.stopDiscovery();
@@ -54,15 +51,16 @@ describe('Client', function() {
         });
     });
 
-    it('should emit device-new when finding a new device with `devices` specified', function(done) {
+    // TODO: TEST
+    it('should emit device-new when finding a new device with `devices` specified', function (done) {
       const { mac } = testDevices.anyDevice;
       const { host } = testDevices.anyDevice.deviceOptions;
-      expect(mac).to.be.a('string').and.not.empty;
-      expect(host).to.be.a('string').and.not.empty;
+      expect('mac', mac).to.be.a('string').and.not.empty;
+      expect('host', host).to.be.a('string').and.not.empty;
 
       client
         .startDiscovery({ discoveryInterval: 250, devices: [{ host }] })
-        .on('device-new', device => {
+        .on('device-new', (device) => {
           if (device.mac === mac) {
             client.stopDiscovery();
             done();
@@ -70,39 +68,39 @@ describe('Client', function() {
         });
     });
 
-    it('should emit device-new when finding a new device with a deviceType filter', function(done) {
+    it('should emit device-new when finding a new device with a deviceType filter', function (done) {
       client
         .startDiscovery({ discoveryInterval: 250, deviceTypes: ['plug'] })
-        .once('device-new', device => {
+        .once('device-new', (device) => {
           expect(device).to.be.an.instanceof(Device);
           client.stopDiscovery();
           done();
         });
     });
 
-    it('should ONLY emit device-new for specified deviceTypes', function(done) {
+    it('should ONLY emit device-new for specified deviceTypes', function (done) {
       client
         .startDiscovery({ discoveryInterval: 250, deviceTypes: ['plug'] })
-        .on('device-new', device => {
+        .on('device-new', (device) => {
           expect(device.deviceType).to.eql('plug');
         });
       setTimeout(done, 1000);
     });
 
-    it('should NOT emit device-new with an incorrect deviceType filter', function(done) {
+    it('should NOT emit device-new with an incorrect deviceType filter', function (done) {
       client
         .startDiscovery({
           discoveryInterval: 250,
           deviceTypes: ['invalidDeviceType'],
         })
-        .once('device-new', device => {
+        .once('device-new', (device) => {
           client.stopDiscovery();
           expect(device).to.not.exist;
         });
       setTimeout(done, 1000);
     });
 
-    it('should ONLY emit device-new for specified macAddresses', function(done) {
+    it('should ONLY emit device-new for specified macAddresses', function (done) {
       const spy = sinon.spy();
       const { mac } = testDevices.anyDevice;
       expect(mac).to.be.a('string').and.not.empty;
@@ -118,7 +116,7 @@ describe('Client', function() {
       }, 1000);
     });
 
-    it('should NOT emit device-new for specified excludedMacAddresses', function(done) {
+    it('should NOT emit device-new for specified excludedMacAddresses', function (done) {
       const spy = sinon.spy();
       const { mac } = testDevices.anyDevice;
       expect(mac, 'mac blank').to.be.a('string').and.not.empty;
@@ -135,7 +133,7 @@ describe('Client', function() {
       }, 1000);
     });
 
-    it('should NOT emit device-new for devices not meeting filterCallback', function(done) {
+    it('should NOT emit device-new for devices not meeting filterCallback', function (done) {
       const spy = sinon.spy();
       const { mac } = testDevices.anyDevice;
       expect(mac, 'mac blank').to.be.a('string').and.not.empty;
@@ -143,7 +141,7 @@ describe('Client', function() {
       client
         .startDiscovery({
           discoveryInterval: 250,
-          filterCallback: sysInfo => {
+          filterCallback: (sysInfo) => {
             return !compareMac(sysInfo.mac, mac);
           },
         })
@@ -157,7 +155,7 @@ describe('Client', function() {
       }, 1000);
     });
 
-    it('should NOT emit device-new for devices not meeting filterCallback -- all devices', function(done) {
+    it('should NOT emit device-new for devices not meeting filterCallback -- all devices', function (done) {
       const spy = sinon.spy();
 
       client
@@ -171,7 +169,7 @@ describe('Client', function() {
       }, 1000);
     });
 
-    it('should emit device-new for devices meeting filterCallback -- all devices', function(done) {
+    it('should emit device-new for devices meeting filterCallback -- all devices', function (done) {
       client
         .startDiscovery({ discoveryInterval: 250, filterCallback: () => true })
         .on('device-new', () => {
@@ -186,36 +184,55 @@ describe('Client', function() {
       { typeName: 'device', type: Device },
       { typeName: 'plug', type: Plug },
       { typeName: 'bulb', type: Bulb },
-    ].forEach(t => {
-      events.forEach(e => {
+    ].forEach((t) => {
+      events.forEach((e) => {
         eventTests.push({ ...t, event: e });
       });
     });
 
-    eventTests.forEach(et => {
+    eventTests.forEach((et) => {
       const eventName = `${et.typeName}-${et.event}`;
 
-      it(`should emit ${eventName} when finding a(n) ${et.event} ${et.typeName}`, function(done) {
+      it(`should emit ${eventName} when finding a(n) ${et.event} ${et.typeName}`, async function () {
         if (et.event === 'offline') {
-          const invalidDevice = client.getDeviceFromType(et.typeName);
+          let device;
+          switch (et.typeName) {
+            case 'device':
+              device = testDevices.anyDevice;
+              break;
+            case 'plug':
+              device = testDevices.anyPlug;
+              break;
+            case 'bulb':
+              device = testDevices.anyPlug;
+              break;
+            default:
+              throw new Error(`Unexpected device type:${et.typeName}`);
+          }
+
+          if (!('getDevice' in device)) this.skip();
+
+          const invalidDevice = await client.getDevice(device.deviceOptions);
+          invalidDevice.host = testDevices.unreachable.deviceOptions.host;
           invalidDevice.status = 'online';
           invalidDevice.seenOnDiscovery = 0;
-          invalidDevice.sysInfo.type = et.typeName;
-          client.devices.set(invalidDevice.deviceId, invalidDevice);
+          client.devices.set(`invalidDevice.deviceId${'INV'}`, invalidDevice);
         }
 
-        client
-          .startDiscovery({ discoveryInterval: 250, offlineTolerance: 1 })
-          .once(eventName, device => {
-            expect(device).to.be.an.instanceof(et.type);
-            client.stopDiscovery();
-            done();
-          });
+        return new Promise((resolve) => {
+          client
+            .startDiscovery({ discoveryInterval: 100, offlineTolerance: 1 })
+            .once(eventName, (device) => {
+              expect(device).to.be.an.instanceof(et.type);
+              client.stopDiscovery();
+              // done();
+              resolve();
+            });
+        });
       });
     });
 
-    it('should timeout with timeout set', function(done) {
-      this.timeout(1000);
+    it('should timeout with timeout set', function (done) {
       this.slow(100);
       client.startDiscovery({ discoveryInterval: 0, discoveryTimeout: 1 });
       setTimeout(() => {
@@ -225,7 +242,7 @@ describe('Client', function() {
       }, 50);
     });
 
-    it('should emit discovery-invalid for the unreliable test device', function(done) {
+    it('should emit discovery-invalid for the unreliable test device', function (done) {
       const device = testDevices.unreliable;
       if (!device.deviceOptions || !device.deviceOptions.port) this.skip();
 
@@ -242,7 +259,7 @@ describe('Client', function() {
         });
     });
 
-    it('should emit device-new for each child for devices with children and breakoutChildren is true', function(done) {
+    it('should emit device-new for each child for devices with children and breakoutChildren is true', function (done) {
       const devices = {};
       client
         .startDiscovery({
@@ -250,7 +267,7 @@ describe('Client', function() {
           deviceTypes: ['plug'],
           breakoutChildren: true,
         })
-        .on('device-new', device => {
+        .on('device-new', (device) => {
           if (device.model.match(/^HS300/)) {
             expect(device.children).to.have.property('size', 6);
             expect(device.sysInfo.children).to.have.lengthOf(
@@ -274,7 +291,7 @@ describe('Client', function() {
         });
     });
 
-    it('should emit device-new for only the device and not each child for devices with children and breakoutChildren is false', function(done) {
+    it('should emit device-new for only the device and not each child for devices with children and breakoutChildren is false', function (done) {
       const devices = {};
       client
         .startDiscovery({
@@ -282,7 +299,7 @@ describe('Client', function() {
           deviceTypes: ['plug'],
           breakoutChildren: false,
         })
-        .on('device-new', device => {
+        .on('device-new', (device) => {
           if (device.model.match(/^HS300/)) {
             expect(device.children).to.have.property('size', 6);
             expect(device.sysInfo.children).to.have.lengthOf(
@@ -299,31 +316,29 @@ describe('Client', function() {
     });
   });
 
-  testSendOptionsSets.forEach(sendOptions => {
-    context(sendOptions.name, function() {
-      describe('#getDevice()', function() {
-        this.timeout(2000);
-        this.slow(1500);
+  config.testSendOptionsSets.forEach((sendOptions) => {
+    context(sendOptions.name, function () {
+      describe('#getDevice()', function () {
         let client;
         let device;
 
-        before(async function() {
+        before(async function () {
           client = getTestClient(sendOptions);
           device = await client.getDevice(testDevices.anyDevice.deviceOptions);
         });
 
-        after(function() {
+        after(function () {
           device.closeConnection();
         });
 
-        it('should find a device by IP address', function() {
+        it('should find a device by IP address', function () {
           return expect(device.getSysInfo()).to.eventually.have.property(
             'err_code',
             0
           );
         });
 
-        it('should be rejected with an invalid IP address', async function() {
+        it('should be rejected with an invalid IP address', async function () {
           let error;
           const { deviceOptions } = testDevices.unreachable;
           try {
@@ -338,66 +353,94 @@ describe('Client', function() {
         });
       });
 
-      describe('#getPlug()', function() {
-        this.timeout(2000);
-        this.slow(1500);
+      describe('#getPlug()', function () {
+        let skipped = false;
         let client;
         let plug;
         let unreachablePlug;
+        let sysInfo;
 
-        before(function() {
+        before(async function () {
+          if (!('getDevice' in testDevices.anyPlug)) {
+            skipped = true;
+            this.skip();
+          }
+
           client = getTestClient(sendOptions);
-          plug = client.getPlug(testDevices.anyPlug.deviceOptions);
-          unreachablePlug = client.getPlug(
-            testDevices.unreachable.deviceOptions
-          );
+          const { host, port } = testDevices.anyPlug.deviceOptions;
+          sysInfo = await client.getSysInfo(host, port);
+
+          plug = client.getPlug({
+            ...testDevices.anyPlug.deviceOptions,
+            sysInfo,
+          });
+
+          unreachablePlug = client.getPlug({
+            ...testDevices.unreachable.deviceOptions,
+            sysInfo,
+          });
         });
 
-        after(function() {
+        after(function () {
+          if (skipped) return;
           plug.closeConnection();
         });
 
-        it('should find a plug by IP address', function() {
+        it('should find a plug by IP address', function () {
           return expect(plug.getSysInfo()).to.eventually.have.property(
             'err_code',
             0
           );
         });
 
-        it('should be rejected with an invalid IP address', function() {
+        it('should be rejected with an invalid IP address', function () {
           return expect(
             unreachablePlug.getSysInfo({ timeout: 500 })
           ).to.eventually.be.rejected;
         });
       });
 
-      describe('#getBulb()', function() {
-        this.timeout(2000);
-        this.slow(1500);
+      describe('#getBulb()', function () {
+        let skipped = false;
         let client;
         let bulb;
         let unreachableBulb;
+        let sysInfo;
 
-        before(function() {
+        before(async function () {
+          if (!('getDevice' in testDevices.anyBulb)) {
+            skipped = true;
+            this.skip();
+          }
+
           client = getTestClient(sendOptions);
-          bulb = client.getBulb(testDevices.anyBulb.deviceOptions);
-          unreachableBulb = client.getBulb(
-            testDevices.unreachable.deviceOptions
-          );
+
+          const { host, port } = testDevices.anyBulb.deviceOptions;
+          sysInfo = await client.getSysInfo(host, port);
+
+          bulb = await client.getBulb({
+            ...testDevices.anyBulb.deviceOptions,
+            sysInfo,
+          });
+          unreachableBulb = client.getBulb({
+            ...testDevices.unreachable.deviceOptions,
+            sysInfo,
+          });
         });
 
-        after(function() {
+        after(function () {
+          if (skipped) return;
           bulb.closeConnection();
         });
 
-        it('should find a bulb by IP address', function() {
+        it('should find a bulb by IP address', function () {
           return expect(bulb.getSysInfo()).to.eventually.have.property(
             'err_code',
             0
           );
         });
 
-        it('should be rejected with an invalid IP address', function() {
+        it('should be rejected with an invalid IP address', function () {
           return expect(
             unreachableBulb.getSysInfo({ timeout: 500 })
           ).to.eventually.be.rejected;
@@ -405,39 +448,37 @@ describe('Client', function() {
       });
     });
 
-    describe('.send()', function() {
+    describe('.send()', function () {
       let client;
       let options;
-      before(function() {
+      before(function () {
         client = getTestClient(sendOptions);
         options = testDevices.anyDevice.deviceOptions;
       });
-      ['tcp', 'udp'].forEach(transport => {
-        it(`should return info with string payload ${transport}`, function() {
+      ['tcp', 'udp'].forEach((transport) => {
+        it(`should return info with string payload ${transport}`, async function () {
           return expect(
-            client.send(
-              '{"system":{"get_sysinfo":{}}}',
-              options.host,
-              options.port,
-              { sendOptions: { transport } }
+            JSON.parse(
+              await client.send(
+                '{"system":{"get_sysinfo":{}}}',
+                options.host,
+                options.port,
+                { sendOptions: { transport } }
+              )
             )
-          ).to.eventually.have.nested.property(
-            'system.get_sysinfo.err_code',
-            0
-          );
+          ).to.have.nested.property('system.get_sysinfo.err_code', 0);
         });
-        it(`should return info with object payload${sendOptions.transport}`, function() {
+        it(`should return info with object payload ${sendOptions.transport}`, async function () {
           return expect(
-            client.send(
-              { system: { get_sysinfo: {} } },
-              options.host,
-              options.port,
-              { sendOptions: { transport } }
+            JSON.parse(
+              await client.send(
+                { system: { get_sysinfo: {} } },
+                options.host,
+                options.port,
+                { sendOptions: { transport } }
+              )
             )
-          ).to.eventually.have.nested.property(
-            'system.get_sysinfo.err_code',
-            0
-          );
+          ).to.have.nested.property('system.get_sysinfo.err_code', 0);
         });
       });
     });

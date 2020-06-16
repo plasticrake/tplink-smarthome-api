@@ -1,19 +1,16 @@
-const { expect } = require('../setup');
+const { config, expect } = require('../setup');
 
-module.exports = function() {
-  describe('Netif', function() {
-    this.timeout(5000);
-    this.slow(2000);
-
-    describe('#getScanInfo()', function() {
-      it('should return scan info', function() {
-        this.timeout(10000);
-        this.slow(6000);
+module.exports = function () {
+  describe('Netif', function () {
+    describe('#getScanInfo() @slow', function () {
+      it('should return scan info', function () {
+        this.timeout(config.defaultTestTimeout * 4);
+        this.slow(config.defaultTestTimeout * 2);
         return expect(
           this.device.netif.getScanInfo(true, 2)
         ).to.eventually.have.property('err_code', 0);
       });
-      it('should return cached scan info', function() {
+      it('should return cached scan info', function () {
         return expect(
           this.device.netif.getScanInfo(false)
         ).to.eventually.have.property('err_code', 0);
