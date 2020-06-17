@@ -18,14 +18,14 @@ class Schedule {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async getNextAction(sendOptions) {
-    this.nextaction = this.device.sendCommand(
+    this.nextAction = this.device.sendCommand(
       {
         [this.apiModuleName]: { get_next_action: {} },
       },
       this.childId,
       sendOptions
     );
-    return this.nextaction;
+    return this.nextAction;
   }
 
   /**
@@ -55,7 +55,7 @@ class Schedule {
    */
   async getRule(id, sendOptions) {
     const rules = await this.getRules(sendOptions);
-    const rule = rules.rule_list.find(r => r.id === id);
+    const rule = rules.rule_list.find((r) => r.id === id);
     if (rule) {
       rule.err_code = rules.err_code;
     }
