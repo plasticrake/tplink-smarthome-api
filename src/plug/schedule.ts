@@ -1,12 +1,23 @@
-/* eslint camelcase: ["off"] */
+import Schedule, { createScheduleRule } from '../shared/schedule';
+import type { ScheduleRule, ScheduleRuleInputTime } from '../shared/schedule';
+import type { SendOptions } from '../client';
 
-const Schedule = require('../shared/schedule');
-const { createScheduleRule } = require('../utils');
+type PlugScheduleRule = Omit<ScheduleRule, 'emin'> & {
+  sact?: number;
+  s_dimmer?: {};
+  emin: 0;
+};
 
-/**
- * PlugSchedule
- */
-class PlugSchedule extends Schedule {
+export type PlugScheduleRuleInput = {
+  powerState: boolean;
+  dimmer?: {};
+  start: ScheduleRuleInputTime;
+  daysOfWeek?: number[];
+  name?: string;
+  enable: boolean;
+};
+
+export default class PlugSchedule extends Schedule {
   /**
    * Adds Schedule rule.
    *
@@ -22,10 +33,17 @@ class PlugSchedule extends Schedule {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async addRule(
-    { powerState, dimmer, start, daysOfWeek, name = '', enable = true },
-    sendOptions
-  ) {
-    const rule = {
+    {
+      powerState,
+      dimmer,
+      start,
+      daysOfWeek,
+      name = '',
+      enable = true,
+    }: PlugScheduleRuleInput,
+    sendOptions?: SendOptions
+  ): ReturnType<Schedule['addRule']> {
+    const rule: PlugScheduleRule = {
       sact: powerState ? 1 : 0,
       name,
       enable: enable ? 1 : 0,
@@ -58,10 +76,18 @@ class PlugSchedule extends Schedule {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async editRule(
-    { id, powerState, dimmer, start, daysOfWeek, name = '', enable = true },
-    sendOptions
-  ) {
-    const rule = {
+    {
+      id,
+      powerState,
+      dimmer,
+      start,
+      daysOfWeek,
+      name = '',
+      enable = true,
+    }: PlugScheduleRuleInput & { id: string },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
+    const rule: PlugScheduleRule & { id: string } = {
       id,
       sact: powerState ? 1 : 0,
       name,
@@ -79,5 +105,3 @@ class PlugSchedule extends Schedule {
     return Schedule.prototype.editRule.call(this, rule, sendOptions); // super.editRule(rule); // workaround babel bug
   }
 }
-
-module.exports = PlugSchedule;

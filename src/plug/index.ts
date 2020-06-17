@@ -13,7 +13,13 @@ import Emeter from '../shared/emeter';
 import Schedule from './schedule';
 import Timer from './timer';
 import Time from '../shared/time';
-import { isObjectLike, ResponseError, extractResponse } from '../utils';
+import {
+  isObjectLike,
+  ResponseError,
+  extractResponse,
+  HasErrCode,
+  hasErrCode,
+} from '../utils';
 
 // type PlugGetInfo = {
 //   emeter: { get_realtime: {} };
@@ -482,8 +488,8 @@ export default class Plug extends Device {
     const scheduleNextAction = extractResponse(
       data,
       'schedule.get_next_action',
-      isObjectLike
-    ) as object;
+      hasErrCode
+    ) as HasErrCode;
     this.schedule.nextAction = scheduleNextAction;
 
     return {

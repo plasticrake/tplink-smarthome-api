@@ -1,11 +1,9 @@
-/**
- * Netif
- */
-class Netif {
-  constructor(device, apiModuleName) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
-  }
+import clone from 'lodash.clone';
+import type { SendOptions } from '../client';
+import type Device from '.';
+
+export default class Netif {
+  constructor(readonly device: Device, readonly apiModuleName: string) {}
 
   /**
    * Requests `netif.get_scaninfo` (list of WiFi networks).
@@ -13,15 +11,20 @@ class Netif {
    * Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
    * The network timeout for the request is calculated by adding the
    * default network timeout to `timeoutInSeconds`.
-   * @param  {Boolean}     [refresh=false]       request device's cached results
-   * @param  {number}      [timeoutInSeconds=10] timeout for scan in seconds
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param  refresh - request device's cached results. default: false
+   * @param  timeoutInSeconds - timeout for scan in seconds. default: 10
+   * @param  sendOptions
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getScanInfo(refresh = false, timeoutInSeconds = 10, sendOptions = {}) {
-    if (sendOptions.timeout == null) {
-      // eslint-disable-next-line no-param-reassign
-      sendOptions.timeout =
+  async getScanInfo(
+    refresh = false,
+    timeoutInSeconds = 10,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
+    const sendOptionsWithTimeout = clone(sendOptions || {});
+    if (sendOptionsWithTimeout.timeout == null) {
+      sendOptionsWithTimeout.timeout =
         timeoutInSeconds * 1000 * 2 +
         (this.device.defaultSendOptions.timeout || 5000);
     }
@@ -34,10 +37,8 @@ class Netif {
           },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
 }
-
-module.exports = Netif;
