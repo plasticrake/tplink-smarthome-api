@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import castArray from 'lodash.castarray';
 import get from 'lodash.get';
 
@@ -36,95 +34,13 @@ export class ResponseError extends Error {
   }
 }
 
-type ScheduleDateStart = {
-  smin: number;
-  stime_opt: number;
+export type HasErrCode = {
+  err_code: number;
+  err_msg?: string;
 };
 
-type ScheduleDateEnd = {
-  emin: number;
-  etime_opt: number;
-};
-
-type ScheduleDate = ScheduleDateStart | ScheduleDateEnd;
-
-type DaysOfWeek = number[];
-
-type WDay = [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
-
-type ScheduleRule = {
-  day?: number;
-  month?: number;
-  year?: number;
-  wday?: WDay;
-  repeat?: boolean;
-};
-
-type ScheduleRuleTime = Date | number | 'sunrise' | 'sunset';
-
-function createScheduleDate(
-  date: ScheduleRuleTime,
-  startOrEnd: 'start' | 'end'
-): ScheduleDate {
-  let min = 0;
-  let time_opt = 0;
-
-  if (date instanceof Date) {
-    min = date.getHours() * 60 + date.getMinutes();
-  } else if (typeof date === 'number') {
-    min = date;
-  } else if (date === 'sunrise') {
-    min = 0;
-    time_opt = 1;
-  } else if (date === 'sunset') {
-    min = 0;
-    time_opt = 2;
-  }
-
-  if (startOrEnd === 'end') {
-    return { emin: min, etime_opt: time_opt };
-  }
-  return { smin: min, stime_opt: time_opt };
-}
-
-function createWday(daysOfWeek: DaysOfWeek): WDay {
-  const wday: WDay = [false, false, false, false, false, false, false];
-  daysOfWeek.forEach((dw) => {
-    wday[dw] = true;
-  });
-  return wday;
-}
-
-export function createScheduleRule({
-  start,
-  end,
-  daysOfWeek,
-}: {
-  start: ScheduleRuleTime;
-  end?: ScheduleRuleTime;
-  daysOfWeek?: DaysOfWeek;
-}): ScheduleRule {
-  const sched: ScheduleRule = {};
-
-  Object.assign(sched, createScheduleDate(start, 'start'));
-  if (end !== undefined) {
-    Object.assign(sched, createScheduleDate(end, 'end'));
-  }
-
-  if (daysOfWeek !== undefined && daysOfWeek.length > 0) {
-    sched.wday = createWday(daysOfWeek);
-    sched.repeat = true;
-  } else {
-    const date = start instanceof Date ? start : new Date();
-    sched.day = date.getDate();
-    sched.month = date.getMonth() + 1;
-    sched.year = date.getFullYear();
-    sched.wday = [false, false, false, false, false, false, false];
-    sched.wday[date.getDay()] = true;
-    sched.repeat = false;
-  }
-
-  return sched;
+export function hasErrCode(candidate: unknown): candidate is HasErrCode {
+  return isObjectLike(candidate) && typeof candidate.err_code === 'number';
 }
 
 export function normalizeMac(mac = ''): string {
@@ -192,10 +108,6 @@ function flattenResponses(
   return results;
 }
 
-function hasErrCode(candidate: unknown): candidate is { err_code: unknown } {
-  return isObjectLike(candidate) && 'err_code' in candidate;
-}
-
 /**
  *
  * @param command
@@ -203,7 +115,7 @@ function hasErrCode(candidate: unknown): candidate is { err_code: unknown } {
  * @returns
  * @throws {ResponseError}
  */
-export function processResponse(command: object, response: object): unknown {
+export function processResponse(command: object, response: object): object {
   const multipleResponses = Object.keys(response).length > 1;
   const commandResponses = flattenResponses(command, response);
 
@@ -286,7 +198,7 @@ export function extractResponse(
   }
   if (!typeGuardFn(ret))
     throw new TypeError(
-      `Unexpected object path:${path} in ${JSON.stringify(response)}`
+      `Unexpected object path:"${path}" in ${JSON.stringify(response)}`
     );
   return ret;
 }

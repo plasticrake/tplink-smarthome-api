@@ -1,27 +1,61 @@
-/* eslint camelcase: ["off"] */
+/* eslint-disable @typescript-eslint/camelcase */
+import isEqual from 'lodash.isequal';
+import type { SendOptions } from '../client';
+import type Bulb from '.';
+import { extractResponse, isObjectLike, hasErrCode } from '../utils';
 
-const isEqual = require('lodash.isequal');
+export type LightState = {
+  transition_period?: number;
+  on_off?: 0 | 1;
+  mode?: string;
+  hue?: number;
+  saturation?: number;
+  brightness?: number;
+  color_temp?: number;
+  ignore_default?: 0 | 1;
+  dft_on_state?: {
+    mode?: string;
+    hue?: number;
+    saturation?: number;
+    color_temp?: number;
+    brightness?: number;
+  };
+};
 
-/**
- * Lighting
- */
-class Lighting {
-  lastState;
+export type LightStateInput = Omit<LightState, 'on_off' | 'ignore_default'> & {
+  on_off?: boolean | 0 | 1;
+  ignore_default?: boolean | 0 | 1;
+};
 
-  #lightState = {};
+export type LightStateResponse = LightState & {
+  err_code: number;
+};
 
-  constructor(device, apiModuleName) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
+export function isLightState(candidate: unknown): candidate is LightState {
+  return isObjectLike(candidate);
+}
 
-    this.lastState = { powerOn: null, lightState: null };
-  }
+export function isLightStateResponse(
+  candidate: unknown
+): candidate is LightStateResponse {
+  return isObjectLike(candidate) && hasErrCode(candidate);
+}
+
+export default class Lighting {
+  lastState: { powerOn?: boolean; lightState?: {} } = {
+    powerOn: undefined,
+    lightState: undefined,
+  };
+
+  #lightState: LightState = {};
+
+  constructor(readonly device: Bulb, readonly apiModuleName: string) {}
 
   /**
    * Returns cached results from last retrieval of `lightingservice.get_light_state`.
    * @return {Object}
    */
-  get lightState() {
+  get lightState(): LightState {
     return this.#lightState;
   }
 
@@ -53,10 +87,7 @@ class Lighting {
    * @event Bulb#lightstate-update
    * @property {Object} value lightstate
    */
-  /**
-   * @private
-   */
-  emitEvents() {
+  private emitEvents(): void {
     if (!this.#lightState) return;
     const powerOn = this.#lightState.on_off === 1;
 
@@ -83,14 +114,19 @@ class Lighting {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getLightState(sendOptions) {
-    this.lightState = await this.device.sendCommand(
-      {
-        [this.apiModuleName]: { get_light_state: {} },
-      },
-      null,
-      sendOptions
-    );
+  async getLightState(sendOptions?: SendOptions): Promise<LightState> {
+    this.lightState = extractResponse(
+      await this.device.sendCommand(
+        {
+          [this.apiModuleName]: { get_light_state: {} },
+        },
+        undefined,
+        sendOptions
+      ),
+      '',
+      isLightStateResponse
+    ) as LightStateResponse;
+
     return this.lightState;
   }
 
@@ -98,17 +134,16 @@ class Lighting {
    * Sets Bulb light state (on/off, brightness, color, etc).
    *
    * Sends `lightingservice.transition_light_state` command.
-   * @param  {Object}       options
-   * @param  {number}      [options.transition_period] (ms)
-   * @param  {boolean}     [options.on_off]
-   * @param  {string}      [options.mode]
-   * @param  {number}      [options.hue]               0-360
-   * @param  {number}      [options.saturation]        0-100
-   * @param  {number}      [options.brightness]        0-100
-   * @param  {number}      [options.color_temp]        Kelvin (LB120:2700-6500 LB130:2500-9000)
-   * @param  {boolean}     [options.ignore_default=true]
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @param  options
+   * @param  options.transition_period (ms)
+   * @param  options.on_off
+   * @param  options.mode
+   * @param  options.hue               0-360
+   * @param  options.saturation        0-100
+   * @param  options.brightness        0-100
+   * @param  options.color_temp        Kelvin (LB120:2700-6500 LB130:2500-9000)
+   * @param  options.ignore_default    default: true
+   * @param  sendOptions
    */
   async setLightState(
     {
@@ -120,10 +155,10 @@ class Lighting {
       brightness,
       color_temp,
       ignore_default = true,
-    },
-    sendOptions
-  ) {
-    const state = {};
+    }: LightStateInput,
+    sendOptions?: SendOptions
+  ): Promise<true> {
+    const state: LightState = {};
     if (ignore_default !== undefined)
       state.ignore_default = ignore_default ? 1 : 0;
     if (transition_period !== undefined)
@@ -135,15 +170,17 @@ class Lighting {
     if (brightness !== undefined) state.brightness = brightness;
     if (color_temp !== undefined) state.color_temp = color_temp;
 
-    this.lightState = await this.device.sendCommand(
-      {
-        [this.apiModuleName]: { transition_light_state: state },
-      },
-      null,
-      sendOptions
-    );
+    this.lightState = extractResponse(
+      await this.device.sendCommand(
+        {
+          [this.apiModuleName]: { transition_light_state: state },
+        },
+        undefined,
+        sendOptions
+      ),
+      '',
+      isLightStateResponse
+    ) as LightStateResponse;
     return true;
   }
 }
-
-module.exports = Lighting;

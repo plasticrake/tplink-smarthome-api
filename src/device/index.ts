@@ -109,7 +109,7 @@ export default abstract class Device extends EventEmitter {
 
   protected log: Logger;
 
-  private defaultSendOptions: SendOptions;
+  readonly defaultSendOptions: SendOptions;
 
   private readonly udpConnection = new UdpConnection(this);
 

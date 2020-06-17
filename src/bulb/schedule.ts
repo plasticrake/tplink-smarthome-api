@@ -1,12 +1,26 @@
 /* eslint camelcase: ["off"] */
 
-const Schedule = require('../shared/schedule');
-const { createScheduleRule } = require('../utils');
+import Schedule, { createScheduleRule, ScheduleRule } from '../shared/schedule';
+import type { ScheduleRuleInputTime } from '../shared/schedule';
+import type { LightState } from './lighting';
+import type { SendOptions } from '../client';
 
-/**
- * BulbSchedule
- */
-class BulbSchedule extends Schedule {
+type BulbScheduleRule = Omit<ScheduleRule, 'emin'> & {
+  s_light: LightState;
+  sact: 2;
+  emin: -1;
+  etime_opt: -1;
+};
+
+export type BulbScheduleRuleInput = {
+  lightState: LightState;
+  start: ScheduleRuleInputTime;
+  daysOfWeek?: number[];
+  name: string;
+  enable: boolean;
+};
+
+export default class BulbSchedule extends Schedule {
   /**
    * Adds Schedule rule.
    *
@@ -21,10 +35,16 @@ class BulbSchedule extends Schedule {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async addRule(
-    { lightState, start, daysOfWeek, name = '', enable = true },
-    sendOptions
-  ) {
-    const rule = {
+    {
+      lightState,
+      start,
+      daysOfWeek,
+      name = '',
+      enable = true,
+    }: BulbScheduleRuleInput,
+    sendOptions: SendOptions
+  ): Promise<{ id: string }> {
+    const rule: BulbScheduleRule = {
       s_light: lightState,
       name,
       enable: enable ? 1 : 0,
@@ -34,7 +54,7 @@ class BulbSchedule extends Schedule {
       ...createScheduleRule({ start, daysOfWeek }),
     };
 
-    return Schedule.prototype.addRule.call(this, rule, null, sendOptions); // super.addRule(rule); // workaround babel bug
+    return Schedule.prototype.addRule.call(this, rule, sendOptions); // super.addRule(rule); // workaround babel bug
   }
 
   /**
@@ -51,9 +71,16 @@ class BulbSchedule extends Schedule {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async editRule(
-    { id, lightState, start, daysOfWeek, name = '', enable = true },
-    sendOptions
-  ) {
+    {
+      id,
+      lightState,
+      start,
+      daysOfWeek,
+      name = '',
+      enable = true,
+    }: BulbScheduleRuleInput & { id: string },
+    sendOptions: SendOptions
+  ): Promise<unknown> {
     const rule = {
       id,
       s_light: lightState,
@@ -65,8 +92,6 @@ class BulbSchedule extends Schedule {
       ...createScheduleRule({ start, daysOfWeek }),
     };
 
-    return Schedule.prototype.editRule.call(this, rule, null, sendOptions); // super.addRule(rule); // workaround babel bug
+    return Schedule.prototype.editRule.call(this, rule, sendOptions); // super.addRule(rule); // workaround babel bug
   }
 }
-
-module.exports = BulbSchedule;
