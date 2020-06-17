@@ -161,7 +161,7 @@ const testDevicesPartial: Partial<TestDevices> = {
 
 Object.entries(groupBy(testDevicesPartial.devices, 'deviceType')).forEach(
   ([key, value]) => {
-    testDevicesPartial[key] = value;
+    testDevicesPartial[key as 'bulb' | 'plug'] = value;
   }
 );
 
@@ -258,7 +258,7 @@ export async function testDeviceCleanup(): Promise<void> {
   }
 
   function testDeviceOut(
-    td: TestDevice,
+    td: TestDevice | undefined,
     description: string
   ): {
     description: string;
@@ -294,9 +294,10 @@ export async function testDeviceCleanup(): Promise<void> {
 
   console.table(
     Object.entries(testDevices)
-      .reduce((acc, [key, val]) => {
+      .reduce((acc: [string, TestDevice | undefined][], [key, val]) => {
         if (Array.isArray(val)) {
-          val.map((v) => [`${key}[]`, v]).forEach((a) => acc.push(a));
+          const d = val.map((v) => [`${key}[]`, v]) as [string, TestDevice][];
+          d.forEach((a) => acc.push(a));
         } else {
           acc.push([key, val]);
         }

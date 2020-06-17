@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
 import castArray from 'lodash.castarray';
+import get from 'lodash.get';
+
+export function isObjectLike(
+  candidate: unknown
+): candidate is Record<string, unknown> {
+  return typeof candidate === 'object' && candidate !== null;
+}
 
 /**
  * Represents an error result received from a TP-Link device.
@@ -55,12 +62,6 @@ type ScheduleRule = {
 
 type ScheduleRuleTime = Date | number | 'sunrise' | 'sunset';
 
-export function isObjectLike(
-  candidate: unknown
-): candidate is Record<string, unknown> {
-  return typeof candidate === 'object' && candidate !== null;
-}
-
 function createScheduleDate(
   date: ScheduleRuleTime,
   startOrEnd: 'start' | 'end'
@@ -88,7 +89,7 @@ function createScheduleDate(
 
 function createWday(daysOfWeek: DaysOfWeek): WDay {
   const wday: WDay = [false, false, false, false, false, false, false];
-  daysOfWeek.forEach(dw => {
+  daysOfWeek.forEach((dw) => {
     wday[dw] = true;
   });
   return wday;
@@ -131,7 +132,7 @@ export function normalizeMac(mac = ''): string {
 }
 
 export function compareMac(mac = '', macPattern: string | string[]): boolean {
-  const macPatterns = castArray(macPattern).map(p => {
+  const macPatterns = castArray(macPattern).map((p) => {
     return new RegExp(
       `^${p
         .replace(/[^A-Za-z0-9?*]/g, '')
@@ -141,7 +142,7 @@ export function compareMac(mac = '', macPattern: string | string[]): boolean {
     );
   });
   const normalizedMac = normalizeMac(mac);
-  return macPatterns.findIndex(p => p.test(normalizedMac)) !== -1;
+  return macPatterns.findIndex((p) => p.test(normalizedMac)) !== -1;
 }
 
 export function replaceControlCharacters(
@@ -149,4 +150,143 @@ export function replaceControlCharacters(
   replace = '﹖'
 ): string {
   return input.replace(/[\x00-\x1F]/g, replace); // eslint-disable-line no-control-regex
+}
+
+function flattenResponses(
+  command: object,
+  response: object,
+  depth = 0,
+  module = '',
+  results: Array<{ module: string; method?: string; response: object }> = []
+): Array<{ module: string; method?: string; response: object }> {
+  const keys = Object.keys(command);
+  if (keys.length === 0) {
+    // results.push(response);
+  } else if (isObjectLike(command) && isObjectLike(response)) {
+    for (let i = 0; i < keys.length; i += 1) {
+      const key = keys[i];
+      if (depth === 1) {
+        if (key in response && isObjectLike(response[key])) {
+          results.push({
+            module,
+            method: key,
+            response: response[key] as object,
+          });
+        } else {
+          results.push({ module, response });
+          return results;
+        }
+      } else if (depth < 1) {
+        if (response[key] !== undefined) {
+          flattenResponses(
+            command[key] as object,
+            response[key] as object,
+            depth + 1,
+            key,
+            results
+          );
+        }
+      }
+    }
+  }
+  return results;
+}
+
+function hasErrCode(candidate: unknown): candidate is { err_code: unknown } {
+  return isObjectLike(candidate) && 'err_code' in candidate;
+}
+
+/**
+ *
+ * @param command
+ * @param response
+ * @returns
+ * @throws {ResponseError}
+ */
+export function processResponse(command: object, response: object): unknown {
+  const multipleResponses = Object.keys(response).length > 1;
+  const commandResponses = flattenResponses(command, response);
+
+  const errors: Array<{
+    msg: string;
+    response: object;
+    module: string;
+    method?: string;
+  }> = [];
+
+  commandResponses.forEach((r) => {
+    const res = r.response;
+    if (hasErrCode(res)) {
+      if (res.err_code !== 0) {
+        errors.push({
+          msg: 'err_code not zero',
+          response: res,
+          module: r.module,
+          method:
+            r.method !== undefined ? `${r.module}.${r.method}` : undefined,
+        });
+      }
+    } else {
+      errors.push({
+        msg: 'err_code missing',
+        response: res,
+        module: r.module,
+        method: r.method !== undefined ? `${r.module}.${r.method}` : undefined,
+      });
+    }
+  });
+
+  if (errors.length === 1 && !multipleResponses) {
+    throw new ResponseError(
+      errors[0].msg,
+      JSON.stringify(errors[0].response),
+      JSON.stringify(command),
+      [errors[0].module],
+      errors[0].method === undefined ? undefined : [errors[0].method]
+    );
+  } else if (errors.length > 0) {
+    throw new ResponseError(
+      'err_code',
+      JSON.stringify(response),
+      JSON.stringify(command),
+      errors.map((e) => e.module),
+      errors
+        .filter((e) => e.method !== undefined)
+        .map((e) => e.method as string)
+    );
+  }
+
+  if (commandResponses.length === 1) {
+    return commandResponses[0].response;
+  }
+  return response;
+}
+
+/**
+ * Extract `path` from `response` (from `Client#sendCommand`) and run `typeGuardFn`
+ *
+ * @param response
+ * @param path passed to `lodash.get`
+ * @param typeGuardFn
+ * @returns value of `path` in `response`
+ * @throws Error
+ * @throws TypeError
+ */
+export function extractResponse(
+  response: unknown,
+  path: string,
+  typeGuardFn: (arg0: unknown) => boolean
+): object {
+  const ret = path.length > 0 ? get(response, path) : response;
+
+  if (ret === undefined || !isObjectLike(ret)) {
+    throw new Error(
+      `Could not find path:"${path}" in ${JSON.stringify(response)}`
+    );
+  }
+  if (!typeGuardFn(ret))
+    throw new TypeError(
+      `Unexpected object path:${path} in ${JSON.stringify(response)}`
+    );
+  return ret;
 }

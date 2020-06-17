@@ -1,13 +1,15 @@
-import { encrypt, decrypt } from 'tplink-smarthome-crypto';
-import type { DeepRequired, MarkOptional } from 'ts-essentials';
-import type log from 'loglevel';
-
 import { Socket, createSocket } from 'dgram';
 import { EventEmitter } from 'events';
+import util from 'util';
 
-import Device from './device';
-import Plug from './plug';
+import type log from 'loglevel';
+import { encrypt, decrypt } from 'tplink-smarthome-crypto';
+import type { DeepRequired, MarkOptional } from 'ts-essentials';
+
+import Device, { isBulbSysinfo, isPlugSysinfo } from './device';
+import type { Sysinfo } from './device';
 import Bulb from './bulb';
+import Plug, { hasSysinfoChildren } from './plug';
 import createLogger from './logger';
 import type { Logger } from './logger';
 import TcpConnection from './network/tcp-connection';
@@ -18,8 +20,10 @@ const discoveryMsgBuf = encrypt(
   '{"system":{"get_sysinfo":{}},"emeter":{"get_realtime":{}},"smartlife.iot.common.emeter":{"get_realtime":{}}}'
 );
 
+export type AnyDevice = Bulb | Plug;
+
 type DeviceDiscovery = { status: string; seenOnDiscovery: number };
-type AnyDevice = (Plug | Bulb) & Partial<DeviceDiscovery>;
+type AnyDeviceDiscovery = (Bulb | Plug) & Partial<DeviceDiscovery>;
 
 type SysinfoResponse = { system: { get_sysinfo: Sysinfo } };
 type EmeterResponse = PlugEmeterResponse | BulbEmeterResponse;
@@ -47,43 +51,17 @@ type EmeterRealtimeV2 = {
   total_wh: number;
 };
 
-type DeviceOptions = {
-  host: string;
-  port?: number;
-  client: Client;
-  defaultSendOptions?: SendOptions;
-};
+type AnyDeviceOptions =
+  | ConstructorParameters<typeof Bulb>[0]
+  | ConstructorParameters<typeof Plug>[0];
 
-type BulbDeviceOptions = DeviceOptions;
-type PlugDeviceOptions = {
-  host: string;
-  port?: number;
-  client: Client;
-  defaultSendOptions?: SendOptions;
-  inUseThreshold?: number;
-  childId?: string;
-};
-type AnyDeviceOptions = BulbDeviceOptions | PlugDeviceOptions;
-
-type SysinfoType =
-  | 'IOT.SMARTPLUGSWITCH'
-  | 'IOT.SMARTBULB'
-  | 'IOT.RANGEEXTENDER.SMARTPLUG';
-type CommonSysinfo = { type: SysinfoType; alias: string; deviceId: string };
-type BulbSysinfo = CommonSysinfo & {
-  mic_type: 'IOT.SMARTBULB';
-  mic_mac: string;
-};
-type SysinfoChildren = { children?: [{ id: string }] };
-type PlugSysinfo = CommonSysinfo &
-  SysinfoChildren &
-  ({ type: 'IOT.SMARTPLUGSWITCH' } | { type: 'IOT.RANGEEXTENDER.SMARTPLUG' }) &
-  ({ mac: string } | { ethernet_mac: string });
-type Sysinfo = BulbSysinfo | PlugSysinfo;
+type AnyDeviceOptionsCon =
+  | MarkOptional<ConstructorParameters<typeof Plug>[0], 'client' | 'sysInfo'>
+  | MarkOptional<ConstructorParameters<typeof Bulb>[0], 'client' | 'sysInfo'>;
 
 type DiscoveryDevice = { host: string; port?: number };
 
-function hasSysinfoResponse(candidate: unknown): candidate is SysinfoResponse {
+function isSysinfoResponse(candidate: unknown): candidate is SysinfoResponse {
   return (
     isObjectLike(candidate) &&
     'system' in candidate &&
@@ -121,20 +99,6 @@ function hasBulbEmeterResponse(
   );
 }
 
-function hasSysinfoChildren(
-  candidate: Sysinfo
-): candidate is Sysinfo & Required<SysinfoChildren> {
-  return (
-    isObjectLike(candidate) &&
-    'children' in candidate &&
-    candidate.children !== undefined &&
-    candidate.children.length > 0
-  );
-}
-
-/**
- * @internal
- */
 function parseEmeter(response: DiscoveryResponse): EmeterRealtime | null {
   if (hasPlugEmeterResponse(response)) {
     if (response.emeter.get_realtime.err_code === 0) {
@@ -158,11 +122,11 @@ function parseEmeter(response: DiscoveryResponse): EmeterRealtime | null {
  * @typeParam useSharedSocket - attempt to reuse a shared socket if available, UDP only
  * @typeParam sharedSocketTimeout - (ms) how long to wait for another send before closing a shared socket. 0 = never automatically close socket
  */
-type SendOptions = {
-  timeout: number;
-  transport: 'tcp' | 'udp';
-  useSharedSocket: boolean;
-  sharedSocketTimeout: number;
+export type SendOptions = {
+  timeout?: number;
+  transport?: 'tcp' | 'udp';
+  useSharedSocket?: boolean;
+  sharedSocketTimeout?: number;
 };
 
 /**
@@ -171,7 +135,7 @@ type SendOptions = {
  * - Events are emitted after {@link #startDiscovery} is called.
  */
 export default class Client extends EventEmitter {
-  defaultSendOptions: SendOptions = {
+  defaultSendOptions: Required<SendOptions> = {
     timeout: 10000,
     transport: 'tcp',
     useSharedSocket: false,
@@ -180,7 +144,7 @@ export default class Client extends EventEmitter {
 
   log: log.RootLogger;
 
-  devices: Map<string, AnyDevice> = new Map();
+  devices: Map<string, AnyDeviceDiscovery> = new Map();
 
   discoveryTimer: NodeJS.Timeout | null = null;
 
@@ -223,6 +187,7 @@ export default class Client extends EventEmitter {
   }
 
   /**
+   * Used by `tplink-connection`
    * @internal
    */
   getNextSocketId(): number {
@@ -233,7 +198,7 @@ export default class Client extends EventEmitter {
   /**
    * {@link https://github.com/plasticrake/tplink-smarthome-crypto Encrypts} `payload` and sends to device.
    * - If `payload` is not a string, it is `JSON.stringify`'d.
-   * - Promise fulfills with parsed JSON response.
+   * - Promise fulfills with string response.
    *
    * Devices use JSON to communicate.\
    * For Example:
@@ -303,23 +268,26 @@ export default class Client extends EventEmitter {
   async getSysInfo(
     host: string,
     port = 9999,
-    sendOptions: SendOptions
+    sendOptions?: SendOptions
   ): Promise<Sysinfo> {
     this.log.debug('client.getSysInfo(%j)', { host, port, sendOptions });
-    const data = await this.send(
+    const response = await this.send(
       '{"system":{"get_sysinfo":{}}}',
       host,
       port,
       sendOptions
     );
-    if (hasSysinfoResponse(data)) {
-      return data.system.get_sysinfo;
+
+    const responseObj = JSON.parse(response);
+    if (isSysinfoResponse(responseObj)) {
+      return responseObj.system.get_sysinfo;
     }
-    throw new Error(`Unexpected Response: ${data}`);
+
+    throw new Error(`Unexpected Response: ${response}`);
   }
 
   /**
-   * @private
+   * @internal
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(eventName: string, ...args: any[]): boolean {
@@ -347,7 +315,9 @@ export default class Client extends EventEmitter {
    * @param  {Object} deviceOptions passed to [Bulb constructor]{@link Bulb}
    * @returns {Bulb}
    */
-  getBulb(deviceOptions: MarkOptional<BulbDeviceOptions, 'client'>): Bulb {
+  getBulb(
+    deviceOptions: MarkOptional<ConstructorParameters<typeof Bulb>[0], 'client'>
+  ): Bulb {
     return new Bulb({
       defaultSendOptions: this.defaultSendOptions,
       ...deviceOptions,
@@ -362,7 +332,9 @@ export default class Client extends EventEmitter {
    * @param  {Object} deviceOptions passed to [Plug constructor]{@link Plug}
    * @returns {Plug}
    */
-  getPlug(deviceOptions: MarkOptional<PlugDeviceOptions, 'client'>): Plug {
+  getPlug(
+    deviceOptions: MarkOptional<ConstructorParameters<typeof Plug>[0], 'client'>
+  ): Plug {
     return new Plug({
       defaultSendOptions: this.defaultSendOptions,
       ...deviceOptions,
@@ -371,50 +343,34 @@ export default class Client extends EventEmitter {
   }
 
   /**
-   * Creates a {@link Plug} or {@link Bulb} after querying device to determine type.
+   * Creates a {@link Plug} or {@link Bulb} from passed in sysInfo or after querying device to determine type.
    *
    * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options.
    * @param  {Object}      deviceOptions passed to [Device constructor]{@link Device}
    * @param  {SendOptions} [sendOptions]
-   * @returns {Promise<Plug|Bulb, Error>}
+   * @returns {Promise<AnyDevice, Error>}
    */
   async getDevice(
-    deviceOptions: MarkOptional<AnyDeviceOptions, 'client'>,
-    sendOptions: SendOptions
-  ): Promise<Plug | Bulb> {
+    deviceOptions: AnyDeviceOptionsCon,
+    sendOptions?: SendOptions
+  ): Promise<AnyDevice> {
     this.log.debug('client.getDevice(%j)', { deviceOptions, sendOptions });
-    const sysInfo = await this.getSysInfo(
-      deviceOptions.host,
-      deviceOptions.port,
-      sendOptions
-    );
-    return this.getDeviceFromSysInfo(sysInfo, {
+    let sysInfo: Sysinfo;
+    if ('sysInfo' in deviceOptions && deviceOptions.sysInfo !== undefined) {
+      sysInfo = deviceOptions.sysInfo;
+    } else {
+      sysInfo = await this.getSysInfo(
+        deviceOptions.host,
+        deviceOptions.port,
+        sendOptions
+      );
+    }
+
+    const combinedDeviceOptions = {
       ...deviceOptions,
       client: this,
-    });
-  }
-
-  /**
-   * @internal
-   */
-  getDeviceFromType(
-    typeName: string | Function,
-    deviceOptions: AnyDeviceOptions
-  ): Plug | Bulb {
-    let name;
-    if (typeof typeName === 'function') {
-      name = typeName.name;
-    } else {
-      name = typeName;
-    }
-    switch (name.toLowerCase()) {
-      case 'plug':
-        return this.getPlug(deviceOptions);
-      case 'bulb':
-        return this.getBulb(deviceOptions);
-      default:
-        return this.getPlug(deviceOptions);
-    }
+    } as AnyDeviceOptions;
+    return this.getDeviceFromSysInfo(sysInfo, combinedDeviceOptions);
   }
 
   /**
@@ -424,26 +380,25 @@ export default class Client extends EventEmitter {
    * @param  {Object} sysInfo
    * @param  {Object} deviceOptions passed to device constructor
    * @returns {Plug|Bulb}
+   * @throws
    */
   getDeviceFromSysInfo(
     sysInfo: Sysinfo,
-    deviceOptions: AnyDeviceOptions
-  ): Plug | Bulb {
-    const thisDeviceOptions = { ...deviceOptions, sysInfo };
-    switch (this.getTypeFromSysInfo(sysInfo)) {
-      case 'plug':
-        return this.getPlug(thisDeviceOptions);
-      case 'bulb':
-        return this.getBulb(thisDeviceOptions);
-      default:
-        return this.getPlug(thisDeviceOptions);
+    deviceOptions: AnyDeviceOptionsCon
+  ): AnyDevice {
+    if (isPlugSysinfo(sysInfo)) {
+      return this.getPlug({ ...deviceOptions, sysInfo });
     }
+    if (isBulbSysinfo(sysInfo)) {
+      return this.getBulb({ ...deviceOptions, sysInfo });
+    }
+    throw new Error('Could not determine device from sysinfo');
   }
 
   /**
    * Guess the device type from provided `sysInfo`.
    *
-   * Based on sys_info.[type|mic_type]
+   * Based on sysinfo.[type|mic_type]
    * @param  {Object} sysInfo
    * @returns {string}         'plug','bulb','device'
    */
@@ -715,10 +670,28 @@ export default class Client extends EventEmitter {
     return this;
   }
 
-  /**
-   * @internal
-   */
-  createOrUpdateDeviceFromSysInfo({
+  private static setSysInfoForDevice(
+    device: AnyDeviceDiscovery,
+    sysInfo: Sysinfo
+  ): void {
+    if (device instanceof Plug) {
+      if (!isPlugSysinfo(sysInfo)) {
+        throw new TypeError(
+          util.format('Expected PlugSysinfo but received: %O', sysInfo)
+        );
+      }
+      device.setSysInfo(sysInfo);
+    } else if (device instanceof Bulb) {
+      if (!isBulbSysinfo(sysInfo)) {
+        throw new TypeError(
+          util.format('Expected BulbSysinfo but received: %O', sysInfo)
+        );
+      }
+      device.setSysInfo(sysInfo);
+    }
+  }
+
+  private createOrUpdateDeviceFromSysInfo({
     sysInfo,
     emeterRealtime,
     host,
@@ -734,13 +707,13 @@ export default class Client extends EventEmitter {
     breakoutChildren: boolean;
   }): void {
     const process = (id: string, childId?: string): void => {
-      let device: AnyDevice & Partial<DeviceDiscovery>;
+      let device: AnyDeviceDiscovery & Partial<DeviceDiscovery>;
       if (this.devices.has(id) && this.devices.get(id) !== undefined) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         device = this.devices.get(id)!;
         device.host = host;
         device.port = port;
-        device.sysInfo = sysInfo;
+        Client.setSysInfoForDevice(device, sysInfo);
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
         if (emeterRealtime !== null && device.emeter) {
@@ -748,14 +721,14 @@ export default class Client extends EventEmitter {
         }
         this.emit('online', device);
       } else {
-        const deviceOptions: AnyDeviceOptions = {
+        // const deviceOptions: AnyDeviceOptions = ;
+        device = this.getDeviceFromSysInfo(sysInfo, {
           ...options,
           client: this,
           host,
           port,
           childId,
-        };
-        device = this.getDeviceFromSysInfo(sysInfo, deviceOptions);
+        });
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
         if (emeterRealtime !== null && device.emeter) {
@@ -790,10 +763,7 @@ export default class Client extends EventEmitter {
     }
   }
 
-  /**
-   * @internal
-   */
-  sendDiscovery(
+  private sendDiscovery(
     socket: Socket,
     address: string,
     devices: DiscoveryDevice[] = [],
@@ -810,6 +780,7 @@ export default class Client extends EventEmitter {
         if (device.status !== 'offline') {
           const diff =
             this.discoveryPacketSequence - (device.seenOnDiscovery || 0);
+
           if (diff >= offlineTolerance) {
             // eslint-disable-next-line no-param-reassign
             device.status = 'offline';
@@ -847,5 +818,3 @@ export default class Client extends EventEmitter {
     }
   }
 }
-
-module.exports = Client;

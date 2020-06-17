@@ -32,6 +32,7 @@ module.exports = {
     },
   ],
   rules: {
+    '@typescript-eslint/ban-ts-ignore': ['off'],
     'no-restricted-syntax': [
       'off',
       {

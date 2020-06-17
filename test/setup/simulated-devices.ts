@@ -1,5 +1,5 @@
 // spell-checker:ignore Mock’s
-
+// @ts-ignore
 import simulator from 'tplink-smarthome-simulator';
 import type { Client } from '../../src';
 import type { AnyDevice } from '../../src/client';
@@ -12,26 +12,6 @@ type SimulatorDevice = {
   address: string;
   port: number;
   children: Array<{ sysinfo: { id: string } }>;
-};
-
-type SimulatorDeviceConstructor = {
-  new ({
-    model,
-    port,
-    address,
-    alias,
-    responseDelay,
-    unreliablePercent,
-    data,
-  }?: {
-    model: string;
-    port?: number;
-    address?: string;
-    alias: string;
-    responseDelay?: number;
-    unreliablePercent?: number;
-    data?: object;
-  }): SimulatorDevice;
 };
 
 type SimulatedUdpServer = {
@@ -80,8 +60,9 @@ export async function getSimulatedUnreliableDevice(
 export async function cleanUpSimulatedDevices(): Promise<void> {
   const len = simulatorDevices.length;
   for (let i = 0; i < len; i += 1) {
+    const sd = simulatorDevices.shift();
     // eslint-disable-next-line no-await-in-loop
-    await simulatorDevices.shift().stop();
+    if (sd !== undefined) await sd.stop();
   }
 }
 

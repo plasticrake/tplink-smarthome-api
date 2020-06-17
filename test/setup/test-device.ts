@@ -2,6 +2,7 @@
 import { Client, Plug } from '../../src';
 import { AnyDevice } from '../../src/client';
 import { isObjectLike } from '../../src/utils';
+import { MarkRequired } from 'ts-essentials';
 
 export type TestDevice = {
   name: string;
@@ -16,9 +17,12 @@ export type TestDevice = {
     sendOptions?: Parameters<Client['getDevice']>[1]
   ) => ReturnType<Client['getDevice']>;
   parent?: TestDevice;
-  children?: TestDevice[];
+  children?: MarkRequired<TestDevice, 'getDevice' | 'childId' | 'parent'>[];
   childId?: string;
-  getOtherChildren?: () => TestDevice[];
+  getOtherChildren?: () => MarkRequired<
+    TestDevice,
+    'getDevice' | 'childId' | 'parent'
+  >[];
   getOtherChildrenState?: () => Promise<
     Array<{
       childId: string;
@@ -53,7 +57,7 @@ export function createTestDevice(
     name: string;
     model: string;
     isSimulated: boolean;
-    hardwareVersion: string;
+    hardwareVersion?: string;
     parent: TestDevice;
     childId: string;
   }
@@ -114,7 +118,10 @@ export function testDeviceDecorator(
 
     if ('children' in device && device.children.size > 0) {
       if (testDevice.childId === undefined) {
-        testDevice.children = ((): TestDevice[] => {
+        testDevice.children = ((): MarkRequired<
+          TestDevice,
+          'getDevice' | 'childId' | 'parent'
+        >[] => {
           return Array.from(device.children.keys()).map((key) => {
             return createTestDevice(device, client, {
               name: testDevice.name,
@@ -123,11 +130,16 @@ export function testDeviceDecorator(
               isSimulated: testDevice.isSimulated,
               parent: testDevice,
               childId: key,
-            });
+            }) as MarkRequired<TestDevice, 'getDevice' | 'childId' | 'parent'>;
           });
         })();
       } else {
-        testDevice.getOtherChildren = function getOtherChildren(): TestDevice[] {
+        testDevice.getOtherChildren = function getOtherChildren(): MarkRequired<
+          TestDevice,
+          'getDevice' | 'childId' | 'parent'
+        >[] {
+          if (!(parent !== undefined && parent.children !== undefined))
+            throw new TypeError();
           return parent.children.filter((oc) => oc.childId !== this.childId);
         };
 
@@ -138,9 +150,18 @@ export function testDeviceDecorator(
             alias: string;
           }>
         > {
+          if (
+            !(
+              'getOtherChildren' in testDevice &&
+              testDevice.getOtherChildren !== undefined
+            )
+          ) {
+            throw new Error();
+          }
           return Promise.all(
             testDevice.getOtherChildren().map(async (childDevice) => {
               const d = (await childDevice.getDevice()) as Plug;
+              if (d.childId === undefined) throw new TypeError();
               return {
                 childId: d.childId,
                 relayState: d.relayState,
