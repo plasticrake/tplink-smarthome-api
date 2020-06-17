@@ -1,4 +1,4 @@
-const { createScheduleRule } = require('../utils');
+const { createRule } = require('../shared/schedule');
 
 /**
  * Away
@@ -37,7 +37,7 @@ class Away {
    */
   async getRule(id, sendOptions) {
     const rules = await this.getRules(sendOptions);
-    const rule = rules.rule_list.find(r => r.id === id);
+    const rule = rules.rule_list.find((r) => r.id === id);
     if (rule) {
       rule.err_code = rules.err_code;
     }
@@ -66,7 +66,7 @@ class Away {
       frequency,
       name,
       enable: enable ? 1 : 0,
-      ...createScheduleRule({ start, end, daysOfWeek }),
+      ...createRule({ start, end, daysOfWeek }),
     };
     return this.device.sendCommand(
       {
@@ -101,7 +101,7 @@ class Away {
       frequency,
       name,
       enable: enable ? 1 : 0,
-      ...createScheduleRule({ start, end, daysOfWeek }),
+      ...createRule({ start, end, daysOfWeek }),
     };
     return this.device.sendCommand(
       {
