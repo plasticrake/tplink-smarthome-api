@@ -1,12 +1,57 @@
-const Device = require('../device');
-const Away = require('./away');
-const Cloud = require('../shared/cloud');
-const Dimmer = require('./dimmer');
-const Emeter = require('../shared/emeter');
-const Schedule = require('./schedule');
-const Timer = require('./timer');
-const Time = require('../shared/time');
-const { ResponseError } = require('../utils');
+/* eslint-disable no-underscore-dangle */
+import type { SendOptions } from '../client';
+import Device, { isPlugSysinfo } from '../device';
+import type {
+  CommonSysinfo,
+  DeviceConstructorParameters,
+  Sysinfo,
+} from '../device';
+import Away from './away';
+import Cloud from '../shared/cloud';
+import Dimmer from './dimmer';
+import Emeter from '../shared/emeter';
+import Schedule from './schedule';
+import Timer from './timer';
+import Time from '../shared/time';
+import { isObjectLike, ResponseError, extractResponse } from '../utils';
+
+// type PlugGetInfo = {
+//   emeter: { get_realtime: {} };
+//   schedule: { get_next_action: {} };
+//   system: { get_sysinfo: {} };
+//   cnCloud: { get_info: {} };
+// };
+
+type PlugChild = { id: string; alias: string; state: number };
+
+type SysinfoChildren = {
+  children?: [{ id: string; alias: string; state: number }];
+};
+
+export type PlugSysinfo = CommonSysinfo &
+  SysinfoChildren &
+  (
+    | { type: 'IOT.SMARTPLUGSWITCH' | 'IOT.RANGEEXTENDER.SMARTPLUG' }
+    | { mic_type: 'IOT.SMARTPLUGSWITCH' }
+  ) &
+  ({ mac: string } | { ethernet_mac: string }) & {
+    feature: string;
+    led_off: 0 | 1;
+    relay_state?: 0 | 1;
+    dev_name?: string;
+  };
+
+export function hasSysinfoChildren(
+  candidate: Sysinfo
+): candidate is Sysinfo & Required<SysinfoChildren> {
+  return (
+    isObjectLike(candidate) &&
+    'children' in candidate &&
+    candidate.children !== undefined &&
+    isObjectLike(candidate.children) &&
+    candidate.children.length > 0
+  );
+}
 
 /**
  * Plug Device.
@@ -28,111 +73,123 @@ const { ResponseError } = require('../utils');
  * @emits  Plug#in-use-update
  * @emits  Plug#emeter-realtime-update
  */
-class Plug extends Device {
-  #children;
+export default class Plug extends Device {
+  // private get _sysInfo(): PlugSysinfo {
+  //   // eslint-disable-next-line no-underscore-dangle
+  //   return super._sysInfo as PlugSysinfo;
+  // }
 
-  #child;
+  protected _sysInfo: PlugSysinfo;
 
-  #childId;
+  #children: Map<string, PlugChild> = new Map();
+
+  #child?: PlugChild;
+
+  #childId?: string;
+
+  inUseThreshold = 0.1;
+
+  emitEventsEnabled = true;
+
+  lastState = { inUse: false, relayState: false };
+
+  protected supportsEmeter = false;
+
+  protected static readonly apiModuleNamespace = {
+    system: 'system',
+    cloud: 'cnCloud',
+    schedule: 'schedule',
+    timesetting: 'time',
+    emeter: 'emeter',
+    netif: 'netif',
+    lightingservice: '',
+  };
+
+  /**
+   * @borrows Away#getRules as Plug.away#getRules
+   * @borrows Away#addRule as Plug.away#addRule
+   * @borrows Away#editRule as Plug.away#editRule
+   * @borrows Away#deleteAllRules as Plug.away#deleteAllRules
+   * @borrows Away#deleteRule as Plug.away#deleteRule
+   * @borrows Away#setOverallEnable as Plug.away#setOverallEnable
+   */
+  away = new Away(this, 'anti_theft', this.#childId);
+
+  /**
+   * @borrows Cloud#getInfo as Plug.cloud#getInfo
+   * @borrows Cloud#bind as Plug.cloud#bind
+   * @borrows Cloud#unbind as Plug.cloud#unbind
+   * @borrows Cloud#getFirmwareList as Plug.cloud#getFirmwareList
+   * @borrows Cloud#setServerUrl as Plug.cloud#setServerUrl
+   */
+  cloud = new Cloud(this, 'cnCloud');
+
+  /**
+   * @borrows Dimmer#setBrightness as Plug.dimmer#setBrightness
+   * @borrows Dimmer#getDefaultBehavior as Plug.dimmer#getDefaultBehavior
+   * @borrows Dimmer#getDimmerParameters as Plug.dimmer#getDimmerParameters
+   * @borrows Dimmer#setDimmerTransition as Plug.dimmer#setDimmerTransition
+   * @borrows Dimmer#setDoubleClickAction as Plug.dimmer#setDoubleClickAction
+   * @borrows Dimmer#setFadeOffTime as Plug.dimmer#setFadeOffTime
+   * @borrows Dimmer#setFadeOnTime as Plug.dimmer#setFadeOnTime
+   * @borrows Dimmer#setGentleOffTime as Plug.dimmer#setGentleOffTime
+   * @borrows Dimmer#setGentleOnTime as Plug.dimmer#setGentleOnTime
+   * @borrows Dimmer#setLongPressAction as Plug.dimmer#setLongPressAction
+   * @borrows Dimmer#setSwitchState as Plug.dimmer#setSwitchState
+   */
+  dimmer = new Dimmer(this, 'smartlife.iot.dimmer');
+
+  /**
+   * @borrows Emeter#realtime as Plug.emeter#realtime
+   * @borrows Emeter#getRealtime as Plug.emeter#getRealtime
+   * @borrows Emeter#getDayStats as Plug.emeter#getDayStats
+   * @borrows Emeter#getMonthStats as Plug.emeter#getMonthStats
+   * @borrows Emeter#eraseStats as Plug.emeter#eraseStats
+   */
+  emeter = new Emeter(this, 'emeter', this.#childId);
+
+  /**
+   * @borrows Schedule#getNextAction as Plug.schedule#getNextAction
+   * @borrows Schedule#getRules as Plug.schedule#getRules
+   * @borrows Schedule#getRule as Plug.schedule#getRule
+   * @borrows PlugSchedule#addRule as Plug.schedule#addRule
+   * @borrows PlugSchedule#editRule as Plug.schedule#editRule
+   * @borrows Schedule#deleteAllRules as Plug.schedule#deleteAllRules
+   * @borrows Schedule#deleteRule as Plug.schedule#deleteRule
+   * @borrows Schedule#setOverallEnable as Plug.schedule#setOverallEnable
+   * @borrows Schedule#getDayStats as Plug.schedule#getDayStats
+   * @borrows Schedule#getMonthStats as Plug.schedule#getMonthStats
+   * @borrows Schedule#eraseStats as Plug.schedule#eraseStats
+   */
+  schedule = new Schedule(this, 'schedule', this.#childId);
+
+  /**
+   * @borrows Time#getTime as Plug.time#getTime
+   * @borrows Time#getTimezone as Plug.time#getTimezone
+   */
+  time = new Time(this, 'time');
+
+  /**
+   * @borrows Timer#getRules as Plug.timer#getRules
+   * @borrows Timer#addRule as Plug.timer#addRule
+   * @borrows Timer#editRule as Plug.timer#editRule
+   * @borrows Timer#deleteAllRules as Plug.timer#deleteAllRules
+   */
+  timer = new Timer(this, 'count_down', this.#childId);
 
   /**
    * Created by {@link Client} - Do not instantiate directly.
    *
    * See [Device constructor]{@link Device} for common options.
-   * @param  {Object}  options
-   * @param  {number} [options.inUseThreshold=0.1] Watts
-   * @param  {string} [options.childId] If passed an integer or string between 0 and 99 it will prepend the deviceId
+   * @param  {Object}       options
+   * @param  {Client}       options.client
+   * @param  {string}       options.host
+   * @param  {number|undefined}      [options.port=9999]
+   * @param  {Object}      [options.logger]
+   * @param  {SendOptions} [options.defaultSendOptions]
+   * @param  {number|undefined}      [options.inUseThreshold=0.1] Watts
+   * @param  {string|undefined}      [options.childId] If passed an integer or string between 0 and 99 it will prepend the deviceId
    */
-  constructor(options) {
-    super(options);
-
-    this.log.debug('plug.constructor()');
-
-    this.apiModuleNamespace = {
-      system: 'system',
-      cloud: 'cnCloud',
-      schedule: 'schedule',
-      timesetting: 'time',
-      emeter: 'emeter',
-      netif: 'netif',
-    };
-
-    this.inUseThreshold = options.inUseThreshold || 0.1;
-
-    if (options.sysInfo) {
-      this.sysInfo = options.sysInfo;
-    }
-
-    this.childId = options.childId || null;
-
-    this.emitEventsEnabled = true;
-
-    /**
-     * @borrows Away#getRules as Plug.away#getRules
-     * @borrows Away#addRule as Plug.away#addRule
-     * @borrows Away#editRule as Plug.away#editRule
-     * @borrows Away#deleteAllRules as Plug.away#deleteAllRules
-     * @borrows Away#deleteRule as Plug.away#deleteRule
-     * @borrows Away#setOverallEnable as Plug.away#setOverallEnable
-     */
-    this.away = new Away(this, 'anti_theft', this.childId);
-    /**
-     * @borrows Cloud#getInfo as Plug.cloud#getInfo
-     * @borrows Cloud#bind as Plug.cloud#bind
-     * @borrows Cloud#unbind as Plug.cloud#unbind
-     * @borrows Cloud#getFirmwareList as Plug.cloud#getFirmwareList
-     * @borrows Cloud#setServerUrl as Plug.cloud#setServerUrl
-     */
-    this.cloud = new Cloud(this, 'cnCloud');
-    /**
-     * @borrows Dimmer#setBrightness as Plug.dimmer#setBrightness
-     * @borrows Dimmer#getDefaultBehavior as Plug.dimmer#getDefaultBehavior
-     * @borrows Dimmer#getDimmerParameters as Plug.dimmer#getDimmerParameters
-     * @borrows Dimmer#setDimmerTransition as Plug.dimmer#setDimmerTransition
-     * @borrows Dimmer#setDoubleClickAction as Plug.dimmer#setDoubleClickAction
-     * @borrows Dimmer#setFadeOffTime as Plug.dimmer#setFadeOffTime
-     * @borrows Dimmer#setFadeOnTime as Plug.dimmer#setFadeOnTime
-     * @borrows Dimmer#setGentleOffTime as Plug.dimmer#setGentleOffTime
-     * @borrows Dimmer#setGentleOnTime as Plug.dimmer#setGentleOnTime
-     * @borrows Dimmer#setLongPressAction as Plug.dimmer#setLongPressAction
-     * @borrows Dimmer#setSwitchState as Plug.dimmer#setSwitchState
-     */
-    this.dimmer = new Dimmer(this, 'smartlife.iot.dimmer');
-    /**
-     * @borrows Emeter#realtime as Plug.emeter#realtime
-     * @borrows Emeter#getRealtime as Plug.emeter#getRealtime
-     * @borrows Emeter#getDayStats as Plug.emeter#getDayStats
-     * @borrows Emeter#getMonthStats as Plug.emeter#getMonthStats
-     * @borrows Emeter#eraseStats as Plug.emeter#eraseStats
-     */
-    this.emeter = new Emeter(this, 'emeter', this.childId);
-    /**
-     * @borrows Schedule#getNextAction as Plug.schedule#getNextAction
-     * @borrows Schedule#getRules as Plug.schedule#getRules
-     * @borrows Schedule#getRule as Plug.schedule#getRule
-     * @borrows PlugSchedule#addRule as Plug.schedule#addRule
-     * @borrows PlugSchedule#editRule as Plug.schedule#editRule
-     * @borrows Schedule#deleteAllRules as Plug.schedule#deleteAllRules
-     * @borrows Schedule#deleteRule as Plug.schedule#deleteRule
-     * @borrows Schedule#setOverallEnable as Plug.schedule#setOverallEnable
-     * @borrows Schedule#getDayStats as Plug.schedule#getDayStats
-     * @borrows Schedule#getMonthStats as Plug.schedule#getMonthStats
-     * @borrows Schedule#eraseStats as Plug.schedule#eraseStats
-     */
-    this.schedule = new Schedule(this, 'schedule', this.childId);
-    /**
-     * @borrows Time#getTime as Plug.time#getTime
-     * @borrows Time#getTimezone as Plug.time#getTimezone
-     */
-    this.time = new Time(this, 'time');
-    /**
-     * @borrows Timer#getRules as Plug.timer#getRules
-     * @borrows Timer#addRule as Plug.timer#addRule
-     * @borrows Timer#editRule as Plug.timer#editRule
-     * @borrows Timer#deleteAllRules as Plug.timer#deleteAllRules
-     */
-    this.timer = new Timer(this, 'count_down', this.childId);
-
   constructor({
     client,
     sysInfo,
@@ -142,55 +199,67 @@ class Plug extends Device {
     defaultSendOptions,
     inUseThreshold = 0.1,
     childId,
-  }: DeviceConstructorParameters[0] & {
+  }: Omit<DeviceConstructorParameters[0], 'sysInfo'> & {
     sysInfo: PlugSysinfo;
     inUseThreshold?: number;
     childId?: string;
   }) {
-    super({ client, sysInfo, host, port, logger, defaultSendOptions });
+    super({
+      client,
+      _sysInfo: sysInfo,
+      host,
+      port,
+      logger,
+      defaultSendOptions,
+    });
+
+    this.log.debug('plug.constructor()');
+
+    this._sysInfo = sysInfo;
+    this.setSysInfo(sysInfo);
+
+    this.inUseThreshold = inUseThreshold;
+
+    if (childId !== undefined) this.setChildId(childId);
+
     if (this.sysInfo) {
       this.lastState.inUse = this.inUse;
       this.lastState.relayState = this.relayState;
     }
   }
 
-  /**
-   * Returns cached results from last retrieval of `system.sys_info`.
-   * @return {Object} system.sys_info
-   */
-  get sysInfo() {
-    return super.sysInfo;
+  get sysInfo(): PlugSysinfo {
+    return this._sysInfo;
   }
 
   /**
-   * @private
+   * @internal
    */
-  set sysInfo(sysInfo) {
-    super.sysInfo = sysInfo;
+  setSysInfo(sysInfo: PlugSysinfo): void {
+    super.setSysInfo(sysInfo);
     this.supportsEmeter =
       sysInfo.feature && typeof sysInfo.feature === 'string'
         ? sysInfo.feature.indexOf('ENE') >= 0
         : false;
-    this.children = sysInfo.children ? sysInfo.children : null;
+    if (sysInfo.children) {
+      this.setChildren(sysInfo.children);
+    }
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
   }
 
   /**
-   * Returns children as a map keyed by childId. From cached results from last retrieval of `system.sys_info.children`.
+   * Returns children as a map keyed by childId. From cached results from last retrieval of `system.sysinfo.children`.
    * @return {Map} children
    */
-  get children() {
+  get children(): Map<string, PlugChild> {
     return this.#children;
   }
 
-  /**
-   * @private
-   */
-  set children(children) {
+  private setChildren(children: PlugChild[] | Map<string, PlugChild>): void {
     if (Array.isArray(children)) {
       this.#children = new Map(
-        children.map(child => {
+        children.map((child) => {
           // eslint-disable-next-line no-param-reassign
           child.id = this.normalizeChildId(child.id);
           return [child.id, child];
@@ -200,23 +269,22 @@ class Plug extends Device {
       this.#children = children;
     }
     if (this.#childId && this.#children) {
-      this.childId = this.#childId;
+      if (this.#childId !== undefined) this.setChildId(this.#childId);
       // this.#child = this.#children.get(this.normalizeChildId(this.#childId));
     }
   }
 
   /**
    * Returns childId.
-   * @return {string} childId
    */
-  get childId() {
+  get childId(): string | undefined {
     return this.#childId;
   }
 
   /**
-   * @private
+   * @internal
    */
-  set childId(childId) {
+  private setChildId(childId: string): void {
     this.#childId = this.normalizeChildId(childId);
     if (this.#childId && this.#children) {
       this.#child = this.#children.get(this.#childId);
@@ -227,33 +295,46 @@ class Plug extends Device {
   }
 
   /**
-   * Cached value of `sys_info.alias` or `sys_info.children[childId].alias` if childId set.
+   * Cached value of `sysinfo.alias` or `sysinfo.children[childId].alias` if childId set.
    * @return {string}
    */
-  get alias() {
-    if (this.childId) {
+  get alias(): string {
+    if (this.#childId && this.#child !== undefined) {
       return this.#child.alias;
     }
+    if (this.sysInfo === undefined) return '';
     return this.sysInfo.alias;
   }
 
   /**
-   * @private
+   * @internal
    */
-  set alias(alias) {
-    if (this.childId) {
+  protected setAliasProperty(alias: string): void {
+    if (this.#childId && this.#child !== undefined) {
       this.#child.alias = alias;
     }
     this.sysInfo.alias = alias;
   }
 
   /**
-   * Cached value of `sys_info.deviceId` or `childId` if set.
+   * Cached value of `sysinfo.dev_name`.
+   */
+  get description(): string | undefined {
+    return this.sysInfo.dev_name;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  get deviceType(): 'plug' {
+    return 'plug';
+  }
+
+  /**
+   * Cached value of `sysinfo.deviceId` or `childId` if set.
    * @return {string}
    */
-  get id() {
-    if (this.childId) {
-      return this.childId;
+  get id(): string {
+    if (this.#childId && this.#child !== undefined) {
+      return this.#childId;
     }
     return this.sysInfo.deviceId;
   }
@@ -263,13 +344,14 @@ class Plug extends Device {
    *
    * If device supports energy monitoring (e.g. HS110): `power > inUseThreshold`. `inUseThreshold` is specified in Watts
    *
-   * Otherwise fallback on relay state: `relay_state === 1` or `sys_info.children[childId].state === 1`.
+   * Otherwise fallback on relay state: `relay_state === 1` or `sysinfo.children[childId].state === 1`.
    *
    * Supports childId.
    * @return {boolean}
    */
-  get inUse() {
+  get inUse(): boolean {
     if (this.supportsEmeter) {
+      // @ts-ignore
       return this.emeter.realtime.power > this.inUseThreshold;
     }
     return this.relayState;
@@ -282,7 +364,7 @@ class Plug extends Device {
    * @return {boolean} On (true) or Off (false)
    */
   get relayState(): boolean {
-    if (this.#childId) {
+    if (this.#childId && this.#child !== undefined) {
       return this.#child.state === 1;
     }
     if (this.#children && this.#children.size > 0) {
@@ -296,7 +378,7 @@ class Plug extends Device {
   }
 
   protected setRelayState(relayState: boolean): void {
-    if (this.#childId) {
+    if (this.#childId && this.#child !== undefined) {
       this.#child.state = relayState ? 1 : 0;
       return;
     }
@@ -310,11 +392,27 @@ class Plug extends Device {
   }
 
   /**
-   * Cached value of `sys_info.brightness != null`
+   * True if cached value of `sysinfo` has `brightness` property.
    * @return {boolean}
    */
-  get supportsDimmer() {
-    return this.sysInfo.brightness != null;
+  get supportsDimmer(): boolean {
+    return 'brightness' in this.sysInfo;
+  }
+
+  /**
+   * Gets plug's SysInfo.
+   *
+   * Requests `system.sysinfo` from device. Does not support childId.
+   * @param  {SendOptions}  [sendOptions]
+   * @return {Promise<Object, ResponseError>} parsed JSON response
+   */
+  async getSysInfo(sendOptions?: SendOptions): Promise<PlugSysinfo> {
+    const response = await super.getSysInfo(sendOptions);
+
+    if (!isPlugSysinfo(response)) {
+      throw new Error(`Unexpected Response: ${response}`);
+    }
+    return this.sysInfo;
   }
 
   /**
@@ -328,33 +426,66 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, Error>} parsed JSON response
    */
-  async getInfo(sendOptions) {
+  async getInfo(
+    sendOptions?: SendOptions
+  ): Promise<{
+    sysInfo: object;
+    cloud: { info: object };
+    emeter: { realtime: object };
+    schedule: { nextAction: object };
+  }> {
     // TODO force TCP unless overridden here
-    let data;
+    let data: unknown;
     try {
       data = await this.sendCommand(
         '{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}',
-        this.childId,
+        this.#childId,
         sendOptions
       );
     } catch (err) {
       // Ignore emeter section errors as not all devices support it
       if (
         err instanceof ResponseError &&
-        err.errorModules.length === 1 &&
-        err.errorModules[0] === 'emeter'
+        err.modules.length === 1 &&
+        err.modules[0] === 'emeter'
       ) {
-        data = err.response;
+        data = JSON.parse(err.response);
       } else {
         throw err;
       }
     }
-    this.sysInfo = data.system.get_sysinfo;
-    this.cloud.info = data.cnCloud.get_info;
-    if (Object.prototype.hasOwnProperty.call(data.emeter, 'get_realtime')) {
+
+    const sysinfo = extractResponse(
+      data,
+      'system.get_sysinfo',
+      isPlugSysinfo
+    ) as PlugSysinfo;
+    this.setSysInfo(sysinfo);
+
+    const cloudInfo = extractResponse(
+      data,
+      'cnCloud.get_info',
+      isObjectLike
+    ) as object;
+    this.cloud.info = cloudInfo;
+
+    if (
+      isObjectLike(data) &&
+      'emeter' in data &&
+      isObjectLike(data.emeter) &&
+      'get_realtime' in data.emeter &&
+      isObjectLike(data.emeter.get_realtime)
+    ) {
       this.emeter.realtime = data.emeter.get_realtime;
     }
-    this.schedule.nextAction = data.schedule.get_next_action;
+
+    const scheduleNextAction = extractResponse(
+      data,
+      'schedule.get_next_action',
+      isObjectLike
+    ) as object;
+    this.schedule.nextAction = scheduleNextAction;
+
     return {
       sysInfo: this.sysInfo,
       cloud: { info: this.cloud.info },
@@ -368,7 +499,7 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async getInUse(sendOptions) {
+  async getInUse(sendOptions?: SendOptions): Promise<boolean> {
     if (this.supportsEmeter) {
       await this.emeter.getRealtime(sendOptions);
     } else {
@@ -380,11 +511,11 @@ class Plug extends Device {
   /**
    * Get Plug LED state (night mode).
    *
-   * Requests `system.sys_info` and returns true if `led_off === 0`. Does not support childId.
+   * Requests `system.sysinfo` and returns true if `led_off === 0`. Does not support childId.
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>} LED State, true === on
    */
-  async getLedState(sendOptions) {
+  async getLedState(sendOptions?: SendOptions): Promise<boolean> {
     const sysInfo = await this.getSysInfo(sendOptions);
     return sysInfo.led_off === 0;
   }
@@ -393,17 +524,20 @@ class Plug extends Device {
    * Turn Plug LED on/off (night mode). Does not support childId.
    *
    * Sends `system.set_led_off` command.
-   * @param  {boolean}      value LED State, true === on
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @param   value - LED State, true === on
+   * @param   sendOptions
+   * @returns {Promise<boolean, ResponseError>}
    */
-  async setLedState(value, sendOptions) {
+  async setLedState(
+    value: boolean,
+    sendOptions?: SendOptions
+  ): Promise<boolean> {
     await this.sendCommand(
       `{"system":{"set_led_off":{"off":${value ? 0 : 1}}}}`,
-      null,
+      undefined,
       sendOptions
     );
-    this.sysInfo.set_led_off = value ? 0 : 1;
+    this.sysInfo.led_off = value ? 0 : 1;
     return true;
   }
 
@@ -412,9 +546,9 @@ class Plug extends Device {
    *
    * Requests `system.get_sysinfo` and returns true if On. Calls {@link #relayState}. Supports childId.
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @returns {Promise<boolean>}
    */
-  async getPowerState(sendOptions) {
+  async getPowerState(sendOptions?: SendOptions): Promise<boolean> {
     await this.getSysInfo(sendOptions);
     return this.relayState;
   }
@@ -427,13 +561,16 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setPowerState(value, sendOptions) {
+  async setPowerState(
+    value: boolean,
+    sendOptions?: SendOptions
+  ): Promise<boolean> {
     await this.sendCommand(
       `{"system":{"set_relay_state":{"state":${value ? 1 : 0}}}}`,
-      this.childId,
+      this.#childId,
       sendOptions
     );
-    this.relayState = value;
+    this.setRelayState(value);
     this.emitEvents();
     return true;
   }
@@ -445,7 +582,7 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async togglePowerState(sendOptions) {
+  async togglePowerState(sendOptions?: SendOptions): Promise<boolean> {
     const powerState = await this.getPowerState(sendOptions);
     await this.setPowerState(!powerState, sendOptions);
     return !powerState;
@@ -463,9 +600,13 @@ class Plug extends Device {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async blink(times = 5, rate = 1000, sendOptions) {
-    const delay = t => {
-      return new Promise(resolve => {
+  async blink(
+    times = 5,
+    rate = 1000,
+    sendOptions?: SendOptions
+  ): Promise<boolean> {
+    const delay = (t: number): Promise<void> => {
+      return new Promise((resolve) => {
         setTimeout(resolve, t);
       });
     };
@@ -522,10 +663,7 @@ class Plug extends Device {
    * @event Plug#emeter-realtime-update
    * @property {Object} value emeterRealtime
    */
-  /**
-   * @private
-   */
-  emitEvents() {
+  private emitEvents(): void {
     if (!this.emitEventsEnabled) {
       return;
     }
@@ -561,5 +699,3 @@ class Plug extends Device {
     this.emit('power-update', relayState);
   }
 }
-
-module.exports = Plug;

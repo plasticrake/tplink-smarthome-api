@@ -1,87 +1,94 @@
-const castArray = require('lodash.castarray');
-const EventEmitter = require('events');
+/* eslint-disable no-underscore-dangle */
+import castArray from 'lodash.castarray';
+import { EventEmitter } from 'events';
+import type log from 'loglevel';
 
-const TcpConnection = require('../network/tcp-connection');
-const UdpConnection = require('../network/udp-connection');
-const Netif = require('./netif');
-const { ResponseError } = require('../utils');
+import type { BulbSysinfo } from '../bulb';
+// eslint-disable-next-line import/no-duplicates
+import type Client from '../client';
+// eslint-disable-next-line import/no-duplicates
+import type { SendOptions } from '../client';
+import type { Logger } from '../logger';
+import Netif from './netif';
+import TcpConnection from '../network/tcp-connection';
+import UdpConnection from '../network/udp-connection';
+import type { PlugSysinfo } from '../plug';
+import { isObjectLike, processResponse, extractResponse } from '../utils';
 
-/**
- * @private
- */
-const recur = function recur(
-  command,
-  response,
-  depth = 0,
-  section,
-  results = []
-) {
-  const keys = Object.keys(command);
-  if (keys.length === 0) {
-    results.push(response);
+interface ApiModuleNamespace {
+  system: string;
+  cloud: string;
+  schedule: string;
+  timesetting: string;
+  emeter: string;
+  netif: string;
+  lightingservice: string;
+}
+
+export type Sysinfo = BulbSysinfo | PlugSysinfo;
+
+export type DeviceConstructorParameters = [
+  {
+    client: Client;
+    host: string;
+    port?: number;
+    logger?: log.RootLogger;
+    defaultSendOptions?: SendOptions;
   }
-  for (let i = 0; i < keys.length; i += 1) {
-    const key = keys[i];
-    if (depth === 1) {
-      if (response[key]) {
-        results.push({ section, response: response[key] });
-      } else {
-        return results.push({ section, response });
-      }
-    } else if (depth < 1) {
-      if (response[key] !== undefined) {
-        recur(command[key], response[key], depth + 1, key, results);
-      }
-    }
-  }
-  return results;
+];
+
+// type SysinfoTypeValues =
+//   | 'IOT.SMARTPLUGSWITCH'
+//   | 'IOT.SMARTBULB'
+//   | 'IOT.RANGEEXTENDER.SMARTPLUG';
+
+export type CommonSysinfo = {
+  alias: string;
+  deviceId: string;
+  model: string;
+  sw_ver: string;
+  hw_ver: string;
 };
 
-/**
- * @private
- */
-const processResponse = function processResponse(command, response) {
-  const multipleResponses = Object.keys(response).length > 1;
-  const commandResponses = recur(command, response);
+export function isCommonSysinfo(
+  candidate: unknown
+): candidate is CommonSysinfo {
+  return (
+    isObjectLike(candidate) &&
+    'alias' in candidate &&
+    'deviceId' in candidate &&
+    'model' in candidate &&
+    'sw_ver' in candidate &&
+    'hw_ver' in candidate
+  );
+}
 
-  const errors = [];
-  commandResponses.forEach(r => {
-    if (r.response.err_code == null) {
-      errors.push({
-        msg: 'err_code missing',
-        response: r.response,
-        section: r.section,
-      });
-    } else if (r.response.err_code !== 0) {
-      errors.push({
-        msg: 'err_code not zero',
-        response: r.response,
-        section: r.section,
-      });
-    }
-  });
+export function isBulbSysinfo(candidate: unknown): candidate is BulbSysinfo {
+  return (
+    isCommonSysinfo(candidate) &&
+    'mic_type' in candidate &&
+    'mic_mac' in candidate &&
+    'description' in candidate &&
+    'light_state' in candidate &&
+    'is_dimmable' in candidate &&
+    'is_color' in candidate &&
+    'is_variable_color_temp' in candidate
+  );
+}
 
-  if (errors.length === 1 && !multipleResponses) {
-    throw new ResponseError(
-      errors[0].msg,
-      errors[0].response,
-      command,
-      errors[0].section
-    );
-  } else if (errors.length > 0) {
-    throw new ResponseError(
-      'err_code',
-      response,
-      command,
-      errors.map(e => e.section)
-    );
-  }
+export function isPlugSysinfo(candidate: unknown): candidate is PlugSysinfo {
+  return (
+    isCommonSysinfo(candidate) &&
+    ('type' in candidate || 'mic_type' in candidate) &&
+    ('mac' in candidate || 'ethernet_mac' in candidate) &&
+    'feature' in candidate &&
+    ('relay_state' in candidate || 'children' in candidate)
+  );
+}
 
-  if (commandResponses.length === 1) {
-    return commandResponses[0].response;
-  }
-  return response;
-};
+function isSysinfo(candidate: unknown): candidate is Sysinfo {
+  return isPlugSysinfo(candidate) || isBulbSysinfo(candidate);
+}
 
 /**
  * TP-Link Device.
@@ -92,137 +99,151 @@ const processResponse = function processResponse(command, response) {
  * @emits  Device#emeter-realtime-update
  */
 export default abstract class Device extends EventEmitter {
+  client: Client;
+
+  host: string;
+
+  port: number;
+
+  netif = new Netif(this, 'netif');
+
+  protected log: Logger;
+
+  private defaultSendOptions: SendOptions;
+
+  private readonly udpConnection = new UdpConnection(this);
+
+  private readonly tcpConnection = new TcpConnection(this);
+
+  private pollingTimer: NodeJS.Timeout | null = null;
+
+  protected _sysInfo: Sysinfo;
+
+  protected static apiModuleNamespace: ApiModuleNamespace;
+
+  protected abstract supportsEmeter = false;
+
+  childId?: string;
 
   /**
    * Created by {@link Client#getCommonDevice} - Do not instantiate directly
-   * @param  {Object}       options
-   * @param  {Client}       options.client
-   * @param  {string}       options.host
-   * @param  {number}      [options.port=9999]
-   * @param  {Object}      [options.logger]
-   * @param  {SendOptions} [options.defaultSendOptions]
+   * @param   options
+   * @param   options.client
+   * @param   options.host
+   * @param  [options.port=9999]
+   * @param  [options.logger]
+   * @param  [options.defaultSendOptions]
    */
   constructor({
     client,
-    sysInfo,
+    _sysInfo,
     host,
     port = 9999,
     logger,
     defaultSendOptions,
-  }: DeviceConstructorParameters[0]) {
+  }: DeviceConstructorParameters[0] & { _sysInfo: Sysinfo }) {
     super();
 
-    this.client = client;
-    this.host = host;
-    this.port = port;
-
-    this.log = logger || this.client.log;
+    // Log first as methods below may call `log`
+    this.log = logger || client.log;
     this.log.debug('device.constructor(%j)', {
       // eslint-disable-next-line prefer-rest-params
       ...arguments[0],
       client: 'not shown',
     });
 
+    this.client = client;
+    this._sysInfo = _sysInfo;
+    this.host = host;
+    this.port = port;
+
     this.defaultSendOptions = {
       ...client.defaultSendOptions,
       ...defaultSendOptions,
     };
+  }
 
-    this.udpConnection = new UdpConnection(this);
-    this.tcpConnection = new TcpConnection(this);
-
-    this.lastState = {};
-    this.#sysInfo = {};
-
-    this.netif = new Netif(this, 'netif');
+  get apiModule(): ApiModuleNamespace {
+    return (this.constructor as typeof Device).apiModuleNamespace;
   }
 
   /**
-   * Returns cached results from last retrieval of `system.sys_info`.
-   * @return {Object} system.sys_info
+   * Returns cached results from last retrieval of `system.sysinfo`.
+   * @returns system.sysinfo
    */
-  get sysInfo() {
-    return this.#sysInfo;
+  get sysInfo(): Sysinfo {
+    return this._sysInfo;
   }
 
   /**
-   * @private
+   * @internal
    */
-  set sysInfo(sysInfo) {
+  setSysInfo(sysInfo: Sysinfo): void {
     this.log.debug('[%s] device sysInfo set', sysInfo.alias || this.alias);
-    this.#sysInfo = sysInfo;
+    this._sysInfo = sysInfo;
   }
 
   /**
-   * Cached value of `sys_info.alias`.
-   * @return {string}
+   * Cached value of `sysinfo.alias`.
    */
-  get alias() {
-    return this.sysInfo.alias;
+  get alias(): string {
+    return this.sysInfo !== undefined ? this.sysInfo.alias : '';
   }
 
   /**
-   * @private
+   * Cached value of `sysinfo.deviceId`.
    */
-  set alias(alias) {
-    this.sysInfo.alias = alias;
-  }
-
-  /**
-   * Cached value of `sys_info.deviceId`.
-   * @return {string}
-   */
-  get id() {
+  get id(): string {
     return this.deviceId;
   }
 
   /**
-   * Cached value of `sys_info.deviceId`.
-   * @return {string}
+   * Cached value of `sysinfo.deviceId`.
    */
-  get deviceId() {
+  get deviceId(): string {
     return this.sysInfo.deviceId;
   }
 
   /**
-   * Cached value of `sys_info.[description|dev_name]`.
-   * @return {string}
+   * Cached value of `sysinfo.[description|dev_name]`.
    */
-  get description() {
-    return this.sysInfo.description || this.sysInfo.dev_name;
-  }
+  abstract get description(): string | undefined;
 
   /**
-   * Cached value of `sys_info.model`.
+   * Cached value of `sysinfo.model`.
    * @return {string}
    */
-  get model() {
+  get model(): string {
     return this.sysInfo.model;
   }
 
   /**
-   * Cached value of `sys_info.alias`.
+   * Cached value of `sysinfo.alias`.
    * @return {string}
    */
-  get name() {
+  get name(): string {
     return this.alias;
   }
 
   /**
-   * Cached value of `sys_info.[type|mic_type]`.
+   * Cached value of `sysinfo.[type|mic_type]`.
    * @return {string}
    */
-  get type() {
-    return this.sysInfo.type || this.sysInfo.mic_type;
+  get type(): string {
+    if ('type' in this.sysInfo && this.sysInfo.type !== undefined)
+      return this.sysInfo.type;
+    if ('mic_type' in this.sysInfo && this.sysInfo.mic_type !== undefined)
+      return this.sysInfo.mic_type;
+    return '';
   }
 
   /**
    * Type of device (or `device` if unknown).
    *
-   * Based on cached value of `sys_info.[type|mic_type]`
+   * Based on cached value of `sysinfo.[type|mic_type]`
    * @return {string} 'plug'|'bulb'|'device'
    */
-  get deviceType() {
+  get deviceType(): 'plug' | 'bulb' | 'device' {
     const { type } = this;
     switch (true) {
       case /plug/i.test(type):
@@ -235,39 +256,46 @@ export default abstract class Device extends EventEmitter {
   }
 
   /**
-   * Cached value of `sys_info.sw_ver`.
+   * Cached value of `sysinfo.sw_ver`.
    * @return {string}
    */
-  get softwareVersion() {
+  get softwareVersion(): string {
     return this.sysInfo.sw_ver;
   }
 
   /**
-   * Cached value of `sys_info.hw_ver`.
+   * Cached value of `sysinfo.hw_ver`.
    * @return {string}
    */
-  get hardwareVersion() {
+  get hardwareVersion(): string {
     return this.sysInfo.hw_ver;
   }
 
   /**
-   * Cached value of `sys_info.[mac|mic_mac|ethernet_mac]`.
+   * Cached value of `sysinfo.[mac|mic_mac|ethernet_mac]`.
    * @return {string}
    */
-  get mac() {
-    return (
-      this.sysInfo.mac || this.sysInfo.mic_mac || this.sysInfo.ethernet_mac
-    );
+  get mac(): string {
+    if ('mac' in this.sysInfo && this.sysInfo.mac !== undefined)
+      return this.sysInfo.mac;
+    if ('mic_mac' in this.sysInfo && this.sysInfo.mic_mac !== undefined)
+      return this.sysInfo.mic_mac;
+    if (
+      'ethernet_mac' in this.sysInfo &&
+      this.sysInfo.ethernet_mac !== undefined
+    )
+      return this.sysInfo.ethernet_mac;
+    return '';
   }
 
   /**
-   * Normalized cached value of `sys_info.[mac|mic_mac|ethernet_mac]`
+   * Normalized cached value of `sysinfo.[mac|mic_mac|ethernet_mac]`
    *
    * Removes all non alphanumeric characters and makes uppercase
    * `aa:bb:cc:00:11:22` will be normalized to `AABBCC001122`
    * @return {string}
    */
-  get macNormalized() {
+  get macNormalized(): string {
     const mac = this.mac || '';
     return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   }
@@ -275,28 +303,29 @@ export default abstract class Device extends EventEmitter {
   /**
    * Closes any open network connections including any shared sockets.
    */
-  closeConnection() {
+  closeConnection(): void {
     this.udpConnection.close();
     this.tcpConnection.close();
   }
 
   /**
    * Sends `payload` to device (using {@link Client#send})
-   * @param  {Object|string} payload
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, Error>} parsed JSON response
+   * @param   payload
+   * @param   sendOptions
+   * @returns parsed JSON response
    */
-  async send(payload, sendOptions) {
+  async send(
+    payload: string | object,
+    sendOptions?: SendOptions
+  ): Promise<string> {
     this.log.debug('[%s] device.send()', this.alias);
 
     try {
       const thisSendOptions = {
         ...this.defaultSendOptions,
         ...sendOptions,
-      };
-      const payloadString = !(
-        typeof payload === 'string' || payload instanceof String
-      )
+      } as Required<SendOptions>;
+      const payloadString = !(typeof payload === 'string')
         ? JSON.stringify(payload)
         : payload;
 
@@ -332,13 +361,16 @@ export default abstract class Device extends EventEmitter {
    * @param  {string[]|string} [childIds]
    * @param  {SendOptions}     [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @throws {ResponseError}
    */
-  async sendCommand(command, childIds = this.childId, sendOptions) {
+  async sendCommand(
+    command: string | object,
+    childIds: string[] | string | undefined = this.childId,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     // TODO allow certain err codes (particularly emeter for non HS110 devices)
     const commandObj =
-      typeof command === 'string' || command instanceof String
-        ? JSON.parse(command)
-        : command;
+      typeof command === 'string' ? JSON.parse(command) : command;
 
     if (childIds) {
       const childIdsArray = castArray(childIds).map(
@@ -349,30 +381,22 @@ export default abstract class Device extends EventEmitter {
     }
 
     const response = await this.send(commandObj, sendOptions);
-    const results = processResponse(commandObj, response);
+    const results = processResponse(commandObj, JSON.parse(response));
     return results;
   }
 
   /**
-   * @private
+   * @internal
    */
-  normalizeChildId(childId) {
-    let normalizedChildId = childId;
-    if (Number.isInteger(childId) && childId >= 0 && childId < 100) {
-      normalizedChildId += '';
+  protected normalizeChildId(childId: string): string {
+    if (childId.length === 1) {
+      return `${this.deviceId}0${childId}`;
     }
-    if (
-      typeof normalizedChildId === 'string' ||
-      normalizedChildId instanceof String
-    ) {
-      if (normalizedChildId.length === 1) {
-        return `${this.deviceId || ''}0${normalizedChildId}`;
-      }
-      if (normalizedChildId.length === 2) {
-        return (this.deviceId || '') + normalizedChildId;
-      }
+    if (childId.length === 2) {
+      return this.deviceId + childId;
     }
-    return normalizedChildId;
+
+    return childId;
   }
 
   /**
@@ -384,8 +408,8 @@ export default abstract class Device extends EventEmitter {
    * @param  {number} interval (ms)
    * @return {Device|Bulb|Plug}          this
    */
-  startPolling(interval) {
-    const fn = async () => {
+  startPolling(interval: number): this {
+    const fn = async (): Promise<void> => {
       try {
         await this.getInfo();
       } catch (err) {
@@ -409,7 +433,8 @@ export default abstract class Device extends EventEmitter {
   /**
    * Stops device polling.
    */
-  stopPolling() {
+  stopPolling(): void {
+    if (this.pollingTimer === null) return;
     clearInterval(this.pollingTimer);
     this.pollingTimer = null;
   }
@@ -417,17 +442,23 @@ export default abstract class Device extends EventEmitter {
   /**
    * Gets device's SysInfo.
    *
-   * Requests `system.sys_info` from device. Does not support childId.
+   * Requests `system.sysinfo` from device. Does not support childId.
    * @param  {SendOptions}  [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async getSysInfo(sendOptions) {
+  async getSysInfo(sendOptions?: SendOptions): Promise<Sysinfo> {
     this.log.debug('[%s] device.getSysInfo()', this.alias);
-    this.sysInfo = await this.sendCommand(
-      '{"system":{"get_sysinfo":{}}}',
-      null,
-      sendOptions
-    );
+    const response = extractResponse(
+      await this.sendCommand(
+        '{"system":{"get_sysinfo":{}}}',
+        undefined,
+        sendOptions
+      ),
+      '',
+      isSysinfo
+    ) as Sysinfo;
+
+    this.setSysInfo(response);
     return this.sysInfo;
   }
 
@@ -439,17 +470,21 @@ export default abstract class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<boolean, ResponseError>}
    */
-  async setAlias(alias, sendOptions) {
+  async setAlias(alias: string, sendOptions?: SendOptions): Promise<boolean> {
     await this.sendCommand(
       {
-        [this.apiModuleNamespace.system]: { set_dev_alias: { alias } },
+        [this.apiModule.system]: {
+          set_dev_alias: { alias },
+        },
       },
       this.childId,
       sendOptions
     );
-    this.alias = alias;
+    this.setAliasProperty(alias);
     return true;
   }
+
+  protected abstract setAliasProperty(alias: string): void;
 
   /**
    * Set device's location.
@@ -460,28 +495,36 @@ export default abstract class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async setLocation(latitude, longitude, sendOptions) {
-    const latitude_i = Math.round(latitude * 10000); // eslint-disable-line camelcase
-    const longitude_i = Math.round(longitude * 10000); // eslint-disable-line camelcase
-    return this.sendCommand(
+  async setLocation(
+    latitude: number,
+    longitude: number,
+    sendOptions?: SendOptions
+  ): Promise<object> {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    const latitude_i = Math.round(latitude * 10000);
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    const longitude_i = Math.round(longitude * 10000);
+    const response = await this.sendCommand(
       {
-        [this.apiModuleNamespace.system]: {
+        [this.apiModule.system]: {
           set_dev_location: { latitude, longitude, latitude_i, longitude_i },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
+    if (isObjectLike(response)) return response;
+    throw new Error('Unexpected Response');
   }
 
   /**
    * Gets device's model.
    *
-   * Requests `system.sys_info` and returns model name. Does not support childId.
+   * Requests `system.sysinfo` and returns model name. Does not support childId.
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @return {Promise<string, ResponseError>} parsed JSON response
    */
-  async getModel(sendOptions) {
+  async getModel(sendOptions?: SendOptions): Promise<string> {
     const sysInfo = await this.getSysInfo(sendOptions);
     return sysInfo.model;
   }
@@ -494,12 +537,12 @@ export default abstract class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async reboot(delay, sendOptions) {
+  async reboot(delay: number, sendOptions?: SendOptions): Promise<unknown> {
     return this.sendCommand(
       {
-        [this.apiModuleNamespace.system]: { reboot: { delay } },
+        [this.apiModule.system]: { reboot: { delay } },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -512,15 +555,15 @@ export default abstract class Device extends EventEmitter {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async reset(delay, sendOptions) {
+  async reset(delay: number, sendOptions?: SendOptions): Promise<unknown> {
     return this.sendCommand(
       {
-        [this.apiModuleNamespace.system]: { reset: { delay } },
+        [this.apiModule.system]: { reset: { delay } },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
-}
 
-module.exports = Device;
+  abstract async getInfo(sendOptions?: SendOptions): Promise<object>;
+}

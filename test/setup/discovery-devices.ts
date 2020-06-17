@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import type { Client } from '../../src';
 import { AnyDevice } from '../../src/client';
 
