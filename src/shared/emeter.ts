@@ -1,43 +1,66 @@
-/**
- * Emeter
- */
-class Emeter {
-  #realtime = {};
+import type { AnyDevice, SendOptions } from '../client';
+import {
+  extractResponse,
+  isObjectLike,
+  HasErrCode,
+  hasErrCode,
+} from '../utils';
 
-  constructor(device, apiModuleName, childId = null) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
-    this.childId = childId;
-  }
+type RealtimeV1 = {
+  current?: number;
+  power?: number;
+  total?: number;
+  voltage?: number;
+};
+
+type RealtimeV2 = {
+  current_ma?: number;
+  power_mw?: number;
+  total_wh?: number;
+  voltage_mv?: number;
+};
+
+type Realtime = RealtimeV1 | RealtimeV2;
+
+type RealtimeNormalized = RealtimeV1 & RealtimeV2;
+
+export function isRealtime(candidate: unknown): candidate is Realtime {
+  return isObjectLike(candidate);
+}
+
+export default class Emeter {
+  #realtime: Realtime = {};
+
+  constructor(
+    readonly device: AnyDevice,
+    readonly apiModuleName: string,
+    readonly childId: string | undefined = undefined
+  ) {}
 
   /**
    * Returns cached results from last retrieval of `emeter.get_realtime`.
    * @return {Object}
    */
-  get realtime() {
+  get realtime(): Realtime {
     return this.#realtime;
   }
 
   /**
    * @private
    */
-  set realtime(realtime) {
-    const normalizedRealtime = { ...realtime }; // will coerce null/undefined to {}
+  set realtime(realtime: Realtime) {
+    const normRealtime: RealtimeNormalized = { ...realtime }; // will coerce null/undefined to {}
 
-    const normalize = (propName, propName2, multiplier) => {
-      if (
-        normalizedRealtime[propName] != null &&
-        normalizedRealtime[propName2] == null
-      ) {
-        normalizedRealtime[propName2] = Math.floor(
-          normalizedRealtime[propName] * multiplier
-        );
-      } else if (
-        normalizedRealtime[propName] == null &&
-        normalizedRealtime[propName2] != null
-      ) {
-        normalizedRealtime[propName] =
-          normalizedRealtime[propName2] / multiplier;
+    const normalize = <K extends keyof RealtimeNormalized>(
+      key1: K,
+      key2: K,
+      multiplier: number
+    ): void => {
+      const r = normRealtime;
+      if (typeof r[key1] === 'number' && r[key2] === undefined) {
+        r[key2] = Math.floor((r[key1] as number) * multiplier);
+      } else if (r[key1] == null && typeof r[key2] === 'number') {
+        r[key1] = (r[key2] as number) / multiplier;
       }
     };
 
@@ -48,7 +71,7 @@ class Emeter {
       normalize('voltage', 'voltage_mv', 1000);
     }
 
-    this.#realtime = normalizedRealtime;
+    this.#realtime = normRealtime;
     this.device.emit('emeter-realtime-update', this.#realtime);
   }
 
@@ -59,16 +82,21 @@ class Emeter {
    * while newer devices return `current_ma`, `voltage_mv` etc
    * This will return a normalized response including both old and new style properties for backwards compatibility.
    * Supports childId.
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getRealtime(sendOptions) {
-    this.realtime = await this.device.sendCommand(
-      {
-        [this.apiModuleName]: { get_realtime: {} },
-      },
-      this.childId,
-      sendOptions
+  async getRealtime(sendOptions?: SendOptions): Promise<unknown> {
+    this.realtime = extractResponse<Realtime & HasErrCode>(
+      await this.device.sendCommand(
+        {
+          [this.apiModuleName]: { get_realtime: {} },
+        },
+        this.childId,
+        sendOptions
+      ),
+      '',
+      (c) => isRealtime(c) && hasErrCode(c)
     );
     return this.realtime;
   }
@@ -77,12 +105,17 @@ class Emeter {
    * Get Daily Emeter Statistics.
    *
    * Sends `emeter.get_daystat` command. Supports childId.
-   * @param  {number}       year
-   * @param  {number}       month
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   year
+   * @param   month
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async getDayStats(year, month, sendOptions) {
+  async getDayStats(
+    year: number,
+    month: number,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_daystat: { year, month } },
@@ -96,11 +129,15 @@ class Emeter {
    * Get Monthly Emeter Statistics.
    *
    * Sends `emeter.get_monthstat` command. Supports childId.
-   * @param  {number}       year
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   year
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async getMonthStats(year, sendOptions) {
+  async getMonthStats(
+    year: number,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_monthstat: { year } },
@@ -114,10 +151,11 @@ class Emeter {
    * Erase Emeter Statistics.
    *
    * Sends `emeter.erase_runtime_stat` command. Supports childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async eraseStats(sendOptions) {
+  async eraseStats(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { erase_emeter_stat: {} },

@@ -42,7 +42,7 @@ export default class BulbSchedule extends Schedule {
       name = '',
       enable = true,
     }: BulbScheduleRuleInput,
-    sendOptions: SendOptions
+    sendOptions?: SendOptions
   ): Promise<{ id: string }> {
     const rule: BulbScheduleRule = {
       s_light: lightState,
@@ -79,7 +79,7 @@ export default class BulbSchedule extends Schedule {
       name = '',
       enable = true,
     }: BulbScheduleRuleInput & { id: string },
-    sendOptions: SendOptions
+    sendOptions?: SendOptions
   ): Promise<unknown> {
     const rule = {
       id,

@@ -330,9 +330,9 @@ export default abstract class Device extends EventEmitter {
         : payload;
 
       if (thisSendOptions.transport === 'udp') {
-        return this.udpConnection.send(payloadString, thisSendOptions);
+        return await this.udpConnection.send(payloadString, thisSendOptions);
       }
-      return this.tcpConnection.send(payloadString, thisSendOptions);
+      return await this.tcpConnection.send(payloadString, thisSendOptions);
     } catch (err) {
       this.log.error('[%s] device.send() %s', this.alias, err);
       throw err;

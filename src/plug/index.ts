@@ -7,7 +7,8 @@ import type {
   Sysinfo,
 } from '../device';
 import Away from './away';
-import Cloud from '../shared/cloud';
+import Cloud, { isCloudInfo } from '../shared/cloud';
+import type { CloudInfo } from '../shared/cloud';
 import Dimmer from './dimmer';
 import Emeter from '../shared/emeter';
 import Schedule from './schedule';
@@ -468,11 +469,11 @@ export default class Plug extends Device {
     ) as PlugSysinfo;
     this.setSysInfo(sysinfo);
 
-    const cloudInfo = extractResponse(
+    const cloudInfo = extractResponse<CloudInfo & HasErrCode>(
       data,
       'cnCloud.get_info',
-      isObjectLike
-    ) as object;
+      (c) => isCloudInfo(c) && hasErrCode(c)
+    );
     this.cloud.info = cloudInfo;
 
     if (

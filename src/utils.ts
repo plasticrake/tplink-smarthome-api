@@ -24,7 +24,7 @@ export class ResponseError extends Error {
     message: string,
     readonly response: string,
     readonly command: string,
-    readonly modules: string[],
+    readonly modules: string[] = [],
     readonly methods: string[] = []
   ) {
     super(message);
@@ -184,11 +184,11 @@ export function processResponse(command: object, response: object): object {
  * @throws Error
  * @throws TypeError
  */
-export function extractResponse(
+export function extractResponse<T>(
   response: unknown,
   path: string,
   typeGuardFn: (arg0: unknown) => boolean
-): object {
+): T {
   const ret = path.length > 0 ? get(response, path) : response;
 
   if (ret === undefined || !isObjectLike(ret)) {
@@ -200,5 +200,5 @@ export function extractResponse(
     throw new TypeError(
       `Unexpected object path:"${path}" in ${JSON.stringify(response)}`
     );
-  return ret;
+  return ret as T;
 }

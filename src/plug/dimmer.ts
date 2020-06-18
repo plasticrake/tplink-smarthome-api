@@ -1,30 +1,34 @@
+import type { SendOptions } from '../client';
+import type Plug from '.';
+
 /**
  * Dimmer
  *
  * TP-Link models: HS220.
  */
-class Dimmer {
-  constructor(device, apiModuleName) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
-  }
+export default class Dimmer {
+  constructor(readonly device: Plug, readonly apiModuleName: string) {}
 
   /**
    * Sets Plug to the specified `brightness`.
    *
    * Sends `dimmer.set_brightness` command. Does not support childId.
-   * @param  {Boolean}     brightness  0-100
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param  brightness  0-100
+   * @param  sendOptions
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async setBrightness(brightness, sendOptions = {}) {
+  async setBrightness(
+    brightness: number,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_brightness: { brightness },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -33,17 +37,17 @@ class Dimmer {
    * Get Plug/Dimmer default behavior configuration.
    *
    * Requests `dimmer.get_default_behavior`. Does not support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getDefaultBehavior(sendOptions = {}) {
+  async getDefaultBehavior(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           get_default_behavior: {},
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -52,17 +56,17 @@ class Dimmer {
    * Get Plug/Dimmer parameters configuration.
    *
    * Requests `dimmer.get_dimmer_parameters`. Does not support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getDimmerParameters(sendOptions = {}) {
+  async getDimmerParameters(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           get_dimmer_parameters: {},
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -76,22 +80,28 @@ class Dimmer {
    * @param  {number}      [options.mode]        "gentle_on_off", etc.
    * @param  {number}      [options.duration]    duration in seconds
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async setDimmerTransition({ brightness, mode, duration }, sendOptions = {}) {
-    const transition = {};
-
-    if (brightness !== undefined) transition.brightness = brightness;
-    if (mode !== undefined) transition.mode = mode;
-    if (duration !== undefined) transition.duration = duration;
-
+  async setDimmerTransition(
+    {
+      brightness,
+      mode,
+      duration,
+    }: { brightness?: number; mode?: string; duration?: number },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
-          set_dimmer_transition: transition,
+          set_dimmer_transition: {
+            brightness,
+            mode,
+            duration,
+          },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -104,9 +114,13 @@ class Dimmer {
    * @param  {string}      [options.mode]
    * @param  {number}      [options.index]
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async setDoubleClickAction({ mode, index }, sendOptions = {}) {
+  async setDoubleClickAction(
+    { mode, index }: { mode?: string; index?: number },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.setAction(
       {
         actionName: 'set_double_click_action',
@@ -117,21 +131,25 @@ class Dimmer {
     );
   }
 
-  /**
-   * @private
-   */
-  async setAction({ actionName, mode, index }, sendOptions = {}) {
-    const action = {};
-    if (mode !== undefined) action.mode = mode;
-    if (index !== undefined) action.index = index;
-
+  private async setAction(
+    {
+      actionName,
+      mode,
+      index,
+    }: {
+      actionName: string;
+      mode?: string;
+      index?: number;
+    },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
-          [actionName]: action,
+          [actionName]: { mode, index },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -140,18 +158,22 @@ class Dimmer {
    * Set Plug `dimmer_parameters` for `fadeOffTime`.
    *
    * Sends `dimmer.set_fade_off_time`. Does not support childId.
-   * @param  {number} duration  duration in ms
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   fadeTime - duration in ms
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async setFadeOffTime(fadeTime, sendOptions = {}) {
+  async setFadeOffTime(
+    fadeTime: number,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_fade_off_time: { fadeTime },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -160,18 +182,22 @@ class Dimmer {
    * Set Plug `dimmer_parameters` for `fadeOnTime`.
    *
    * Sends `dimmer.set_fade_on_time`. Does not support childId.
-   * @param  {number} fadeTime  duration in ms
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   fadeTime - duration in ms
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async setFadeOnTime(fadeTime, sendOptions = {}) {
+  async setFadeOnTime(
+    fadeTime: number,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_fade_on_time: { fadeTime },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -180,18 +206,22 @@ class Dimmer {
    * Set Plug `dimmer_parameters` for `gentleOffTime`.
    *
    * Sends `dimmer.set_gentle_off_time`. Does not support childId.
-   * @param  {number} fadeTime  duration in ms
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   fadeTime - duration in ms
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async setGentleOffTime(fadeTime, sendOptions = {}) {
+  async setGentleOffTime(
+    fadeTime: number,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_gentle_off_time: { fadeTime },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -200,18 +230,22 @@ class Dimmer {
    * Set Plug `dimmer_parameters` for `gentleOnTime`.
    *
    * Sends `dimmer.set_gentle_on_time`. Does not support childId.
-   * @param  {number} fadeTime  duration in ms
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   fadeTime - duration in ms
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async setGentleOnTime(fadeTime, sendOptions = {}) {
+  async setGentleOnTime(
+    fadeTime: number,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_gentle_on_time: { fadeTime },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -220,13 +254,17 @@ class Dimmer {
    * Set Plug/Dimmer `default_behavior` configuration for `long_press`.
    *
    * Sends `dimmer.set_long_press_action`. Does not support childId.
-   * @param  {Object}       options
-   * @param  {string}      [options.mode]
-   * @param  {number}      [options.index]
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @param   options
+   * @param   options.mode
+   * @param   options.index
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws  ResponseError
    */
-  async setLongPressAction({ mode, index }, sendOptions = {}) {
+  async setLongPressAction(
+    { mode, index }: { mode: string; index: number },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.setAction(
       { actionName: 'set_long_press_action', mode, index },
       sendOptions
@@ -239,19 +277,21 @@ class Dimmer {
    * Sends `dimmer.set_switch_state` command. Does not support childId.
    * @param  {Boolean}     state  true=on, false=off
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async setSwitchState(state, sendOptions = {}) {
+  async setSwitchState(
+    state: boolean | 0 | 1,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_switch_state: { state: state ? 1 : 0 },
         },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
 }
-
-module.exports = Dimmer;

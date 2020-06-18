@@ -1,29 +1,55 @@
-const { createRule } = require('../shared/schedule');
+import type { AnyDevice, SendOptions } from '../client';
+import {
+  createRule,
+  hasRuleListWithRuleIds,
+  ScheduleRuleInputTime,
+} from '../shared/schedule';
+import type { HasRuleListWithRuleIds } from '../shared/schedule';
+import { extractResponse, HasErrCode, hasErrCode } from '../utils';
 
-/**
- * Away
- */
-class Away {
-  constructor(device, apiModuleName, childId = null) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
-    this.childId = childId;
-  }
+export type AwayRule = {
+  name?: string;
+  enable?: number;
+  frequency?: number;
+  delay?: number;
+};
+
+export type AwayRuleInput = {
+  start: ScheduleRuleInputTime;
+  end: ScheduleRuleInputTime;
+  daysOfWeek: number[];
+  frequency: number;
+  name?: string;
+  enable: boolean | 0 | 1;
+};
+
+export default class Away {
+  constructor(
+    readonly device: AnyDevice,
+    readonly apiModuleName: string,
+    readonly childId: string | undefined = undefined
+  ) {}
 
   /**
    * Gets Away Rules.
    *
    * Requests `anti_theft.get_rules`. Support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getRules(sendOptions) {
-    return this.device.sendCommand(
-      {
-        [this.apiModuleName]: { get_rules: {} },
-      },
-      this.childId,
-      sendOptions
+  async getRules(
+    sendOptions?: SendOptions
+  ): Promise<HasRuleListWithRuleIds & HasErrCode> {
+    return extractResponse<HasRuleListWithRuleIds & HasErrCode>(
+      await this.device.sendCommand(
+        {
+          [this.apiModuleName]: { get_rules: {} },
+        },
+        this.childId,
+        sendOptions
+      ),
+      '',
+      (c) => hasRuleListWithRuleIds(c) && hasErrCode(c)
     );
   }
 
@@ -31,17 +57,17 @@ class Away {
    * Gets Away Rule.
    *
    * Requests `anti_theft.get_rules` and return rule matching Id. Support childId.
-   * @param  {string}       id
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response of rule
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getRule(id, sendOptions) {
+  async getRule(
+    id: string,
+    sendOptions?: SendOptions
+  ): Promise<{ id: string } & HasErrCode> {
     const rules = await this.getRules(sendOptions);
     const rule = rules.rule_list.find((r) => r.id === id);
-    if (rule) {
-      rule.err_code = rules.err_code;
-    }
-    return rule;
+    if (rule === undefined) throw new Error(`Rule id not found: ${id}`);
+    return { ...rule, err_code: rules.err_code };
   }
 
   /**
@@ -56,13 +82,21 @@ class Away {
    * @param  {string}       [options.name]
    * @param  {boolean}      [options.enable=true]
    * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
   async addRule(
-    { start, end, daysOfWeek, frequency = 5, name = '', enable = true },
-    sendOptions
-  ) {
-    const rule = {
+    {
+      start,
+      end,
+      daysOfWeek,
+      frequency = 5,
+      name = '',
+      enable = true,
+    }: AwayRuleInput,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
+    const rule: AwayRule = {
       frequency,
       name,
       enable: enable ? 1 : 0,
@@ -90,13 +124,22 @@ class Away {
    * @param  {string}       [options.name]
    * @param  {boolean}      [options.enable=true]
    * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
   async editRule(
-    { id, start, end, daysOfWeek, frequency = 5, name = '', enable = true },
-    sendOptions
-  ) {
-    const rule = {
+    {
+      id,
+      start,
+      end,
+      daysOfWeek,
+      frequency = 5,
+      name = '',
+      enable = true,
+    }: AwayRuleInput & { id: string },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
+    const rule: AwayRule & { id: string } = {
       id,
       frequency,
       name,
@@ -116,10 +159,10 @@ class Away {
    * Deletes All Away Rules.
    *
    * Sends `anti_theft.delete_all_rules` command. Support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async deleteAllRules(sendOptions) {
+  async deleteAllRules(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { delete_all_rules: {} },
@@ -133,11 +176,10 @@ class Away {
    * Deletes Away Rule.
    *
    * Sends `anti_theft.delete_rule` command. Support childId.
-   * @param  {string}       id
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async deleteRule(id, sendOptions) {
+  async deleteRule(id: string, sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { delete_rule: { id } },
@@ -151,11 +193,13 @@ class Away {
    * Enables or Disables Away Rules.
    *
    * Sends `anti_theft.set_overall_enable` command. Support childId.
-   * @param  {boolean}      enable
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async setOverallEnable(enable, sendOptions) {
+  async setOverallEnable(
+    enable: boolean | 0 | 1,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {

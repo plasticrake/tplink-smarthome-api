@@ -1,26 +1,51 @@
-/**
- * Cloud
- */
-class Cloud {
-  constructor(device, apiModuleName) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
-  }
+import type { AnyDevice, SendOptions } from '../client';
+import {
+  extractResponse,
+  isObjectLike,
+  HasErrCode,
+  hasErrCode,
+} from '../utils';
+
+export type CloudInfo = {
+  username?: string;
+  server?: string;
+  binded?: number;
+  cld_connection?: number;
+  illegalType?: number;
+  tcspStatus?: number;
+  fwDlPage?: string;
+  tcspInfo?: string;
+  stopConnect?: number;
+  fwNotifyType?: number;
+};
+
+export function isCloudInfo(candidate: unknown): candidate is CloudInfo {
+  return isObjectLike(candidate);
+}
+
+export default class Cloud {
+  info: (CloudInfo & HasErrCode) | undefined;
+
+  constructor(readonly device: AnyDevice, readonly apiModuleName: string) {}
 
   /**
    * Gets device's TP-Link cloud info.
    *
    * Requests `cloud.get_info`. Does not support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   sendOptions
+   * @returns parsed JSON response
    */
-  async getInfo(sendOptions) {
-    this.info = await this.device.sendCommand(
-      {
-        [this.apiModuleName]: { get_info: {} },
-      },
-      null,
-      sendOptions
+  async getInfo(sendOptions?: SendOptions): Promise<CloudInfo & HasErrCode> {
+    this.info = extractResponse<CloudInfo & HasErrCode>(
+      await this.device.sendCommand(
+        {
+          [this.apiModuleName]: { get_info: {} },
+        },
+        undefined,
+        sendOptions
+      ),
+      '',
+      (c) => isCloudInfo(c) && hasErrCode(c)
     );
     return this.info;
   }
@@ -29,17 +54,21 @@ class Cloud {
    * Add device to TP-Link cloud.
    *
    * Sends `cloud.bind` command. Does not support childId.
-   * @param  {string}       username
-   * @param  {string}       password
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   username
+   * @param   password
+   * @param   sendOptions
+   * @returns parsed JSON response
    */
-  async bind(username, password, sendOptions) {
+  async bind(
+    username: string,
+    password: string,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { bind: { username, password } },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -48,15 +77,15 @@ class Cloud {
    * Remove device from TP-Link cloud.
    *
    * Sends `cloud.unbind` command. Does not support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   sendOptions
+   * @returns parsed JSON response
    */
-  async unbind(sendOptions) {
+  async unbind(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { unbind: {} },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -65,15 +94,15 @@ class Cloud {
    * Get device's TP-Link cloud firmware list.
    *
    * Sends `cloud.get_intl_fw_list` command. Does not support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   sendOptions
+   * @returns parsed JSON response
    */
-  async getFirmwareList(sendOptions) {
+  async getFirmwareList(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_intl_fw_list: {} },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -82,19 +111,20 @@ class Cloud {
    * Sets device's TP-Link cloud server URL.
    *
    * Sends `cloud.set_server_url` command. Does not support childId.
-   * @param  {string}       server URL
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   server - URL
+   * @param   sendOptions
+   * @returns parsed JSON response
    */
-  async setServerUrl(server, sendOptions) {
+  async setServerUrl(
+    server: string,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { set_server_url: { server } },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
 }
-
-module.exports = Cloud;

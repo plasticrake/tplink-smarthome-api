@@ -1,12 +1,25 @@
-/**
- * Timer
- */
-class Timer {
-  constructor(device, apiModuleName, childId = null) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
-    this.childId = childId;
-  }
+import type { AnyDevice, SendOptions } from '../client';
+
+export type TimerRule = {
+  name?: string;
+  enable?: number;
+  act?: number;
+  delay?: number;
+};
+
+export type TimerRuleInput = {
+  name?: string;
+  enable: boolean;
+  powerState: boolean | 0 | 1;
+  delay: number;
+};
+
+export default class Timer {
+  constructor(
+    readonly device: AnyDevice,
+    readonly apiModuleName: string,
+    readonly childId: string | undefined = undefined
+  ) {}
 
   /**
    * Get Countdown Timer Rule (only one allowed).
@@ -14,9 +27,10 @@ class Timer {
    * Requests `count_down.get_rules`. Supports childId.
    * @param  {string[]|string|number[]|number} [childIds] for multi-outlet devices, which outlet(s) to target
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getRules(sendOptions) {
+  async getRules(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_rules: {} },
@@ -40,9 +54,15 @@ class Timer {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async addRule(
-    { delay, powerState, name = 'timer', enable = true, deleteExisting = true },
-    sendOptions
-  ) {
+    {
+      delay,
+      powerState,
+      name = 'timer',
+      enable = true,
+      deleteExisting = true,
+    }: TimerRuleInput & { deleteExisting: boolean },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     if (deleteExisting) await this.deleteAllRules(sendOptions);
     return this.device.sendCommand(
       {
@@ -74,9 +94,15 @@ class Timer {
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
   async editRule(
-    { id, delay, powerState, name = 'timer', enable = true },
-    sendOptions
-  ) {
+    {
+      id,
+      delay,
+      powerState,
+      name = 'timer',
+      enable = true,
+    }: TimerRuleInput & { id: string },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
@@ -101,7 +127,7 @@ class Timer {
    * @param  {SendOptions} [sendOptions]
    * @return {Promise<Object, ResponseError>} parsed JSON response
    */
-  async deleteAllRules(sendOptions) {
+  async deleteAllRules(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { delete_all_rules: {} },
@@ -111,5 +137,3 @@ class Timer {
     );
   }
 }
-
-module.exports = Timer;
