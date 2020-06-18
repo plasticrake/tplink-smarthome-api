@@ -1,25 +1,22 @@
-/**
- * Time
- */
-class Time {
-  constructor(device, apiModuleName) {
-    this.device = device;
-    this.apiModuleName = apiModuleName;
-  }
+import type { AnyDevice, SendOptions } from '../client';
+
+export default class Time {
+  constructor(readonly device: AnyDevice, readonly apiModuleName: string) {}
 
   /**
    * Gets device's time.
    *
    * Requests `timesetting.get_time`. Does not support ChildId.
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getTime(sendOptions) {
+  async getTime(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_time: {} },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
@@ -28,18 +25,17 @@ class Time {
    * Gets device's timezone.
    *
    * Requests `timesetting.get_timezone`. Does not support ChildId.
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @param   sendOptions
+   * @returns parsed JSON response
+   * @throws ResponseError
    */
-  async getTimezone(sendOptions) {
+  async getTimezone(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_timezone: {} },
       },
-      null,
+      undefined,
       sendOptions
     );
   }
 }
-
-module.exports = Time;

@@ -4,6 +4,7 @@ import util from 'util';
 
 import type log from 'loglevel';
 import { encrypt, decrypt } from 'tplink-smarthome-crypto';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import type { DeepRequired, MarkOptional } from 'ts-essentials';
 
 import Device, { isBulbSysinfo, isPlugSysinfo } from './device';

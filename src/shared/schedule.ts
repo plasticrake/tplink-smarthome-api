@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import type { MarkRequired } from 'ts-essentials';
 
 import type { AnyDevice, SendOptions } from '../client';
@@ -52,6 +53,22 @@ export function isScheduleNextActionResponse(
   candidate: unknown
 ): candidate is ScheduleNextActionResponse {
   return isScheduleNextAction(candidate) && hasErrCode(candidate);
+}
+
+export type HasRuleListWithRuleIds = { rule_list: { id: string }[] };
+
+export function hasRuleListWithRuleIds(
+  candidate: unknown
+): candidate is { rule_list: { id: string }[] } {
+  return (
+    isObjectLike(candidate) &&
+    'rule_list' in candidate &&
+    isObjectLike(candidate.rule_list) &&
+    Array.isArray(candidate.rule_list) &&
+    candidate.rule_list.every(
+      (rule) => 'id' in rule && typeof rule.id === 'string'
+    )
+  );
 }
 
 function isScheduleRules(candidate: unknown): candidate is ScheduleRules {
