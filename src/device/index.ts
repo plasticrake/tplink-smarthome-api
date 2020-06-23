@@ -13,7 +13,17 @@ import Netif from './netif';
 import TcpConnection from '../network/tcp-connection';
 import UdpConnection from '../network/udp-connection';
 import type { PlugSysinfo } from '../plug';
-import { isObjectLike, processResponse, extractResponse } from '../utils';
+import {
+  isObjectLike,
+  processResponse,
+  extractResponse,
+  processSingleCommandResponse,
+  HasErrCode,
+} from '../utils';
+
+type HasAtLeastOneProperty = {
+  [key: string]: unknown;
+};
 
 interface ApiModuleNamespace {
   system: string;
@@ -99,7 +109,7 @@ function isSysinfo(candidate: unknown): candidate is Sysinfo {
  * @emits  Device#emeter-realtime-update
  */
 export default abstract class Device extends EventEmitter {
-  client: Client;
+  readonly client: Client;
 
   host: string;
 
@@ -111,9 +121,9 @@ export default abstract class Device extends EventEmitter {
 
   readonly defaultSendOptions: SendOptions;
 
-  private readonly udpConnection = new UdpConnection(this);
+  private readonly udpConnection: UdpConnection;
 
-  private readonly tcpConnection = new TcpConnection(this);
+  private readonly tcpConnection: TcpConnection;
 
   private pollingTimer: NodeJS.Timeout | null = null;
 
@@ -161,6 +171,20 @@ export default abstract class Device extends EventEmitter {
       ...client.defaultSendOptions,
       ...defaultSendOptions,
     };
+
+    this.udpConnection = new UdpConnection(
+      this.host,
+      this.port,
+      this.log,
+      this.client
+    );
+
+    this.tcpConnection = new TcpConnection(
+      this.host,
+      this.port,
+      this.log,
+      this.client
+    );
   }
 
   get apiModule(): ApiModuleNamespace {
@@ -330,9 +354,19 @@ export default abstract class Device extends EventEmitter {
         : payload;
 
       if (thisSendOptions.transport === 'udp') {
-        return await this.udpConnection.send(payloadString, thisSendOptions);
+        return await this.udpConnection.send(
+          payloadString,
+          this.port,
+          this.host,
+          thisSendOptions
+        );
       }
-      return await this.tcpConnection.send(payloadString, thisSendOptions);
+      return await this.tcpConnection.send(
+        payloadString,
+        this.port,
+        this.host,
+        thisSendOptions
+      );
     } catch (err) {
       this.log.error('[%s] device.send() %s', this.alias, err);
       throw err;

@@ -1,25 +1,23 @@
-const TplinkConnection = require('./tplink-connection');
-const TcpSocket = require('./tcp-socket');
+import TplinkConnection from './tplink-connection';
+import TcpSocket from './tcp-socket';
 
-class TcpConnection extends TplinkConnection {
-  /**
-   * @private
-   */
-  // eslint-disable-next-line class-methods-use-this
-  get socketType() {
-    return 'TCP';
+export default class TcpConnection extends TplinkConnection {
+  readonly socketType = 'TCP';
+
+  protected async getSocket(): Promise<TcpSocket> {
+    this.log.debug(`TcpConnection(${this.description}).getSocket()`);
+
+    const socket = new TcpSocket(this.client.getNextSocketId(), this.log);
+    await socket.createSocket();
+    return socket;
   }
 
-  /**
-   * @private
-   */
-  async getSocket() {
-    return super.getSocket(TcpSocket);
-  }
-
-  async send(payload, { timeout } = {}) {
-    return super.send(payload, { timeout });
+  async send(
+    payload: string,
+    port: number,
+    host: string,
+    { timeout }: { timeout: number }
+  ): Promise<string> {
+    return super.send(payload, port, host, { timeout });
   }
 }
-
-module.exports = TcpConnection;

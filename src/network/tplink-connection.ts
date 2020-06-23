@@ -1,15 +1,25 @@
-const Queue = require('promise-queue');
-const EventEmitter = require('events');
+import { EventEmitter } from 'events';
+import Queue from 'promise-queue';
 
-class TplinkConnection extends EventEmitter {
-  constructor(device) {
+import type Client from '../client';
+
+import TcpSocket from './tcp-socket';
+import UdpSocket from './udp-socket';
+import { Logger } from '../logger';
+
+export default abstract class TplinkConnection extends EventEmitter {
+  abstract readonly socketType: string;
+
+  // TODO: Move queue to device, so UDP and TCP connections share a queue
+  private queue = new Queue(1, Infinity);
+
+  constructor(
+    public host: string,
+    public port: number,
+    readonly log: Logger,
+    readonly client: Client
+  ) {
     super();
-    this.device = device;
-    this.client = device.client;
-    this.log = device.log;
-    this.sharedSocket = null;
-
-    this.queue = new Queue(1, Infinity);
 
     this.on('timeout', () => {
       this.log.debug(
@@ -23,59 +33,28 @@ class TplinkConnection extends EventEmitter {
     });
   }
 
-  /**
-   * @private
-   */
-  get host() {
-    return this.device.host;
-  }
-
-  /**
-   * @private
-   */
-  get port() {
-    return this.device.port;
-  }
-
-  /**
-   * @private
-   */
-  get description() {
+  protected get description(): string {
     return `${this.socketType} ${this.host}:${this.port}`;
   }
 
-  /**
-   * @private
-   */
-  async getSocket(Constructor, useSharedSocket = false) {
-    this.log.debug(`TplinkConnection(${this.description}).getSocket(%j)`, {
+  protected abstract async getSocket(
+    useSharedSocket?: boolean
+  ): Promise<UdpSocket | TcpSocket>;
+
+  async send(
+    payload: string,
+    port: number,
+    host: string,
+    {
+      timeout,
       useSharedSocket,
-    });
-
-    if (useSharedSocket && this.sharedSocket != null) {
-      this.log.debug(
-        `TplinkConnection(${this.description}).getSocket(): reusing shared socket`
-      );
-      if (this.sharedSocket.socket != null && this.sharedSocket.isBound) {
-        return this.sharedSocket;
-      }
-      this.log.debug(
-        `TplinkConnection(${this.description}).getSocket(): recreating shared socket`
-      );
+      sharedSocketTimeout,
+    }: {
+      timeout: number;
+      useSharedSocket?: boolean;
+      sharedSocketTimeout?: number;
     }
-
-    const socket = new Constructor(this.client.getNextSocketId(), this.log);
-    await socket.createSocket();
-
-    if (useSharedSocket) {
-      socket.unref(); // let node exit cleanly if socket is left open
-      this.sharedSocket = socket;
-    }
-
-    return socket;
-  }
-
-  async send(payload, { timeout, useSharedSocket, sharedSocketTimeout } = {}) {
+  ): Promise<string> {
     this.log.debug(`TplinkConnection(${this.description}).send(%j)`, {
       payload,
       timeout,
@@ -83,11 +62,11 @@ class TplinkConnection extends EventEmitter {
       sharedSocketTimeout,
     });
 
-    if (useSharedSocket && sharedSocketTimeout != null) {
-      this.setTimeout(sharedSocketTimeout);
-    }
+    // Allow redefining post/host on each send in case device IP has changed
+    this.port = port;
+    this.host = host;
 
-    let socket;
+    let socket: TcpSocket | UdpSocket;
     return this.queue.add(async () => {
       try {
         socket = await this.getSocket(useSharedSocket);
@@ -106,30 +85,7 @@ class TplinkConnection extends EventEmitter {
     });
   }
 
-  close() {
+  close(): void {
     this.log.debug(`TplinkConnection(${this.description}).close()`);
-    this.setTimeout(0);
-    if (this.sharedSocket && this.sharedSocket.isBound) {
-      this.log.debug(
-        `TplinkConnection(${this.description}).close() closing shared socket`
-      );
-      this.sharedSocket.close();
-    }
-  }
-
-  /**
-   * @private
-   */
-  setTimeout(timeout) {
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-    if (timeout > 0) {
-      this.timer = setTimeout(() => {
-        this.emit('timeout');
-      }, timeout);
-    }
   }
 }
-
-module.exports = TplinkConnection;
