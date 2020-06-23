@@ -1,81 +1,76 @@
-const dgram = require('dgram');
+import dgram from 'dgram';
+import { encrypt, decrypt } from 'tplink-smarthome-crypto';
 
-const { encrypt, decrypt } = require('tplink-smarthome-crypto');
+import TplinkSocket from './tplink-socket';
+import { replaceControlCharacters } from '../utils';
 
-const TplinkSocket = require('./tplink-socket');
-const { replaceControlCharacters } = require('../utils');
+export default class UdpSocket extends TplinkSocket {
+  readonly socketType = 'UDP';
 
-class UdpSocket extends TplinkSocket {
-  // eslint-disable-next-line class-methods-use-this
-  get socketType() {
-    return 'UDP';
-  }
+  socket?: dgram.Socket;
 
-  logDebug(...args) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  logDebug(...args: any[]): void {
     this.log.debug(`[${this.socketId}] UdpSocket${args.shift()}`, ...args);
   }
 
-  async createSocket() {
-    return super.createSocket(() => {
-      return new Promise((resolve, reject) => {
-        this.socket = dgram.createSocket('udp4');
+  async createSocketImpl(): Promise<dgram.Socket> {
+    return new Promise((resolve, reject) => {
+      const socket = dgram.createSocket('udp4');
+      this.socket = socket;
 
-        // Polyfill stub for Node < v8.7
-        if (this.socket.getRecvBufferSize === undefined) {
-          this.socket.getRecvBufferSize = () => {};
-        }
-        // Polyfill stub for Node < v8.7
-        if (this.socket.getSendBufferSize === undefined) {
-          this.socket.getSendBufferSize = () => {};
-        }
+      this.socket.on('error', (err) => {
+        this.logDebug(': createSocket:error');
+        reject(err);
+      });
 
-        this.socket.on('error', err => {
-          this.logDebug(': createSocket:error');
-          reject(err);
-        });
+      this.socket.bind(() => {
+        this.logDebug('.createSocket(): listening on %j', socket.address());
+        socket.removeAllListeners('error'); // remove listener so promise can't be resolved & rejected
 
-        this.socket.bind(() => {
-          this.logDebug(
-            '.createSocket(): listening on %j',
-            this.socket.address()
-          );
-          this.socket.removeAllListeners('error');
-          this.isBound = true;
-          resolve(this.socket);
-        });
+        this.isBound = true;
+        resolve(socket);
       });
     });
   }
 
-  close() {
-    super.close(() => {
-      this.socket.close();
-    });
+  close(): void {
+    if (this.socket !== undefined) this.socket.close();
+    super.close();
   }
 
-  /**
-   * @private
-   */
-  async sendAndGetResponse(payload, port, host, timeout) {
+  protected async sendAndGetResponse(
+    payload: string,
+    port: number,
+    host: string,
+    timeout: number
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
-      let timer;
-      const setSocketTimeout = socketTimeout => {
+      const { socket } = this;
+      if (socket === undefined)
+        throw new Error('send called without creating socket');
+
+      let timer: NodeJS.Timeout;
+      const setSocketTimeout = (socketTimeout: number): void => {
         if (timer != null) clearTimeout(timer);
         if (socketTimeout > 0) {
           timer = setTimeout(() => {
             this.logDebug(`: socketTimeout(${socketTimeout})`);
-            reject(new Error('UDP Timeout'));
+            reject(
+              new Error(
+                `UDP Timeout after ${socketTimeout}ms\n${host}:${port} ${payload}`
+              )
+            );
           }, socketTimeout);
         }
       };
       setSocketTimeout(timeout);
 
-      const { socket } = this;
       socket.removeAllListeners('message');
       socket.removeAllListeners('close');
 
       socket.on('message', (msg, rinfo) => {
-        let decryptedMsg;
+        let decryptedMsg = '';
         try {
           this.logDebug(': socket:data rinfo: %j', rinfo);
           setSocketTimeout(0);
@@ -84,6 +79,7 @@ class UdpSocket extends TplinkSocket {
           this.logDebug(
             `: socket:data message:${replaceControlCharacters(decryptedMsg)}`
           );
+
           return resolve(decryptedMsg);
         } catch (err) {
           this.log.error(
@@ -107,8 +103,9 @@ class UdpSocket extends TplinkSocket {
         }
       });
 
-      socket.on('error', err => {
+      socket.on('error', (err) => {
         this.logDebug(': socket:error');
+        setSocketTimeout(0);
         reject(err);
       });
 
@@ -121,7 +118,7 @@ class UdpSocket extends TplinkSocket {
         encryptedPayload.length,
         port,
         host,
-        err => {
+        (err) => {
           if (err) {
             try {
               this.logDebug(
@@ -142,5 +139,3 @@ class UdpSocket extends TplinkSocket {
     });
   }
 }
-
-module.exports = UdpSocket;

@@ -1,46 +1,58 @@
-const net = require('net');
+import net from 'net';
+import { encryptWithHeader, decrypt } from 'tplink-smarthome-crypto';
 
-const { encryptWithHeader, decrypt } = require('tplink-smarthome-crypto');
+import TplinkSocket from './tplink-socket';
+import { replaceControlCharacters } from '../utils';
 
-const TplinkSocket = require('./tplink-socket');
-const { replaceControlCharacters } = require('../utils');
+export default class TcpSocket extends TplinkSocket {
+  readonly socketType = 'TCP';
 
-class TcpSocket extends TplinkSocket {
-  // eslint-disable-next-line class-methods-use-this
-  get socketType() {
-    return 'TCP';
-  }
+  socket?: net.Socket;
 
-  logDebug(...args) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  logDebug(...args: any[]): void {
     this.log.debug(`[${this.socketId}] TcpSocket${args.shift()}`, ...args);
   }
 
-  async createSocket() {
-    return super.createSocket(() => {
-      return new Promise(resolve => {
-        this.socket = new net.Socket();
-        resolve(this.socket);
-      });
+  protected async createSocketImpl(): Promise<net.Socket> {
+    return new Promise((resolve) => {
+      this.socket = new net.Socket();
+      resolve(this.socket);
     });
   }
 
-  close() {
-    super.close(() => {
-      this.socket.end();
-    });
+  close(): void {
+    if (this.socket !== undefined) this.socket.end();
+    super.close();
   }
 
-  /**
-   * @private
-   */
-  async sendAndGetResponse(payload, port, host, timeout) {
+  private destroy(exception?: Error): void {
+    this.logDebug('#destroy(),', exception || '');
+
+    if (this.socket === undefined)
+      throw new Error('destroy called on without creating socket');
+
+    this.socket.destroy(exception);
+    this.isBound = false;
+  }
+
+  protected async sendAndGetResponse(
+    payload: string,
+    port: number,
+    host: string,
+    timeout: number
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
-      let deviceDataBuf;
-      let segmentCount = 0;
-      let decryptedMsg;
+      const { socket } = this;
+      if (socket === undefined)
+        throw new Error('send called without creating socket');
 
-      let timer;
-      const setSocketTimeout = socketTimeout => {
+      let deviceDataBuf: Buffer;
+      let segmentCount = 0;
+      let decryptedMsg: string;
+
+      let timer: NodeJS.Timeout;
+      const setSocketTimeout = (socketTimeout: number): void => {
         if (timer != null) clearTimeout(timer);
         if (socketTimeout > 0) {
           timer = setTimeout(() => {
@@ -48,18 +60,19 @@ class TcpSocket extends TplinkSocket {
             try {
               this.destroy();
             } finally {
-              reject(new Error('TCP Timeout'));
+              reject(
+                new Error(
+                  `TCP Timeout after ${socketTimeout}ms\n${host}:${port} ${payload}`
+                )
+              );
             }
           }, socketTimeout);
         }
       };
       setSocketTimeout(timeout);
 
-      const { socket } = this;
       socket.removeAllListeners('data');
-      socket.removeAllListeners('error');
-
-      socket.on('data', data => {
+      socket.on('data', (data) => {
         try {
           segmentCount += 1;
 
@@ -89,7 +102,7 @@ class TcpSocket extends TplinkSocket {
                 decryptedMsg
               )}]`
             );
-            this.socket.end();
+            socket.end();
           } else {
             this.logDebug(
               `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} ...`
@@ -102,7 +115,8 @@ class TcpSocket extends TplinkSocket {
         }
       });
 
-      socket.once('close', hadError => {
+      socket.removeAllListeners('close');
+      socket.once('close', (hadError) => {
         try {
           this.logDebug(`: socket:close, hadError:${hadError}`);
           setSocketTimeout(0);
@@ -131,7 +145,8 @@ class TcpSocket extends TplinkSocket {
         }
       });
 
-      socket.on('error', err => {
+      socket.removeAllListeners('error');
+      socket.on('error', (err) => {
         try {
           this.logDebug(': socket:error', err);
           setSocketTimeout(0);
@@ -166,5 +181,3 @@ class TcpSocket extends TplinkSocket {
     });
   }
 }
-
-module.exports = TcpSocket;

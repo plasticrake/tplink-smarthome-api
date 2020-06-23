@@ -15,7 +15,7 @@ import createLogger from './logger';
 import type { Logger } from './logger';
 import TcpConnection from './network/tcp-connection';
 import UdpConnection from './network/udp-connection';
-import { compareMac, isObjectLike } from './utils';
+import { compareMac, isDefinedAndNotNull, isObjectLike } from './utils';
 
 const discoveryMsgBuf = encrypt(
   '{"system":{"get_sysinfo":{}},"emeter":{"get_realtime":{}},"smartlife.iot.common.emeter":{"get_realtime":{}}}'
@@ -182,7 +182,7 @@ export default class Client extends EventEmitter {
     };
 
     this.log = createLogger({ logger });
-    if (logLevel !== undefined) {
+    if (isDefinedAndNotNull(logLevel)) {
       this.log.setLevel(logLevel);
     }
   }
@@ -230,30 +230,23 @@ export default class Client extends EventEmitter {
       useSharedSocket: false,
     };
 
-    const payloadString = !(
-      typeof payload === 'string' || payload instanceof String
-    )
+    const payloadString = !(typeof payload === 'string')
       ? JSON.stringify(payload)
       : payload;
 
     let connection: UdpConnection | TcpConnection;
 
     if (thisSendOptions.transport === 'udp') {
-      connection = new UdpConnection({
-        host,
-        port,
-        log: this.log,
-        client: this,
-      });
+      connection = new UdpConnection(host, port, this.log, this);
     } else {
-      connection = new TcpConnection({
-        host,
-        port,
-        log: this.log,
-        client: this,
-      });
+      connection = new TcpConnection(host, port, this.log, this);
     }
-    const response = await connection.send(payloadString, thisSendOptions);
+    const response = await connection.send(
+      payloadString,
+      port,
+      host,
+      thisSendOptions
+    );
     connection.close();
     return response;
   }

@@ -34,6 +34,12 @@ export class ResponseError extends Error {
   }
 }
 
+export function isDefinedAndNotNull<T>(
+  candidate: T
+): candidate is Exclude<T, null | undefined> {
+  return candidate !== undefined && candidate !== null;
+}
+
 export type HasErrCode = {
   err_code: number;
   err_msg?: string;

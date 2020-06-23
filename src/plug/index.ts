@@ -15,11 +15,12 @@ import Schedule from './schedule';
 import Timer from './timer';
 import Time from '../shared/time';
 import {
+  extractResponse,
+  hasErrCode,
+  HasErrCode,
+  isDefinedAndNotNull,
   isObjectLike,
   ResponseError,
-  extractResponse,
-  HasErrCode,
-  hasErrCode,
 } from '../utils';
 
 // type PlugGetInfo = {
@@ -227,7 +228,7 @@ export default class Plug extends Device {
 
     this.inUseThreshold = inUseThreshold;
 
-    if (childId !== undefined) this.setChildId(childId);
+    if (isDefinedAndNotNull(childId)) this.setChildId(childId);
 
     if (this.sysInfo) {
       this.lastState.inUse = this.inUse;

@@ -4,10 +4,11 @@ import type { MarkRequired } from 'ts-essentials';
 
 import type { AnyDevice, SendOptions } from '../client';
 import {
-  hasErrCode,
-  isObjectLike,
   extractResponse,
+  hasErrCode,
   HasErrCode,
+  isDefinedAndNotNull,
+  isObjectLike,
 } from '../utils';
 
 type ScheduleDateStart = {
@@ -156,7 +157,7 @@ export function createScheduleRule({
       year?: number;
     }> = createScheduleDateStart(start);
 
-  if (daysOfWeek !== undefined && daysOfWeek.length > 0) {
+  if (isDefinedAndNotNull(daysOfWeek) && daysOfWeek.length > 0) {
     sched.wday = createWday(daysOfWeek);
     sched.repeat = true;
   } else {
@@ -184,11 +185,11 @@ export function createRule({
   const sched: Partial<ScheduleRule> &
     ScheduleDateStart = createScheduleDateStart(start);
 
-  if (end !== undefined) {
+  if (isDefinedAndNotNull(end)) {
     Object.assign(sched, createScheduleDateEnd(end));
   }
 
-  if (daysOfWeek !== undefined && daysOfWeek.length > 0) {
+  if (isDefinedAndNotNull(daysOfWeek) && daysOfWeek.length > 0) {
     sched.wday = createWday(daysOfWeek);
     sched.repeat = true;
   } else {

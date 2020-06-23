@@ -1,16 +1,24 @@
-const Queue = require('promise-queue');
+import Queue from 'promise-queue';
+import dgram from 'dgram';
+import net from 'net';
+import type { Logger } from '../logger';
 
-class TplinkSocket {
-  constructor(socketId, log) {
-    this.socketId = socketId;
-    this.log = log;
+export default abstract class TplinkSocket {
+  abstract socketType: string;
 
-    this.socket = null;
-    this.isBound = false;
-    this.queue = new Queue(1, Infinity);
-  }
+  socket?: dgram.Socket | net.Socket;
 
-  async createSocket(func) {
+  isBound = false;
+
+  queue = new Queue(1, Infinity);
+
+  constructor(readonly socketId: number, readonly log: Logger) {}
+
+  protected abstract async createSocketImpl(): Promise<
+    dgram.Socket | net.Socket
+  >;
+
+  async createSocket(): Promise<dgram.Socket | net.Socket> {
     this.log.debug(
       `[${this.socketId}] TplinkSocket(${this.socketType}).createSocket()`
     );
@@ -20,7 +28,7 @@ class TplinkSocket {
     }
 
     try {
-      this.socket = await func();
+      this.socket = await this.createSocketImpl();
       return this.socket;
     } catch (err) {
       this.log.error(`${this.socketType} Error (createSocket): %s`, err);
@@ -29,44 +37,52 @@ class TplinkSocket {
     }
   }
 
-  async send(payload, port, host, { timeout } = {}) {
+  protected abstract async sendAndGetResponse(
+    payload: string,
+    port: number,
+    host: string,
+    timeout: number
+  ): Promise<string>;
+
+  async send(
+    payload: string,
+    port: number,
+    host: string,
+    { timeout }: { timeout: number }
+  ): Promise<string> {
     this.log.debug(
       `[${this.socketId}] TplinkSocket(${this.socketType}).send(%j)`,
       { payload, port, host, timeout }
     );
 
-    return this.queue.add(async () => {
-      try {
-        return this.sendAndGetResponse(payload, port, host, timeout);
-      } catch (err) {
-        this.log.debug(
-          `[${this.socketId}] TplinkSocket(${this.socketType}).send()`,
-          err
-        );
-        if (this.isBound) this.close();
+    return this.queue
+      .add(async () => {
+        try {
+          return await this.sendAndGetResponse(payload, port, host, timeout);
+        } catch (err) {
+          this.log.debug(
+            `[${this.socketId}] TplinkSocket(${this.socketType}).send()`,
+            err
+          );
+          if (this.isBound) this.close();
+          throw err;
+        }
+      })
+      .catch((err) => {
         throw err;
-      }
-    });
+      });
   }
 
-  close(func) {
+  close(): void {
     this.log.debug(
       `[${this.socketId}] TplinkSocket(${this.socketType}).close()`
     );
-    func();
     this.isBound = false;
   }
 
-  destroy(exception) {
-    this.log.debug(
-      `[${this.socketId}] TplinkSocket(${this.socketType}).destroy()`,
-      exception || ''
-    );
-    this.socket.destroy(exception);
-    this.isBound = false;
-  }
-
-  unref() {
+  unref(): dgram.Socket | net.Socket {
+    if (this.socket === undefined)
+      throw new Error('unref called without creating socket');
     return this.socket.unref();
   }
 }

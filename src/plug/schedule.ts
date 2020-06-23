@@ -1,6 +1,7 @@
 import Schedule, { createScheduleRule } from '../shared/schedule';
 import type { ScheduleRule, ScheduleRuleInputTime } from '../shared/schedule';
 import type { SendOptions } from '../client';
+import { isDefinedAndNotNull } from '../utils';
 
 type PlugScheduleRule = Omit<ScheduleRule, 'emin'> & {
   sact?: number;
@@ -52,7 +53,7 @@ export default class PlugSchedule extends Schedule {
       ...createScheduleRule({ start, daysOfWeek }),
     };
 
-    if (dimmer !== undefined) {
+    if (isDefinedAndNotNull(dimmer)) {
       rule.sact = 3;
       rule.s_dimmer = dimmer;
     }
@@ -97,7 +98,7 @@ export default class PlugSchedule extends Schedule {
       ...createScheduleRule({ start, daysOfWeek }),
     };
 
-    if (dimmer !== undefined) {
+    if (isDefinedAndNotNull(dimmer)) {
       rule.sact = 3;
       rule.s_dimmer = dimmer;
     }

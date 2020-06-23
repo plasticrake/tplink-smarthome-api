@@ -2,7 +2,12 @@
 import isEqual from 'lodash.isequal';
 import type { SendOptions } from '../client';
 import type Bulb from '.';
-import { extractResponse, isObjectLike, hasErrCode } from '../utils';
+import {
+  extractResponse,
+  hasErrCode,
+  isDefinedAndNotNull,
+  isObjectLike,
+} from '../utils';
 
 export type LightState = {
   transition_period?: number;
@@ -159,16 +164,16 @@ export default class Lighting {
     sendOptions?: SendOptions
   ): Promise<true> {
     const state: LightState = {};
-    if (ignore_default !== undefined)
+    if (isDefinedAndNotNull(ignore_default))
       state.ignore_default = ignore_default ? 1 : 0;
-    if (transition_period !== undefined)
+    if (isDefinedAndNotNull(transition_period))
       state.transition_period = transition_period;
-    if (on_off !== undefined) state.on_off = on_off ? 1 : 0;
-    if (mode !== undefined) state.mode = mode;
-    if (hue !== undefined) state.hue = hue;
-    if (saturation !== undefined) state.saturation = saturation;
-    if (brightness !== undefined) state.brightness = brightness;
-    if (color_temp !== undefined) state.color_temp = color_temp;
+    if (isDefinedAndNotNull(on_off)) state.on_off = on_off ? 1 : 0;
+    if (isDefinedAndNotNull(mode)) state.mode = mode;
+    if (isDefinedAndNotNull(hue)) state.hue = hue;
+    if (isDefinedAndNotNull(saturation)) state.saturation = saturation;
+    if (isDefinedAndNotNull(brightness)) state.brightness = brightness;
+    if (isDefinedAndNotNull(color_temp)) state.color_temp = color_temp;
 
     this.lightState = extractResponse(
       await this.device.sendCommand(
