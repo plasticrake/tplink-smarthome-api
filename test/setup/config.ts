@@ -23,7 +23,7 @@ const envHasValue = function envHasValue(value: unknown): boolean {
 
 export const testClientLogLevel = envHasValue(process.env.TEST_CLIENT_LOGLEVEL)
   ? (process.env.TEST_CLIENT_LOGLEVEL as log.LogLevelDesc)
-  : 'warn';
+  : 'silent';
 
 export const useSimulator = envIsTrue(
   envHasValue(process.env.TEST_SIMULATOR) ? process.env.TEST_SIMULATOR : true
