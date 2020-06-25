@@ -267,5 +267,35 @@ describe('Utils', function () {
         'err_code missing'
       );
     });
+
+    it('to throw ResponseError when err_code missing', function () {
+      const command = { emeter: {} };
+      const response = { emeter: {} };
+      expect(() => processResponse(command, response)).to.throw(
+        ResponseError,
+        'err_code missing'
+      );
+    });
+
+    it('to throw ResponseError when err_code missing', function () {
+      const command = {};
+      const response = {};
+      expect(() => processResponse(command, response)).to.throw(
+        ResponseError,
+        'err_code missing'
+      );
+    });
+
+    it('to throw ResponseError when err_code missing', function () {
+      const command = { system: {}, emeter: { get_realtime: {} } };
+      const response = {
+        system: {},
+        emeter: { get_realtime: { err_code: 0 } },
+      };
+      expect(() => processResponse(command, response)).to.throw(
+        ResponseError,
+        'err_code'
+      );
+    });
   });
 });
