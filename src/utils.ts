@@ -83,7 +83,11 @@ function flattenResponses(
 ): Array<{ module: string; method?: string; response: object }> {
   const keys = Object.keys(command);
   if (keys.length === 0) {
-    // results.push(response);
+    if (depth === 1) {
+      results.push({ module, response: {} });
+    } else if (depth < 1) {
+      results.push({ module, response: {} });
+    }
   } else if (isObjectLike(command) && isObjectLike(response)) {
     for (let i = 0; i < keys.length; i += 1) {
       const key = keys[i];
@@ -131,6 +135,14 @@ export function processResponse(command: object, response: object): object {
     module: string;
     method?: string;
   }> = [];
+
+  if (commandResponses.length === 0) {
+    throw new ResponseError(
+      'err_code missing',
+      JSON.stringify(response),
+      JSON.stringify(command)
+    );
+  }
 
   commandResponses.forEach((r) => {
     const res = r.response;
