@@ -2,9 +2,10 @@ const { expect, config } = require('../setup');
 
 // Certain longer running commands may return an err_code response of 0,
 // but follow up commands may fail with `{ err_code: -32, err_msg: 'another cmd is running' }`
+// eslint-disable-next-line consistent-return
 async function retryIfBusy(fn) {
   let runCount = 0;
-  while (runCount < 5) {
+  do {
     runCount += 1;
 
     try {
@@ -18,9 +19,9 @@ async function retryIfBusy(fn) {
       // else retry loop
       // wait before retrying
       // eslint-disable-next-line no-await-in-loop
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-  }
+  } while (runCount < 5);
 }
 
 async function bindCloud(device, force = false) {

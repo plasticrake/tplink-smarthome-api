@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
+import type { MarkRequired } from 'ts-essentials';
 import { Client, Plug } from '../../src';
 import { AnyDevice } from '../../src/client';
 import { isObjectLike } from '../../src/utils';
-import { MarkRequired } from 'ts-essentials';
 
 export type TestDevice = {
   name: string;

@@ -1,9 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const { expect } = require('../setup');
 
-// const { ResponseError } = require('../../src');
-
-module.exports = function (testDevice) {
+module.exports = function () {
   describe('Dimmer', function () {
     describe('#setBrightness()', function () {
       it('should set brightness', async function () {
