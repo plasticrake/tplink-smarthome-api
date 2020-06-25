@@ -1,18 +1,20 @@
 #!/usr/bin/env node
-
 /* eslint-disable no-console */
 
-const castArray = require('lodash.castarray');
-const program = require('commander');
-const tplinkCrypto = require('tplink-smarthome-crypto');
-const util = require('util');
+import castArray from 'lodash.castarray';
+import program from 'commander';
+import type { LogLevelDesc } from 'loglevel';
+import * as tplinkCrypto from 'tplink-smarthome-crypto';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import type { PickProperties } from 'ts-essentials';
+import util from 'util';
 
-const { Client, ResponseError } = require('./');
+import { Client, ResponseError } from '.';
+import { SendOptions, AnyDevice } from './client';
 
-let logLevel;
-let client;
+let logLevel: LogLevelDesc;
 
-const outputError = function outputError(err) {
+function outputError(err: Error): void {
   if (err instanceof ResponseError) {
     console.log('Response Error:');
     console.log(err.response);
@@ -20,14 +22,21 @@ const outputError = function outputError(err) {
     console.error('Error:');
     console.error(err);
   }
-};
+}
 
-const search = function search(
-  sysInfo,
-  breakoutChildren,
-  discoveryTimeout,
-  params
-) {
+function getClient(): Client {
+  const defaultSendOptions: SendOptions = {};
+  if (program.udp) defaultSendOptions.transport = 'udp';
+  if (program.timeout) defaultSendOptions.timeout = program.timeout;
+  return new Client({ logLevel, defaultSendOptions });
+}
+
+function search(
+  sysInfo: object,
+  breakoutChildren: boolean,
+  discoveryTimeout: number,
+  params: Parameters<Client['startDiscovery']>[0]
+): void {
   try {
     console.log('Searching...');
 
@@ -38,24 +47,31 @@ const search = function search(
       ...params,
     };
     console.log(`startDiscovery(${util.inspect(commandParams)})`);
-    client.startDiscovery(commandParams).on('device-new', device => {
-      console.log(
-        `${device.model} ${device.deviceType} ${device.type} ${device.host} ${device.port} ${device.macNormalized} ${device.deviceId} ${device.alias}`
-      );
-      if (sysInfo) {
-        console.dir(device.sysInfo, {
-          colors: program.color === 'on',
-          depth: 10,
-        });
-      }
-    });
+    getClient()
+      .startDiscovery(commandParams)
+      .on('device-new', (device) => {
+        console.log(
+          `${device.model} ${device.deviceType} ${device.type} ${device.host} ${device.port} ${device.macNormalized} ${device.deviceId} ${device.alias}`
+        );
+        if (sysInfo) {
+          console.dir(device.sysInfo, {
+            colors: program.color === 'on',
+            depth: 10,
+          });
+        }
+      });
   } catch (err) {
     outputError(err);
   }
-};
+}
 
-const send = async function send(host, port, payload) {
+async function send(
+  host: string,
+  port: number,
+  payload: string
+): Promise<void> {
   try {
+    const client = getClient();
     console.log(
       `Sending to ${host}:${port || ''} via ${
         client.defaultSendOptions.transport
@@ -67,10 +83,16 @@ const send = async function send(host, port, payload) {
   } catch (err) {
     outputError(err);
   }
-};
+}
 
-const sendCommand = async function sendCommand(host, port, childId, payload) {
+async function sendCommand(
+  host: string,
+  port: number,
+  childId: string,
+  payload: string
+): Promise<void> {
   try {
+    const client = getClient();
     console.log(
       `Sending to ${host}:${port || ''} ${
         childId ? `childId: ${childId}` : ''
@@ -83,34 +105,36 @@ const sendCommand = async function sendCommand(host, port, childId, payload) {
   } catch (err) {
     outputError(err);
   }
-};
+}
 
-const sendCommandDynamic = async function sendCommandDynamic(
-  host,
-  port,
-  command,
-  commandParams = [],
-  childId = null
-) {
+async function sendCommandDynamic(
+  host: string,
+  port: number,
+  command: Exclude<keyof PickProperties<AnyDevice, Function>, undefined>,
+  commandParams: Array<boolean | number | string> = [],
+  childId?: string
+): Promise<void> {
   try {
+    const client = getClient();
     console.log(
       `Sending ${command} command to ${host}:${port || ''} ${
         childId ? `childId: ${childId}` : ''
       } via ${client.defaultSendOptions.transport}...`
     );
     const device = await client.getDevice({ host, port, childId });
+    // @ts-ignore
     const results = await device[command](...commandParams);
     console.log('response:');
     console.dir(results, { colors: program.color === 'on', depth: 10 });
   } catch (err) {
     outputError(err);
   }
-};
+}
 
-const details = async function details(host, port) {
+async function details(host: string, port: number): Promise<void> {
   try {
     console.log(`Getting details from ${host}:${port || ''}...`);
-    const device = await client.getDevice({ host, port });
+    const device = await getClient().getDevice({ host, port });
     console.dir(
       {
         alias: device.alias,
@@ -128,37 +152,45 @@ const details = async function details(host, port) {
   } catch (err) {
     outputError(err);
   }
-};
+}
 
-const blink = function blink(host, port, times, rate) {
+async function blink(
+  host: string,
+  port: number,
+  times: number,
+  rate: number
+): Promise<void> {
   console.log(`Sending blink commands to ${host}:${port || ''}...`);
-  client
+  getClient()
     .getDevice({ host, port })
-    .then(device => {
+    .then((device) => {
+      // @ts-ignore
       return device.blink(times, rate).then(() => {
         console.log('Blinking complete');
       });
     })
-    .catch(reason => {
+    .catch((reason) => {
       outputError(reason);
     });
-};
+}
 
-const toInt = s => {
+function toInt(s: string): number {
   return parseInt(s, 10);
-};
+}
 
-const setupClient = function setupClient() {
-  const defaultSendOptions = {};
-  if (program.udp) defaultSendOptions.transport = 'udp';
-  if (program.timeout) defaultSendOptions.timeout = program.timeout;
-  return new Client({ logLevel, defaultSendOptions });
-};
-
-const setParamTypes = function setParamTypes(params, types) {
-  if (params && params.length > 0 && types && types.length > 0) {
+function setParamTypes(
+  params: string[],
+  commandSetup: CommandSetup
+): Array<boolean | number | string> {
+  if (
+    params &&
+    params.length > 0 &&
+    commandSetup.params &&
+    commandSetup.params.length > 0
+  ) {
+    const sParams = commandSetup.params;
     return castArray(params).map((el, i) => {
-      switch (types[i]) {
+      switch (sParams[i].type) {
         case 'number':
           return +el;
         case 'boolean':
@@ -169,7 +201,7 @@ const setParamTypes = function setParamTypes(params, types) {
     });
   }
   return params;
-};
+}
 
 program
   .option('-D, --debug', 'turn on debug level logging', () => {
@@ -193,7 +225,6 @@ program
     true
   )
   .action((params, options) => {
-    client = setupClient();
     let paramsObj;
     if (params) {
       console.dir(params);
@@ -211,7 +242,6 @@ program
   .command('send <host> <payload>')
   .description('Send payload to device (using Client.send)')
   .action((host, payload) => {
-    client = setupClient();
     const [hostOnly, port] = host.split(':');
     send(hostOnly, port, payload);
   });
@@ -221,13 +251,11 @@ program
   .description('Send payload to device (using Device#sendCommand)')
   .option('-c, --childId [childId]', 'childId')
   .action((host, payload, options) => {
-    client = setupClient();
     const [hostOnly, port] = host.split(':');
     sendCommand(hostOnly, port, options.childId, payload);
   });
 
-program.command('details <host>').action(host => {
-  client = setupClient();
+program.command('details <host>').action((host) => {
   const [hostOnly, port] = host.split(':');
   details(hostOnly, port);
 });
@@ -235,50 +263,66 @@ program.command('details <host>').action(host => {
 program
   .command('blink <host> [times] [rate]')
   .action((host, times = 5, rate = 500) => {
-    client = setupClient();
     const [hostOnly, port] = host.split(':');
     blink(hostOnly, port, times, rate);
   });
 
-[
-  { fnName: 'getSysInfo', supportsChildId: true },
-  { fnName: 'getInfo', supportsChildId: true },
-  { fnName: 'setAlias', supportsChildId: true },
-  { fnName: 'getModel', supportsChildId: true },
-  { fnName: 'setPowerState', paramTypes: ['boolean'], supportsChildId: true },
-  { fnName: 'setLocation', paramTypes: ['number', 'number'] },
-  { fnName: 'reboot', paramTypes: ['number'] },
-  { fnName: 'reset', paramTypes: ['number'] },
-].forEach(command => {
-  let commandName;
-  let paramTypes;
-  let supportsChildId = false;
-  if (command.fnName) {
-    commandName = command.fnName;
-    paramTypes = command.paramTypes;
-    supportsChildId = command.supportsChildId;
-  } else {
-    commandName = command;
-  }
-  let cmd = program
-    .command(`${commandName} <host> [params]`)
-    .description(`Send ${commandName} to device (using Device#${commandName})`)
+type CommandSetup = {
+  name: Parameters<typeof sendCommandDynamic>[2];
+  params?: { name: string; type: 'boolean' | 'number' | 'string' }[];
+  supportsChildId?: boolean;
+  action?: (device: AnyDevice, ...args: unknown[]) => Promise<unknown>;
+};
+
+const commandSetup: CommandSetup[] = [
+  { name: 'getSysInfo', supportsChildId: true },
+  { name: 'getInfo', supportsChildId: true },
+  { name: 'setAlias', supportsChildId: true },
+  { name: 'getModel', supportsChildId: true },
+  {
+    name: 'setPowerState',
+    params: [{ name: 'state', type: 'boolean' }],
+    supportsChildId: true,
+  },
+  {
+    name: 'setLocation',
+    params: [
+      { name: 'latitude', type: 'number' },
+      { name: 'longitude', type: 'number' },
+    ],
+  },
+  { name: 'reboot', params: [{ name: 'delay', type: 'number' }] },
+  { name: 'reset', params: [{ name: 'delay', type: 'number' }] },
+];
+
+for (const command of commandSetup) {
+  const paramsString = command.params
+    ? command.params.map((p) => `[${p.name}]`).join(' ')
+    : '';
+
+  const cmd = program
+    .command(`${command.name} <host> ${paramsString}`)
+    .description(
+      `Send ${command.name} to device (using Device#${command.name})`
+    )
     .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 10000);
-  if (supportsChildId) {
-    cmd = cmd.option('-c, --childId [childId]', 'childId');
+  if (command.supportsChildId) {
+    cmd.option('-c, --childId [childId]', 'childId');
   }
+
   cmd.action((host, params, options) => {
-    client = setupClient();
     const [hostOnly, port] = host.split(':');
+    const commandParams = setParamTypes(params, command);
+
     sendCommandDynamic(
       hostOnly,
       port,
-      commandName,
-      setParamTypes(params, paramTypes),
+      command.name,
+      commandParams,
       options.childId
     );
   });
-});
+}
 
 program
   .command('encrypt <outputEncoding> <input> [firstKey=0xAB]')
@@ -286,12 +330,14 @@ program
     const outputBuf = tplinkCrypto.encrypt(input, firstKey);
     console.log(outputBuf.toString(outputEncoding));
   });
+
 program
   .command('encryptWithHeader <outputEncoding> <input> [firstKey=0xAB]')
   .action((outputEncoding, input, firstKey = 0xab) => {
     const outputBuf = tplinkCrypto.encryptWithHeader(input, firstKey);
     console.log(outputBuf.toString(outputEncoding));
   });
+
 program
   .command('decrypt <inputEncoding> <input> [firstKey=0xAB]')
   .action((inputEncoding, input, firstKey = 0xab) => {
@@ -299,6 +345,7 @@ program
     const outputBuf = tplinkCrypto.decrypt(inputBuf, firstKey);
     console.log(outputBuf.toString());
   });
+
 program
   .command('decryptWithHeader <inputEncoding> <input> [firstKey=0xAB]')
   .action((inputEncoding, input, firstKey = 0xab) => {
