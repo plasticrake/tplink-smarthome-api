@@ -20,7 +20,9 @@
     "loglevel",
     "markdownlint",
     "semistandard",
+    "tsdoc",
 
+    "buildable",
     "polyfill",
     "preallocate",
     "rssi",
@@ -40,7 +42,7 @@
     "lightstate",
     "monthstat",
     "netif",
-    "nextaction",
+    "rangeextender",
     "realtime",
     "sact",
     "scaninfo",
@@ -48,24 +50,24 @@
     "smartbulb",
     "smarthome",
     "smartlife",
+    "smartplug",
     "smartplugswitch",
+    "smartswitch",
     "smin",
     "stime",
     "sysinfo",
+    "tcsp",
     "timesetting",
     "tplink",
     "wday"
   ],
-  "languageSettings": [{
-    "languageId": "markdown",
-    "local": "*",
-    "dictionaries": ["node","typescript"]
-  }],
-  "ignorePaths": [
-    "node_modules",
-    "package-lock.json",
-    "README.md",
-    "API.md"
+  "languageSettings": [
+    {
+      "languageId": "markdown",
+      "local": "*",
+      "dictionaries": ["node", "typescript"]
+    }
   ],
-  "ignoreRegExpList": ["\/[\/*] eslint[- ].*/gi"]
+  "ignorePaths": ["node_modules", "package-lock.json", "README.md", "API.md"],
+  "ignoreRegExpList": ["/[/*] eslint[- ].*/gi"]
 }
