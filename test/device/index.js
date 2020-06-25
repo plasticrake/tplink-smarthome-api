@@ -2,7 +2,12 @@
 // spell-checker:ignore MYTESTMAC MYTESTMICMAC MYTESTETHERNETMAC
 
 const sinon = require('sinon');
-const { config, expect, getTestClient, testDevices } = require('../setup');
+const {
+  config,
+  createUnresponsiveDevice,
+  expect,
+  testDevices,
+} = require('../setup');
 
 const { Client, ResponseError } = require('../../src');
 
@@ -20,14 +25,12 @@ describe('Device', function () {
   testDevices.devices.forEach((testDevice) => {
     let device;
     let time;
-    let client;
 
     config.testSendOptionsSets.forEach((testSendOptions) => {
       context(testSendOptions.name, function () {
         context(testDevice.name, function () {
           // beforeEach() doesn't work with assigning to `this`
           before('device', async function () {
-            client = getTestClient(testSendOptions);
             if (testDevice.getDevice) {
               device = await testDevice.getDevice(undefined, testSendOptions);
               this.device = device;
@@ -135,6 +138,37 @@ describe('Device', function () {
                 -2000,
               ]);
             });
+
+            it('should reject with an unreachable host', async function () {
+              device.host = testDevices.unreachable.deviceOptions.host;
+              expect(
+                device.send('{"system":{"get_sysinfo":{}}}')
+              ).to.be.eventually.rejected;
+            });
+
+            describe('unresponsive', function () {
+              let unresponsive;
+              beforeEach(async function () {
+                unresponsive = await createUnresponsiveDevice(
+                  testSendOptions.transport
+                );
+              });
+              afterEach(function () {
+                unresponsive.close();
+              });
+
+              it("should reject with a host that doesn't respond", async function () {
+                this.timeout(5000);
+                device.host = unresponsive.host;
+                device.port = unresponsive.port;
+
+                expect(
+                  device.send('{"system":{"get_sysinfo":{}}}', {
+                    timeout: 4000,
+                  })
+                ).to.be.eventually.rejected;
+              });
+            });
           });
 
           describe('#sendCommand', function () {
@@ -218,6 +252,12 @@ describe('Device', function () {
               for (let i = 0; i < 20; i += 1) {
                 expect(responses[i]).to.have.property('err_code', 0);
               }
+            });
+            it('should reject with an unreachable host', async function () {
+              device.host = testDevices.unreachable.deviceOptions.host;
+              expect(
+                device.sendCommand('{"system":{"get_sysinfo":{}}}')
+              ).to.be.eventually.rejected;
             });
           });
 
@@ -478,6 +518,25 @@ describe('Device', function () {
               });
 
               expect(spy).to.not.be.called;
+            });
+
+            it('should throw error for unreachable device', async function () {
+              badDevice = await testDevice.getDevice(
+                undefined,
+                testSendOptions
+              );
+              badDevice.host = testDevices.unreachable.deviceOptions.host;
+
+              const spy = sinon.spy();
+              await new Promise((resolve) => {
+                badDevice.once('polling-error', () => {
+                  spy();
+                  resolve();
+                });
+                badDevice.startPolling(200);
+              });
+
+              expect(spy).to.be.called;
             });
 
             it('should throw error for unreachable device', async function () {

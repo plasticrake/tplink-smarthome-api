@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
 
 const sinon = require('sinon');
@@ -51,7 +50,6 @@ describe('Client', function () {
         });
     });
 
-    // TODO: TEST
     it('should emit device-new when finding a new device with `devices` specified', function (done) {
       const { mac } = testDevices.anyDevice;
       const { host } = testDevices.anyDevice.deviceOptions;
@@ -468,6 +466,19 @@ describe('Client', function () {
             )
           ).to.have.nested.property('system.get_sysinfo.err_code', 0);
         });
+        it(`should return info with object payload ${sendOptions.transport}`, async function () {
+          return expect(
+            JSON.parse(
+              await client.send(
+                { system: { get_sysinfo: {} } },
+                options.host,
+                options.port,
+                { sendOptions: { transport } }
+              )
+            )
+          ).to.have.nested.property('system.get_sysinfo.err_code', 0);
+        });
+
         it(`should return info with object payload ${sendOptions.transport}`, async function () {
           return expect(
             JSON.parse(

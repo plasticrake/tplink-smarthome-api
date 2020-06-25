@@ -4,11 +4,11 @@
 load '../node_modules/bats-support/load'
 load '../node_modules/bats-assert/load'
 
-cli='babel-node ./src/cli.js'
+cli='ts-node ./src/cli.ts'
 
 @test "run without arguments" {
   run $cli
-  assert_success
+  assert_failure
   assert_output --regexp '^[[:space:]]*Usage: '
 }
 
