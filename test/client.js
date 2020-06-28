@@ -38,7 +38,7 @@ describe('Client', function () {
 
     let client;
     beforeEach('startDiscovery', function () {
-      client = getTestClient({ logLevel: 'silent' });
+      client = getTestClient();
     });
 
     afterEach('startDiscovery', function () {
@@ -222,7 +222,7 @@ describe('Client', function () {
               device = testDevices.anyPlug;
               break;
             case 'bulb':
-              device = testDevices.anyPlug;
+              device = testDevices.anyBulb;
               break;
             default:
               throw new Error(`Unexpected device type:${et.typeName}`);
@@ -234,16 +234,15 @@ describe('Client', function () {
           invalidDevice.host = testDevices.unreachable.deviceOptions.host;
           invalidDevice.status = 'online';
           invalidDevice.seenOnDiscovery = 0;
-          client.devices.set(`invalidDevice.deviceId${'INV'}`, invalidDevice);
+          client.devices.set(`${invalidDevice.deviceId}INV`, invalidDevice);
         }
 
         return new Promise((resolve) => {
           client
-            .startDiscovery({ discoveryInterval: 100, offlineTolerance: 1 })
+            .startDiscovery({ discoveryInterval: 100, offlineTolerance: 2 })
             .once(eventName, (device) => {
               expect(device).to.be.an.instanceof(et.type);
               client.stopDiscovery();
-              // done();
               resolve();
             });
         });
