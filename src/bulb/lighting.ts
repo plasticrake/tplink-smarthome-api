@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import isEqual from 'lodash.isequal';
 import type { SendOptions } from '../client';
 import type Bulb from '.';
@@ -92,7 +91,7 @@ export default class Lighting {
   /**
    * @internal
    */
-  set lightState(lightState) {
+  set lightState(lightState: LightState) {
     this.#lightState = lightState;
     this.emitEvents();
   }
@@ -173,6 +172,7 @@ export default class Lighting {
     sendOptions?: SendOptions
   ): Promise<true> {
     const {
+      /* eslint-disable @typescript-eslint/naming-convention */
       transition_period,
       on_off,
       mode,
@@ -181,6 +181,7 @@ export default class Lighting {
       brightness,
       color_temp,
       ignore_default = 1,
+      /* eslint-enable @typescript-eslint/naming-convention */
     } = lightState;
     const state: LightState = {};
     if (isDefinedAndNotNull(ignore_default))

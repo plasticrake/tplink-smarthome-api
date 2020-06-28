@@ -1,5 +1,5 @@
 // spell-checker:ignore Mock’s
-// @ts-ignore
+// @ts-ignore: no types for this package
 import simulator from 'tplink-smarthome-simulator';
 import type { Client } from '../../src';
 import type { AnyDevice } from '../../src/client';

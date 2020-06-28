@@ -81,12 +81,20 @@ export function replaceControlCharacters(
 }
 
 function flattenResponses(
-  command: object,
-  response: object,
+  command: Record<string, unknown>,
+  response: Record<string, unknown>,
   depth = 0,
   module = '',
-  results: Array<{ module: string; method?: string; response: object }> = []
-): Array<{ module: string; method?: string; response: object }> {
+  results: Array<{
+    module: string;
+    method?: string;
+    response: Record<string, unknown>;
+  }> = []
+): Array<{
+  module: string;
+  method?: string;
+  response: Record<string, unknown>;
+}> {
   const keys = Object.keys(command);
   if (keys.length === 0) {
     if (depth === 1) {
@@ -102,7 +110,7 @@ function flattenResponses(
           results.push({
             module,
             method: key,
-            response: response[key] as object,
+            response: response[key] as Record<string, unknown>, // using cast, this is TS bug or limitation. isObjectLike above assures type safety
           });
         } else {
           results.push({ module, response });
@@ -111,8 +119,8 @@ function flattenResponses(
       } else if (depth < 1) {
         if (response[key] !== undefined) {
           flattenResponses(
-            command[key] as object,
-            response[key] as object,
+            command[key] as Record<string, unknown>,
+            response[key] as Record<string, unknown>,
             depth + 1,
             key,
             results
@@ -164,13 +172,16 @@ export function processSingleCommandResponse(
  * @returns
  * @throws {@link ResponseError}
  */
-export function processResponse(command: object, response: object): object {
+export function processResponse(
+  command: Record<string, unknown>,
+  response: Record<string, unknown>
+): Record<string, unknown> {
   const multipleResponses = Object.keys(response).length > 1;
   const commandResponses = flattenResponses(command, response);
 
   const errors: Array<{
     msg: string;
-    response: object;
+    response: Record<string, unknown>;
     module: string;
     method?: string;
   }> = [];

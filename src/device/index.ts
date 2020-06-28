@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import castArray from 'lodash.castarray';
 import { EventEmitter } from 'events';
 import type log from 'loglevel';
@@ -140,6 +139,7 @@ export default abstract class Device extends EventEmitter {
 
     const {
       client,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       _sysInfo,
       host,
       port = 9999,
@@ -156,6 +156,7 @@ export default abstract class Device extends EventEmitter {
     });
 
     this.client = client;
+    // eslint-disable-next-line no-underscore-dangle
     this._sysInfo = _sysInfo;
     this.host = host;
     this.port = port;
@@ -181,8 +182,7 @@ export default abstract class Device extends EventEmitter {
   }
 
   get apiModules(): ApiModuleNamespace {
-    // https://github.com/Microsoft/TypeScript/issues/3841
-    // @ts-ignore
+    // @ts-ignore: https://github.com/Microsoft/TypeScript/issues/3841
     return this.constructor.apiModules;
   }
 
@@ -191,6 +191,7 @@ export default abstract class Device extends EventEmitter {
    * @returns system.sysinfo
    */
   get sysInfo(): Sysinfo {
+    // eslint-disable-next-line no-underscore-dangle
     return this._sysInfo;
   }
 
@@ -199,6 +200,7 @@ export default abstract class Device extends EventEmitter {
    */
   setSysInfo(sysInfo: Sysinfo): void {
     this.log.debug('[%s] device sysInfo set', sysInfo.alias || this.alias);
+    // eslint-disable-next-line no-underscore-dangle
     this._sysInfo = sysInfo;
   }
 
@@ -321,11 +323,11 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Sends `payload` to device (using {@link Client#send})
-   * @param   payload - paylaod to send to device, if object, converted to string via `JSON.stringify`
+   * @param   payload - payload to send to device, if object, converted to string via `JSON.stringify`
    * @returns parsed JSON response
    */
   async send(
-    payload: string | object,
+    payload: string | Record<string, unknown>,
     sendOptions?: SendOptions
   ): Promise<string> {
     this.log.debug('[%s] device.send()', this.alias);
@@ -421,7 +423,7 @@ export default abstract class Device extends EventEmitter {
    * @throws {@link ResponseError}
    */
   async sendCommand(
-    command: string | object,
+    command: string | Record<string, unknown>,
     childIds: string[] | string | undefined = this.childId,
     sendOptions?: SendOptions
   ): Promise<unknown> {
@@ -549,10 +551,10 @@ export default abstract class Device extends EventEmitter {
     latitude: number,
     longitude: number,
     sendOptions?: SendOptions
-  ): Promise<object> {
-    // eslint-disable-next-line @typescript-eslint/camelcase
+  ): Promise<Record<string, unknown>> {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const latitude_i = Math.round(latitude * 10000);
-    // eslint-disable-next-line @typescript-eslint/camelcase
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const longitude_i = Math.round(longitude * 10000);
     const response = await this.sendCommand(
       {
@@ -613,5 +615,7 @@ export default abstract class Device extends EventEmitter {
     );
   }
 
-  abstract async getInfo(sendOptions?: SendOptions): Promise<object>;
+  abstract async getInfo(
+    sendOptions?: SendOptions
+  ): Promise<Record<string, unknown>>;
 }

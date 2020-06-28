@@ -5,7 +5,6 @@ import castArray from 'lodash.castarray';
 import program from 'commander';
 import type { LogLevelDesc } from 'loglevel';
 import * as tplinkCrypto from 'tplink-smarthome-crypto';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import type { PickProperties } from 'ts-essentials';
 import util from 'util';
 
@@ -32,7 +31,7 @@ function getClient(): Client {
 }
 
 function search(
-  sysInfo: object,
+  sysInfo: Record<string, unknown>,
   breakoutChildren: boolean,
   discoveryTimeout: number,
   params: Parameters<Client['startDiscovery']>[0]
@@ -110,6 +109,7 @@ async function sendCommand(
 async function sendCommandDynamic(
   host: string,
   port: number,
+  // eslint-disable-next-line @typescript-eslint/ban-types
   command: Exclude<keyof PickProperties<AnyDevice, Function>, undefined>,
   commandParams: Array<boolean | number | string> = [],
   childId?: string
@@ -122,7 +122,7 @@ async function sendCommandDynamic(
       } via ${client.defaultSendOptions.transport}...`
     );
     const device = await client.getDevice({ host, port, childId });
-    // @ts-ignore
+    // @ts-ignore: ignoring for now
     const results = await device[command](...commandParams);
     console.log('response:');
     console.dir(results, { colors: program.color === 'on', depth: 10 });
@@ -164,7 +164,7 @@ async function blink(
   getClient()
     .getDevice({ host, port })
     .then((device) => {
-      // @ts-ignore
+      // @ts-ignore: ignoring for now, need to implement blink on bulb
       return device.blink(times, rate).then(() => {
         console.log('Blinking complete');
       });

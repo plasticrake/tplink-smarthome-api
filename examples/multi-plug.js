@@ -1,6 +1,6 @@
 const util = require('util');
 
-const { Client } = require('tplink-smarthome-api');
+const { Client } = require('..'); // or require('tplink-smarthome-api')
 
 const client = new Client({
   defaultSendOptions: { timeout: 20000, transport: 'tcp' },
@@ -17,7 +17,7 @@ const logEvent = function logEvent(eventName, device, state) {
 
 const monitorEvents = function monitorEvents(device) {
   // Device (Common) Events
-  device.on('emeter-realtime-update', emeterRealtime => {
+  device.on('emeter-realtime-update', (emeterRealtime) => {
     logEvent('emeter-realtime-update', device, emeterRealtime);
   });
 
@@ -28,7 +28,7 @@ const monitorEvents = function monitorEvents(device) {
   device.on('power-off', () => {
     logEvent('power-off', device);
   });
-  device.on('power-update', powerOn => {
+  device.on('power-update', (powerOn) => {
     logEvent('power-update', device, powerOn);
   });
   device.on('in-use', () => {
@@ -37,7 +37,7 @@ const monitorEvents = function monitorEvents(device) {
   device.on('not-in-use', () => {
     logEvent('not-in-use', device);
   });
-  device.on('in-use-update', inUse => {
+  device.on('in-use-update', (inUse) => {
     logEvent('in-use-update', device, inUse);
   });
 
@@ -54,12 +54,12 @@ const monitorEvents = function monitorEvents(device) {
     return;
   }
 
-  device.children.forEach(child => {
+  device.children.forEach((child) => {
     console.log(child);
   });
 
   await Promise.all(
-    Array.from(device.children.keys(), async childId => {
+    Array.from(device.children.keys(), async (childId) => {
       const childPlug = await client.getDevice({ host: '10.0.1.136', childId });
       monitorEvents(childPlug);
     })

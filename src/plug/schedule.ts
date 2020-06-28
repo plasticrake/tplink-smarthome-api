@@ -6,7 +6,7 @@ import { isDefinedAndNotNull } from '../utils';
 
 export type PlugScheduleRule = Omit<ScheduleRule, 'emin'> & {
   sact?: number;
-  s_dimmer?: {};
+  s_dimmer?: Record<string, unknown>;
   emin: 0;
 };
 
@@ -15,7 +15,7 @@ export interface PlugScheduleRuleInput {
   /**
    * dimmer data (dimmable plugs only)
    */
-  dimmer?: {};
+  dimmer?: Record<string, unknown>;
   /**
    * Date or number of minutes
    */
