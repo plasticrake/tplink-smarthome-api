@@ -3,6 +3,7 @@
 const sinon = require('sinon');
 const { config, expect, getTestClient, testDevices } = require('./setup');
 
+const { default: Client } = require('../src/client');
 const { default: Device } = require('../src/device');
 const { default: Plug } = require('../src/plug');
 const { default: Bulb } = require('../src/bulb');
@@ -10,9 +11,28 @@ const { default: Bulb } = require('../src/bulb');
 const { compareMac } = require('../src/utils');
 
 describe('Client', function () {
-  this.retries(1);
+  describe('constructor', function () {
+    it('should use custom logger', function () {
+      const debugSpy = sinon.spy();
+      const infoSpy = sinon.spy();
+
+      const logger = {
+        debug: debugSpy,
+        info: infoSpy,
+      };
+
+      const client = new Client({ logger });
+
+      client.log.debug('debug msg');
+      client.log.info('info msg');
+
+      expect(debugSpy).to.be.calledOnce;
+      expect(infoSpy).to.be.calledOnce;
+    });
+  });
 
   describe('#startDiscovery()', function () {
+    this.retries(1);
     this.timeout(config.defaultTestTimeout * 2);
     this.slow(config.defaultTestTimeout);
 
@@ -316,6 +336,7 @@ describe('Client', function () {
 
   config.testSendOptionsSets.forEach((sendOptions) => {
     context(sendOptions.name, function () {
+      this.retries(1);
       describe('#getDevice()', function () {
         let client;
         let device;

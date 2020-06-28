@@ -75,6 +75,22 @@ describe('Device', function () {
                 'device'
               ).to.equal(transport);
             });
+
+            it('should inherit logger from Client', function () {
+              const logger = {
+                debug: () => {},
+              };
+
+              const clientTest = new Client({ logger });
+
+              const anotherDevice = clientTest.getDeviceFromSysInfo(
+                device.sysInfo
+              );
+
+              expect(clientTest.log.debug, 'client').to.equal(
+                anotherDevice.log.debug
+              );
+            });
           });
 
           describe('#send', function () {
