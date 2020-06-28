@@ -593,7 +593,7 @@ export default class Plug extends Device {
     };
 
     const origLedState = await this.getLedState(sendOptions);
-    let lastBlink = Date.now();
+    let lastBlink: number;
 
     let currLedState = false;
     for (let i = 0; i < times * 2; i += 1) {
