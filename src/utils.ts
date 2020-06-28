@@ -126,6 +126,39 @@ function flattenResponses(
 
 /**
  *
+ * @param module
+ * @param method
+ * @param response
+ */
+export function processSingleCommandResponse(
+  module: string,
+  method: string,
+  command: string,
+  response: string
+): HasErrCode {
+  let responseObj;
+  try {
+    responseObj = JSON.parse(response);
+  } catch (err) {
+    throw new ResponseError('Could not parse response', response, command);
+  }
+  if (responseObj[module] === undefined) {
+    throw new ResponseError('Module not found in response', response, command);
+  }
+  if (responseObj[module][method] === undefined) {
+    throw new ResponseError('Method not found in response', response, command, [
+      module,
+    ]);
+  }
+  const methodResponse = responseObj[module][method];
+  if (!hasErrCode(methodResponse)) {
+    throw new ResponseError('err_code missing', response, command, [module]);
+  }
+  return methodResponse;
+}
+
+/**
+ *
  * @param command
  * @param response
  * @returns

@@ -360,6 +360,46 @@ export default abstract class Device extends EventEmitter {
   }
 
   /**
+   * @internal
+   * @alpha
+   */
+  async sendSingleCommand(
+    moduleName: string,
+    methodName: string,
+    parameters: HasAtLeastOneProperty,
+    childIds: string[] | string | undefined = this.childId,
+    sendOptions?: SendOptions
+  ): Promise<HasErrCode> {
+    const payload: {
+      [key: string]: {
+        [key: string]: unknown;
+        context?: { childIds: string[] };
+      };
+    } = {
+      [moduleName]: { [methodName]: parameters },
+    };
+
+    if (childIds) {
+      const childIdsArray = castArray(childIds).map(
+        this.normalizeChildId,
+        this
+      );
+      payload.context = { child_ids: childIdsArray };
+    }
+
+    const payloadString = JSON.stringify(payload);
+
+    const response = await this.send(payloadString, sendOptions);
+    const results = processSingleCommandResponse(
+      moduleName,
+      methodName,
+      payloadString,
+      response
+    );
+    return results;
+  }
+
+  /**
    * Sends command(s) to device.
    *
    * Calls {@link #send} and processes the response.
