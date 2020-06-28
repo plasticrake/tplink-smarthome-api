@@ -11,6 +11,8 @@ module.exports = {
   },
   reportUnusedDisableDirectives: true,
 
+  ignorePatterns: ['docs'],
+
   overrides: [
     {
       files: ['*.ts'],
