@@ -1,12 +1,17 @@
 language: node_js
 node_js:
-  - "node"
-  - "lts/*"
-  - "11"
-  - "10"
-cache:
-  directories:
-    - "node_modules"
+  - 'node'
+  - 'lts/*'
+  - '10'
+cache: npm
 script:
-  - npm test
-  - npm run coverage
+  - npm run test:ci
+after_success:
+  - npm run report-coverage
+jobs:
+  include:
+    - name: Lint
+      node_js: 'lts/*'
+      script:
+        - npm run lint
+      after_success: false
