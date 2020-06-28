@@ -2,16 +2,6 @@
   "name": "tplink-smarthome-api",
   "version": "2.0.0",
   "description": "TP-Link Smart Home API",
-  "author": "Patrick Seal",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/plasticrake/tplink-smarthome-api.git"
-  },
-  "bugs": {
-    "url": "https://github.com/plasticrake/tplink-smarthome-api/issues",
-    "email": "code@plasticrake.com"
-  },
   "keywords": [
     "tplink",
     "kasa",
@@ -37,9 +27,39 @@
     "smartbulb",
     "api"
   ],
+  "bugs": {
+    "url": "https://github.com/plasticrake/tplink-smarthome-api/issues",
+    "email": "code@plasticrake.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/plasticrake/tplink-smarthome-api.git"
+  },
+  "license": "MIT",
+  "author": "Patrick Seal",
   "main": "lib/index.js",
-  "engines": {
-    "node": ">=10"
+  "bin": {
+    "tplink-smarthome-api": "lib/cli.js"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "prebuild": "npm run clean",
+    "build": "tsc",
+    "clean": "rimraf lib/",
+    "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
+    "docs": "typedoc",
+    "lint": "eslint --ignore-path .gitignore . --ext .js,.ts",
+    "prepare": "npm run build",
+    "spellcheck": "cspell '{examples,src,test}/**/*' *.md",
+    "pretest": "npm run lint && npm run build",
+    "test": "npm run test:only",
+    "test:ci": "npm run test:only",
+    "test:only": "cross-env NODE_ENV=test nyc mocha && bats test",
+    "preversion": "npm test",
+    "version": "npm run build && npm run docs && git add -A README.md API.md",
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "commander": "^5.1.0",
@@ -101,27 +121,7 @@
     "typedoc-plugin-no-inherit": "^1.1.10",
     "typescript": "^3.9.5"
   },
-  "scripts": {
-    "clean": "rimraf lib/",
-    "preversion": "npm test",
-    "version": "npm run build && npm run docs && git add -A README.md API.md",
-    "postversion": "git push && git push --tags",
-    "lint": "eslint --ignore-path .gitignore . --ext .js,.ts",
-    "pretest": "npm run lint && npm run build",
-    "test": "npm run test:only",
-    "test:only": "cross-env NODE_ENV=test nyc mocha && bats test",
-    "test:ci": "npm run test:only",
-    "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
-    "prebuild": "npm run clean",
-    "build": "tsc",
-    "prepare": "npm run build",
-    "docs": "typedoc",
-    "spellcheck": "cspell '{examples,src,test}/**/*' *.md"
-  },
-  "bin": {
-    "tplink-smarthome-api": "lib/cli.js"
-  },
-  "files": [
-    "lib"
-  ]
+  "engines": {
+    "node": ">=10"
+  }
 }
