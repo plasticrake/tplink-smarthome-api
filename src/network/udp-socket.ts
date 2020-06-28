@@ -71,6 +71,7 @@ export default class UdpSocket extends TplinkSocket {
 
       socket.removeAllListeners('message');
       socket.removeAllListeners('close');
+      socket.removeAllListeners('error');
 
       socket.on('message', (msg, rinfo) => {
         let decryptedMsg = '';
