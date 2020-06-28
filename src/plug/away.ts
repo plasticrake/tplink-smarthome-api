@@ -1,4 +1,5 @@
-import type { AnyDevice, SendOptions } from '../client';
+import type Plug from '.';
+import type { SendOptions } from '../client';
 import {
   createRule,
   hasRuleListWithRuleIds,
@@ -14,18 +15,33 @@ export type AwayRule = {
   delay?: number;
 };
 
-export type AwayRuleInput = {
+export interface AwayRuleInput {
+  /**
+   * Date or number of minutes
+   */
   start: ScheduleRuleInputTime;
+  /**
+   * Date or number of minutes (only time component of date is used)
+   */
   end: ScheduleRuleInputTime;
+  /**
+   * [0,6] = weekend, [1,2,3,4,5] = weekdays
+   */
   daysOfWeek: number[];
+  /**
+   * @defaultValue 5
+   */
   frequency: number;
   name?: string;
+  /**
+   * @defaultValue true
+   */
   enable: boolean | 0 | 1;
-};
+}
 
 export default class Away {
   constructor(
-    readonly device: AnyDevice,
+    readonly device: Plug,
     readonly apiModuleName: string,
     readonly childId: string | undefined = undefined
   ) {}
@@ -34,8 +50,7 @@ export default class Away {
    * Gets Away Rules.
    *
    * Requests `anti_theft.get_rules`. Support childId.
-   * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getRules(
     sendOptions?: SendOptions
@@ -57,8 +72,7 @@ export default class Away {
    * Gets Away Rule.
    *
    * Requests `anti_theft.get_rules` and return rule matching Id. Support childId.
-   * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getRule(
     id: string,
@@ -74,37 +88,32 @@ export default class Away {
    * Adds Away Rule.
    *
    * Sends `anti_theft.add_rule` command and returns rule id. Support childId.
-   * @param  {Object}        options
-   * @param  {(Date|number)} options.start   Date or number of minutes
-   * @param  {(Date|number)} options.end     Date or number of minutes (only time component of date is used)
-   * @param  {number[]}      options.daysOfWeek  [0,6] = weekend, [1,2,3,4,5] = weekdays
-   * @param  {number}       [options.frequency=5]
-   * @param  {string}       [options.name]
-   * @param  {boolean}      [options.enable=true]
-   * @param  {SendOptions}  [sendOptions]
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async addRule(
-    {
+    rule: AwayRuleInput,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
+    const {
       start,
       end,
       daysOfWeek,
       frequency = 5,
       name = '',
       enable = true,
-    }: AwayRuleInput,
-    sendOptions?: SendOptions
-  ): Promise<unknown> {
-    const rule: AwayRule = {
+    } = rule;
+
+    const awayRule: AwayRule = {
       frequency,
       name,
       enable: enable ? 1 : 0,
       ...createRule({ start, end, daysOfWeek }),
     };
+
     return this.device.sendCommand(
       {
-        [this.apiModuleName]: { add_rule: rule },
+        [this.apiModuleName]: { add_rule: awayRule },
       },
       this.childId,
       sendOptions
@@ -115,20 +124,14 @@ export default class Away {
    * Edits Away rule.
    *
    * Sends `anti_theft.edit_rule` command and returns rule id. Support childId.
-   * @param  {Object}        options
-   * @param  {string}        options.id
-   * @param  {(Date|number)} options.start   Date or number of minutes
-   * @param  {(Date|number)} options.end     Date or number of minutes (only time component of date is used)
-   * @param  {number[]}      options.daysOfWeek  [0,6] = weekend, [1,2,3,4,5] = weekdays
-   * @param  {number}       [options.frequency=5]
-   * @param  {string}       [options.name]
-   * @param  {boolean}      [options.enable=true]
-   * @param  {SendOptions}  [sendOptions]
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async editRule(
-    {
+    rule: AwayRuleInput & { id: string },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
+    const {
       id,
       start,
       end,
@@ -136,19 +139,19 @@ export default class Away {
       frequency = 5,
       name = '',
       enable = true,
-    }: AwayRuleInput & { id: string },
-    sendOptions?: SendOptions
-  ): Promise<unknown> {
-    const rule: AwayRule & { id: string } = {
+    } = rule;
+
+    const awayRule: AwayRule & { id: string } = {
       id,
       frequency,
       name,
       enable: enable ? 1 : 0,
       ...createRule({ start, end, daysOfWeek }),
     };
+
     return this.device.sendCommand(
       {
-        [this.apiModuleName]: { edit_rule: rule },
+        [this.apiModuleName]: { edit_rule: awayRule },
       },
       this.childId,
       sendOptions
@@ -160,7 +163,7 @@ export default class Away {
    *
    * Sends `anti_theft.delete_all_rules` command. Support childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async deleteAllRules(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -177,7 +180,7 @@ export default class Away {
    *
    * Sends `anti_theft.delete_rule` command. Support childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async deleteRule(id: string, sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -194,7 +197,7 @@ export default class Away {
    *
    * Sends `anti_theft.set_overall_enable` command. Support childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async setOverallEnable(
     enable: boolean | 0 | 1,

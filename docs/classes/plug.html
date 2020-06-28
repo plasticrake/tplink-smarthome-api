@@ -1,0 +1,2163 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Plug | tplink-smarthome-api</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">tplink-smarthome-api</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="plug.html">Plug</a>
+				</li>
+			</ul>
+			<h1>Class Plug</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Plug Device.</p>
+					</div>
+					<p>TP-Link models: HS100, HS105, HS107, HS110, HS200, HS210, HS220, HS300.</p>
+					<p>Models with multiple outlets (HS107, HS300) will have a children property.
+						If Plug is instantiated with a childId it will control the outlet associated with that childId.
+					Some functions only apply to the entire device, and are noted below.</p>
+					<p>Emits events after device status is queried, such as {@link #getSysInfo} and {@link #getEmeterRealtime}.</p>
+					<dl class="tsd-comment-tags">
+						<dt>extends</dt>
+						<dd><p>Device</p>
+						</dd>
+						<dt>extends</dt>
+						<dd><p>EventEmitter</p>
+						</dd>
+						<dt>fires</dt>
+						<dd><p>Plug#power-on</p>
+						</dd>
+						<dt>fires</dt>
+						<dd><p>Plug#power-off</p>
+						</dd>
+						<dt>fires</dt>
+						<dd><p>Plug#power-update</p>
+						</dd>
+						<dt>fires</dt>
+						<dd><p>Plug#in-use</p>
+						</dd>
+						<dt>fires</dt>
+						<dd><p>Plug#not-in-use</p>
+						</dd>
+						<dt>fires</dt>
+						<dd><p>Plug#in-use-update</p>
+						</dd>
+						<dt>fires</dt>
+						<dd><p>Plug#emeter-realtime-update</p>
+						</dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<a href="device.html" class="tsd-signature-type">Device</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">Plug</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#_child" class="tsd-kind-icon">#child</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#_childid" class="tsd-kind-icon">#child<wbr>Id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#_children" class="tsd-kind-icon">#children</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#away" class="tsd-kind-icon">away</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#client" class="tsd-kind-icon">client</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#cloud" class="tsd-kind-icon">cloud</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#defaultsendoptions" class="tsd-kind-icon">default<wbr>Send<wbr>Options</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#dimmer" class="tsd-kind-icon">dimmer</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#emeter" class="tsd-kind-icon">emeter</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#emiteventsenabled" class="tsd-kind-icon">emit<wbr>Events<wbr>Enabled</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#host" class="tsd-kind-icon">host</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#inusethreshold" class="tsd-kind-icon">in<wbr>Use<wbr>Threshold</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#netif" class="tsd-kind-icon">netif</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#port" class="tsd-kind-icon">port</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#schedule" class="tsd-kind-icon">schedule</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#time" class="tsd-kind-icon">time</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plug.html#timer" class="tsd-kind-icon">timer</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#alias" class="tsd-kind-icon">alias</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#apimodules" class="tsd-kind-icon">api<wbr>Modules</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#childid" class="tsd-kind-icon">child<wbr>Id</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="plug.html#children" class="tsd-kind-icon">children</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#description" class="tsd-kind-icon">description</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#deviceid" class="tsd-kind-icon">device<wbr>Id</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#devicetype" class="tsd-kind-icon">device<wbr>Type</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#hardwareversion" class="tsd-kind-icon">hardware<wbr>Version</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="plug.html#inuse" class="tsd-kind-icon">in<wbr>Use</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#mac" class="tsd-kind-icon">mac</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#macnormalized" class="tsd-kind-icon">mac<wbr>Normalized</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#model" class="tsd-kind-icon">model</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="plug.html#relaystate" class="tsd-kind-icon">relay<wbr>State</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#softwareversion" class="tsd-kind-icon">software<wbr>Version</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="plug.html#supportsdimmer" class="tsd-kind-icon">supports<wbr>Dimmer</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#sysinfo" class="tsd-kind-icon">sys<wbr>Info</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#type" class="tsd-kind-icon">type</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="plug.html#blink" class="tsd-kind-icon">blink</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#closeconnection" class="tsd-kind-icon">close<wbr>Connection</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="plug.html#getinuse" class="tsd-kind-icon">get<wbr>InUse</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#getinfo" class="tsd-kind-icon">get<wbr>Info</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="plug.html#getledstate" class="tsd-kind-icon">get<wbr>Led<wbr>State</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#getmodel" class="tsd-kind-icon">get<wbr>Model</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="plug.html#getpowerstate" class="tsd-kind-icon">get<wbr>Power<wbr>State</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plug.html#getsysinfo" class="tsd-kind-icon">get<wbr>Sys<wbr>Info</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#reboot" class="tsd-kind-icon">reboot</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#reset" class="tsd-kind-icon">reset</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#send" class="tsd-kind-icon">send</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#sendcommand" class="tsd-kind-icon">send<wbr>Command</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#setalias" class="tsd-kind-icon">set<wbr>Alias</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="plug.html#setledstate" class="tsd-kind-icon">set<wbr>Led<wbr>State</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#setlocation" class="tsd-kind-icon">set<wbr>Location</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="plug.html#setpowerstate" class="tsd-kind-icon">set<wbr>Power<wbr>State</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#startpolling" class="tsd-kind-icon">start<wbr>Polling</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plug.html#stoppolling" class="tsd-kind-icon">stop<wbr>Polling</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="plug.html#togglepowerstate" class="tsd-kind-icon">toggle<wbr>Power<wbr>State</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Object literals</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-object-literal tsd-parent-kind-class"><a href="plug.html#laststate" class="tsd-kind-icon">last<wbr>State</a></li>
+								<li class="tsd-kind-object-literal tsd-parent-kind-class tsd-is-overwrite tsd-is-static"><a href="plug.html#apimodules-1" class="tsd-kind-icon">api<wbr>Modules</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Plug<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PlugConstructorOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="plug.html" class="tsd-signature-type">Plug</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="device.html">Device</a>.<a href="device.html#constructor">constructor</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L199">src/plug/index.ts:199</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Created by <a href="client.html">Client</a> - Do not instantiate directly.</p>
+								</div>
+								<p>See <a href="device.html">Device constructor</a> for common options.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <span class="tsd-signature-type">PlugConstructorOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="plug.html" class="tsd-signature-type">Plug</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="_child" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> #child</h3>
+					<div class="tsd-signature tsd-kind-icon">#child<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">PlugChild</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L107">src/plug/index.ts:107</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="_childid" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> #child<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">#child<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L109">src/plug/index.ts:109</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="_children" class="tsd-anchor"></a>
+					<h3>#children</h3>
+					<div class="tsd-signature tsd-kind-icon">#children<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">PlugChild</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = new Map()</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L105">src/plug/index.ts:105</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="away" class="tsd-anchor"></a>
+					<h3>away</h3>
+					<div class="tsd-signature tsd-kind-icon">away<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Away</span><span class="tsd-signature-symbol"> = new Away(this, &#x27;anti_theft&#x27;, this.#childId)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L137">src/plug/index.ts:137</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>borrows</dt>
+							<dd><p>Away#getRules as Plug.away#getRules</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Away#addRule as Plug.away#addRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Away#editRule as Plug.away#editRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Away#deleteAllRules as Plug.away#deleteAllRules</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Away#deleteRule as Plug.away#deleteRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Away#setOverallEnable as Plug.away#setOverallEnable</p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="client" class="tsd-anchor"></a>
+					<h3>client</h3>
+					<div class="tsd-signature tsd-kind-icon">client<span class="tsd-signature-symbol">:</span> <a href="client.html" class="tsd-signature-type">Client</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#client">client</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L112">src/device/index.ts:112</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="cloud" class="tsd-anchor"></a>
+					<h3>cloud</h3>
+					<div class="tsd-signature tsd-kind-icon">cloud<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Cloud</span><span class="tsd-signature-symbol"> = new Cloud(this, &#x27;cnCloud&#x27;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L146">src/plug/index.ts:146</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>borrows</dt>
+							<dd><p>Cloud#getInfo as Plug.cloud#getInfo</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Cloud#bind as Plug.cloud#bind</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Cloud#unbind as Plug.cloud#unbind</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Cloud#getFirmwareList as Plug.cloud#getFirmwareList</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Cloud#setServerUrl as Plug.cloud#setServerUrl</p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="defaultsendoptions" class="tsd-anchor"></a>
+					<h3>default<wbr>Send<wbr>Options</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>Send<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">SendOptions</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#defaultsendoptions">defaultSendOptions</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L122">src/device/index.ts:122</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="dimmer" class="tsd-anchor"></a>
+					<h3>dimmer</h3>
+					<div class="tsd-signature tsd-kind-icon">dimmer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Dimmer</span><span class="tsd-signature-symbol"> = new Dimmer(this, &#x27;smartlife.iot.dimmer&#x27;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L161">src/plug/index.ts:161</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setBrightness as Plug.dimmer#setBrightness</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#getDefaultBehavior as Plug.dimmer#getDefaultBehavior</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#getDimmerParameters as Plug.dimmer#getDimmerParameters</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setDimmerTransition as Plug.dimmer#setDimmerTransition</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setDoubleClickAction as Plug.dimmer#setDoubleClickAction</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setFadeOffTime as Plug.dimmer#setFadeOffTime</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setFadeOnTime as Plug.dimmer#setFadeOnTime</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setGentleOffTime as Plug.dimmer#setGentleOffTime</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setGentleOnTime as Plug.dimmer#setGentleOnTime</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setLongPressAction as Plug.dimmer#setLongPressAction</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Dimmer#setSwitchState as Plug.dimmer#setSwitchState</p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="emeter" class="tsd-anchor"></a>
+					<h3>emeter</h3>
+					<div class="tsd-signature tsd-kind-icon">emeter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Emeter</span><span class="tsd-signature-symbol"> = new Emeter(this, &#x27;emeter&#x27;, this.#childId)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L170">src/plug/index.ts:170</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>borrows</dt>
+							<dd><p>Emeter#realtime as Plug.emeter#realtime</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Emeter#getRealtime as Plug.emeter#getRealtime</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Emeter#getDayStats as Plug.emeter#getDayStats</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Emeter#getMonthStats as Plug.emeter#getMonthStats</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Emeter#eraseStats as Plug.emeter#eraseStats</p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="emiteventsenabled" class="tsd-anchor"></a>
+					<h3>emit<wbr>Events<wbr>Enabled</h3>
+					<div class="tsd-signature tsd-kind-icon">emit<wbr>Events<wbr>Enabled<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L113">src/plug/index.ts:113</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="host" class="tsd-anchor"></a>
+					<h3>host</h3>
+					<div class="tsd-signature tsd-kind-icon">host<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#host">host</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L114">src/device/index.ts:114</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="inusethreshold" class="tsd-anchor"></a>
+					<h3>in<wbr>Use<wbr>Threshold</h3>
+					<div class="tsd-signature tsd-kind-icon">in<wbr>Use<wbr>Threshold<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0.1</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L111">src/plug/index.ts:111</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="netif" class="tsd-anchor"></a>
+					<h3>netif</h3>
+					<div class="tsd-signature tsd-kind-icon">netif<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Netif</span><span class="tsd-signature-symbol"> = new Netif(this, &#x27;netif&#x27;)</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#netif">netif</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L118">src/device/index.ts:118</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="port" class="tsd-anchor"></a>
+					<h3>port</h3>
+					<div class="tsd-signature tsd-kind-icon">port<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#port">port</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L116">src/device/index.ts:116</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="schedule" class="tsd-anchor"></a>
+					<h3>schedule</h3>
+					<div class="tsd-signature tsd-kind-icon">schedule<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">PlugSchedule</span><span class="tsd-signature-symbol"> = new Schedule(this, &#x27;schedule&#x27;, this.#childId)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L185">src/plug/index.ts:185</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>borrows</dt>
+							<dd><p>Schedule#getNextAction as Plug.schedule#getNextAction</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#getRules as Plug.schedule#getRules</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#getRule as Plug.schedule#getRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>PlugSchedule#addRule as Plug.schedule#addRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>PlugSchedule#editRule as Plug.schedule#editRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#deleteAllRules as Plug.schedule#deleteAllRules</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#deleteRule as Plug.schedule#deleteRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#setOverallEnable as Plug.schedule#setOverallEnable</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#getDayStats as Plug.schedule#getDayStats</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#getMonthStats as Plug.schedule#getMonthStats</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Schedule#eraseStats as Plug.schedule#eraseStats</p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="time" class="tsd-anchor"></a>
+					<h3>time</h3>
+					<div class="tsd-signature tsd-kind-icon">time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Time</span><span class="tsd-signature-symbol"> = new Time(this, &#x27;time&#x27;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L191">src/plug/index.ts:191</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>borrows</dt>
+							<dd><p>Time#getTime as Plug.time#getTime</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Time#getTimezone as Plug.time#getTimezone</p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="timer" class="tsd-anchor"></a>
+					<h3>timer</h3>
+					<div class="tsd-signature tsd-kind-icon">timer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Timer</span><span class="tsd-signature-symbol"> = new Timer(this, &#x27;count_down&#x27;, this.#childId)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L199">src/plug/index.ts:199</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>borrows</dt>
+							<dd><p>Timer#getRules as Plug.timer#getRules</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Timer#addRule as Plug.timer#addRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Timer#editRule as Plug.timer#editRule</p>
+							</dd>
+							<dt>borrows</dt>
+							<dd><p>Timer#deleteAllRules as Plug.timer#deleteAllRules</p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+					<a name="alias" class="tsd-anchor"></a>
+					<h3>alias</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> alias<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="bulb.html">Bulb</a>.<a href="bulb.html#alias">alias</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L298">src/plug/index.ts:298</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.alias</code> or <code>sysinfo.children[childId].alias</code> if childId set.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="apimodules" class="tsd-anchor"></a>
+					<h3>api<wbr>Modules</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> apiModules<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/apimodulenamespace.html" class="tsd-signature-type">ApiModuleNamespace</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#apimodules">apiModules</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L183">src/device/index.ts:183</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/apimodulenamespace.html" class="tsd-signature-type">ApiModuleNamespace</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+					<a name="childid" class="tsd-anchor"></a>
+					<h3>child<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> childId<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="bulb.html">Bulb</a>.<a href="bulb.html#childid">childId</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L281">src/plug/index.ts:281</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns childId.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="children" class="tsd-anchor"></a>
+					<h3>children</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> children<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">PlugChild</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L256">src/plug/index.ts:256</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns children as a map keyed by childId. From cached results from last retrieval of <code>system.sysinfo.children</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">PlugChild</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+					<a name="description" class="tsd-anchor"></a>
+					<h3>description</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> description<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="device.html">Device</a>.<a href="device.html#description">description</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L316">src/plug/index.ts:316</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.dev_name</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="deviceid" class="tsd-anchor"></a>
+					<h3>device<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> deviceId<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#deviceid">deviceId</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L222">src/device/index.ts:222</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.deviceId</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+					<a name="devicetype" class="tsd-anchor"></a>
+					<h3>device<wbr>Type</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> deviceType<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">"plug"</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="device.html">Device</a>.<a href="device.html#devicetype">deviceType</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L321">src/plug/index.ts:321</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">"plug"</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="hardwareversion" class="tsd-anchor"></a>
+					<h3>hardware<wbr>Version</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> hardwareVersion<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#hardwareversion">hardwareVersion</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L283">src/device/index.ts:283</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.hw_ver</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+					<a name="id" class="tsd-anchor"></a>
+					<h3>id</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="bulb.html">Bulb</a>.<a href="bulb.html#id">id</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L328">src/plug/index.ts:328</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.deviceId</code> or <code>childId</code> if set.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="inuse" class="tsd-anchor"></a>
+					<h3>in<wbr>Use</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> inUse<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L344">src/plug/index.ts:344</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Determines if device is in use based on cached <code>emeter.get_realtime</code> results.</p>
+								</div>
+								<p>If device supports energy monitoring (e.g. HS110): <code>power &gt; inUseThreshold</code>. <code>inUseThreshold</code> is specified in Watts</p>
+								<p>Otherwise fallback on relay state: <code>relay_state === 1</code> or <code>sysinfo.children[childId].state === 1</code>.</p>
+								<p>Supports childId.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="mac" class="tsd-anchor"></a>
+					<h3>mac</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> mac<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#mac">mac</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L290">src/device/index.ts:290</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.[mac|mic_mac|ethernet_mac]</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="macnormalized" class="tsd-anchor"></a>
+					<h3>mac<wbr>Normalized</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> macNormalized<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#macnormalized">macNormalized</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L309">src/device/index.ts:309</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Normalized cached value of <code>sysinfo.[mac|mic_mac|ethernet_mac]</code></p>
+								</div>
+								<p>Removes all non alphanumeric characters and makes uppercase
+								<code>aa:bb:cc:00:11:22</code> will be normalized to <code>AABBCC001122</code></p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="model" class="tsd-anchor"></a>
+					<h3>model</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> model<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#model">model</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L234">src/device/index.ts:234</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.model</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="name" class="tsd-anchor"></a>
+					<h3>name</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> name<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#name">name</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L241">src/device/index.ts:241</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.alias</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="relaystate" class="tsd-anchor"></a>
+					<h3>relay<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> relayState<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L358">src/plug/index.ts:358</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.relay_state === 1</code> or <code>sysinfo.children[childId].state === 1</code>.
+										Supports childId.
+									If device supports childId, but childId is not set, then it will return true if any child has <code>state === 1</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<p>On (true) or Off (false)</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="softwareversion" class="tsd-anchor"></a>
+					<h3>software<wbr>Version</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> softwareVersion<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#softwareversion">softwareVersion</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L276">src/device/index.ts:276</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.sw_ver</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="supportsdimmer" class="tsd-anchor"></a>
+					<h3>supports<wbr>Dimmer</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> supportsDimmer<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L390">src/plug/index.ts:390</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>True if cached value of <code>sysinfo</code> has <code>brightness</code> property.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<p>true if cached value of <code>sysinfo</code> has <code>brightness</code> property.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+					<a name="sysinfo" class="tsd-anchor"></a>
+					<h3>sys<wbr>Info</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> sysInfo<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PlugSysinfo</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="device.html">Device</a>.<a href="device.html#sysinfo">sysInfo</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L233">src/plug/index.ts:233</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">PlugSysinfo</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> type<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#type">type</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L248">src/device/index.ts:248</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Cached value of <code>sysinfo.[type|mic_type]</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="blink" class="tsd-anchor"></a>
+					<h3>blink</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">blink<span class="tsd-signature-symbol">(</span>times<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, rate<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L584">src/plug/index.ts:584</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Blink Plug LED.</p>
+								</div>
+								<p>Sends <code>system.set_led_off</code> command alternating on and off number of <code>times</code> at <code>rate</code>,
+								then sets the led to its pre-blink state. Does not support childId.</p>
+								<p>Note: <code>system.set_led_off</code> is particularly slow, so blink rate is not guaranteed.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> times: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 5</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> rate: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1000</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="closeconnection" class="tsd-anchor"></a>
+					<h3>close<wbr>Connection</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">close<wbr>Connection<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#closeconnection">closeConnection</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L317">src/device/index.ts:317</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Closes any open network connections including any shared sockets.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getinuse" class="tsd-anchor"></a>
+					<h3>get<wbr>InUse</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>InUse<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L493">src/plug/index.ts:493</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Same as {@link #inUse}, but requests current <code>emeter.get_realtime</code>. Supports childId.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="getinfo" class="tsd-anchor"></a>
+					<h3>get<wbr>Info</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Info<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>cloud<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>info<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>emeter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>realtime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>schedule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>nextAction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>sysInfo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="device.html">Device</a>.<a href="device.html#getinfo">getInfo</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L420">src/plug/index.ts:420</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Requests common Plug status details in a single request.</p>
+									<ul>
+										<li><code>system.get_sysinfo</code></li>
+										<li><code>cloud.get_sysinfo</code></li>
+										<li><code>emeter.get_realtime</code></li>
+										<li><code>schedule.get_next_action</code></li>
+									</ul>
+								</div>
+								<p>Supports childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>cloud<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>info<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>emeter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>realtime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>schedule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>nextAction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>sysInfo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getledstate" class="tsd-anchor"></a>
+					<h3>get<wbr>Led<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Led<wbr>State<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L510">src/plug/index.ts:510</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get Plug LED state (night mode).</p>
+								</div>
+								<p>Requests <code>system.sysinfo</code> and returns true if <code>led_off === 0</code>. Does not support childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>LED State, true === on</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="getmodel" class="tsd-anchor"></a>
+					<h3>get<wbr>Model</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Model<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#getmodel">getModel</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L576">src/device/index.ts:576</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Gets device&#39;s model.</p>
+								</div>
+								<p>Requests <code>system.sysinfo</code> and returns model name. Does not support childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getpowerstate" class="tsd-anchor"></a>
+					<h3>get<wbr>Power<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Power<wbr>State<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L538">src/plug/index.ts:538</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get Plug relay state (on/off).</p>
+								</div>
+								<p>Requests <code>system.get_sysinfo</code> and returns true if On. Calls {@link #relayState}. Supports childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="getsysinfo" class="tsd-anchor"></a>
+					<h3>get<wbr>Sys<wbr>Info</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Sys<wbr>Info<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PlugSysinfo</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="device.html">Device</a>.<a href="device.html#getsysinfo">getSysInfo</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L400">src/plug/index.ts:400</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Gets plug&#39;s SysInfo.</p>
+								</div>
+								<p>Requests <code>system.sysinfo</code> from device. Does not support childId.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PlugSysinfo</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="reboot" class="tsd-anchor"></a>
+					<h3>reboot</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">reboot<span class="tsd-signature-symbol">(</span>delay<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#reboot">reboot</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L588">src/device/index.ts:588</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Reboot device.</p>
+								</div>
+								<p>Sends <code>system.reboot</code> command. Does not support childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>delay: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="reset" class="tsd-anchor"></a>
+					<h3>reset</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">reset<span class="tsd-signature-symbol">(</span>delay<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#reset">reset</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L605">src/device/index.ts:605</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Reset device.</p>
+								</div>
+								<p>Sends <code>system.reset</code> command. Does not support childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>delay: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="send" class="tsd-anchor"></a>
+					<h3>send</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">send<span class="tsd-signature-symbol">(</span>payload<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#send">send</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L327">src/device/index.ts:327</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sends <code>payload</code> to device (using {@link Client#send})</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>payload: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>paylaod to send to device, if object, converted to string via <code>JSON.stringify</code></p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="sendcommand" class="tsd-anchor"></a>
+					<h3>send<wbr>Command</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">send<wbr>Command<span class="tsd-signature-symbol">(</span>command<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span>, childIds<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#sendcommand">sendCommand</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L422">src/device/index.ts:422</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sends command(s) to device.</p>
+								</div>
+								<p>Calls {@link #send} and processes the response.</p>
+								<ul>
+									<li><p>Adds context.child_ids:[] to the command.</p>
+										<ul>
+											<li>If <code>childIds</code> parameter is set. <em>or</em></li>
+											<li>If device was instantiated with a childId it will default to that value.</li>
+										</ul>
+									</li>
+									<li><p>If only one operation was sent:</p>
+										<ul>
+											<li>Promise fulfills with specific parsed JSON response for command.<br>Example: <code>{system:{get_sysinfo:{}}}</code><ul>
+													<li>resolves to: <code>{err_code:0,...}</code>\</li>
+													<li>instead of: <code>{system:{get_sysinfo:{err_code:0,...}}}</code> (as {@link #send} would)</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+									<li><p>If more than one operation was sent:</p>
+										<ul>
+											<li>Promise fulfills with full parsed JSON response (same as {@link #send})</li>
+										</ul>
+									</li>
+								</ul>
+								<p>Also, the response&#39;s <code>err_code</code>(s) are checked, if any are missing or != <code>0</code> the Promise is rejected with <a href="responseerror.html">ResponseError</a>.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>command: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> childIds: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> = this.childId</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="setalias" class="tsd-anchor"></a>
+					<h3>set<wbr>Alias</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Alias<span class="tsd-signature-symbol">(</span>alias<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#setalias">setAlias</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L524">src/device/index.ts:524</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Change device&#39;s alias (name).</p>
+								</div>
+								<p>Sends <code>system.set_dev_alias</code> command. Supports childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>alias: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setledstate" class="tsd-anchor"></a>
+					<h3>set<wbr>Led<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Led<wbr>State<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L522">src/plug/index.ts:522</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Turn Plug LED on/off (night mode). Does not support childId.</p>
+								</div>
+								<p>Sends <code>system.set_led_off</code> command.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>LED State, true === on</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="setlocation" class="tsd-anchor"></a>
+					<h3>set<wbr>Location</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Location<span class="tsd-signature-symbol">(</span>latitude<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, longitude<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#setlocation">setLocation</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L547">src/device/index.ts:547</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Set device&#39;s location.</p>
+								</div>
+								<p>Sends <code>system.set_dev_location</code> command. Does not support childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>latitude: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>longitude: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>parsed JSON response</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setpowerstate" class="tsd-anchor"></a>
+					<h3>set<wbr>Power<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Power<wbr>State<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L549">src/plug/index.ts:549</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Turns Plug relay on/off.</p>
+								</div>
+								<p>Sends <code>system.set_relay_state</code> command. Supports childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="startpolling" class="tsd-anchor"></a>
+					<h3>start<wbr>Polling</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">start<wbr>Polling<span class="tsd-signature-symbol">(</span>interval<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#startpolling">startPolling</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L463">src/device/index.ts:463</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Polls the device every <code>interval</code>.</p>
+								</div>
+								<p>Returns <code>this</code> (for chaining) that emits events based on state changes.
+								Refer to specific device sections for event details.</p>
+								<dl class="tsd-comment-tags">
+									<dt>fires</dt>
+									<dd><p>Device#polling-error</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>interval: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>(ms)</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="stoppolling" class="tsd-anchor"></a>
+					<h3>stop<wbr>Polling</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">stop<wbr>Polling<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="bulb.html">Bulb</a>.<a href="bulb.html#stoppolling">stopPolling</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/device/index.ts#L488">src/device/index.ts:488</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Stops device polling.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="togglepowerstate" class="tsd-anchor"></a>
+					<h3>toggle<wbr>Power<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">toggle<wbr>Power<wbr>State<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L569">src/plug/index.ts:569</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Toggles Plug relay state.</p>
+								</div>
+								<p>Requests <code>system.get_sysinfo</code> sets the power state to the opposite <code>relay_state === 1 and returns the new power state</code>. Supports childId.</p>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="responseerror.html">ResponseError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Object literals</h2>
+				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-parent-kind-class">
+					<a name="laststate" class="tsd-anchor"></a>
+					<h3>last<wbr>State</h3>
+					<div class="tsd-signature tsd-kind-icon">last<wbr>State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L115">src/plug/index.ts:115</a></li>
+						</ul>
+					</aside>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="laststate.inuse-1" class="tsd-anchor"></a>
+						<h3>in<wbr>Use</h3>
+						<div class="tsd-signature tsd-kind-icon">in<wbr>Use<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L115">src/plug/index.ts:115</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="laststate.relaystate-1" class="tsd-anchor"></a>
+						<h3>relay<wbr>State</h3>
+						<div class="tsd-signature tsd-kind-icon">relay<wbr>State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L115">src/plug/index.ts:115</a></li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-parent-kind-class tsd-is-overwrite tsd-is-static">
+					<a name="apimodules-1" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> api<wbr>Modules</h3>
+					<div class="tsd-signature tsd-kind-icon">api<wbr>Modules<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<p>Overrides <a href="bulb.html">Bulb</a>.<a href="bulb.html#apimodules">apiModules</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L119">src/plug/index.ts:119</a></li>
+						</ul>
+					</aside>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="apimodules-1.cloud-1" class="tsd-anchor"></a>
+						<h3>cloud</h3>
+						<div class="tsd-signature tsd-kind-icon">cloud<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;cnCloud&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L121">src/plug/index.ts:121</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="apimodules-1.emeter-1" class="tsd-anchor"></a>
+						<h3>emeter</h3>
+						<div class="tsd-signature tsd-kind-icon">emeter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;emeter&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L124">src/plug/index.ts:124</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="apimodules-1.lightingservice" class="tsd-anchor"></a>
+						<h3>lightingservice</h3>
+						<div class="tsd-signature tsd-kind-icon">lightingservice<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L126">src/plug/index.ts:126</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="apimodules-1.netif-1" class="tsd-anchor"></a>
+						<h3>netif</h3>
+						<div class="tsd-signature tsd-kind-icon">netif<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;netif&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L125">src/plug/index.ts:125</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="apimodules-1.schedule-1" class="tsd-anchor"></a>
+						<h3>schedule</h3>
+						<div class="tsd-signature tsd-kind-icon">schedule<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;schedule&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L122">src/plug/index.ts:122</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="apimodules-1.system" class="tsd-anchor"></a>
+						<h3>system</h3>
+						<div class="tsd-signature tsd-kind-icon">system<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;system&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L120">src/plug/index.ts:120</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="apimodules-1.timesetting" class="tsd-anchor"></a>
+						<h3>timesetting</h3>
+						<div class="tsd-signature tsd-kind-icon">timesetting<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;time&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/133f928/src/plug/index.ts#L123">src/plug/index.ts:123</a></li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="bulb.html" class="tsd-kind-icon">Bulb</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="client.html" class="tsd-kind-icon">Client</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="device.html" class="tsd-kind-icon">Device</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class">
+						<a href="plug.html" class="tsd-kind-icon">Plug</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#_child" class="tsd-kind-icon">#child</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#_childid" class="tsd-kind-icon">#child<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#_children" class="tsd-kind-icon">#children</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#away" class="tsd-kind-icon">away</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#client" class="tsd-kind-icon">client</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#cloud" class="tsd-kind-icon">cloud</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#defaultsendoptions" class="tsd-kind-icon">default<wbr>Send<wbr>Options</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#dimmer" class="tsd-kind-icon">dimmer</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#emeter" class="tsd-kind-icon">emeter</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#emiteventsenabled" class="tsd-kind-icon">emit<wbr>Events<wbr>Enabled</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#host" class="tsd-kind-icon">host</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#inusethreshold" class="tsd-kind-icon">in<wbr>Use<wbr>Threshold</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#netif" class="tsd-kind-icon">netif</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#port" class="tsd-kind-icon">port</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#schedule" class="tsd-kind-icon">schedule</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#time" class="tsd-kind-icon">time</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plug.html#timer" class="tsd-kind-icon">timer</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#alias" class="tsd-kind-icon">alias</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#apimodules" class="tsd-kind-icon">api<wbr>Modules</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#childid" class="tsd-kind-icon">child<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="plug.html#children" class="tsd-kind-icon">children</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#description" class="tsd-kind-icon">description</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#deviceid" class="tsd-kind-icon">device<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#devicetype" class="tsd-kind-icon">device<wbr>Type</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#hardwareversion" class="tsd-kind-icon">hardware<wbr>Version</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#id" class="tsd-kind-icon">id</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="plug.html#inuse" class="tsd-kind-icon">in<wbr>Use</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#mac" class="tsd-kind-icon">mac</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#macnormalized" class="tsd-kind-icon">mac<wbr>Normalized</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#model" class="tsd-kind-icon">model</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#name" class="tsd-kind-icon">name</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="plug.html#relaystate" class="tsd-kind-icon">relay<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#softwareversion" class="tsd-kind-icon">software<wbr>Version</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="plug.html#supportsdimmer" class="tsd-kind-icon">supports<wbr>Dimmer</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#sysinfo" class="tsd-kind-icon">sys<wbr>Info</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#type" class="tsd-kind-icon">type</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plug.html#blink" class="tsd-kind-icon">blink</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#closeconnection" class="tsd-kind-icon">close<wbr>Connection</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plug.html#getinuse" class="tsd-kind-icon">get<wbr>InUse</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#getinfo" class="tsd-kind-icon">get<wbr>Info</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plug.html#getledstate" class="tsd-kind-icon">get<wbr>Led<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#getmodel" class="tsd-kind-icon">get<wbr>Model</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plug.html#getpowerstate" class="tsd-kind-icon">get<wbr>Power<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plug.html#getsysinfo" class="tsd-kind-icon">get<wbr>Sys<wbr>Info</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#reboot" class="tsd-kind-icon">reboot</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#reset" class="tsd-kind-icon">reset</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#send" class="tsd-kind-icon">send</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#sendcommand" class="tsd-kind-icon">send<wbr>Command</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#setalias" class="tsd-kind-icon">set<wbr>Alias</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plug.html#setledstate" class="tsd-kind-icon">set<wbr>Led<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#setlocation" class="tsd-kind-icon">set<wbr>Location</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plug.html#setpowerstate" class="tsd-kind-icon">set<wbr>Power<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#startpolling" class="tsd-kind-icon">start<wbr>Polling</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plug.html#stoppolling" class="tsd-kind-icon">stop<wbr>Polling</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plug.html#togglepowerstate" class="tsd-kind-icon">toggle<wbr>Power<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-object-literal tsd-parent-kind-class">
+								<a href="plug.html#laststate" class="tsd-kind-icon">last<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-overwrite tsd-is-static">
+								<a href="plug.html#apimodules-1" class="tsd-kind-icon">api<wbr>Modules</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-class">
+						<a href="responseerror.html" class="tsd-kind-icon">Response<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/apimodulenamespace.html" class="tsd-kind-icon">Api<wbr>Module<wbr>Namespace</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/awayruleinput.html" class="tsd-kind-icon">Away<wbr>Rule<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/bulbconstructoroptions.html" class="tsd-kind-icon">Bulb<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/bulbscheduleruleinput.html" class="tsd-kind-icon">Bulb<wbr>Schedule<wbr>Rule<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/clientconstructoroptions.html" class="tsd-kind-icon">Client<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/deviceconstructoroptions.html" class="tsd-kind-icon">Device<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/dimmeractioninput.html" class="tsd-kind-icon">Dimmer<wbr>Action<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/dimmertransitioninput.html" class="tsd-kind-icon">Dimmer<wbr>Transition<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/discoveryoptions.html" class="tsd-kind-icon">Discovery<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/lightstate.html" class="tsd-kind-icon">Light<wbr>State</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/lightstateinput.html" class="tsd-kind-icon">Light<wbr>State<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/plugscheduleruleinput.html" class="tsd-kind-icon">Plug<wbr>Schedule<wbr>Rule<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#awayrule" class="tsd-kind-icon">Away<wbr>Rule</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#bulbschedulerule" class="tsd-kind-icon">Bulb<wbr>Schedule<wbr>Rule</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#plugschedulerule" class="tsd-kind-icon">Plug<wbr>Schedule<wbr>Rule</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

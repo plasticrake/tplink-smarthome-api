@@ -87,16 +87,18 @@
     "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-tsdoc": "^0.2.5",
-    "jsdoc-to-markdown": "^5.0.3",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",
     "source-map-support": "^0.5.19",
     "tplink-smarthome-simulator": "^2.0.0",
     "ts-essentials": "^7.0.0",
     "ts-node": "^8.10.2",
+    "typedoc": "^0.17.0-3",
+    "typedoc-plugin-no-inherit": "^1.1.10",
     "typescript": "^3.9.5"
   },
   "scripts": {
@@ -108,10 +110,11 @@
     "pretest": "npm run lint",
     "test": "cross-env NODE_ENV=test nyc mocha && bats test",
     "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
+    "prebuild": "npm run clean",
     "build": "tsc",
     "prepare": "npm run build",
-    "docs": "jsdoc2md 'src/**/*.js' > API.md && jsdoc2md --template=jsdoc2md/README.hbs 'src/**/*.js' > README.md",
-    "spellcheck": "cspell '{examples,jsdoc2md,src,test}/**/*' *.md"
+    "docs": "typedoc",
+    "spellcheck": "cspell '{examples,docs,src,test}/**/*' *.md"
   },
   "bin": {
     "tplink-smarthome-api": "lib/cli.js"

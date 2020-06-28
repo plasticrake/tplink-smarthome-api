@@ -27,8 +27,7 @@ export default class Timer {
    * Requests `count_down.get_rules`. Supports childId.
    * @param  {string[]|string|number[]|number} [childIds] for multi-outlet devices, which outlet(s) to target
    * @param  {SendOptions} [sendOptions]
-   * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getRules(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -50,8 +49,9 @@ export default class Timer {
    * @param  {string}      [options.name='timer']        rule name
    * @param  {boolean}     [options.enable=true]         rule enabled
    * @param  {boolean}     [options.deleteExisting=true] send `delete_all_rules` command before adding
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async addRule(
     {
@@ -90,8 +90,9 @@ export default class Timer {
    * @param  {number}       options.powerState       turn on or off device
    * @param  {string}      [options.name='timer']    rule name
    * @param  {Boolean}     [options.enable=true]     rule enabled
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   *
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async editRule(
     {
@@ -125,7 +126,7 @@ export default class Timer {
    *
    * Sends count_down.delete_all_rules command. Supports childId.
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns {Promise<Object, ResponseError>} parsed JSON response
    */
   async deleteAllRules(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(

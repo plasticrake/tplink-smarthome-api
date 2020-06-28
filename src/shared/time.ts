@@ -9,7 +9,7 @@ export default class Time {
    * Requests `timesetting.get_time`. Does not support ChildId.
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getTime(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -27,7 +27,7 @@ export default class Time {
    * Requests `timesetting.get_timezone`. Does not support ChildId.
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getTimezone(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(

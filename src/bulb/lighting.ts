@@ -9,13 +9,29 @@ import {
   isObjectLike,
 } from '../utils';
 
-export type LightState = {
+export interface LightState {
+  /**
+   * (ms)
+   */
   transition_period?: number;
   on_off?: 0 | 1;
   mode?: string;
+  /**
+   * 0-360
+   */
   hue?: number;
+  /**
+   * 0-100
+   */
   saturation?: number;
+  /**
+   * 0-100
+   */
   brightness?: number;
+  /**
+   * Kelvin
+   * (LB120:2700-6500 LB130:2500-9000)
+   */
   color_temp?: number;
   ignore_default?: 0 | 1;
   dft_on_state?: {
@@ -25,12 +41,14 @@ export type LightState = {
     color_temp?: number;
     brightness?: number;
   };
-};
+}
 
-export type LightStateInput = Omit<LightState, 'on_off' | 'ignore_default'> & {
-  on_off?: boolean | 0 | 1;
-  ignore_default?: boolean | 0 | 1;
-};
+export interface LightStateInput extends LightState {
+  /**
+   * @defaultValue 1
+   */
+  ignore_default?: 0 | 1;
+}
 
 export type LightStateResponse = LightState & {
   err_code: number;
@@ -47,52 +65,60 @@ export function isLightStateResponse(
 }
 
 export default class Lighting {
-  lastState: { powerOn?: boolean; lightState?: {} } = {
+  lastState: { powerOn?: boolean; lightState?: LightState } = {
     powerOn: undefined,
     lightState: undefined,
   };
 
+  /**
+   * @internal
+   */
   #lightState: LightState = {};
 
-  constructor(readonly device: Bulb, readonly apiModuleName: string) {}
+  constructor(
+    private readonly device: Bulb,
+
+    private readonly apiModuleName: string
+  ) {}
 
   /**
    * Returns cached results from last retrieval of `lightingservice.get_light_state`.
-   * @return {Object}
+   * @returns cached results from last retrieval of `lightingservice.get_light_state`.
    */
   get lightState(): LightState {
     return this.#lightState;
   }
 
   /**
-   * @private
+   * @internal
    */
   set lightState(lightState) {
     this.#lightState = lightState;
     this.emitEvents();
   }
 
-  /**
-   * Bulb was turned on (`lightstate.on_off`).
-   * @event Bulb#lightstate-on
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb was turned off (`lightstate.on_off`).
-   * @event Bulb#lightstate-off
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's lightstate was changed.
-   * @event Bulb#lightstate-change
-   * @property {Object} value lightstate
-   */
-  /**
-   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
-   * @event Bulb#lightstate-update
-   * @property {Object} value lightstate
-   */
   private emitEvents(): void {
+    /**
+     * Bulb was turned on (`lightstate.on_off`).
+     * @event Bulb#lightstate-on
+     * @property {object} value lightstate
+     */
+    /**
+     * Bulb was turned off (`lightstate.on_off`).
+     * @event Bulb#lightstate-off
+     * @property {object} value lightstate
+     */
+    /**
+     * Bulb's lightstate was changed.
+     * @event Bulb#lightstate-change
+     * @property {object} value lightstate
+     */
+    /**
+     * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+     * @event Bulb#lightstate-update
+     * @property {object} value lightstate
+     */
+
     if (!this.#lightState) return;
     const powerOn = this.#lightState.on_off === 1;
 
@@ -116,8 +142,8 @@ export default class Lighting {
    * Get Bulb light state.
    *
    * Requests `lightingservice.get_light_state`.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async getLightState(sendOptions?: SendOptions): Promise<LightState> {
     this.lightState = extractResponse(
@@ -139,19 +165,14 @@ export default class Lighting {
    * Sets Bulb light state (on/off, brightness, color, etc).
    *
    * Sends `lightingservice.transition_light_state` command.
-   * @param  options
-   * @param  options.transition_period (ms)
-   * @param  options.on_off
-   * @param  options.mode
-   * @param  options.hue               0-360
-   * @param  options.saturation        0-100
-   * @param  options.brightness        0-100
-   * @param  options.color_temp        Kelvin (LB120:2700-6500 LB130:2500-9000)
-   * @param  options.ignore_default    default: true
-   * @param  sendOptions
+   * @param  lightState - light state
+   * @param  sendOptions - send options
    */
   async setLightState(
-    {
+    lightState: LightStateInput,
+    sendOptions?: SendOptions
+  ): Promise<true> {
+    const {
       transition_period,
       on_off,
       mode,
@@ -159,10 +180,8 @@ export default class Lighting {
       saturation,
       brightness,
       color_temp,
-      ignore_default = true,
-    }: LightStateInput,
-    sendOptions?: SendOptions
-  ): Promise<true> {
+      ignore_default = 1,
+    } = lightState;
     const state: LightState = {};
     if (isDefinedAndNotNull(ignore_default))
       state.ignore_default = ignore_default ? 1 : 0;

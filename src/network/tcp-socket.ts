@@ -4,6 +4,9 @@ import { encryptWithHeader, decrypt } from 'tplink-smarthome-crypto';
 import TplinkSocket from './tplink-socket';
 import { replaceControlCharacters } from '../utils';
 
+/**
+ * @hidden
+ */
 export default class TcpSocket extends TplinkSocket {
   readonly socketType = 'TCP';
 

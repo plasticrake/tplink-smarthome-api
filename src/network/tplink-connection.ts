@@ -5,8 +5,11 @@ import type Client from '../client';
 
 import TcpSocket from './tcp-socket';
 import UdpSocket from './udp-socket';
-import { Logger } from '../logger';
+import type { Logger } from '../logger';
 
+/**
+ * @hidden
+ */
 export default abstract class TplinkConnection extends EventEmitter {
   abstract readonly socketType: string;
 

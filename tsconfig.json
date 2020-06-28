@@ -3,5 +3,13 @@
   "compilerOptions": {
     "outDir": "./lib"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "typedocOptions": {
+    "mode": "library",
+    "inputFiles": ["src/index.ts"],
+    "out": "docs",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "stripInternal": true
+  }
 }

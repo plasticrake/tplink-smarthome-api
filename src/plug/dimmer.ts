@@ -1,6 +1,26 @@
 import type { SendOptions } from '../client';
 import type Plug from '.';
 
+export interface DimmerTransitionInput {
+  /**
+   * 0-100
+   */
+  brightness?: number;
+  /**
+   * "gentle_on_off", etc.
+   */
+  mode?: string;
+  /**
+   * duration in seconds
+   */
+  duration?: number;
+}
+
+export interface DimmerActionInput {
+  mode?: string;
+  index?: number;
+}
+
 /**
  * Dimmer
  *
@@ -13,10 +33,9 @@ export default class Dimmer {
    * Sets Plug to the specified `brightness`.
    *
    * Sends `dimmer.set_brightness` command. Does not support childId.
-   * @param  brightness  0-100
-   * @param  sendOptions
+   * @param   brightness - 0-100
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async setBrightness(
     brightness: number,
@@ -38,7 +57,7 @@ export default class Dimmer {
    *
    * Requests `dimmer.get_default_behavior`. Does not support childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getDefaultBehavior(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -57,7 +76,7 @@ export default class Dimmer {
    *
    * Requests `dimmer.get_dimmer_parameters`. Does not support childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getDimmerParameters(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -75,22 +94,15 @@ export default class Dimmer {
    * Transitions Plug to the specified `brightness`.
    *
    * Sends `dimmer.set_dimmer_transition` command. Does not support childId.
-   * @param  {Object}       options
-   * @param  {Boolean}     [options.brightness]  0-100
-   * @param  {number}      [options.mode]        "gentle_on_off", etc.
-   * @param  {number}      [options.duration]    duration in seconds
-   * @param  {SendOptions} [sendOptions]
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async setDimmerTransition(
-    {
-      brightness,
-      mode,
-      duration,
-    }: { brightness?: number; mode?: string; duration?: number },
+    dimmerTransition: DimmerTransitionInput,
     sendOptions?: SendOptions
   ): Promise<unknown> {
+    const { brightness, mode, duration } = dimmerTransition;
+
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
@@ -110,15 +122,11 @@ export default class Dimmer {
    * Set Plug/Dimmer `default_behavior` configuration for `double_click`.
    *
    * Sends `dimmer.set_double_click_action`. Does not support childId.
-   * @param  {Object}       options
-   * @param  {string}      [options.mode]
-   * @param  {number}      [options.index]
-   * @param  {SendOptions} [sendOptions]
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async setDoubleClickAction(
-    { mode, index }: { mode?: string; index?: number },
+    { mode, index }: DimmerActionInput,
     sendOptions?: SendOptions
   ): Promise<unknown> {
     return this.setAction(
@@ -161,7 +169,7 @@ export default class Dimmer {
    * @param   fadeTime - duration in ms
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async setFadeOffTime(
     fadeTime: number,
@@ -185,7 +193,7 @@ export default class Dimmer {
    * @param   fadeTime - duration in ms
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async setFadeOnTime(
     fadeTime: number,
@@ -209,7 +217,7 @@ export default class Dimmer {
    * @param   fadeTime - duration in ms
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async setGentleOffTime(
     fadeTime: number,
@@ -233,7 +241,7 @@ export default class Dimmer {
    * @param   fadeTime - duration in ms
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async setGentleOnTime(
     fadeTime: number,
@@ -259,10 +267,10 @@ export default class Dimmer {
    * @param   options.index
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async setLongPressAction(
-    { mode, index }: { mode: string; index: number },
+    { mode, index }: DimmerActionInput,
     sendOptions?: SendOptions
   ): Promise<unknown> {
     return this.setAction(
@@ -278,7 +286,7 @@ export default class Dimmer {
    * @param  {Boolean}     state  true=on, false=off
    * @param  {SendOptions} [sendOptions]
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async setSwitchState(
     state: boolean | 0 | 1,

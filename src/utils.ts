@@ -11,8 +11,6 @@ export function isObjectLike(
  * Represents an error result received from a TP-Link device.
  *
  * Where response err_code != 0.
- * @param command - command sent to device
- * @param errorModules - array of modules that returned with errors.
  */
 export class ResponseError extends Error {
   /**
@@ -20,6 +18,14 @@ export class ResponseError extends Error {
    */
   readonly stack = '';
 
+  /**
+   *
+   * @param message -
+   * @param response -
+   * @param command - command sent to device
+   * @param modules - array of module names that returned with errors.
+   * @param methods - array of method names (format: `${moduleName}.${methodName}`) that returned with errors.
+   */
   constructor(
     message: string,
     readonly response: string,
@@ -123,7 +129,7 @@ function flattenResponses(
  * @param command
  * @param response
  * @returns
- * @throws {ResponseError}
+ * @throws {@link ResponseError}
  */
 export function processResponse(command: object, response: object): object {
   const multipleResponses = Object.keys(response).length > 1;
@@ -199,8 +205,8 @@ export function processResponse(command: object, response: object): object {
  * @param path passed to `lodash.get`
  * @param typeGuardFn
  * @returns value of `path` in `response`
- * @throws Error
- * @throws TypeError
+ * @throws {@link Error}
+ * @throws {@link TypeError}
  */
 export function extractResponse<T>(
   response: unknown,
