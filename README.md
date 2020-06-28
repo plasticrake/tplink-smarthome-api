@@ -51,7 +51,7 @@ Install the command line utility with `npm install -g tplink-smarthome-api`. Run
 
 ## API
 
-[API docs can be found here.](https://github.com/plasticrake/tplink-smarthome-api/tree/master/docs)
+[API docs can be found here.](https://plasticrake.github.io/tplink-smarthome-api/)
 
 For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`, etc.
 
