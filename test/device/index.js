@@ -46,6 +46,9 @@ describe('Device', function () {
             device = await testDevice.getDevice(undefined, testSendOptions);
             this.device = device;
           });
+          afterEach('device', async function () {
+            device.closeConnection();
+          });
 
           describe('constructor', function () {
             it('should inherit defaultSendOptions from Client', function () {
