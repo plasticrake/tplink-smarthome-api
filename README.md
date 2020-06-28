@@ -12,10 +12,10 @@ TP-Link Smarthome API
 
 ## Known Supported Devices
 
-| Model                                                                           | Type |
-| ------------------------------------------------------------------------------- | ---- |
-| HS100, HS103, HS105, HS107, HS110,<br/>HS200, HS210, HS220, HS300, KP303, KP400 | Plug |
-| LB100, LB110, LB120, LB130, LB200, LB230                                        | Bulb |
+| Model                                                                                       | Type |
+| ------------------------------------------------------------------------------------------- | ---- |
+| HS100, HS103, HS105, HS107, HS110,<br/>HS200, HS210, HS220, HS300, KP303, KP400<br/>...etc. | Plug |
+| LB100, LB110, LB120, LB130, LB200, LB230<br/>...etc.                                        | Bulb |
 
 Most other TP-Link Plug and Bulb models may work as well.
 
@@ -51,9 +51,9 @@ Install the command line utility with `npm install -g tplink-smarthome-api`. Run
 
 ## API
 
-[Full API docs can be found here.](https://github.com/plasticrake/tplink-smarthome-api/blob/master/API.md)
+[API docs can be found here.](https://github.com/plasticrake/tplink-smarthome-api/tree/master/docs)
 
-For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`.
+For functions that send commands, the last argument is `SendOptions` where you can set the `transport` ('tcp','udp') and `timeout`, etc.
 
 Functions that take more than 3 arguments are passed a single options object as the first argument (and if its a network command, SendOptions as the second.)
 
