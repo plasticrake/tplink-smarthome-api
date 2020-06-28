@@ -1,50 +1,66 @@
+import type Plug from '.';
 import Schedule, { createScheduleRule } from '../shared/schedule';
 import type { ScheduleRule, ScheduleRuleInputTime } from '../shared/schedule';
 import type { SendOptions } from '../client';
 import { isDefinedAndNotNull } from '../utils';
 
-type PlugScheduleRule = Omit<ScheduleRule, 'emin'> & {
+export type PlugScheduleRule = Omit<ScheduleRule, 'emin'> & {
   sact?: number;
   s_dimmer?: {};
   emin: 0;
 };
 
-export type PlugScheduleRuleInput = {
+export interface PlugScheduleRuleInput {
   powerState: boolean;
+  /**
+   * dimmer data (dimmable plugs only)
+   */
   dimmer?: {};
+  /**
+   * Date or number of minutes
+   */
   start: ScheduleRuleInputTime;
+  /**
+   * [0,6] = weekend, [1,2,3,4,5] = weekdays
+   */
   daysOfWeek?: number[];
   name?: string;
+  /**
+   * @defaultValue true
+   */
   enable: boolean;
-};
+}
 
 export default class PlugSchedule extends Schedule {
+  constructor(
+    readonly device: Plug,
+    readonly apiModuleName: string,
+    readonly childId?: string
+  ) {
+    super(device, apiModuleName, childId);
+  }
+
   /**
    * Adds Schedule rule.
    *
    * Sends `schedule.add_rule` command and returns rule id. Supports childId.
-   * @param  {Object}        options
-   * @param  {boolean}      [options.powerState]
-   * @param  {Object}       [options.dimmer] dimmer data (dimmable plugs only)
-   * @param  {(Date|number)} options.start  Date or number of minutes
-   * @param  {number[]}     [options.daysOfWeek]  [0,6] = weekend, [1,2,3,4,5] = weekdays
-   * @param  {string}       [options.name]
-   * @param  {boolean}      [options.enable=true]
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async addRule(
-    {
+    rule: PlugScheduleRuleInput,
+    sendOptions?: SendOptions
+  ): ReturnType<Schedule['addRule']> {
+    const {
       powerState,
       dimmer,
       start,
       daysOfWeek,
       name = '',
       enable = true,
-    }: PlugScheduleRuleInput,
-    sendOptions?: SendOptions
-  ): ReturnType<Schedule['addRule']> {
-    const rule: PlugScheduleRule = {
+    } = rule;
+
+    const scheduleRule: PlugScheduleRule = {
       sact: powerState ? 1 : 0,
       name,
       enable: enable ? 1 : 0,
@@ -54,30 +70,25 @@ export default class PlugSchedule extends Schedule {
     };
 
     if (isDefinedAndNotNull(dimmer)) {
-      rule.sact = 3;
-      rule.s_dimmer = dimmer;
+      scheduleRule.sact = 3;
+      scheduleRule.s_dimmer = dimmer;
     }
 
-    return Schedule.prototype.addRule.call(this, rule, sendOptions); // super.addRule(rule); // workaround babel bug
+    return super.addRule(scheduleRule, sendOptions);
   }
 
   /**
    * Edits Schedule rule.
    *
    * Sends `schedule.edit_rule` command and returns rule id. Supports childId.
-   * @param  {Object}        options
-   * @param  {string}        options.id
-   * @param  {boolean}      [options.powerState]
-   * @param  {Object}       [options.dimmer] dimmer data (dimmable plugs only)
-   * @param  {(Date|number)} options.start  Date or number of minutes
-   * @param  {number[]}     [options.daysOfWeek]  [0,6] = weekend, [1,2,3,4,5] = weekdays
-   * @param  {string}       [options.name]    [description]
-   * @param  {boolean}      [options.enable=true]
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async editRule(
-    {
+    rule: PlugScheduleRuleInput & { id: string },
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
+    const {
       id,
       powerState,
       dimmer,
@@ -85,10 +96,9 @@ export default class PlugSchedule extends Schedule {
       daysOfWeek,
       name = '',
       enable = true,
-    }: PlugScheduleRuleInput & { id: string },
-    sendOptions?: SendOptions
-  ): Promise<unknown> {
-    const rule: PlugScheduleRule & { id: string } = {
+    } = rule;
+
+    const scheduleRule: PlugScheduleRule & { id: string } = {
       id,
       sact: powerState ? 1 : 0,
       name,
@@ -99,10 +109,10 @@ export default class PlugSchedule extends Schedule {
     };
 
     if (isDefinedAndNotNull(dimmer)) {
-      rule.sact = 3;
-      rule.s_dimmer = dimmer;
+      scheduleRule.sact = 3;
+      scheduleRule.s_dimmer = dimmer;
     }
 
-    return Schedule.prototype.editRule.call(this, rule, sendOptions); // super.editRule(rule); // workaround babel bug
+    return super.editRule(scheduleRule, sendOptions);
   }
 }

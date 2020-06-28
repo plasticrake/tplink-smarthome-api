@@ -1,6 +1,9 @@
 import TplinkConnection from './tplink-connection';
 import UdpSocket from './udp-socket';
 
+/**
+ * @hidden
+ */
 export default class UdpConnection extends TplinkConnection {
   protected sharedSocket?: UdpSocket;
 

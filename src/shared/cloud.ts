@@ -32,8 +32,8 @@ export default class Cloud {
    * Gets device's TP-Link cloud info.
    *
    * Requests `cloud.get_info`. Does not support childId.
-   * @param   sendOptions
    * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async getInfo(sendOptions?: SendOptions): Promise<CloudInfo & HasErrCode> {
     this.info = extractResponse<CloudInfo & HasErrCode>(

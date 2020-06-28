@@ -15,7 +15,7 @@ import createLogger from './logger';
 import type { Logger } from './logger';
 import TcpConnection from './network/tcp-connection';
 import UdpConnection from './network/udp-connection';
-import { compareMac, isDefinedAndNotNull, isObjectLike } from './utils';
+import { compareMac, isObjectLike } from './utils';
 
 const discoveryMsgBuf = encrypt(
   '{"system":{"get_sysinfo":{}},"emeter":{"get_realtime":{}},"smartlife.iot.common.emeter":{"get_realtime":{}}}'
@@ -115,6 +115,82 @@ function parseEmeter(response: DiscoveryResponse): EmeterRealtime | null {
   return null;
 }
 
+export interface ClientConstructorOptions {
+  /**
+   * @defaultValue \{
+   *   timeout: 10000,
+   *   transport: 'tcp',
+   *   useSharedSocket: false,
+   *   sharedSocketTimeout: 20000
+   * \}
+   */
+  defaultSendOptions?: SendOptions;
+  /**
+   * @defaultValue 'warn'
+   */
+  logLevel?: log.LogLevelDesc;
+  logger?: Logger;
+}
+
+export interface DiscoveryOptions {
+  /**
+   * address to bind udp socket
+   */
+  address?: string;
+  /**
+   * port to bind udp socket
+   */
+  port?: number;
+  /**
+   * broadcast address
+   * @defaultValue '255.255.255.255'
+   */
+  broadcast?: string;
+  /**
+   * Interval in (ms)
+   * @defaultValue 10000
+   */
+  discoveryInterval?: number;
+  /**
+   * Timeout in (ms)
+   * @defaultValue 0
+   */
+  discoveryTimeout?: number;
+  /**
+   * Number of consecutive missed replies to consider offline
+   * @defaultValue 3
+   */
+  offlineTolerance?: number;
+  deviceTypes?: Array<'plug' | 'bulb'>;
+  /**
+   * MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported
+   * @defaultValue []
+   */
+  macAddresses?: string[];
+  /**
+   * MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported
+   * @defaultValue []
+   */
+  excludeMacAddresses?: string[];
+  /**
+   * called with fn(sysInfo), return truthy value to include device
+   */
+  filterCallback?: Function;
+  /**
+   * if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
+   * @defaultValue true
+   */
+  breakoutChildren?: boolean;
+  /**
+   * passed to device constructors
+   */
+  deviceOptions?: AnyDeviceOptions;
+  /**
+   * known devices to query instead of relying only on broadcast
+   */
+  devices?: DiscoveryDevice[];
+}
+
 /**
  * Send Options.
  *
@@ -134,6 +210,7 @@ export type SendOptions = {
  * Client that sends commands to specified devices or discover devices on the local subnet.
  * - Contains factory methods to create devices.
  * - Events are emitted after {@link #startDiscovery} is called.
+ * @noInheritDoc
  */
 export default class Client extends EventEmitter {
   defaultSendOptions: Required<SendOptions> = {
@@ -143,7 +220,7 @@ export default class Client extends EventEmitter {
     sharedSocketTimeout: 20000,
   };
 
-  log: log.RootLogger;
+  log: Logger;
 
   devices: Map<string, AnyDeviceDiscovery> = new Map();
 
@@ -157,34 +234,16 @@ export default class Client extends EventEmitter {
 
   isSocketBound = false;
 
-  /**
-   * @param  options
-   * @param  options.defaultSendOptions
-   * @param  options.defaultSendOptions.timeout - default: 10000
-   * @param  options.defaultSendOptions.transport - default: 'tcp'
-   * @param  options.defaultSendOptions.useSharedSocket - default: false
-   * @param  options.defaultSendOptions.sharedSocketTimeout - default: 20000
-   * @param  options.logLevel - default: warn - level for built in logger ['error','warn','info','debug','trace']
-   */
-  constructor({
-    defaultSendOptions,
-    logLevel = 'warn',
-    logger,
-  }: {
-    defaultSendOptions?: SendOptions;
-    logLevel?: log.LogLevelDesc;
-    logger?: Logger;
-  } = {}) {
+  constructor(options: ClientConstructorOptions = {}) {
     super();
+    const { defaultSendOptions, logLevel = 'warn', logger } = options;
+
     this.defaultSendOptions = {
       ...this.defaultSendOptions,
       ...defaultSendOptions,
     };
 
-    this.log = createLogger({ logger });
-    if (isDefinedAndNotNull(logLevel)) {
-      this.log.setLevel(logLevel);
-    }
+    this.log = createLogger({ logger, level: logLevel });
   }
 
   /**
@@ -197,26 +256,27 @@ export default class Client extends EventEmitter {
   }
 
   /**
-   * {@link https://github.com/plasticrake/tplink-smarthome-crypto Encrypts} `payload` and sends to device.
+   * {@link https://github.com/plasticrake/tplink-smarthome-crypto | Encrypts} `payload` and sends to device.
    * - If `payload` is not a string, it is `JSON.stringify`'d.
-   * - Promise fulfills with string response.
+   * - Promise fulfills with encrypted string response.
    *
    * Devices use JSON to communicate.\
    * For Example:
    * - If a device receives:
    *   - `{"system":{"get_sysinfo":{}}}`
    * - It responds with:
-   *   - `{"system":{"get_sysinfo":{
+   * ```
+   *     {"system":{"get_sysinfo":{
    *       err_code: 0,
    *       sw_ver: "1.0.8 Build 151113 Rel.24658",
    *       hw_ver: "1.0",
    *       ...
-   *     }}}`
+   *     }}}
+   * ```
    *
    * All responses from device contain an `err_code` (`0` is success).
    *
-   * @param   port - default:9999
-   * @returns response
+   * @returns decrypted string response
    */
   async send(
     payload: object | string,
@@ -254,10 +314,9 @@ export default class Client extends EventEmitter {
   /**
    * Requests `{system:{get_sysinfo:{}}}` from device.
    *
-   * @param  {string}       host
-   * @param  {number}      [port=9999]
-   * @param  {SendOptions} [sendOptions]
-   * @returns {Promise<Object, Error>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
+   * @throws {@link Error}
    */
   async getSysInfo(
     host: string,
@@ -306,8 +365,7 @@ export default class Client extends EventEmitter {
    * Creates Bulb object.
    *
    * See [Device constructor]{@link Device} and [Bulb constructor]{@link Bulb} for valid options.
-   * @param  {Object} deviceOptions passed to [Bulb constructor]{@link Bulb}
-   * @returns {Bulb}
+   * @param   deviceOptions - passed to [Bulb constructor]{@link Bulb}
    */
   getBulb(
     deviceOptions: MarkOptional<ConstructorParameters<typeof Bulb>[0], 'client'>
@@ -323,8 +381,7 @@ export default class Client extends EventEmitter {
    * Creates {@link Plug} object.
    *
    * See [Device constructor]{@link Device} and [Plug constructor]{@link Plug} for valid options.
-   * @param  {Object} deviceOptions passed to [Plug constructor]{@link Plug}
-   * @returns {Plug}
+   * @param   deviceOptions - passed to [Plug constructor]{@link Plug}
    */
   getPlug(
     deviceOptions: MarkOptional<ConstructorParameters<typeof Plug>[0], 'client'>
@@ -340,9 +397,8 @@ export default class Client extends EventEmitter {
    * Creates a {@link Plug} or {@link Bulb} from passed in sysInfo or after querying device to determine type.
    *
    * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options.
-   * @param  {Object}      deviceOptions passed to [Device constructor]{@link Device}
-   * @param  {SendOptions} [sendOptions]
-   * @returns {Promise<AnyDevice, Error>}
+   * @param   deviceOptions - passed to [Device constructor]{@link Device}
+   * @throws {@link ResponseError}
    */
   async getDevice(
     deviceOptions: AnyDeviceOptionsCon,
@@ -371,10 +427,8 @@ export default class Client extends EventEmitter {
    * Creates device corresponding to the provided `sysInfo`.
    *
    * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options
-   * @param  {Object} sysInfo
-   * @param  {Object} deviceOptions passed to device constructor
-   * @returns {Plug|Bulb}
-   * @throws
+   * @param  deviceOptions - passed to device constructor
+   * @throws {@link Error}
    */
   getDeviceFromSysInfo(
     sysInfo: Sysinfo,
@@ -393,8 +447,6 @@ export default class Client extends EventEmitter {
    * Guess the device type from provided `sysInfo`.
    *
    * Based on sysinfo.[type|mic_type]
-   * @param  {Object} sysInfo
-   * @returns {string}         'plug','bulb','device'
    */
   // eslint-disable-next-line class-methods-use-this
   getTypeFromSysInfo(
@@ -473,72 +525,44 @@ export default class Client extends EventEmitter {
    * Discover TP-Link Smarthome devices on the network.
    *
    * - Sends a discovery packet (via UDP) to the `broadcast` address every `discoveryInterval`(ms).
-   * - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until {@link #stopDiscovery} is called).
-   *   - If a device does not respond after `offlineTolerance` number of attempts, {@link event:Client#device-offline} is emitted.
+   * - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until {@link Client.stopDiscovery} is called).
+   *   - If a device does not respond after `offlineTolerance` number of attempts, {@link Client.device-offline} is emitted.
    * - If `deviceTypes` are specified only matching devices are found.
    * - If `macAddresses` are specified only devices with matching MAC addresses are found.
    * - If `excludeMacAddresses` are specified devices with matching MAC addresses are excluded.
    * - if `filterCallback` is specified only devices where the callback returns a truthy value are found.
    * - If `devices` are specified it will attempt to contact them directly in addition to sending to the broadcast address.
    *   - `devices` are specified as an array of `[{host, [port: 9999]}]`.
-   * @param  {Object}    options
-   * @param  {string}   [options.address]                     address to bind udp socket
-   * @param  {number}   [options.port]                        port to bind udp socket
-   * @param  {string}   [options.broadcast=255.255.255.255]   broadcast address
-   * @param  {number}   [options.discoveryInterval=10000]     (ms)
-   * @param  {number}   [options.discoveryTimeout=0]          (ms)
-   * @param  {number}   [options.offlineTolerance=3]          # of consecutive missed replies to consider offline
-   * @param  {string[]} [options.deviceTypes]                 'plug','bulb'
-   * @param  {string[]} [options.macAddresses]                MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported
-   * @param  {string[]} [options.excludeMacAddresses]         MAC will be normalized, comparison will be done after removing special characters (`:`,`-`, etc.) and case insensitive, glob style *, and ? in pattern are supported
-   * @param  {function} [options.filterCallback]              called with fn(sysInfo), return truthy value to include device
-   * @param  {boolean}  [options.breakoutChildren=true]       if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
-   * @param  {Object}   [options.deviceOptions]               passed to device constructors
-   * @param  {Object[]} [options.devices]                     known devices to query instead of relying on broadcast
-   * @returns {Client}                                        this
-   * @emits  Client#error
-   * @emits  Client#device-new
-   * @emits  Client#device-online
-   * @emits  Client#device-offline
-   * @emits  Client#bulb-new
-   * @emits  Client#bulb-online
-   * @emits  Client#bulb-offline
-   * @emits  Client#plug-new
-   * @emits  Client#plug-online
-   * @emits  Client#plug-offline
-   * @emits  Client#discovery-invalid
+   * @fires  Client#error
+   * @fires  Client#device-new
+   * @fires  Client#device-online
+   * @fires  Client#device-offline
+   * @fires  Client#bulb-new
+   * @fires  Client#bulb-online
+   * @fires  Client#bulb-offline
+   * @fires  Client#plug-new
+   * @fires  Client#plug-online
+   * @fires  Client#plug-offline
+   * @fires  Client#discovery-invalid
    */
-  startDiscovery({
-    address,
-    port,
-    broadcast = '255.255.255.255',
-    discoveryInterval = 10000,
-    discoveryTimeout = 0,
-    offlineTolerance = 3,
-    deviceTypes,
-    macAddresses = [],
-    excludeMacAddresses = [],
-    filterCallback,
-    breakoutChildren = true,
-    deviceOptions,
-    devices,
-  }: {
-    address?: string;
-    port?: number;
-    broadcast?: string;
-    discoveryInterval?: number;
-    discoveryTimeout?: number;
-    offlineTolerance?: number;
-    deviceTypes?: string[];
-    macAddresses?: string[];
-    excludeMacAddresses?: string[];
-    filterCallback?: Function;
-    breakoutChildren?: boolean;
-    deviceOptions?: AnyDeviceOptions;
-    devices?: DiscoveryDevice[];
-  } = {}): this {
-    // eslint-disable-next-line prefer-rest-params
-    this.log.debug('client.startDiscovery(%j)', arguments[0]);
+  startDiscovery(options: DiscoveryOptions = {}): this {
+    this.log.debug('client.startDiscovery(%j)', options);
+
+    const {
+      address,
+      port,
+      broadcast = '255.255.255.255',
+      discoveryInterval = 10000,
+      discoveryTimeout = 0,
+      offlineTolerance = 3,
+      deviceTypes,
+      macAddresses = [],
+      excludeMacAddresses = [],
+      filterCallback,
+      breakoutChildren = true,
+      deviceOptions,
+      devices,
+    } = options;
 
     try {
       const socket = createSocket('udp4');
@@ -574,7 +598,7 @@ export default class Client extends EventEmitter {
 
         if (deviceTypes && deviceTypes.length > 0) {
           const deviceType = this.getTypeFromSysInfo(sysInfo);
-          if (deviceTypes.indexOf(deviceType) === -1) {
+          if (!(deviceTypes as string[]).includes(deviceType)) {
             this.log.debug(
               `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${deviceType}), allowed device types: (%j)`,
               deviceTypes

@@ -1,22 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 import type { SendOptions } from '../client';
 import Device, { isBulbSysinfo } from '../device';
-import type { CommonSysinfo, DeviceConstructorParameters } from '../device';
+import type { CommonSysinfo, DeviceConstructorOptions } from '../device';
 import Cloud from '../shared/cloud';
 import Emeter from '../shared/emeter';
 import Lighting from './lighting';
 import Schedule from './schedule';
 import Time from '../shared/time';
-
-const enum BulbModules {
-  system = 'smartlife.iot.common.system',
-  cloud = 'smartlife.iot.common.cloud',
-  schedule = 'smartlife.iot.common.schedule',
-  timesetting = 'smartlife.iot.common.timesetting',
-  emeter = 'smartlife.iot.common.emeter',
-  netif = 'netif',
-  lightingservice = 'smartlife.iot.smartbulb.lightingservice',
-}
 
 // type BulbGetInfo = {
 //   [BulbModules.emeter]: { get_realtime: {} };
@@ -40,17 +30,18 @@ export type BulbSysinfo = CommonSysinfo & {
   is_variable_color_temp: 0 | 1;
 };
 
+export interface BulbConstructorOptions extends DeviceConstructorOptions {
+  sysInfo: BulbSysinfo;
+}
+
 /**
  * Bulb Device.
  *
- * TP-Link models: LB100, LB110, LB120, LB130.
- * @extends Device
- * @extends EventEmitter
- * @emits  Bulb#lightstate-on
- * @emits  Bulb#lightstate-off
- * @emits  Bulb#lightstate-change
- * @emits  Bulb#lightstate-update
- * @emits  Bulb#emeter-realtime-update
+ * @fires  Bulb#lightstate-on
+ * @fires  Bulb#lightstate-off
+ * @fires  Bulb#lightstate-change
+ * @fires  Bulb#lightstate-update
+ * @fires  Bulb#emeter-realtime-update
  */
 export default class Bulb extends Device {
   protected _sysInfo: BulbSysinfo;
@@ -59,14 +50,14 @@ export default class Bulb extends Device {
 
   protected supportsEmeter = true;
 
-  static readonly apiModuleNamespace = {
-    system: BulbModules.system,
-    cloud: BulbModules.cloud,
-    schedule: BulbModules.schedule,
-    timesetting: BulbModules.timesetting,
-    emeter: BulbModules.emeter,
-    netif: BulbModules.netif,
-    lightingservice: BulbModules.lightingservice,
+  static readonly apiModules = {
+    system: 'smartlife.iot.common.system',
+    cloud: 'smartlife.iot.common.cloud',
+    schedule: 'smartlife.iot.common.schedule',
+    timesetting: 'smartlife.iot.common.timesetting',
+    emeter: 'smartlife.iot.common.emeter',
+    netif: 'netif',
+    lightingservice: 'smartlife.iot.smartbulb.lightingservice',
   };
 
   /**
@@ -128,25 +119,16 @@ export default class Bulb extends Device {
    *
    * See [Device constructor]{@link Device} for common options.
    * @see Device
-   * @param  {Object} options
+   * @param options -
    */
-  constructor({
-    client,
-    sysInfo,
-    host,
-    port,
-    logger,
-    defaultSendOptions,
-  }: Omit<DeviceConstructorParameters[0], 'sysInfo'> & {
-    sysInfo: BulbSysinfo;
-  }) {
+  constructor(options: BulbConstructorOptions) {
     super({
-      client,
-      _sysInfo: sysInfo,
-      host,
-      port,
-      logger,
-      defaultSendOptions,
+      client: options.client,
+      _sysInfo: options.sysInfo,
+      host: options.host,
+      port: options.port,
+      logger: options.logger,
+      defaultSendOptions: options.defaultSendOptions,
     });
 
     this.lastState = Object.assign(this.lastState, {
@@ -154,13 +136,13 @@ export default class Bulb extends Device {
       inUse: null,
     });
 
-    this.setSysInfo(sysInfo);
-    this._sysInfo = sysInfo;
+    this.setSysInfo(options.sysInfo);
+    this._sysInfo = options.sysInfo;
   }
 
   /**
    * Returns cached results from last retrieval of `system.sysinfo`.
-   * @return {Object} system.sysinfo
+   * @returns system.sysinfo
    */
   get sysInfo(): BulbSysinfo {
     return this._sysInfo;
@@ -175,9 +157,6 @@ export default class Bulb extends Device {
     this.lighting.lightState = sysInfo.light_state;
   }
 
-  /**
-   * @internal
-   */
   protected setAliasProperty(alias: string): void {
     this.sysInfo.alias = alias;
   }
@@ -196,7 +175,7 @@ export default class Bulb extends Device {
 
   /**
    * Cached value of `sysinfo.is_dimmable === 1`
-   * @return {boolean}
+   * @returns Cached value of `sysinfo.is_dimmable === 1`
    */
   get supportsBrightness(): boolean {
     return this.sysInfo.is_dimmable === 1;
@@ -204,7 +183,7 @@ export default class Bulb extends Device {
 
   /**
    * Cached value of `sysinfo.is_color === 1`
-   * @return {boolean}
+   * @returns Cached value of `sysinfo.is_color === 1`
    */
   get supportsColor(): boolean {
     return this.sysInfo.is_color === 1;
@@ -212,7 +191,7 @@ export default class Bulb extends Device {
 
   /**
    * Cached value of `sysinfo.is_variable_color_temp === 1`
-   * @return {boolean}
+   * @returns Cached value of `sysinfo.is_variable_color_temp === 1`
    */
   get supportsColorTemperature(): boolean {
     return this.sysInfo.is_variable_color_temp === 1;
@@ -236,8 +215,7 @@ export default class Bulb extends Device {
    * Gets bulb's SysInfo.
    *
    * Requests `system.sysinfo` from device.
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
    */
   async getSysInfo(sendOptions?: SendOptions): Promise<BulbSysinfo> {
     const response = await super.getSysInfo(sendOptions);
@@ -255,22 +233,21 @@ export default class Bulb extends Device {
    * - `cloud.get_sysinfo`
    * - `emeter.get_realtime`
    * - `schedule.get_next_action`
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, Error>} parsed JSON response
+   * @returns parsed JSON response
    */
   async getInfo(sendOptions?: SendOptions): Promise<object> {
     // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
     const response = await this.send(
-      `{"${this.apiModule.emeter}":{"get_realtime":{}},"${this.apiModule.lightingservice}":{"get_light_state":{}},"${this.apiModule.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModule.cloud}":{"get_info":{}}}`,
+      `{"${this.apiModules.emeter}":{"get_realtime":{}},"${this.apiModules.lightingservice}":{"get_light_state":{}},"${this.apiModules.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModules.cloud}":{"get_info":{}}}`,
       sendOptions
     );
     const data = JSON.parse(response);
     this.setSysInfo(data.system.get_sysinfo);
-    this.cloud.info = data[this.apiModule.cloud].get_info;
-    this.emeter.realtime = data[this.apiModule.emeter].get_realtime;
-    this.schedule.nextAction = data[this.apiModule.schedule].get_next_action;
+    this.cloud.info = data[this.apiModules.cloud].get_info;
+    this.emeter.realtime = data[this.apiModules.emeter].get_realtime;
+    this.schedule.nextAction = data[this.apiModules.schedule].get_next_action;
     this.lighting.lightState =
-      data[this.apiModule.lightingservice].get_light_state;
+      data[this.apiModules.lightingservice].get_light_state;
     return {
       sysInfo: this.sysInfo,
       cloud: { info: this.cloud.info },
@@ -284,8 +261,7 @@ export default class Bulb extends Device {
    * Gets on/off state of Bulb.
    *
    * Requests `lightingservice.get_light_state` and returns true if `on_off === 1`.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @throws {@link ResponseError}
    */
   async getPowerState(sendOptions?: SendOptions): Promise<boolean> {
     const lightState = await this.lighting.getLightState(sendOptions);
@@ -297,9 +273,8 @@ export default class Bulb extends Device {
    * Sets on/off state of Bulb.
    *
    * Sends `lightingservice.transition_light_state` command with on_off `value`.
-   * @param  {boolean}     value          true: on, false: off
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @param  value - true: on, false: off
+   * @throws {@link ResponseError}
    */
   async setPowerState(
     value: boolean,
@@ -312,8 +287,7 @@ export default class Bulb extends Device {
    * Toggles state of Bulb.
    *
    * Requests `lightingservice.get_light_state` sets the power state to the opposite of `on_off === 1` and returns the new power state.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @throws {@link ResponseError}
    */
   async togglePowerState(sendOptions?: SendOptions): Promise<boolean> {
     const powerState = await this.getPowerState(sendOptions);

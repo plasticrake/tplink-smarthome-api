@@ -3,7 +3,7 @@ import type { SendOptions } from '../client';
 import Device, { isPlugSysinfo } from '../device';
 import type {
   CommonSysinfo,
-  DeviceConstructorParameters,
+  DeviceConstructorOptions,
   Sysinfo,
 } from '../device';
 import Away from './away';
@@ -61,6 +61,19 @@ export function hasSysinfoChildren(
   );
 }
 
+export interface PlugConstructorOptions extends DeviceConstructorOptions {
+  sysInfo: PlugSysinfo;
+  /**
+   * Watts
+   * @defaultValue 0.1
+   */
+  inUseThreshold?: number;
+  /**
+   * If passed a string between 0 and 99 it will prepend the deviceId
+   */
+  childId?: string;
+}
+
 /**
  * Plug Device.
  *
@@ -73,13 +86,13 @@ export function hasSysinfoChildren(
  * Emits events after device status is queried, such as {@link #getSysInfo} and {@link #getEmeterRealtime}.
  * @extends Device
  * @extends EventEmitter
- * @emits  Plug#power-on
- * @emits  Plug#power-off
- * @emits  Plug#power-update
- * @emits  Plug#in-use
- * @emits  Plug#not-in-use
- * @emits  Plug#in-use-update
- * @emits  Plug#emeter-realtime-update
+ * @fires  Plug#power-on
+ * @fires  Plug#power-off
+ * @fires  Plug#power-update
+ * @fires  Plug#in-use
+ * @fires  Plug#not-in-use
+ * @fires  Plug#in-use-update
+ * @fires  Plug#emeter-realtime-update
  */
 export default class Plug extends Device {
   // private get _sysInfo(): PlugSysinfo {
@@ -103,7 +116,7 @@ export default class Plug extends Device {
 
   protected supportsEmeter = false;
 
-  protected static readonly apiModuleNamespace = {
+  static readonly apiModules = {
     system: 'system',
     cloud: 'cnCloud',
     schedule: 'schedule',
@@ -189,37 +202,18 @@ export default class Plug extends Device {
    * Created by {@link Client} - Do not instantiate directly.
    *
    * See [Device constructor]{@link Device} for common options.
-   * @param  {Object}       options
-   * @param  {Client}       options.client
-   * @param  {string}       options.host
-   * @param  {number|undefined}      [options.port=9999]
-   * @param  {Object}      [options.logger]
-   * @param  {SendOptions} [options.defaultSendOptions]
-   * @param  {number|undefined}      [options.inUseThreshold=0.1] Watts
-   * @param  {string|undefined}      [options.childId] If passed an integer or string between 0 and 99 it will prepend the deviceId
    */
-  constructor({
-    client,
-    sysInfo,
-    host,
-    port,
-    logger,
-    defaultSendOptions,
-    inUseThreshold = 0.1,
-    childId,
-  }: Omit<DeviceConstructorParameters[0], 'sysInfo'> & {
-    sysInfo: PlugSysinfo;
-    inUseThreshold?: number;
-    childId?: string;
-  }) {
+  constructor(options: PlugConstructorOptions) {
     super({
-      client,
-      _sysInfo: sysInfo,
-      host,
-      port,
-      logger,
-      defaultSendOptions,
+      client: options.client,
+      _sysInfo: options.sysInfo,
+      host: options.host,
+      port: options.port,
+      logger: options.logger,
+      defaultSendOptions: options.defaultSendOptions,
     });
+
+    const { sysInfo, inUseThreshold = 0.1, childId } = options;
 
     this.log.debug('plug.constructor()');
 
@@ -258,7 +252,6 @@ export default class Plug extends Device {
 
   /**
    * Returns children as a map keyed by childId. From cached results from last retrieval of `system.sysinfo.children`.
-   * @return {Map} children
    */
   get children(): Map<string, PlugChild> {
     return this.#children;
@@ -289,9 +282,6 @@ export default class Plug extends Device {
     return this.#childId;
   }
 
-  /**
-   * @internal
-   */
   private setChildId(childId: string): void {
     this.#childId = this.normalizeChildId(childId);
     if (this.#childId && this.#children) {
@@ -304,7 +294,6 @@ export default class Plug extends Device {
 
   /**
    * Cached value of `sysinfo.alias` or `sysinfo.children[childId].alias` if childId set.
-   * @return {string}
    */
   get alias(): string {
     if (this.#childId && this.#child !== undefined) {
@@ -314,9 +303,6 @@ export default class Plug extends Device {
     return this.sysInfo.alias;
   }
 
-  /**
-   * @internal
-   */
   protected setAliasProperty(alias: string): void {
     if (this.#childId && this.#child !== undefined) {
       this.#child.alias = alias;
@@ -338,7 +324,6 @@ export default class Plug extends Device {
 
   /**
    * Cached value of `sysinfo.deviceId` or `childId` if set.
-   * @return {string}
    */
   get id(): string {
     if (this.#childId && this.#child !== undefined) {
@@ -355,7 +340,6 @@ export default class Plug extends Device {
    * Otherwise fallback on relay state: `relay_state === 1` or `sysinfo.children[childId].state === 1`.
    *
    * Supports childId.
-   * @return {boolean}
    */
   get inUse(): boolean {
     if (this.supportsEmeter) {
@@ -369,7 +353,7 @@ export default class Plug extends Device {
    * Cached value of `sysinfo.relay_state === 1` or `sysinfo.children[childId].state === 1`.
    * Supports childId.
    * If device supports childId, but childId is not set, then it will return true if any child has `state === 1`.
-   * @return {boolean} On (true) or Off (false)
+   * @returns On (true) or Off (false)
    */
   get relayState(): boolean {
     if (this.#childId && this.#child !== undefined) {
@@ -401,7 +385,7 @@ export default class Plug extends Device {
 
   /**
    * True if cached value of `sysinfo` has `brightness` property.
-   * @return {boolean}
+   * @returns true if cached value of `sysinfo` has `brightness` property.
    */
   get supportsDimmer(): boolean {
     return 'brightness' in this.sysInfo;
@@ -411,8 +395,7 @@ export default class Plug extends Device {
    * Gets plug's SysInfo.
    *
    * Requests `system.sysinfo` from device. Does not support childId.
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+
    */
   async getSysInfo(sendOptions?: SendOptions): Promise<PlugSysinfo> {
     const response = await super.getSysInfo(sendOptions);
@@ -431,8 +414,8 @@ export default class Plug extends Device {
    * - `schedule.get_next_action`
    *
    * Supports childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, Error>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async getInfo(
     sendOptions?: SendOptions
@@ -504,8 +487,8 @@ export default class Plug extends Device {
 
   /**
    * Same as {@link #inUse}, but requests current `emeter.get_realtime`. Supports childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async getInUse(sendOptions?: SendOptions): Promise<boolean> {
     if (this.supportsEmeter) {
@@ -521,7 +504,8 @@ export default class Plug extends Device {
    *
    * Requests `system.sysinfo` and returns true if `led_off === 0`. Does not support childId.
    * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>} LED State, true === on
+   * @returns LED State, true === on
+   * @throws {@link ResponseError}
    */
   async getLedState(sendOptions?: SendOptions): Promise<boolean> {
     const sysInfo = await this.getSysInfo(sendOptions);
@@ -533,13 +517,9 @@ export default class Plug extends Device {
    *
    * Sends `system.set_led_off` command.
    * @param   value - LED State, true === on
-   * @param   sendOptions
-   * @returns {Promise<boolean, ResponseError>}
+   * @throws {@link ResponseError}
    */
-  async setLedState(
-    value: boolean,
-    sendOptions?: SendOptions
-  ): Promise<boolean> {
+  async setLedState(value: boolean, sendOptions?: SendOptions): Promise<true> {
     await this.sendCommand(
       `{"system":{"set_led_off":{"off":${value ? 0 : 1}}}}`,
       undefined,
@@ -553,8 +533,7 @@ export default class Plug extends Device {
    * Get Plug relay state (on/off).
    *
    * Requests `system.get_sysinfo` and returns true if On. Calls {@link #relayState}. Supports childId.
-   * @param  {SendOptions} [sendOptions]
-   * @returns {Promise<boolean>}
+   * @throws {@link ResponseError}
    */
   async getPowerState(sendOptions?: SendOptions): Promise<boolean> {
     await this.getSysInfo(sendOptions);
@@ -565,14 +544,12 @@ export default class Plug extends Device {
    * Turns Plug relay on/off.
    *
    * Sends `system.set_relay_state` command. Supports childId.
-   * @param  {boolean}      value
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @throws {@link ResponseError}
    */
   async setPowerState(
     value: boolean,
     sendOptions?: SendOptions
-  ): Promise<boolean> {
+  ): Promise<true> {
     await this.sendCommand(
       `{"system":{"set_relay_state":{"state":${value ? 1 : 0}}}}`,
       this.#childId,
@@ -587,8 +564,7 @@ export default class Plug extends Device {
    * Toggles Plug relay state.
    *
    * Requests `system.get_sysinfo` sets the power state to the opposite `relay_state === 1 and returns the new power state`. Supports childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @throws {@link ResponseError}
    */
   async togglePowerState(sendOptions?: SendOptions): Promise<boolean> {
     const powerState = await this.getPowerState(sendOptions);
@@ -603,10 +579,7 @@ export default class Plug extends Device {
    * then sets the led to its pre-blink state. Does not support childId.
    *
    * Note: `system.set_led_off` is particularly slow, so blink rate is not guaranteed.
-   * @param  {number}      [times=5]
-   * @param  {number}      [rate=1000]
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @throws {@link ResponseError}
    */
   async blink(
     times = 5,

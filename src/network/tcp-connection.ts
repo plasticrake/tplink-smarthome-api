@@ -1,6 +1,9 @@
 import TplinkConnection from './tplink-connection';
 import TcpSocket from './tcp-socket';
 
+/**
+ * @hidden
+ */
 export default class TcpConnection extends TplinkConnection {
   readonly socketType = 'TCP';
 

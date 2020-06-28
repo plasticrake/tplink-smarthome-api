@@ -25,7 +25,7 @@ type HasAtLeastOneProperty = {
   [key: string]: unknown;
 };
 
-interface ApiModuleNamespace {
+export interface ApiModuleNamespace {
   system: string;
   cloud: string;
   schedule: string;
@@ -37,15 +37,16 @@ interface ApiModuleNamespace {
 
 export type Sysinfo = BulbSysinfo | PlugSysinfo;
 
-export type DeviceConstructorParameters = [
-  {
-    client: Client;
-    host: string;
-    port?: number;
-    logger?: log.RootLogger;
-    defaultSendOptions?: SendOptions;
-  }
-];
+export interface DeviceConstructorOptions {
+  client: Client;
+  host: string;
+  /**
+   * @defaultValue 9999
+   */
+  port?: number;
+  logger?: log.RootLogger;
+  defaultSendOptions?: SendOptions;
+}
 
 // type SysinfoTypeValues =
 //   | 'IOT.SMARTPLUGSWITCH'
@@ -103,10 +104,9 @@ function isSysinfo(candidate: unknown): candidate is Sysinfo {
 /**
  * TP-Link Device.
  *
- * Shared behavior for {@link Plug} and {@link Bulb}.
- * @abstract
- * @extends EventEmitter
- * @emits  Device#emeter-realtime-update
+ * Abstract class. Shared behavior for {@link Plug} and {@link Bulb}.
+ * @fires  Device#emeter-realtime-update
+ * @noInheritDoc
  */
 export default abstract class Device extends EventEmitter {
   readonly client: Client;
@@ -129,30 +129,23 @@ export default abstract class Device extends EventEmitter {
 
   protected _sysInfo: Sysinfo;
 
-  protected static apiModuleNamespace: ApiModuleNamespace;
+  static readonly apiModules: ApiModuleNamespace;
 
   protected abstract supportsEmeter = false;
 
   childId?: string;
 
-  /**
-   * Created by {@link Client#getCommonDevice} - Do not instantiate directly
-   * @param   options
-   * @param   options.client
-   * @param   options.host
-   * @param  [options.port=9999]
-   * @param  [options.logger]
-   * @param  [options.defaultSendOptions]
-   */
-  constructor({
-    client,
-    _sysInfo,
-    host,
-    port = 9999,
-    logger,
-    defaultSendOptions,
-  }: DeviceConstructorParameters[0] & { _sysInfo: Sysinfo }) {
+  constructor(options: DeviceConstructorOptions & { _sysInfo: Sysinfo }) {
     super();
+
+    const {
+      client,
+      _sysInfo,
+      host,
+      port = 9999,
+      logger,
+      defaultSendOptions,
+    } = options;
 
     // Log first as methods below may call `log`
     this.log = logger || client.log;
@@ -187,8 +180,10 @@ export default abstract class Device extends EventEmitter {
     );
   }
 
-  get apiModule(): ApiModuleNamespace {
-    return (this.constructor as typeof Device).apiModuleNamespace;
+  get apiModules(): ApiModuleNamespace {
+    // https://github.com/Microsoft/TypeScript/issues/3841
+    // @ts-ignore
+    return this.constructor.apiModules;
   }
 
   /**
@@ -235,7 +230,6 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Cached value of `sysinfo.model`.
-   * @return {string}
    */
   get model(): string {
     return this.sysInfo.model;
@@ -243,7 +237,6 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Cached value of `sysinfo.alias`.
-   * @return {string}
    */
   get name(): string {
     return this.alias;
@@ -251,7 +244,6 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Cached value of `sysinfo.[type|mic_type]`.
-   * @return {string}
    */
   get type(): string {
     if ('type' in this.sysInfo && this.sysInfo.type !== undefined)
@@ -265,7 +257,6 @@ export default abstract class Device extends EventEmitter {
    * Type of device (or `device` if unknown).
    *
    * Based on cached value of `sysinfo.[type|mic_type]`
-   * @return {string} 'plug'|'bulb'|'device'
    */
   get deviceType(): 'plug' | 'bulb' | 'device' {
     const { type } = this;
@@ -281,7 +272,6 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Cached value of `sysinfo.sw_ver`.
-   * @return {string}
    */
   get softwareVersion(): string {
     return this.sysInfo.sw_ver;
@@ -289,7 +279,6 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Cached value of `sysinfo.hw_ver`.
-   * @return {string}
    */
   get hardwareVersion(): string {
     return this.sysInfo.hw_ver;
@@ -297,7 +286,6 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Cached value of `sysinfo.[mac|mic_mac|ethernet_mac]`.
-   * @return {string}
    */
   get mac(): string {
     if ('mac' in this.sysInfo && this.sysInfo.mac !== undefined)
@@ -317,7 +305,6 @@ export default abstract class Device extends EventEmitter {
    *
    * Removes all non alphanumeric characters and makes uppercase
    * `aa:bb:cc:00:11:22` will be normalized to `AABBCC001122`
-   * @return {string}
    */
   get macNormalized(): string {
     const mac = this.mac || '';
@@ -334,8 +321,7 @@ export default abstract class Device extends EventEmitter {
 
   /**
    * Sends `payload` to device (using {@link Client#send})
-   * @param   payload
-   * @param   sendOptions
+   * @param   payload - paylaod to send to device, if object, converted to string via `JSON.stringify`
    * @returns parsed JSON response
    */
   async send(
@@ -391,11 +377,8 @@ export default abstract class Device extends EventEmitter {
    *   - Promise fulfills with full parsed JSON response (same as {@link #send})
    *
    * Also, the response's `err_code`(s) are checked, if any are missing or != `0` the Promise is rejected with {@link ResponseError}.
-   * @param  {Object|string}    command
-   * @param  {string[]|string} [childIds]
-   * @param  {SendOptions}     [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
-   * @throws {ResponseError}
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async sendCommand(
     command: string | object,
@@ -419,9 +402,6 @@ export default abstract class Device extends EventEmitter {
     return results;
   }
 
-  /**
-   * @internal
-   */
   protected normalizeChildId(childId: string): string {
     if (childId.length === 1) {
       return `${this.deviceId}0${childId}`;
@@ -438,9 +418,8 @@ export default abstract class Device extends EventEmitter {
    *
    * Returns `this` (for chaining) that emits events based on state changes.
    * Refer to specific device sections for event details.
-   * @emits  Device#polling-error
-   * @param  {number} interval (ms)
-   * @return {Device|Bulb|Plug}          this
+   * @fires  Device#polling-error
+   * @param   interval - (ms)
    */
   startPolling(interval: number): this {
     const fn = async (): Promise<void> => {
@@ -477,8 +456,8 @@ export default abstract class Device extends EventEmitter {
    * Gets device's SysInfo.
    *
    * Requests `system.sysinfo` from device. Does not support childId.
-   * @param  {SendOptions}  [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async getSysInfo(sendOptions?: SendOptions): Promise<Sysinfo> {
     this.log.debug('[%s] device.getSysInfo()', this.alias);
@@ -500,14 +479,13 @@ export default abstract class Device extends EventEmitter {
    * Change device's alias (name).
    *
    * Sends `system.set_dev_alias` command. Supports childId.
-   * @param  {string}       alias
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<boolean, ResponseError>}
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async setAlias(alias: string, sendOptions?: SendOptions): Promise<boolean> {
     await this.sendCommand(
       {
-        [this.apiModule.system]: {
+        [this.apiModules.system]: {
           set_dev_alias: { alias },
         },
       },
@@ -524,10 +502,8 @@ export default abstract class Device extends EventEmitter {
    * Set device's location.
    *
    * Sends `system.set_dev_location` command. Does not support childId.
-   * @param  {number}       latitude
-   * @param  {number}       longitude
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async setLocation(
     latitude: number,
@@ -540,7 +516,7 @@ export default abstract class Device extends EventEmitter {
     const longitude_i = Math.round(longitude * 10000);
     const response = await this.sendCommand(
       {
-        [this.apiModule.system]: {
+        [this.apiModules.system]: {
           set_dev_location: { latitude, longitude, latitude_i, longitude_i },
         },
       },
@@ -555,8 +531,8 @@ export default abstract class Device extends EventEmitter {
    * Gets device's model.
    *
    * Requests `system.sysinfo` and returns model name. Does not support childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<string, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async getModel(sendOptions?: SendOptions): Promise<string> {
     const sysInfo = await this.getSysInfo(sendOptions);
@@ -567,14 +543,13 @@ export default abstract class Device extends EventEmitter {
    * Reboot device.
    *
    * Sends `system.reboot` command. Does not support childId.
-   * @param  {number}       delay
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async reboot(delay: number, sendOptions?: SendOptions): Promise<unknown> {
     return this.sendCommand(
       {
-        [this.apiModule.system]: { reboot: { delay } },
+        [this.apiModules.system]: { reboot: { delay } },
       },
       undefined,
       sendOptions
@@ -585,14 +560,13 @@ export default abstract class Device extends EventEmitter {
    * Reset device.
    *
    * Sends `system.reset` command. Does not support childId.
-   * @param  {number}       delay
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
    */
   async reset(delay: number, sendOptions?: SendOptions): Promise<unknown> {
     return this.sendCommand(
       {
-        [this.apiModule.system]: { reset: { delay } },
+        [this.apiModules.system]: { reset: { delay } },
       },
       undefined,
       sendOptions

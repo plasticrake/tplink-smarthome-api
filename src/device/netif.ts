@@ -11,11 +11,10 @@ export default class Netif {
    * Note that `timeoutInSeconds` is sent in the request and is not the actual network timeout.
    * The network timeout for the request is calculated by adding the
    * default network timeout to `timeoutInSeconds`.
-   * @param  refresh - request device's cached results. default: false
-   * @param  timeoutInSeconds - timeout for scan in seconds. default: 10
-   * @param  sendOptions
+   * @param  refresh - request device's cached results
+   * @param  timeoutInSeconds - timeout for scan in seconds
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getScanInfo(
     refresh = false,

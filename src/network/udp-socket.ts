@@ -4,6 +4,9 @@ import { encrypt, decrypt } from 'tplink-smarthome-crypto';
 import TplinkSocket from './tplink-socket';
 import { replaceControlCharacters } from '../utils';
 
+/**
+ * @hidden
+ */
 export default class UdpSocket extends TplinkSocket {
   readonly socketType = 'UDP';
 

@@ -3,6 +3,9 @@ import dgram from 'dgram';
 import net from 'net';
 import type { Logger } from '../logger';
 
+/**
+ * @hidden
+ */
 export default abstract class TplinkSocket {
   abstract socketType: string;
 

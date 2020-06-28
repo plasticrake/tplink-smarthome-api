@@ -211,15 +211,14 @@ export default abstract class Schedule {
   constructor(
     readonly device: AnyDevice,
     readonly apiModuleName: string,
-    readonly childId: string | undefined = undefined
+    readonly childId?: string
   ) {}
 
   /**
    * Gets Next Schedule Rule Action.
    *
    * Requests `schedule.get_next_action`. Supports childId.
-   * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getNextAction(
     sendOptions?: SendOptions
@@ -243,8 +242,7 @@ export default abstract class Schedule {
    * Gets Schedule Rules.
    *
    * Requests `schedule.get_rules`. Supports childId.
-   * @param  {SendOptions} [sendOptions]
-   * @return {Promise<Object, ResponseError>} parsed JSON response
+   * @throws {@link ResponseError}
    */
   async getRules(sendOptions?: SendOptions): Promise<ScheduleRulesResponse> {
     return extractResponse(
@@ -264,9 +262,8 @@ export default abstract class Schedule {
    * Gets Schedule Rule.
    *
    * Requests `schedule.get_rules` and return rule matching Id. Supports childId.
-   * @returns parsed JSON response of rule
-   * @throws ResponseError
-   * @throws Error
+   * @throws {@link ResponseError}
+   * @throws {@link Error}
    */
   async getRule(
     id: string,
@@ -287,7 +284,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.add_rule` command and returns rule id. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async addRule(
     rule: object,
@@ -313,7 +310,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.edit_rule` command. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async editRule(rule: object, sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -330,7 +327,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.delete_all_rules` command. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async deleteAllRules(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -347,7 +344,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.delete_rule` command. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async deleteRule(id: string, sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
@@ -364,7 +361,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.set_overall_enable` command. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async setOverallEnable(
     enable: boolean,
@@ -386,7 +383,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.get_daystat` command. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getDayStats(
     year: number,
@@ -407,7 +404,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.get_monthstat` command. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getMonthStats(
     year: number,
@@ -427,7 +424,7 @@ export default abstract class Schedule {
    *
    * Sends `schedule.erase_runtime_stat` command. Supports childId.
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async eraseStats(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(

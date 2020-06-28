@@ -34,7 +34,7 @@ describe('Device', function () {
             if (testDevice.getDevice) {
               device = await testDevice.getDevice(undefined, testSendOptions);
               this.device = device;
-              time = device.apiModule.timesetting;
+              time = device.apiModules.timesetting;
             }
           });
           beforeEach('device', async function () {

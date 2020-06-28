@@ -39,7 +39,7 @@ export default class Emeter {
 
   /**
    * Returns cached results from last retrieval of `emeter.get_realtime`.
-   * @return {Object}
+   * @returns {Object}
    */
   get realtime(): Realtime {
     return this.#realtime;
@@ -84,7 +84,7 @@ export default class Emeter {
    * Supports childId.
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws ResponseError
+   * @throws {@link ResponseError}
    */
   async getRealtime(sendOptions?: SendOptions): Promise<unknown> {
     this.realtime = extractResponse<Realtime & HasErrCode>(
@@ -109,7 +109,7 @@ export default class Emeter {
    * @param   month
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async getDayStats(
     year: number,
@@ -132,7 +132,7 @@ export default class Emeter {
    * @param   year
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async getMonthStats(
     year: number,
@@ -153,7 +153,7 @@ export default class Emeter {
    * Sends `emeter.erase_runtime_stat` command. Supports childId.
    * @param   sendOptions
    * @returns parsed JSON response
-   * @throws  ResponseError
+   * @throws {@link ResponseError}
    */
   async eraseStats(sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(

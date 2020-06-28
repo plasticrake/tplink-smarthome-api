@@ -21,6 +21,7 @@
     "markdownlint",
     "semistandard",
     "tsdoc",
+    "typedoc",
 
     "buildable",
     "polyfill",
