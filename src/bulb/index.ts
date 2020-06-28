@@ -235,7 +235,7 @@ export default class Bulb extends Device {
    * - `schedule.get_next_action`
    * @returns parsed JSON response
    */
-  async getInfo(sendOptions?: SendOptions): Promise<object> {
+  async getInfo(sendOptions?: SendOptions): Promise<Record<string, unknown>> {
     // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
     const response = await this.send(
       `{"${this.apiModules.emeter}":{"get_realtime":{}},"${this.apiModules.lightingservice}":{"get_light_state":{}},"${this.apiModules.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModules.cloud}":{"get_info":{}}}`,
@@ -265,7 +265,6 @@ export default class Bulb extends Device {
    */
   async getPowerState(sendOptions?: SendOptions): Promise<boolean> {
     const lightState = await this.lighting.getLightState(sendOptions);
-    // @ts-ignore
     return lightState.on_off === 1;
   }
 

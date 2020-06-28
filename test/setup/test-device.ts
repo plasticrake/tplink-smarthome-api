@@ -98,7 +98,7 @@ export function testDeviceDecorator(
       port: device.port,
     };
     if (childId !== undefined) {
-      // @ts-ignore
+      // @ts-ignore: childId is only on plugs, but harmless
       testDevice.deviceOptions.childId = childId;
     }
 

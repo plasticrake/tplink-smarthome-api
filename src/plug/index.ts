@@ -342,8 +342,11 @@ export default class Plug extends Device {
    * Supports childId.
    */
   get inUse(): boolean {
-    if (this.supportsEmeter) {
-      // @ts-ignore
+    if (
+      this.supportsEmeter &&
+      'power' in this.emeter.realtime &&
+      this.emeter.realtime.power !== undefined
+    ) {
       return this.emeter.realtime.power > this.inUseThreshold;
     }
     return this.relayState;
@@ -420,10 +423,10 @@ export default class Plug extends Device {
   async getInfo(
     sendOptions?: SendOptions
   ): Promise<{
-    sysInfo: object;
-    cloud: { info: object };
-    emeter: { realtime: object };
-    schedule: { nextAction: object };
+    sysInfo: Record<string, unknown>;
+    cloud: { info: Record<string, unknown> };
+    emeter: { realtime: Record<string, unknown> };
+    schedule: { nextAction: Record<string, unknown> };
   }> {
     // TODO force TCP unless overridden here
     let data: unknown;

@@ -4,7 +4,6 @@ import util from 'util';
 
 import type log from 'loglevel';
 import { encrypt, decrypt } from 'tplink-smarthome-crypto';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import type { DeepRequired, MarkOptional } from 'ts-essentials';
 
 import Device, { isBulbSysinfo, isPlugSysinfo } from './device';
@@ -175,7 +174,7 @@ export interface DiscoveryOptions {
   /**
    * called with fn(sysInfo), return truthy value to include device
    */
-  filterCallback?: Function;
+  filterCallback?: (sysInfo: Sysinfo) => boolean;
   /**
    * if device has multiple outlets, create a separate plug for each outlet, otherwise create a plug for the main device
    * @defaultValue true
@@ -279,7 +278,7 @@ export default class Client extends EventEmitter {
    * @returns decrypted string response
    */
   async send(
-    payload: object | string,
+    payload: Record<string, unknown> | string,
     host: string,
     port = 9999,
     sendOptions?: SendOptions

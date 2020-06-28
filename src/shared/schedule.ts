@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-// eslint-disable-next-line import/no-extraneous-dependencies
 import type { MarkRequired } from 'ts-essentials';
 
 import type { AnyDevice, SendOptions } from '../client';
@@ -33,12 +31,12 @@ export type ScheduleRule = {
   repeat?: boolean;
   etime_opt: -1;
   emin: -1 | 0;
-} & (ScheduleDateStart | {});
+} & (ScheduleDateStart | Record<string, unknown>);
 
 export type ScheduleRuleWithId = ScheduleRule & { id: string };
 
 type ScheduleRules = { rule_list: ScheduleRuleWithId[] };
-type ScheduleNextAction = {};
+type ScheduleNextAction = Record<string, unknown>;
 
 export type ScheduleRuleResponse = ScheduleRule & HasErrCode;
 export type ScheduleRulesResponse = ScheduleRules & HasErrCode;
@@ -97,6 +95,7 @@ function createScheduleDate(
   startOrEnd: 'start' | 'end'
 ): ScheduleDateStart | ScheduleDateEnd {
   let min = 0;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   let time_opt = 0;
 
   if (date instanceof Date) {
@@ -286,7 +285,9 @@ export default abstract class Schedule {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
+
   async addRule(
+    // eslint-disable-next-line @typescript-eslint/ban-types
     rule: object,
     sendOptions?: SendOptions
   ): Promise<{ id: string }> {
@@ -312,7 +313,11 @@ export default abstract class Schedule {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
-  async editRule(rule: object, sendOptions?: SendOptions): Promise<unknown> {
+  async editRule(
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    rule: object,
+    sendOptions?: SendOptions
+  ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { edit_rule: rule },
