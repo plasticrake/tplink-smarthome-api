@@ -725,7 +725,7 @@ export default class Client extends EventEmitter {
     breakoutChildren: boolean;
   }): void {
     const process = (id: string, childId?: string): void => {
-      let device: AnyDeviceDiscovery & Partial<DeviceDiscovery>;
+      let device: AnyDeviceDiscovery;
       if (this.devices.has(id) && this.devices.get(id) !== undefined) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         device = this.devices.get(id)!;
@@ -739,7 +739,6 @@ export default class Client extends EventEmitter {
         }
         this.emit('online', device);
       } else {
-        // const deviceOptions: AnyDeviceOptions = ;
         device = this.getDeviceFromSysInfo(sysInfo, {
           ...options,
           client: this,
