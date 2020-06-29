@@ -2,7 +2,7 @@
 
 # Change Log
 
-## Unreleased
+## 3.0.0-beta / 2020-06-28
 
 ### Breaking Changes :boom:
 
