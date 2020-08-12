@@ -130,7 +130,7 @@ export default abstract class Device extends EventEmitter {
 
   static readonly apiModules: ApiModuleNamespace;
 
-  protected abstract supportsEmeter = false;
+  abstract supportsEmeter: boolean;
 
   childId?: string;
 

@@ -47,6 +47,7 @@ export type PlugSysinfo = CommonSysinfo &
     led_off: 0 | 1;
     relay_state?: 0 | 1;
     dev_name?: string;
+    brightness?: number;
   };
 
 export function hasSysinfoChildren(
@@ -113,8 +114,6 @@ export default class Plug extends Device {
   emitEventsEnabled = true;
 
   lastState = { inUse: false, relayState: false };
-
-  protected supportsEmeter = false;
 
   static readonly apiModules = {
     system: 'system',
@@ -239,10 +238,6 @@ export default class Plug extends Device {
    */
   setSysInfo(sysInfo: PlugSysinfo): void {
     super.setSysInfo(sysInfo);
-    this.supportsEmeter =
-      sysInfo.feature && typeof sysInfo.feature === 'string'
-        ? sysInfo.feature.indexOf('ENE') >= 0
-        : false;
     if (sysInfo.children) {
       this.setChildren(sysInfo.children);
     }
@@ -388,10 +383,20 @@ export default class Plug extends Device {
 
   /**
    * True if cached value of `sysinfo` has `brightness` property.
-   * @returns true if cached value of `sysinfo` has `brightness` property.
+   * @returns `true` if cached value of `sysinfo` has `brightness` property.
    */
   get supportsDimmer(): boolean {
     return 'brightness' in this.sysInfo;
+  }
+
+  /**
+   * True if cached value of `sysinfo` has `feature` property that contains 'ENE'.
+   * @returns `true` if cached value of `sysinfo` has `feature` property that contains 'ENE'
+   */
+  get supportsEmeter(): boolean {
+    return this.sysInfo.feature && typeof this.sysInfo.feature === 'string'
+      ? this.sysInfo.feature.indexOf('ENE') >= 0
+      : false;
   }
 
   /**

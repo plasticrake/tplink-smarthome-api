@@ -59,7 +59,17 @@ type AnyDeviceOptionsCon =
   | MarkOptional<ConstructorParameters<typeof Plug>[0], 'client' | 'sysInfo'>
   | MarkOptional<ConstructorParameters<typeof Bulb>[0], 'client' | 'sysInfo'>;
 
-type DiscoveryDevice = { host: string; port?: number };
+type DeviceOptionsDiscovery =
+  | MarkOptional<
+      ConstructorParameters<typeof Plug>[0],
+      'client' | 'sysInfo' | 'host'
+    >
+  | MarkOptional<
+      ConstructorParameters<typeof Bulb>[0],
+      'client' | 'sysInfo' | 'host'
+    >;
+
+export type DiscoveryDevice = { host: string; port?: number };
 
 function isSysinfoResponse(candidate: unknown): candidate is SysinfoResponse {
   return (
@@ -183,7 +193,7 @@ export interface DiscoveryOptions {
   /**
    * passed to device constructors
    */
-  deviceOptions?: AnyDeviceOptions;
+  deviceOptions?: DeviceOptionsDiscovery;
   /**
    * known devices to query instead of relying only on broadcast
    */
@@ -720,7 +730,7 @@ export default class Client extends EventEmitter {
     emeterRealtime: EmeterRealtime | null;
     host: string;
     port: number;
-    options?: AnyDeviceOptions;
+    options?: DeviceOptionsDiscovery;
     breakoutChildren: boolean;
   }): void {
     const process = (id: string, childId?: string): void => {

@@ -48,7 +48,7 @@ export default class Bulb extends Device {
 
   lastState = { inUse: false, powerOn: false };
 
-  protected supportsEmeter = true;
+  readonly supportsEmeter = true;
 
   static readonly apiModules = {
     system: 'smartlife.iot.common.system',
@@ -199,7 +199,7 @@ export default class Bulb extends Device {
 
   /**
    * Returns array with min and max supported color temperatures
-   * @returns range {min,max} or `null` if not supported
+   * @returns range in kelvin `{min,max}` or `null` if not supported
    */
   get getColorTemperatureRange(): { min: number; max: number } | null {
     if (!this.supportsColorTemperature) return null;
