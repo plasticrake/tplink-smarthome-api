@@ -12,6 +12,7 @@ export {
   default as Device,
   ApiModuleNamespace,
   DeviceConstructorOptions,
+  Sysinfo,
 } from './device';
 
 export { default as Plug } from './plug';
