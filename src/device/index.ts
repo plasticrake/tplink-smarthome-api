@@ -132,7 +132,10 @@ export default abstract class Device extends EventEmitter {
 
   abstract supportsEmeter: boolean;
 
-  childId?: string;
+  // eslint-disable-next-line class-methods-use-this
+  get childId(): string | undefined {
+    return undefined;
+  }
 
   constructor(options: DeviceConstructorOptions & { _sysInfo: Sysinfo }) {
     super();

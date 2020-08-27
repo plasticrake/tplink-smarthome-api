@@ -125,77 +125,19 @@ export default class Plug extends Device {
     lightingservice: '',
   };
 
-  /**
-   * @borrows Away#getRules as Plug.away#getRules
-   * @borrows Away#addRule as Plug.away#addRule
-   * @borrows Away#editRule as Plug.away#editRule
-   * @borrows Away#deleteAllRules as Plug.away#deleteAllRules
-   * @borrows Away#deleteRule as Plug.away#deleteRule
-   * @borrows Away#setOverallEnable as Plug.away#setOverallEnable
-   */
-  away = new Away(this, 'anti_theft', this.#childId);
+  away: Away;
 
-  /**
-   * @borrows Cloud#getInfo as Plug.cloud#getInfo
-   * @borrows Cloud#bind as Plug.cloud#bind
-   * @borrows Cloud#unbind as Plug.cloud#unbind
-   * @borrows Cloud#getFirmwareList as Plug.cloud#getFirmwareList
-   * @borrows Cloud#setServerUrl as Plug.cloud#setServerUrl
-   */
-  cloud = new Cloud(this, 'cnCloud');
+  cloud: Cloud;
 
-  /**
-   * @borrows Dimmer#setBrightness as Plug.dimmer#setBrightness
-   * @borrows Dimmer#getDefaultBehavior as Plug.dimmer#getDefaultBehavior
-   * @borrows Dimmer#getDimmerParameters as Plug.dimmer#getDimmerParameters
-   * @borrows Dimmer#setDimmerTransition as Plug.dimmer#setDimmerTransition
-   * @borrows Dimmer#setDoubleClickAction as Plug.dimmer#setDoubleClickAction
-   * @borrows Dimmer#setFadeOffTime as Plug.dimmer#setFadeOffTime
-   * @borrows Dimmer#setFadeOnTime as Plug.dimmer#setFadeOnTime
-   * @borrows Dimmer#setGentleOffTime as Plug.dimmer#setGentleOffTime
-   * @borrows Dimmer#setGentleOnTime as Plug.dimmer#setGentleOnTime
-   * @borrows Dimmer#setLongPressAction as Plug.dimmer#setLongPressAction
-   * @borrows Dimmer#setSwitchState as Plug.dimmer#setSwitchState
-   */
-  dimmer = new Dimmer(this, 'smartlife.iot.dimmer');
+  dimmer: Dimmer;
 
-  /**
-   * @borrows Emeter#realtime as Plug.emeter#realtime
-   * @borrows Emeter#getRealtime as Plug.emeter#getRealtime
-   * @borrows Emeter#getDayStats as Plug.emeter#getDayStats
-   * @borrows Emeter#getMonthStats as Plug.emeter#getMonthStats
-   * @borrows Emeter#eraseStats as Plug.emeter#eraseStats
-   */
-  emeter = new Emeter(this, 'emeter', this.#childId);
+  emeter: Emeter;
 
-  /**
-   * @borrows Schedule#getNextAction as Plug.schedule#getNextAction
-   * @borrows Schedule#getRules as Plug.schedule#getRules
-   * @borrows Schedule#getRule as Plug.schedule#getRule
-   * @borrows PlugSchedule#addRule as Plug.schedule#addRule
-   * @borrows PlugSchedule#editRule as Plug.schedule#editRule
-   * @borrows Schedule#deleteAllRules as Plug.schedule#deleteAllRules
-   * @borrows Schedule#deleteRule as Plug.schedule#deleteRule
-   * @borrows Schedule#setOverallEnable as Plug.schedule#setOverallEnable
-   * @borrows Schedule#getDayStats as Plug.schedule#getDayStats
-   * @borrows Schedule#getMonthStats as Plug.schedule#getMonthStats
-   * @borrows Schedule#eraseStats as Plug.schedule#eraseStats
-   */
-  schedule = new Schedule(this, 'schedule', this.#childId);
+  schedule: Schedule;
 
-  /**
-   * @borrows Time#getTime as Plug.time#getTime
-   * @borrows Time#getTimezone as Plug.time#getTimezone
-   */
-  time = new Time(this, 'time');
+  time: Time;
 
-  /**
-   * @borrows Timer#getRules as Plug.timer#getRules
-   * @borrows Timer#addRule as Plug.timer#addRule
-   * @borrows Timer#editRule as Plug.timer#editRule
-   * @borrows Timer#deleteAllRules as Plug.timer#deleteAllRules
-   */
-  timer = new Timer(this, 'count_down', this.#childId);
+  timer: Timer;
 
   /**
    * Created by {@link Client} - Do not instantiate directly.
@@ -215,6 +157,78 @@ export default class Plug extends Device {
     const { sysInfo, inUseThreshold = 0.1, childId } = options;
 
     this.log.debug('plug.constructor()');
+
+    /**
+     * @borrows Away#getRules as Plug.away#getRules
+     * @borrows Away#addRule as Plug.away#addRule
+     * @borrows Away#editRule as Plug.away#editRule
+     * @borrows Away#deleteAllRules as Plug.away#deleteAllRules
+     * @borrows Away#deleteRule as Plug.away#deleteRule
+     * @borrows Away#setOverallEnable as Plug.away#setOverallEnable
+     */
+    this.away = new Away(this, 'anti_theft', this.#childId);
+
+    /**
+     * @borrows Cloud#getInfo as Plug.cloud#getInfo
+     * @borrows Cloud#bind as Plug.cloud#bind
+     * @borrows Cloud#unbind as Plug.cloud#unbind
+     * @borrows Cloud#getFirmwareList as Plug.cloud#getFirmwareList
+     * @borrows Cloud#setServerUrl as Plug.cloud#setServerUrl
+     */
+    this.cloud = new Cloud(this, 'cnCloud');
+
+    /**
+     * @borrows Dimmer#setBrightness as Plug.dimmer#setBrightness
+     * @borrows Dimmer#getDefaultBehavior as Plug.dimmer#getDefaultBehavior
+     * @borrows Dimmer#getDimmerParameters as Plug.dimmer#getDimmerParameters
+     * @borrows Dimmer#setDimmerTransition as Plug.dimmer#setDimmerTransition
+     * @borrows Dimmer#setDoubleClickAction as Plug.dimmer#setDoubleClickAction
+     * @borrows Dimmer#setFadeOffTime as Plug.dimmer#setFadeOffTime
+     * @borrows Dimmer#setFadeOnTime as Plug.dimmer#setFadeOnTime
+     * @borrows Dimmer#setGentleOffTime as Plug.dimmer#setGentleOffTime
+     * @borrows Dimmer#setGentleOnTime as Plug.dimmer#setGentleOnTime
+     * @borrows Dimmer#setLongPressAction as Plug.dimmer#setLongPressAction
+     * @borrows Dimmer#setSwitchState as Plug.dimmer#setSwitchState
+     */
+    this.dimmer = new Dimmer(this, 'smartlife.iot.dimmer');
+
+    /**
+     * @borrows Emeter#realtime as Plug.emeter#realtime
+     * @borrows Emeter#getRealtime as Plug.emeter#getRealtime
+     * @borrows Emeter#getDayStats as Plug.emeter#getDayStats
+     * @borrows Emeter#getMonthStats as Plug.emeter#getMonthStats
+     * @borrows Emeter#eraseStats as Plug.emeter#eraseStats
+     */
+    this.emeter = new Emeter(this, 'emeter', this.#childId);
+
+    /**
+     * @borrows Schedule#getNextAction as Plug.schedule#getNextAction
+     * @borrows Schedule#getRules as Plug.schedule#getRules
+     * @borrows Schedule#getRule as Plug.schedule#getRule
+     * @borrows PlugSchedule#addRule as Plug.schedule#addRule
+     * @borrows PlugSchedule#editRule as Plug.schedule#editRule
+     * @borrows Schedule#deleteAllRules as Plug.schedule#deleteAllRules
+     * @borrows Schedule#deleteRule as Plug.schedule#deleteRule
+     * @borrows Schedule#setOverallEnable as Plug.schedule#setOverallEnable
+     * @borrows Schedule#getDayStats as Plug.schedule#getDayStats
+     * @borrows Schedule#getMonthStats as Plug.schedule#getMonthStats
+     * @borrows Schedule#eraseStats as Plug.schedule#eraseStats
+     */
+    this.schedule = new Schedule(this, 'schedule', this.#childId);
+
+    /**
+     * @borrows Time#getTime as Plug.time#getTime
+     * @borrows Time#getTimezone as Plug.time#getTimezone
+     */
+    this.time = new Time(this, 'time');
+
+    /**
+     * @borrows Timer#getRules as Plug.timer#getRules
+     * @borrows Timer#addRule as Plug.timer#addRule
+     * @borrows Timer#editRule as Plug.timer#editRule
+     * @borrows Timer#deleteAllRules as Plug.timer#deleteAllRules
+     */
+    this.timer = new Timer(this, 'count_down', this.#childId);
 
     this._sysInfo = sysInfo;
     this.setSysInfo(sysInfo);
