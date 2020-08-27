@@ -2,6 +2,14 @@
 
 # Change Log
 
+## 3.0.0-beta.0 / 2020-08-26
+
+### Breaking Changes :boom:
+
+- `Client`
+  - `#startDiscovery` no longer queries energy usage (`emeter:{get_realtime:{}}`)
+    - Some newer devices and firmware would crash and reset when sent `emeter:{get_realtime:{}}`
+
 ## 3.0.0-beta / 2020-06-28
 
 ### Breaking Changes :boom:

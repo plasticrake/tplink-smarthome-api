@@ -4,7 +4,7 @@ import util from 'util';
 
 import type log from 'loglevel';
 import { encrypt, decrypt } from 'tplink-smarthome-crypto';
-import type { DeepRequired, MarkOptional } from 'ts-essentials';
+import type { MarkOptional } from 'ts-essentials';
 
 import Device, { isBulbSysinfo, isPlugSysinfo } from './device';
 import type { Sysinfo } from './device';
@@ -16,9 +16,7 @@ import TcpConnection from './network/tcp-connection';
 import UdpConnection from './network/udp-connection';
 import { compareMac, isObjectLike } from './utils';
 
-const discoveryMsgBuf = encrypt(
-  '{"system":{"get_sysinfo":{}},"emeter":{"get_realtime":{}},"smartlife.iot.common.emeter":{"get_realtime":{}}}'
-);
+const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 
 export type AnyDevice = Bulb | Plug;
 
@@ -78,50 +76,6 @@ function isSysinfoResponse(candidate: unknown): candidate is SysinfoResponse {
     isObjectLike(candidate.system) &&
     'get_sysinfo' in candidate.system
   );
-}
-
-function hasPlugEmeterResponse(
-  candidate: unknown
-): candidate is DeepRequired<PlugEmeterResponse> {
-  return (
-    isObjectLike(candidate) &&
-    'emeter' in candidate &&
-    isObjectLike(candidate.emeter) &&
-    'get_realtime' in candidate.emeter &&
-    isObjectLike(candidate.emeter.get_realtime) &&
-    'err_code' in candidate.emeter.get_realtime &&
-    typeof candidate.emeter.get_realtime.err_code === 'number'
-  );
-}
-
-function hasBulbEmeterResponse(
-  candidate: unknown
-): candidate is DeepRequired<BulbEmeterResponse> {
-  return (
-    isObjectLike(candidate) &&
-    'smartlife.iot.common.emeter' in candidate &&
-    isObjectLike(candidate['smartlife.iot.common.emeter']) &&
-    'get_realtime' in candidate['smartlife.iot.common.emeter'] &&
-    isObjectLike(candidate['smartlife.iot.common.emeter'].get_realtime) &&
-    'err_code' in candidate['smartlife.iot.common.emeter'].get_realtime &&
-    typeof candidate['smartlife.iot.common.emeter'].get_realtime.err_code ===
-      'number'
-  );
-}
-
-function parseEmeter(response: DiscoveryResponse): EmeterRealtime | null {
-  if (hasPlugEmeterResponse(response)) {
-    if (response.emeter.get_realtime.err_code === 0) {
-      return response.emeter.get_realtime;
-    }
-  }
-  if (hasBulbEmeterResponse(response)) {
-    if (response['smartlife.iot.common.emeter'].get_realtime.err_code === 0) {
-      return response['smartlife.iot.common.emeter'].get_realtime;
-    }
-  }
-
-  return null;
 }
 
 export interface ClientConstructorOptions {
@@ -586,11 +540,9 @@ export default class Client extends EventEmitter {
 
         let response: DiscoveryResponse;
         let sysInfo: Sysinfo;
-        let emeterRealtime: EmeterRealtime | null;
         try {
           response = JSON.parse(decryptedMsg);
           sysInfo = response.system.get_sysinfo;
-          emeterRealtime = parseEmeter(response);
         } catch (err) {
           this.log.debug(
             `client.startDiscovery(): Error parsing JSON: %s\nFrom: ${rinfo.address} ${rinfo.port} Original: [%s] Decrypted: [${decryptedMsg}]`,
@@ -652,7 +604,6 @@ export default class Client extends EventEmitter {
 
         this.createOrUpdateDeviceFromSysInfo({
           sysInfo,
-          emeterRealtime,
           host: rinfo.address,
           port: rinfo.port,
           breakoutChildren,
@@ -720,14 +671,12 @@ export default class Client extends EventEmitter {
 
   private createOrUpdateDeviceFromSysInfo({
     sysInfo,
-    emeterRealtime,
     host,
     port,
     options,
     breakoutChildren,
   }: {
     sysInfo: Sysinfo;
-    emeterRealtime: EmeterRealtime | null;
     host: string;
     port: number;
     options?: DeviceOptionsDiscovery;
@@ -743,9 +692,6 @@ export default class Client extends EventEmitter {
         Client.setSysInfoForDevice(device, sysInfo);
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
-        if (emeterRealtime !== null && device.emeter) {
-          device.emeter.realtime = emeterRealtime;
-        }
         this.emit('online', device);
       } else {
         device = this.getDeviceFromSysInfo(sysInfo, {
@@ -757,9 +703,6 @@ export default class Client extends EventEmitter {
         });
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
-        if (emeterRealtime !== null && device.emeter) {
-          device.emeter.realtime = emeterRealtime;
-        }
         this.devices.set(id, device);
         this.emit('new', device);
       }
