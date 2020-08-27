@@ -113,12 +113,12 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="device.html#childid" class="tsd-kind-icon">child<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="device.html#client" class="tsd-kind-icon">client</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="device.html#defaultsendoptions" class="tsd-kind-icon">default<wbr>Send<wbr>Options</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="device.html#host" class="tsd-kind-icon">host</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="device.html#netif" class="tsd-kind-icon">netif</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="device.html#port" class="tsd-kind-icon">port</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="device.html#supportsemeter" class="tsd-kind-icon">supports<wbr>Emeter</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="device.html#apimodules" class="tsd-kind-icon">api<wbr>Modules</a></li>
 							</ul>
 						</section>
@@ -127,6 +127,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="device.html#alias" class="tsd-kind-icon">alias</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="device.html#apimodules-1" class="tsd-kind-icon">api<wbr>Modules</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="device.html#childid" class="tsd-kind-icon">child<wbr>Id</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="device.html#description" class="tsd-kind-icon">description</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="device.html#deviceid" class="tsd-kind-icon">device<wbr>Id</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="device.html#devicetype" class="tsd-kind-icon">device<wbr>Type</a></li>
@@ -167,20 +168,20 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Device<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/deviceconstructoroptions.html" class="tsd-signature-type">DeviceConstructorOptions</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>_sysInfo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Sysinfo</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="device.html" class="tsd-signature-type">Device</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Device<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/deviceconstructoroptions.html" class="tsd-signature-type">DeviceConstructorOptions</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>_sysInfo<span class="tsd-signature-symbol">: </span><a href="../globals.html#sysinfo" class="tsd-signature-type">Sysinfo</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="device.html" class="tsd-signature-type">Device</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.__constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L135">src/device/index.ts:135</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L138">src/device/index.ts:138</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <a href="../interfaces/deviceconstructoroptions.html" class="tsd-signature-type">DeviceConstructorOptions</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>_sysInfo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Sysinfo</span><span class="tsd-signature-symbol"> }</span></h5>
+									<h5>options: <a href="../interfaces/deviceconstructoroptions.html" class="tsd-signature-type">DeviceConstructorOptions</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>_sysInfo<span class="tsd-signature-symbol">: </span><a href="../globals.html#sysinfo" class="tsd-signature-type">Sysinfo</a><span class="tsd-signature-symbol"> }</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="device.html" class="tsd-signature-type">Device</a></h4>
@@ -191,22 +192,12 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="childid" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> child<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">child<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L135">src/device/index.ts:135</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="client" class="tsd-anchor"></a>
 					<h3>client</h3>
 					<div class="tsd-signature tsd-kind-icon">client<span class="tsd-signature-symbol">:</span> <a href="client.html" class="tsd-signature-type">Client</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L111">src/device/index.ts:111</a></li>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L111">src/device/index.ts:111</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -216,7 +207,7 @@
 					<div class="tsd-signature tsd-kind-icon">default<wbr>Send<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">SendOptions</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L121">src/device/index.ts:121</a></li>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L121">src/device/index.ts:121</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -226,7 +217,7 @@
 					<div class="tsd-signature tsd-kind-icon">host<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L113">src/device/index.ts:113</a></li>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L113">src/device/index.ts:113</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -236,7 +227,7 @@
 					<div class="tsd-signature tsd-kind-icon">netif<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Netif</span><span class="tsd-signature-symbol"> = new Netif(this, &#x27;netif&#x27;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L117">src/device/index.ts:117</a></li>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L117">src/device/index.ts:117</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -246,7 +237,17 @@
 					<div class="tsd-signature tsd-kind-icon">port<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L115">src/device/index.ts:115</a></li>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L115">src/device/index.ts:115</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="supportsemeter" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> supports<wbr>Emeter</h3>
+					<div class="tsd-signature tsd-kind-icon">supports<wbr>Emeter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L133">src/device/index.ts:133</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -256,7 +257,7 @@
 					<div class="tsd-signature tsd-kind-icon">api<wbr>Modules<span class="tsd-signature-symbol">:</span> <a href="../interfaces/apimodulenamespace.html" class="tsd-signature-type">ApiModuleNamespace</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L131">src/device/index.ts:131</a></li>
+							<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L131">src/device/index.ts:131</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -273,7 +274,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L210">src/device/index.ts:210</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L213">src/device/index.ts:213</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -295,10 +296,27 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L184">src/device/index.ts:184</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L187">src/device/index.ts:187</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/apimodulenamespace.html" class="tsd-signature-type">ApiModuleNamespace</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="childid" class="tsd-anchor"></a>
+					<h3>child<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> childId<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L136">src/device/index.ts:136</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -312,7 +330,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L231">src/device/index.ts:231</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L234">src/device/index.ts:234</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -334,7 +352,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L224">src/device/index.ts:224</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L227">src/device/index.ts:227</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -356,7 +374,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L263">src/device/index.ts:263</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L266">src/device/index.ts:266</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -379,7 +397,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L285">src/device/index.ts:285</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L288">src/device/index.ts:288</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -401,7 +419,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L217">src/device/index.ts:217</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L220">src/device/index.ts:220</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -423,7 +441,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L292">src/device/index.ts:292</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L295">src/device/index.ts:295</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -445,7 +463,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L311">src/device/index.ts:311</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L314">src/device/index.ts:314</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -469,7 +487,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L236">src/device/index.ts:236</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L239">src/device/index.ts:239</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -491,7 +509,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L243">src/device/index.ts:243</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L246">src/device/index.ts:246</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -513,7 +531,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L278">src/device/index.ts:278</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L281">src/device/index.ts:281</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -529,13 +547,13 @@
 					<a name="sysinfo" class="tsd-anchor"></a>
 					<h3>sys<wbr>Info</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> sysInfo<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Sysinfo</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> sysInfo<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#sysinfo" class="tsd-signature-type">Sysinfo</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L193">src/device/index.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L196">src/device/index.ts:196</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -543,7 +561,7 @@
 									<p>Returns cached results from last retrieval of <code>system.sysinfo</code>.</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Sysinfo</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#sysinfo" class="tsd-signature-type">Sysinfo</a></h4>
 							<p>system.sysinfo</p>
 						</li>
 					</ul>
@@ -558,7 +576,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L250">src/device/index.ts:250</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L253">src/device/index.ts:253</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -583,7 +601,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L319">src/device/index.ts:319</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L322">src/device/index.ts:322</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -605,7 +623,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L618">src/device/index.ts:618</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L621">src/device/index.ts:621</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -628,7 +646,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L579">src/device/index.ts:579</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L582">src/device/index.ts:582</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -657,13 +675,13 @@
 					<a name="getsysinfo" class="tsd-anchor"></a>
 					<h3>get<wbr>Sys<wbr>Info</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Sys<wbr>Info<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Sysinfo</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Sys<wbr>Info<span class="tsd-signature-symbol">(</span>sendOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SendOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#sysinfo" class="tsd-signature-type">Sysinfo</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L504">src/device/index.ts:504</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L507">src/device/index.ts:507</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -683,7 +701,7 @@
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> sendOptions: <span class="tsd-signature-type">SendOptions</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Sysinfo</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#sysinfo" class="tsd-signature-type">Sysinfo</a><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>parsed JSON response</p>
 						</li>
 					</ul>
@@ -698,7 +716,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L591">src/device/index.ts:591</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L594">src/device/index.ts:594</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -736,7 +754,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L608">src/device/index.ts:608</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L611">src/device/index.ts:611</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -774,7 +792,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L329">src/device/index.ts:329</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L332">src/device/index.ts:332</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -809,7 +827,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L425">src/device/index.ts:425</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L428">src/device/index.ts:428</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -873,7 +891,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L527">src/device/index.ts:527</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L530">src/device/index.ts:530</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -911,7 +929,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L550">src/device/index.ts:550</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L553">src/device/index.ts:553</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -952,7 +970,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L466">src/device/index.ts:466</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L469">src/device/index.ts:469</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -990,7 +1008,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/1a7d2dc/src/device/index.ts#L491">src/device/index.ts:491</a></li>
+									<li>Defined in <a href="https://github.com/plasticrake/tplink-smarthome-api/blob/0eb26fe/src/device/index.ts#L494">src/device/index.ts:494</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1029,9 +1047,6 @@
 								<a href="device.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="device.html#childid" class="tsd-kind-icon">child<wbr>Id</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="device.html#client" class="tsd-kind-icon">client</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
@@ -1046,6 +1061,9 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="device.html#port" class="tsd-kind-icon">port</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="device.html#supportsemeter" class="tsd-kind-icon">supports<wbr>Emeter</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
 								<a href="device.html#apimodules" class="tsd-kind-icon">api<wbr>Modules</a>
 							</li>
@@ -1054,6 +1072,9 @@
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="device.html#apimodules-1" class="tsd-kind-icon">api<wbr>Modules</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="device.html#childid" class="tsd-kind-icon">child<wbr>Id</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="device.html#description" class="tsd-kind-icon">description</a>
@@ -1181,6 +1202,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#plugschedulerule" class="tsd-kind-icon">Plug<wbr>Schedule<wbr>Rule</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#sysinfo" class="tsd-kind-icon">Sysinfo</a>
 					</li>
 				</ul>
 			</nav>
