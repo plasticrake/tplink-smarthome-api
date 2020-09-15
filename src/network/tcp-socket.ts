@@ -98,14 +98,12 @@ export default class TcpSocket extends TplinkSocket {
           const actualResponseLen = deviceDataBuf.length - 4;
 
           if (actualResponseLen >= expectedResponseLen) {
-            setSocketTimeout(0);
             decryptedMsg = decrypt(deviceDataBuf.slice(4)).toString('utf8');
             this.logDebug(
               `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} [${replaceControlCharacters(
                 decryptedMsg
               )}]`
             );
-            socket.end();
           } else {
             this.logDebug(
               `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} ...`
@@ -171,11 +169,8 @@ export default class TcpSocket extends TplinkSocket {
             `: socket:connect ${socket.localAddress} ${socket.localPort} ${socket.remoteAddress} ${socket.remotePort}`
           );
           this.isBound = true;
-          const writeRet = socket.write(encryptedPayload);
-          this.logDebug(
-            ': socket:connect:write',
-            writeRet ? 'flushed' : 'queued'
-          );
+          socket.end(encryptedPayload);
+          this.logDebug(': socket:connect:end');
         } catch (err) {
           this.logDebug(': socket:connect error');
           reject(err);
