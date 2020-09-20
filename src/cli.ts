@@ -179,9 +179,9 @@ function toInt(s: string): number {
 }
 
 function setParamTypes(
-  params: string[],
+  params: string[] | undefined,
   commandSetup: CommandSetup
-): Array<boolean | number | string> {
+): Array<boolean | number | string> | undefined {
   if (
     params &&
     params.length > 0 &&
@@ -310,8 +310,19 @@ for (const command of commandSetup) {
     cmd.option('-c, --childId [childId]', 'childId');
   }
 
-  cmd.action((host, params, options) => {
+  cmd.action((host, paramsInput, optionsInput) => {
     const [hostOnly, port] = host.split(':');
+
+    // paramsInput will be options when command has not params
+    let options;
+    let params;
+    if (optionsInput === undefined) {
+      options = paramsInput;
+      params = undefined;
+    } else {
+      options = optionsInput;
+      params = paramsInput;
+    }
     const commandParams = setParamTypes(params, command);
 
     sendCommandDynamic(
