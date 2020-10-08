@@ -2,6 +2,12 @@
 
 # Change Log
 
+## Unreleased
+
+- `Bulb`/`Plug`
+  - `#getInfo` now defaults to TCP transport unless specifically overridden in the call to `#getInfo`.
+    - Some newer devices and firmware would crash and reset when sent `emeter:{get_realtime:{}}` over UDP.
+
 ## 3.0.0-beta.0 / 2020-08-26
 
 ### Breaking Changes :boom:

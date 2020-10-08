@@ -23,13 +23,6 @@ import {
   ResponseError,
 } from '../utils';
 
-// type PlugGetInfo = {
-//   emeter: { get_realtime: {} };
-//   schedule: { get_next_action: {} };
-//   system: { get_sysinfo: {} };
-//   cnCloud: { get_info: {} };
-// };
-
 type PlugChild = { id: string; alias: string; state: number };
 
 type SysinfoChildren = {
@@ -435,6 +428,9 @@ export default class Plug extends Device {
    * - `emeter.get_realtime`
    * - `schedule.get_next_action`
    *
+   * This command is likely to fail on some devices when using UDP transport.
+   * This defaults to TCP transport unless overridden in sendOptions.
+   *
    * Supports childId.
    * @returns parsed JSON response
    * @throws {@link ResponseError}
@@ -447,13 +443,18 @@ export default class Plug extends Device {
     emeter: { realtime: Record<string, unknown> };
     schedule: { nextAction: Record<string, unknown> };
   }> {
-    // TODO force TCP unless overridden here
+    // force TCP unless overridden here
+    const sendOptionsForGetInfo: SendOptions =
+      sendOptions == null ? {} : sendOptions;
+    if (!('transport' in sendOptionsForGetInfo))
+      sendOptionsForGetInfo.transport = 'tcp';
+
     let data: unknown;
     try {
       data = await this.sendCommand(
         '{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}',
         this.#childId,
-        sendOptions
+        sendOptionsForGetInfo
       );
     } catch (err) {
       // Ignore emeter section errors as not all devices support it

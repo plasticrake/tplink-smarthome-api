@@ -233,13 +233,23 @@ export default class Bulb extends Device {
    * - `cloud.get_sysinfo`
    * - `emeter.get_realtime`
    * - `schedule.get_next_action`
+   *
+   * This command is likely to fail on some devices when using UDP transport.
+   * This defaults to TCP transport unless overridden in sendOptions.
+   *
    * @returns parsed JSON response
    */
   async getInfo(sendOptions?: SendOptions): Promise<Record<string, unknown>> {
+    // force TCP unless overridden here
+    const sendOptionsForGetInfo: SendOptions =
+      sendOptions == null ? {} : sendOptions;
+    if (!('transport' in sendOptionsForGetInfo))
+      sendOptionsForGetInfo.transport = 'tcp';
+
     // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
     const response = await this.send(
       `{"${this.apiModules.emeter}":{"get_realtime":{}},"${this.apiModules.lightingservice}":{"get_light_state":{}},"${this.apiModules.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModules.cloud}":{"get_info":{}}}`,
-      sendOptions
+      sendOptionsForGetInfo
     );
     const data = JSON.parse(response);
     this.setSysInfo(data.system.get_sysinfo);
