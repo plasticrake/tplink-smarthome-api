@@ -174,8 +174,34 @@ async function blink(
     });
 }
 
+async function getScanInfo(
+  host: string,
+  port: number,
+  refresh?: boolean,
+  timeoutInSeconds?: number
+) {
+  console.log(`Sending getScanInfo command to ${host}:${port || ''}...`);
+  getClient()
+    .getDevice({ host, port })
+    .then((device) => {
+      // @ts-ignore: ignoring for now, need to implement blink on bulb
+      return device.netif
+        .getScanInfo(refresh, timeoutInSeconds)
+        .then((value) => {
+          console.dir(value);
+        });
+    })
+    .catch((reason) => {
+      outputError(reason);
+    });
+}
+
 function toInt(s: string): number {
   return parseInt(s, 10);
+}
+
+function toBoolean(s: string): boolean {
+  return s === 'true' || s === '1';
 }
 
 function setParamTypes(
@@ -194,7 +220,7 @@ function setParamTypes(
         case 'number':
           return +el;
         case 'boolean':
-          return el === 'true' || el === '1';
+          return toBoolean(el);
         default:
           return el;
       }
@@ -265,6 +291,18 @@ program
   .action((host, times = 5, rate = 500) => {
     const [hostOnly, port] = host.split(':');
     blink(hostOnly, port, times, rate);
+  });
+
+program
+  .command('getScanInfo <host> [refresh] [timeoutInSeconds]')
+  .action((host, refresh = true, timeoutInSeconds = 5) => {
+    const [hostOnly, port] = host.split(':');
+    getScanInfo(
+      hostOnly,
+      port,
+      refresh !== undefined ? toBoolean(refresh) : undefined,
+      timeoutInSeconds
+    );
   });
 
 type CommandSetup = {
