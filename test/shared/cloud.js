@@ -62,8 +62,10 @@ async function unbindCloud(device, force = false) {
   }
 }
 
-module.exports = function (testDevice) {
+module.exports = function (ctx, testDevice) {
   describe.skip('Cloud @slow', function () {
+    let device;
+
     this.timeout(config.defaultTestTimeout * 2);
     this.slow(config.defaultTestTimeout);
 
@@ -71,8 +73,7 @@ module.exports = function (testDevice) {
     let skipped = false;
 
     beforeEach('Cloud', async function () {
-      this.timeout(config.defaultTestTimeout * 2);
-      this.slow(config.defaultTestTimeout);
+      device = ctx.device;
     });
 
     before('Cloud', async function getOriginalCloudInfo() {
@@ -82,7 +83,7 @@ module.exports = function (testDevice) {
         return;
       }
       // const device = await testDevice.getDevice();
-      originalCloudInfo = await this.device.cloud.getInfo();
+      originalCloudInfo = await device.cloud.getInfo();
     });
 
     after('Cloud', async function resetCloudToOriginal() {
@@ -90,21 +91,19 @@ module.exports = function (testDevice) {
       this.timeout(config.defaultTestTimeout * 4);
       this.slow(config.defaultTestTimeout * 2);
 
-      const currentCloudInfo = await retryIfBusy(() =>
-        this.device.cloud.getInfo()
-      );
+      const currentCloudInfo = await retryIfBusy(() => device.cloud.getInfo());
       if (originalCloudInfo.server !== currentCloudInfo.server) {
         await retryIfBusy(() =>
-          this.device.cloud.setServerUrl(originalCloudInfo.server)
+          device.cloud.setServerUrl(originalCloudInfo.server)
         );
       }
       if (originalCloudInfo.binded !== currentCloudInfo.binded) {
         if (originalCloudInfo.binded === 1) {
           await retryIfBusy(() =>
-            this.device.cloud.bind(config.cloudUsername, config.cloudPassword)
+            device.cloud.bind(config.cloudUsername, config.cloudPassword)
           );
         } else {
-          await retryIfBusy(() => this.device.cloud.unbind());
+          await retryIfBusy(() => device.cloud.unbind());
         }
       }
     });
@@ -112,25 +111,25 @@ module.exports = function (testDevice) {
     describe('#getInfo()', function () {
       // Does not require to be logged in to cloud
       it('should return cloud info', async function () {
-        const ci = await this.device.cloud.getInfo();
+        const ci = await device.cloud.getInfo();
         expect(ci).to.have.property('err_code', 0);
         expect(ci).to.include.keys('username', 'server');
       });
     });
     describe('#bind()', function () {
       it('should add device to cloud', async function () {
-        return bindCloud(this.device, true);
+        return bindCloud(device, true);
       });
     });
     describe('#unbind()', function () {
       it('should remove device from cloud', async function () {
-        return unbindCloud(this.device, true);
+        return unbindCloud(device, true);
       });
     });
     describe('#getFirmwareList()', function () {
       // Does not require to be logged in to cloud
       it('should get firmware list from cloud', async function () {
-        expect(await this.device.cloud.getFirmwareList()).to.have.property(
+        expect(await device.cloud.getFirmwareList()).to.have.property(
           'err_code',
           0
         );
@@ -140,7 +139,7 @@ module.exports = function (testDevice) {
       // Does not require to be logged in to cloud
       it('should change cloud server url', async function () {
         expect(
-          await this.device.cloud.setServerUrl(config.cloudServerUrl)
+          await device.cloud.setServerUrl(config.cloudServerUrl)
         ).to.have.property('err_code', 0);
       });
     });

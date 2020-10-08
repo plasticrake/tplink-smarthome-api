@@ -1,12 +1,18 @@
 /* eslint-disable no-unused-expressions */
 
-const { expect } = require('../setup');
+const { config, expect } = require('../setup');
 
-module.exports = function () {
+module.exports = function (ctx) {
   describe('Away', function () {
+    let device;
+
+    beforeEach('Away', async function () {
+      device = ctx.device;
+    });
+
     describe('#getRules()', function () {
       it('should return away rules', function () {
-        return expect(this.device.away.getRules()).to.eventually.have.property(
+        return expect(device.away.getRules()).to.eventually.have.property(
           'err_code',
           0
         );
@@ -14,7 +20,7 @@ module.exports = function () {
     });
     describe('#addRule()', function () {
       it('should add non repeating rule', async function () {
-        const response = await this.device.away.addRule({
+        const response = await device.away.addRule({
           start: 60,
           end: 120,
         });
@@ -22,7 +28,7 @@ module.exports = function () {
         expect(response).to.have.property('id');
       });
       it('should add repeating rule', async function () {
-        const response = await this.device.away.addRule({
+        const response = await device.away.addRule({
           start: 120,
           end: 240,
           daysOfWeek: [0, 6],
@@ -31,7 +37,7 @@ module.exports = function () {
         expect(response).to.have.property('id');
       });
       it('should add disabled rule', async function () {
-        const response = await this.device.away.addRule({
+        const response = await device.away.addRule({
           start: 120,
           end: 600,
           name: 'disabled',
@@ -44,21 +50,24 @@ module.exports = function () {
 
     describe('#editRule()', function () {
       it('should edit a rule', async function () {
-        const addResponse = await this.device.away.addRule({
+        this.timeout(config.defaultTestTimeout * 3);
+        this.slow(config.defaultTestTimeout * 2);
+
+        const addResponse = await device.away.addRule({
           start: 60,
           end: 240,
         });
         expect(addResponse).to.have.property('err_code', 0);
         expect(addResponse).to.have.property('id');
 
-        const editResponse = await this.device.away.editRule({
+        const editResponse = await device.away.editRule({
           id: addResponse.id,
           start: 120,
           end: 600,
         });
         expect(editResponse).to.have.property('err_code', 0);
 
-        const getResponse = await this.device.away.getRule(addResponse.id);
+        const getResponse = await device.away.getRule(addResponse.id);
         expect(getResponse).to.have.property('err_code', 0);
         expect(getResponse).to.have.property('id', addResponse.id);
         expect(getResponse).to.have.property('smin', 120);
@@ -67,36 +76,34 @@ module.exports = function () {
     });
     describe('#deleteAllRules()', function () {
       it('should delete all rules', async function () {
-        const addResponse = await this.device.away.addRule({
+        const addResponse = await device.away.addRule({
           start: 60,
           end: 240,
         });
         expect(addResponse, 'addRule').to.have.property('err_code', 0);
         expect(addResponse, 'addRule').to.have.property('id');
 
-        const deleteResponse = await this.device.away.deleteAllRules();
+        const deleteResponse = await device.away.deleteAllRules();
         expect(deleteResponse).to.have.property('err_code', 0);
 
-        const getResponse = await this.device.away.getRules();
+        const getResponse = await device.away.getRules();
         expect(getResponse).to.have.property('err_code', 0);
         expect(getResponse.rule_list).to.have.property('length', 0);
       });
     });
     describe('#deleteRule()', function () {
       it('should delete a rule', async function () {
-        const addResponse = await this.device.away.addRule({
+        const addResponse = await device.away.addRule({
           start: 60,
           end: 240,
         });
         expect(addResponse, 'addRule').to.have.property('err_code', 0);
         expect(addResponse, 'addRule').to.have.property('id');
 
-        const deleteResponse = await this.device.away.deleteRule(
-          addResponse.id
-        );
+        const deleteResponse = await device.away.deleteRule(addResponse.id);
         expect(deleteResponse).to.have.property('err_code', 0);
 
-        const getResponse = await this.device.away.getRules();
+        const getResponse = await device.away.getRules();
         expect(getResponse).to.have.property('err_code', 0);
         const rule = getResponse.rule_list.find((r) => r.id === addResponse.id);
         expect(rule).to.be.undefined;
@@ -104,13 +111,13 @@ module.exports = function () {
     });
     describe('#setOverallEnable()', function () {
       it('should enable', async function () {
-        expect(await this.device.away.setOverallEnable(true)).to.have.property(
+        expect(await device.away.setOverallEnable(true)).to.have.property(
           'err_code',
           0
         );
       });
       it('should disable', async function () {
-        expect(await this.device.away.setOverallEnable(false)).to.have.property(
+        expect(await device.away.setOverallEnable(false)).to.have.property(
           'err_code',
           0
         );

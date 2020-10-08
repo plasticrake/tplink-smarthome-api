@@ -5,45 +5,42 @@ const { expect } = require('../setup');
 
 const { ResponseError } = require('../../src');
 
-module.exports = function (testDevice) {
+module.exports = function (ctx, testDevice) {
   describe('Emeter', function () {
+    let device;
     let month;
     let year;
     let supportsEmeter;
 
+    beforeEach('Emeter', async function () {
+      device = ctx.device;
+      supportsEmeter = ctx.supportsEmeter;
+    });
+
     before('Emeter', async function () {
-      if (!testDevice.getDevice) {
-        this.skip();
-        return;
-      }
+      if (!testDevice.getDevice) this.skip();
+
       const today = new Date();
       month = today.getMonth() + 1;
       year = today.getFullYear();
-
-      const device = await testDevice.getDevice();
-      await device.getSysInfo();
-      supportsEmeter = device.supportsEmeter;
     });
 
     describe('#realtime get', function () {
       it('should return realtime after getRealtime called', async function () {
-        if (supportsEmeter) {
-          const er = await this.device.emeter.getRealtime();
-          expect(this.device.emeter.realtime).to.eql(er);
-        } else {
-          expect(this.device.emeter.realtime).to.eql({});
-        }
+        if (!supportsEmeter) this.skip();
+        const er = await device.emeter.getRealtime();
+        expect(device.emeter.realtime).to.eql(er);
       });
     });
     describe('#getRealtime()', function () {
       it('should return Realtime if supported or throw error', async function () {
         if (supportsEmeter) {
           return expect(
-            this.device.emeter.getRealtime()
+            device.emeter.getRealtime()
           ).to.eventually.have.property('err_code', 0);
         }
         return expect(
-          this.device.emeter.getRealtime()
+          device.emeter.getRealtime()
         ).to.eventually.be.rejectedWith(ResponseError);
       });
       it('should emit emeter-realtime-update if supported', async function () {
@@ -51,16 +48,16 @@ module.exports = function (testDevice) {
 
         const spy = sinon.spy();
 
-        this.device.on('emeter-realtime-update', spy);
-        await this.device.emeter.getRealtime();
-        await this.device.emeter.getRealtime();
+        device.on('emeter-realtime-update', spy);
+        await device.emeter.getRealtime();
+        await device.emeter.getRealtime();
 
         expect(spy).to.be.calledTwice;
         expect(spy).to.be.calledWithMatch({ err_code: 0 });
       });
       it('should return Realtime normalized with old and new API', async function () {
         if (supportsEmeter) {
-          const response = await this.device.emeter.getRealtime();
+          const response = await device.emeter.getRealtime();
           expect(response).to.have.property('err_code', 0);
           if (response.current != null || response.current_ma != null) {
             expect(response).to.have.property('current');
@@ -96,7 +93,7 @@ module.exports = function (testDevice) {
           }
         } else {
           return expect(
-            this.device.emeter.getRealtime()
+            device.emeter.getRealtime()
           ).to.eventually.be.rejectedWith(ResponseError);
         }
         return null;
@@ -107,11 +104,11 @@ module.exports = function (testDevice) {
       it('should return day stats', function () {
         if (supportsEmeter) {
           return expect(
-            this.device.emeter.getDayStats(year, month)
+            device.emeter.getDayStats(year, month)
           ).to.eventually.have.property('err_code', 0);
         }
         return expect(
-          this.device.emeter.getDayStats(year, month)
+          device.emeter.getDayStats(year, month)
         ).to.eventually.be.rejectedWith(ResponseError);
       });
     });
@@ -120,11 +117,11 @@ module.exports = function (testDevice) {
       it('should return day stats', function () {
         if (supportsEmeter) {
           return expect(
-            this.device.emeter.getMonthStats(year)
+            device.emeter.getMonthStats(year)
           ).to.eventually.have.property('err_code', 0);
         }
         return expect(
-          this.device.emeter.getMonthStats(year)
+          device.emeter.getMonthStats(year)
         ).to.eventually.be.rejectedWith(ResponseError);
       });
     });
@@ -133,13 +130,14 @@ module.exports = function (testDevice) {
       it('(simulated only) should erase stats', function () {
         if (testDevice.type !== 'simulated') this.skip();
         if (supportsEmeter) {
-          return expect(
-            this.device.emeter.eraseStats()
-          ).to.eventually.have.property('err_code', 0);
+          return expect(device.emeter.eraseStats()).to.eventually.have.property(
+            'err_code',
+            0
+          );
         }
-        return expect(
-          this.device.emeter.eraseStats()
-        ).to.eventually.be.rejectedWith(ResponseError);
+        return expect(device.emeter.eraseStats()).to.eventually.be.rejectedWith(
+          ResponseError
+        );
       });
     });
   });

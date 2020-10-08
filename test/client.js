@@ -175,7 +175,7 @@ describe('Client', function () {
     it('should emit device-new for devices meeting filterCallback -- all devices', function (done) {
       client
         .startDiscovery({ discoveryInterval: 250, filterCallback: () => true })
-        .on('device-new', () => {
+        .once('device-new', () => {
           client.stopDiscovery();
           done();
         });
@@ -325,7 +325,7 @@ describe('Client', function () {
         let client;
         let device;
 
-        before(async function () {
+        before('before client #getDevice()', async function () {
           client = getTestClient(sendOptions);
           device = await client.getDevice(testDevices.anyDevice.deviceOptions);
         });
@@ -363,7 +363,7 @@ describe('Client', function () {
         let unreachablePlug;
         let sysInfo;
 
-        before(async function () {
+        before('before client #getPlug()', async function () {
           if (!('getDevice' in testDevices.anyPlug)) {
             skipped = true;
             this.skip();
@@ -410,7 +410,7 @@ describe('Client', function () {
         let unreachableBulb;
         let sysInfo;
 
-        before(async function () {
+        before('before client #getBulb()', async function () {
           if (!('getDevice' in testDevices.anyBulb)) {
             skipped = true;
             this.skip();
@@ -454,7 +454,7 @@ describe('Client', function () {
     describe('.send()', function () {
       let client;
       let options;
-      before(function () {
+      before('before client .send()', function () {
         client = getTestClient(sendOptions);
         options = testDevices.anyDevice.deviceOptions;
       });

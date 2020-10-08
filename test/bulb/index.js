@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 
-const { config, expect, testDevices } = require('../setup');
+const { config, expect, retry, testDevices } = require('../setup');
 
 const lightingTests = require('./lighting');
 const scheduleTests = require('./schedule');
@@ -14,22 +14,25 @@ describe('Bulb', function () {
     context(testSendOptions.name, function () {
       testDevices.bulb.forEach((testDevice) => {
         context(testDevice.name, function () {
+          const ctx = {};
           let bulb;
+
           before('Bulb', async function () {
-            // beforeEach() doesn't work with assigning to `this`
-            if (testDevice.getDevice) {
-              bulb = await testDevice.getDevice(undefined, testSendOptions);
-              this.device = bulb;
+            if (!testDevice.getDevice) {
+              this.skip();
             }
           });
+
           beforeEach('Bulb', async function () {
             // before() doesn't skip nested describes
             if (!testDevice.getDevice) {
               this.skip();
-              return;
             }
-            bulb = await testDevice.getDevice(undefined, testSendOptions);
-            this.device = bulb;
+            await retry(async () => {
+              // this is in beforeEach since many of the tests may overwrite some properties
+              bulb = await testDevice.getDevice(undefined, testSendOptions);
+              ctx.device = bulb;
+            }, 2);
           });
 
           describe('#supportsBrightness get', function () {
@@ -112,8 +115,8 @@ describe('Bulb', function () {
             });
           });
 
-          lightingTests(testDevice);
-          scheduleTests(testDevice);
+          lightingTests(ctx, testDevice);
+          scheduleTests(ctx, testDevice);
 
           describe('#setPowerState()', function () {
             it('should turn on', function () {

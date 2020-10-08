@@ -143,45 +143,47 @@ describe('Schedule', function () {
   });
 });
 
-module.exports = function (testDevice) {
+module.exports = function (ctx, testDevice) {
   describe('Schedule', function () {
+    let device;
     let month;
     let year;
 
+    beforeEach('Schedule', async function () {
+      device = ctx.device;
+      await device.schedule.deleteAllRules();
+    });
+
     before('Schedule', async function () {
-      if (!testDevice.getDevice) {
-        this.skip();
-        return;
-      }
+      if (!testDevice.getDevice) this.skip();
+
       month = today.getMonth() + 1;
       year = today.getFullYear();
-
-      const device = await testDevice.getDevice();
-      await device.schedule.deleteAllRules();
     });
 
     describe('#getNextAction()', function () {
       it('should return schedule next action', function () {
         return expect(
-          this.device.schedule.getNextAction()
+          device.schedule.getNextAction()
         ).to.eventually.have.property('err_code', 0);
       });
     });
 
     describe('#getRules()', function () {
       it('should return schedule rules', function () {
-        return expect(
-          this.device.schedule.getRules()
-        ).to.eventually.have.property('err_code', 0);
+        return expect(device.schedule.getRules()).to.eventually.have.property(
+          'err_code',
+          0
+        );
       });
     });
 
     describe('#deleteAllRules()', function () {
       it('should delete all rules', async function () {
-        const deleteResponse = await this.device.schedule.deleteAllRules();
+        const deleteResponse = await device.schedule.deleteAllRules();
         expect(deleteResponse).to.have.property('err_code', 0);
 
-        const getResponse = await this.device.schedule.getRules();
+        const getResponse = await device.schedule.getRules();
         expect(getResponse).to.have.property('err_code', 0);
         expect(getResponse.rule_list).to.have.property('length', 0);
       });
@@ -198,7 +200,7 @@ module.exports = function (testDevice) {
           mode: 'customize_preset',
           on_off: 1,
         };
-        const addResponse = await this.device.schedule.addRule({
+        const addResponse = await device.schedule.addRule({
           powerState: true,
           lightState,
           start: 60,
@@ -206,12 +208,10 @@ module.exports = function (testDevice) {
         expect(addResponse, 'addRule').to.have.property('err_code', 0);
         expect(addResponse, 'addRule').to.have.property('id');
 
-        const deleteResponse = await this.device.schedule.deleteRule(
-          addResponse.id
-        );
+        const deleteResponse = await device.schedule.deleteRule(addResponse.id);
         expect(deleteResponse).to.have.property('err_code', 0);
 
-        const getResponse = await this.device.schedule.getRules();
+        const getResponse = await device.schedule.getRules();
         expect(getResponse).to.have.property('err_code', 0);
         const rule = getResponse.rule_list.find((r) => r.id === addResponse.id);
         expect(rule).to.be.undefined;
@@ -220,21 +220,23 @@ module.exports = function (testDevice) {
 
     describe('#setOverallEnable()', function () {
       it('should enable', async function () {
-        expect(
-          await this.device.schedule.setOverallEnable(true)
-        ).to.have.property('err_code', 0);
+        expect(await device.schedule.setOverallEnable(true)).to.have.property(
+          'err_code',
+          0
+        );
       });
       it('should disable', async function () {
-        expect(
-          await this.device.schedule.setOverallEnable(false)
-        ).to.have.property('err_code', 0);
+        expect(await device.schedule.setOverallEnable(false)).to.have.property(
+          'err_code',
+          0
+        );
       });
     });
 
     describe('#getDayStats()', function () {
       it('should return day stats', function () {
         return expect(
-          this.device.schedule.getDayStats(year, month)
+          device.schedule.getDayStats(year, month)
         ).to.eventually.have.property('err_code', 0);
       });
     });
@@ -242,7 +244,7 @@ module.exports = function (testDevice) {
     describe('#getMonthStats()', function () {
       it('should return day stats', function () {
         return expect(
-          this.device.schedule.getMonthStats(year)
+          device.schedule.getMonthStats(year)
         ).to.eventually.have.property('err_code', 0);
       });
     });
@@ -250,9 +252,10 @@ module.exports = function (testDevice) {
     describe('#eraseStats()', function () {
       it('should return day stats', function () {
         if (testDevice.type !== 'simulated') this.skip();
-        return expect(
-          this.device.schedule.eraseStats()
-        ).to.eventually.have.property('err_code', 0);
+        return expect(device.schedule.eraseStats()).to.eventually.have.property(
+          'err_code',
+          0
+        );
       });
     });
   });

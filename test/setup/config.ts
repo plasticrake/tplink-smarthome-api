@@ -42,19 +42,19 @@ export const discoveryMacAllow = ((): string[] => {
 export const testSendOptionsSets = [
   {
     name: 'tcp',
-    timeout: useSimulator ? 100 : 8000,
+    timeout: useSimulator ? 250 : 8000,
     transport: 'tcp',
     useSharedSocket: false,
   },
   {
     name: 'udp',
-    timeout: useSimulator ? 100 : 10000,
+    timeout: useSimulator ? 250 : 10000,
     transport: 'udp',
     useSharedSocket: false,
   },
   {
     name: 'udp-shared',
-    timeout: useSimulator ? 100 : 10000,
+    timeout: useSimulator ? 250 : 10000,
     transport: 'udp',
     useSharedSocket: true,
     sharedSocketTimeout: 10000,

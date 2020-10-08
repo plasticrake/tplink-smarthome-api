@@ -6,6 +6,7 @@ const {
   config,
   createUnresponsiveDevice,
   expect,
+  retry,
   testDevices,
 } = require('../setup');
 
@@ -23,31 +24,35 @@ describe('Device', function () {
   this.retries(1);
 
   testDevices.devices.forEach((testDevice) => {
-    let device;
-    let time;
-
     config.testSendOptionsSets.forEach((testSendOptions) => {
       context(testSendOptions.name, function () {
         context(testDevice.name, function () {
-          // beforeEach() doesn't work with assigning to `this`
+          const ctx = {};
+          let device;
+          let time;
+
           before('device', async function () {
-            if (testDevice.getDevice) {
+            this.timeout(20000);
+            if (!testDevice.getDevice) this.skip();
+
+            await retry(async () => {
               device = await testDevice.getDevice(undefined, testSendOptions);
-              this.device = device;
+              await device.getSysInfo();
+              ctx.device = device;
+              ctx.supportsEmeter = device.supportsEmeter;
               time = device.apiModules.timesetting;
-            }
+            }, 2);
           });
+
           beforeEach('device', async function () {
             // before() doesn't skip nested describes
-            if (!testDevice.getDevice) {
-              this.skip();
-              return;
-            }
-            device = await testDevice.getDevice(undefined, testSendOptions);
-            this.device = device;
+            if (!testDevice.getDevice) this.skip();
           });
+
           afterEach('device', async function () {
-            device.closeConnection();
+            if (!testDevice.getDevice) this.skip();
+
+            if (device !== undefined) device.closeConnection();
           });
 
           describe('constructor', function () {
@@ -159,18 +164,25 @@ describe('Device', function () {
             });
 
             it('should reject with an unreachable host', async function () {
-              device.host = testDevices.unreachable.deviceOptions.host;
+              const unreachableDevice = await testDevice.getDevice();
+              unreachableDevice.host =
+                testDevices.unreachable.deviceOptions.host;
+
               expect(
-                device.send('{"system":{"get_sysinfo":{}}}')
+                unreachableDevice.send('{"system":{"get_sysinfo":{}}}')
               ).to.be.eventually.rejected;
             });
 
             describe('unresponsive', function () {
               let unresponsive;
+              let unresponsiveDevice;
               beforeEach(async function () {
                 unresponsive = await createUnresponsiveDevice(
                   testSendOptions.transport
                 );
+                unresponsiveDevice = await testDevice.getDevice();
+                unresponsiveDevice.host = unresponsive.host;
+                unresponsiveDevice.port = unresponsive.port;
               });
               afterEach(function () {
                 unresponsive.close();
@@ -178,11 +190,8 @@ describe('Device', function () {
 
               it("should reject with a host that doesn't respond", async function () {
                 this.timeout(5000);
-                device.host = unresponsive.host;
-                device.port = unresponsive.port;
-
                 expect(
-                  device.send('{"system":{"get_sysinfo":{}}}', {
+                  unresponsiveDevice.send('{"system":{"get_sysinfo":{}}}', {
                     timeout: 4000,
                   })
                 ).to.be.eventually.rejected;
@@ -273,9 +282,12 @@ describe('Device', function () {
               }
             });
             it('should reject with an unreachable host', async function () {
-              device.host = testDevices.unreachable.deviceOptions.host;
+              const unreachableDevice = await testDevice.getDevice();
+              unreachableDevice.host =
+                testDevices.unreachable.deviceOptions.host;
+
               expect(
-                device.sendCommand('{"system":{"get_sysinfo":{}}}')
+                unreachableDevice.sendCommand('{"system":{"get_sysinfo":{}}}')
               ).to.be.eventually.rejected;
             });
           });
@@ -578,11 +590,11 @@ describe('Device', function () {
             });
           });
 
-          cloudTests(testDevice);
-          emeterTests(testDevice);
-          netifTests(testDevice);
-          scheduleTests(testDevice);
-          timeTests(testDevice);
+          cloudTests(ctx, testDevice);
+          emeterTests(ctx, testDevice);
+          netifTests(ctx, testDevice);
+          scheduleTests(ctx, testDevice);
+          timeTests(ctx, testDevice);
         });
       });
     });

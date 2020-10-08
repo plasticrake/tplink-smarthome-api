@@ -24,7 +24,7 @@ const clientDefaultOptions = ((): ConstructorParameters<typeof Client>[0] => {
   if (config.useSimulator) {
     // set low timeout for simulator
     return {
-      defaultSendOptions: { timeout: 100 },
+      defaultSendOptions: { timeout: 250 },
       ...clientOptions,
     };
   }
@@ -179,7 +179,9 @@ async function getDevices(): Promise<AnyDevice[]> {
 }
 
 export async function testDeviceCleanup(): Promise<void> {
-  await cleanUpSimulatedDevices();
+  if (config.useSimulator) {
+    await cleanUpSimulatedDevices();
+  }
   stopUdpServer();
 }
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 
 const sinon = require('sinon');
-const { config, expect, testDevices } = require('../setup');
+const { config, expect, retry, testDevices } = require('../setup');
 
 const awayTests = require('./away');
 const dimmerTests = require('./dimmer');
@@ -11,7 +11,6 @@ const timerTests = require('./timer');
 describe('Plug', function () {
   this.timeout(config.defaultTestTimeout);
   this.slow(config.defaultTestTimeout / 2);
-  this.retries(1);
 
   config.testSendOptionsSets.forEach((testSendOptions) => {
     context(testSendOptions.name, function () {
@@ -19,23 +18,11 @@ describe('Plug', function () {
         if (testDevice.model !== 'hs300') return;
 
         context(`${testDevice.name} children`, function () {
-          let plug;
+          this.retries(0); // retries break the children pre state check
 
-          before('plug children', async function () {
-            // beforeEach() doesn't work with assigning to `this`
-            if (testDevice.getDevice) {
-              plug = await testDevice.getDevice(undefined, testSendOptions);
-              this.device = plug;
-            }
-          });
           beforeEach('plug children', async function () {
             // before() doesn't skip nested describes
-            if (!testDevice.getDevice) {
-              this.skip();
-              return;
-            }
-            plug = await testDevice.getDevice(undefined, testSendOptions);
-            this.device = plug;
+            if (!testDevice.getDevice) this.skip();
 
             // otherChildrenPreState = await testDevice.getOtherChildrenState();
           });
@@ -64,6 +51,8 @@ describe('Plug', function () {
 
           describe('#setAlias()', function () {
             it('should change the alias and not affect other children', async function () {
+              this.timeout(config.defaultTestTimeout * 4);
+
               await eachChild(async (childPlug) => {
                 // Get original value
                 await childPlug.getSysInfo();
@@ -86,6 +75,8 @@ describe('Plug', function () {
 
           describe('#setPowerState()', function () {
             it('should turn on child plug and not affect other children', async function () {
+              this.timeout(config.defaultTestTimeout * 2);
+
               await eachChild(async (childPlug) => {
                 expect(await childPlug.setPowerState(true), 'set return true')
                   .to.be.true;
@@ -94,6 +85,8 @@ describe('Plug', function () {
             });
 
             it('should turn off child plug and not affect other children', async function () {
+              this.timeout(config.defaultTestTimeout * 2);
+
               await eachChild(async (childPlug) => {
                 expect(await childPlug.setPowerState(false), 'set return true')
                   .to.be.true;
@@ -106,22 +99,23 @@ describe('Plug', function () {
 
       testDevices.plug.forEach((testDevice) => {
         context(testDevice.name, function () {
+          this.retries(1);
           let plug;
+          const ctx = {};
+
           before('plug', async function () {
-            // beforeEach() doesn't work with assigning to `this`
-            if ('getDevice' in testDevice) {
+            this.timeout(20000);
+            if (!('getDevice' in testDevice)) this.skip();
+
+            await retry(async () => {
               plug = await testDevice.getDevice(undefined, testSendOptions);
-              this.device = plug;
-            }
+              ctx.device = plug;
+            }, 2);
           });
+
           beforeEach('plug', async function () {
             // before() doesn't skip nested describes
-            if (!('getDevice' in testDevice)) {
-              this.skip();
-              return;
-            }
-            plug = await testDevice.getDevice(undefined, testSendOptions);
-            this.device = plug;
+            if (!('getDevice' in testDevice)) this.skip();
           });
 
           describe('#supportsEmeter', function () {
@@ -363,12 +357,12 @@ describe('Plug', function () {
             });
           });
 
-          awayTests(testDevice);
+          awayTests(ctx, testDevice);
           if (testDevice.model === 'hs220') {
-            dimmerTests(testDevice);
+            dimmerTests(ctx, testDevice);
           }
-          scheduleTests(testDevice);
-          timerTests(testDevice);
+          scheduleTests(ctx, testDevice);
+          timerTests(ctx, testDevice);
         });
       });
     });
