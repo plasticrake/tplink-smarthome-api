@@ -9,7 +9,7 @@ export type Logger = Record<LogLevelMethodNames, loglevel.LoggingMethod>;
 let loggerId = 0;
 
 export default function logger({
-  // eslint-disable-next-line no-shadow
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   logger,
   level,
 }: { logger?: Logger; level?: loglevel.LogLevelDesc } = {}): Logger {
