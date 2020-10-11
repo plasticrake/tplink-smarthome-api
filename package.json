@@ -58,7 +58,7 @@
     "test:ci": "npm run test:only",
     "test:only": "cross-env NODE_ENV=test nyc mocha && bats test",
     "preversion": "npm test",
-    "version": "npm run build && npm run docs && git add -A README.md docs",
+    "version": "npm run build && npm run docs && git add -A README.md CHANGELOG.md docs",
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
