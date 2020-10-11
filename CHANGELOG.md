@@ -2,7 +2,7 @@
 
 # Change Log
 
-## Unreleased
+## 3.0.0-beta.1 / 2020-10-10
 
 - `Bulb`/`Plug`
   - `#getInfo` now defaults to TCP transport unless specifically overridden in the call to `#getInfo`.
