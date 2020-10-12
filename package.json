@@ -52,7 +52,6 @@
     "docs": "typedoc",
     "lint": "eslint --ignore-path .gitignore . --ext .js,.ts",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run build",
     "spellcheck": "cspell '{examples,src,test}/**/*' *.md",
     "pretest": "npm run lint && npm run build",
     "test": "npm run test:only",
