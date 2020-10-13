@@ -15,7 +15,7 @@ TP-Link Smarthome API
 | Model                                                                                       | Type |
 | ------------------------------------------------------------------------------------------- | ---- |
 | HS100, HS103, HS105, HS107, HS110,<br/>HS200, HS210, HS220, HS300, KP303, KP400<br/>...etc. | Plug |
-| LB100, LB110, LB120, LB130, LB200, LB230<br/>...etc.                                        | Bulb |
+| LB100, LB110, LB120, LB130, LB200, LB230, KL120<br/>...etc.                                 | Bulb |
 
 Most other TP-Link Plug and Bulb models may work as well.
 
