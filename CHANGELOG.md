@@ -2,7 +2,15 @@
 
 # Change Log
 
+## 3.0.0 / 2020-10-13
+
+### Added :heavy_plus_sign:
+
+- Export types: `BulbSysinfo`, `PlugSysinfo`, `PlugConstructorOptions`
+
 ## 3.0.0-beta.1 / 2020-10-10
+
+### Breaking Changes :boom:
 
 - `Bulb`/`Plug`
   - `#getInfo` now defaults to TCP transport unless specifically overridden in the call to `#getInfo`.
