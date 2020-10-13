@@ -279,7 +279,7 @@ program
 program
   .command('sendCommand <host> <payload>')
   .description('Send payload to device (using Device#sendCommand)')
-  .option('-c, --childId [childId]', 'childId')
+  .option('--childId [childId]', 'childId')
   .action((host, payload, options) => {
     const [hostOnly, port] = host.split(':');
     sendCommand(hostOnly, port, options.childId, payload);
