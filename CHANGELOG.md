@@ -2,6 +2,12 @@
 
 # Change Log
 
+## 3.1.0 / 2020-10-13
+
+### Added :heavy_plus_sign:
+
+- CLI: add `--broadcast` option to `search` command
+
 ## 3.0.0 / 2020-10-13
 
 ### Added :heavy_plus_sign:
