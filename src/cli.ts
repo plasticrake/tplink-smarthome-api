@@ -31,9 +31,10 @@ function getClient(): Client {
 }
 
 function search(
-  sysInfo: Record<string, unknown>,
+  sysInfo: boolean,
   breakoutChildren: boolean,
   discoveryTimeout: number,
+  broadcast: string,
   params: Parameters<Client['startDiscovery']>[0]
 ): void {
   try {
@@ -43,6 +44,7 @@ function search(
       discoveryInterval: 2000,
       discoveryTimeout,
       breakoutChildren,
+      broadcast,
       ...params,
     };
     console.log(`startDiscovery(${util.inspect(commandParams)})`);
@@ -244,6 +246,7 @@ program
 program
   .command('search [params]')
   .description('Search for devices')
+  .option('--broadcast <address>', 'broadcast address', '255.255.255.255')
   .option('-s, --sysinfo', 'output sysInfo')
   .option(
     '-b, --breakout-children',
@@ -260,6 +263,7 @@ program
       options.sysinfo,
       options.breakoutChildren || false,
       program.timeout,
+      options.broadcast,
       paramsObj
     );
   });
