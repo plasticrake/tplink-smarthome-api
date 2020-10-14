@@ -1,3 +1,8 @@
+docs/_site
+docs/Gemfile
+docs/Gemfile.lock
+docs/.sass-cache
+
 # Logs
 logs
 *.log
