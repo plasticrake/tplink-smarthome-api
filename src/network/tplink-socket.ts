@@ -17,9 +17,7 @@ export default abstract class TplinkSocket {
 
   constructor(readonly socketId: number, readonly log: Logger) {}
 
-  protected abstract async createSocketImpl(): Promise<
-    dgram.Socket | net.Socket
-  >;
+  protected abstract createSocketImpl(): Promise<dgram.Socket | net.Socket>;
 
   async createSocket(): Promise<dgram.Socket | net.Socket> {
     this.log.debug(
@@ -40,7 +38,7 @@ export default abstract class TplinkSocket {
     }
   }
 
-  protected abstract async sendAndGetResponse(
+  protected abstract sendAndGetResponse(
     payload: string,
     port: number,
     host: string,

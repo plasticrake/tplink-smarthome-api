@@ -40,7 +40,7 @@ export default abstract class TplinkConnection extends EventEmitter {
     return `${this.socketType} ${this.host}:${this.port}`;
   }
 
-  protected abstract async getSocket(
+  protected abstract getSocket(
     useSharedSocket?: boolean
   ): Promise<UdpSocket | TcpSocket>;
 

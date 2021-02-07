@@ -618,7 +618,5 @@ export default abstract class Device extends EventEmitter {
     );
   }
 
-  abstract async getInfo(
-    sendOptions?: SendOptions
-  ): Promise<Record<string, unknown>>;
+  abstract getInfo(sendOptions?: SendOptions): Promise<Record<string, unknown>>;
 }
