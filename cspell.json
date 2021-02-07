@@ -66,9 +66,9 @@
     {
       "languageId": "markdown",
       "local": "*",
-      "dictionaries": ["node", "typescript"]
+      "dictionaries": ["node", "npm", "softwareTerms", "typescript"]
     }
   ],
-  "ignorePaths": ["node_modules", "package-lock.json", "README.md", "API.md"],
+  "ignorePaths": ["node_modules", "package-lock.json", "API.md"],
   "ignoreRegExpList": ["/[/*] eslint[- ].*/gi"]
 }

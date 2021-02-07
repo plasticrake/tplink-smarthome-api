@@ -83,7 +83,7 @@
     "chai-things": "^0.2.0",
     "codecov": "^3.8.1",
     "cross-env": "^7.0.3",
-    "cspell": "^4.2.8",
+    "cspell": "^5.2.4",
     "dotenv": "^8.2.0",
     "eslint": "^7.19.0",
     "eslint-config-airbnb-base": "^14.2.1",
