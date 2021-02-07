@@ -25,8 +25,9 @@ function outputError(err: Error): void {
 
 function getClient(): Client {
   const defaultSendOptions: SendOptions = {};
-  if (program.udp) defaultSendOptions.transport = 'udp';
-  if (program.timeout) defaultSendOptions.timeout = program.timeout;
+  const options = program.opts();
+  if (options.udp) defaultSendOptions.transport = 'udp';
+  if (options.timeout) defaultSendOptions.timeout = options.timeout;
   return new Client({ logLevel, defaultSendOptions });
 }
 
@@ -56,7 +57,7 @@ function search(
         );
         if (sysInfo) {
           console.dir(device.sysInfo, {
-            colors: program.color === 'on',
+            colors: program.opts().color === 'on',
             depth: 10,
           });
         }
@@ -80,7 +81,7 @@ async function send(
     );
     const data = await client.send(payload, host, port);
     console.log('response:');
-    console.dir(data, { colors: program.color === 'on', depth: 10 });
+    console.dir(data, { colors: program.opts().color === 'on', depth: 10 });
   } catch (err) {
     outputError(err);
   }
@@ -102,7 +103,7 @@ async function sendCommand(
     const device = await client.getDevice({ host, port, childId });
     const results = await device.sendCommand(payload);
     console.log('response:');
-    console.dir(results, { colors: program.color === 'on', depth: 10 });
+    console.dir(results, { colors: program.opts().color === 'on', depth: 10 });
   } catch (err) {
     outputError(err);
   }
@@ -127,7 +128,7 @@ async function sendCommandDynamic(
     // @ts-ignore: ignoring for now
     const results = await device[command](...commandParams);
     console.log('response:');
-    console.dir(results, { colors: program.color === 'on', depth: 10 });
+    console.dir(results, { colors: program.opts().color === 'on', depth: 10 });
   } catch (err) {
     outputError(err);
   }
@@ -149,7 +150,7 @@ async function details(host: string, port: number): Promise<void> {
         hardwareVersion: device.hardwareVersion,
         mac: device.mac,
       },
-      { colors: program.color === 'on', depth: 10 }
+      { colors: program.opts().color === 'on', depth: 10 }
     );
   } catch (err) {
     outputError(err);
@@ -262,7 +263,7 @@ program
     search(
       options.sysinfo,
       options.breakoutChildren || false,
-      program.timeout,
+      program.opts().timeout,
       options.broadcast,
       paramsObj
     );

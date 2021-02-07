@@ -47,7 +47,7 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "commander": "^6.2.1",
+    "commander": "^7.0.0",
     "lodash.castarray": "^4.4.0",
     "lodash.clone": "^4.5.0",
     "lodash.defaultto": "^4.14.0",
