@@ -103,8 +103,7 @@ function flattenResponses(
       results.push({ module, response: {} });
     }
   } else if (isObjectLike(command) && isObjectLike(response)) {
-    for (let i = 0; i < keys.length; i += 1) {
-      const key = keys[i];
+    for (const key of keys) {
       if (depth === 1) {
         if (key in response && isObjectLike(response[key])) {
           results.push({
@@ -216,7 +215,7 @@ export function processResponse(
     }
   });
 
-  if (errors.length === 1 && !multipleResponses) {
+  if (errors.length === 1 && errors[0] !== undefined && !multipleResponses) {
     throw new ResponseError(
       errors[0].msg,
       JSON.stringify(errors[0].response),
@@ -236,7 +235,7 @@ export function processResponse(
     );
   }
 
-  if (commandResponses.length === 1) {
+  if (commandResponses.length === 1 && commandResponses[0] !== undefined) {
     return commandResponses[0].response;
   }
   return response;

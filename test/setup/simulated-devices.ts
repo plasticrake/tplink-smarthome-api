@@ -129,10 +129,10 @@ async function getSimulatorDevices(): Promise<SimulatorDevice[]> {
     }),
   ];
 
-  for (let i = 0; i < simulatedDevices.length; i += 1) {
+  for (const sd of simulatedDevices) {
     // eslint-disable-next-line no-await-in-loop
-    await simulatedDevices[i].start();
-    simulatorDevices.push(simulatedDevices[i]);
+    await sd.start();
+    simulatorDevices.push(sd);
   }
 
   return simulatedDevices;

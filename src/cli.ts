@@ -219,7 +219,7 @@ function setParamTypes(
   ) {
     const sParams = commandSetup.params;
     return castArray(params).map((el, i) => {
-      switch (sParams[i].type) {
+      switch (sParams[i]?.type) {
         case 'number':
           return +el;
         case 'boolean':
