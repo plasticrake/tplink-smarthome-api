@@ -76,7 +76,7 @@
     "@typescript-eslint/parser": "^4.14.2",
     "bats": "^1.2.1",
     "bats-assert": "2.0.0",
-    "bats-support": "git+https://github.com/ztombol/bats-support.git",
+    "bats-support": "^0.3.0",
     "chai": "^4.3.0",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
