@@ -32,7 +32,7 @@
     "prebuild": "npm run clean",
     "build": "tsc",
     "clean": "rimraf lib/",
-    "coverage": "cross-env NODE_ENV=test nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov",
+    "coverage-report-lcov": "nyc report --reporter=lcov",
     "docs": "typedoc",
     "lint": "eslint --ignore-path .gitignore . --ext .js,.ts",
     "prepare": "npm run build",
@@ -41,7 +41,7 @@
     "test": "npm run test:only",
     "test:ci": "npm run test:only",
     "test:cli": "bats test",
-    "test:only": "cross-env NODE_ENV=test nyc mocha && npm run test:cli",
+    "test:only": "cross-env NODE_ENV=test && nyc mocha --color && npm run test:cli",
     "preversion": "npm test",
     "version": "npm run build && npm run docs && git add -A README.md CHANGELOG.md docs",
     "postversion": "git push && git push --tags"

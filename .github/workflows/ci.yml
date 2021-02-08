@@ -42,6 +42,11 @@ jobs:
       matrix:
         node-version: [10.x, 12.x, 14.x]
         os: [ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            node-version: 14.x
+            env:
+              COVERAGE: 1
 
     runs-on: ${{ matrix.os }}
 
@@ -66,6 +71,23 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm test
+          npm run test:ci
         env:
           CI: true
+          COVERAGE: '${{ matrix.env.COVERAGE }}'
+
+      - name: Generate Coverage Report
+        if: '${{ matrix.env.COVERAGE }}'
+        run: npm run coverage-report-lcov
+
+      - name: Upload Coverage to Coveralls
+        if: '${{ matrix.env.COVERAGE }}'
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+
+      - name: Upload Coverage to Codecov
+        if: '${{ matrix.env.COVERAGE }}'
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
