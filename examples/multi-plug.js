@@ -1,3 +1,5 @@
+const ipAddress = '192.168.0.100';
+
 const util = require('util');
 
 const { Client } = require('..'); // or require('tplink-smarthome-api')
@@ -45,7 +47,7 @@ const monitorEvents = function monitorEvents(device) {
 };
 
 (async () => {
-  const device = await client.getDevice({ host: '10.0.1.136' });
+  const device = await client.getDevice({ host: ipAddress });
 
   console.log(device.alias);
 
@@ -60,7 +62,7 @@ const monitorEvents = function monitorEvents(device) {
 
   await Promise.all(
     Array.from(device.children.keys(), async (childId) => {
-      const childPlug = await client.getDevice({ host: '10.0.1.136', childId });
+      const childPlug = await client.getDevice({ host: ipAddress, childId: childId });
       monitorEvents(childPlug);
     })
   );
