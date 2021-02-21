@@ -6,21 +6,21 @@ import {
   hasErrCode,
 } from '../utils';
 
-type RealtimeV1 = {
+export type RealtimeV1 = {
   current?: number;
   power?: number;
   total?: number;
   voltage?: number;
 };
 
-type RealtimeV2 = {
+export type RealtimeV2 = {
   current_ma?: number;
   power_mw?: number;
   total_wh?: number;
   voltage_mv?: number;
 };
 
-type Realtime = RealtimeV1 | RealtimeV2;
+export type Realtime = RealtimeV1 | RealtimeV2;
 
 type RealtimeNormalized = RealtimeV1 & RealtimeV2;
 
