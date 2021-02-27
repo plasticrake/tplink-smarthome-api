@@ -85,7 +85,7 @@
     "cross-env": "^7.0.3",
     "cspell": "^5.3.3",
     "dotenv": "^8.2.0",
-    "eslint": "^7.20.0",
+    "eslint": "^7.21.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-prettier": "^8.1.0",
