@@ -10,7 +10,7 @@ import Away from './away';
 import Cloud, { isCloudInfo } from '../shared/cloud';
 import type { CloudInfo } from '../shared/cloud';
 import Dimmer from './dimmer';
-import Emeter from '../shared/emeter';
+import Emeter, { Realtime } from '../shared/emeter';
 import Schedule from './schedule';
 import Timer from './timer';
 import Time from '../shared/time';
@@ -68,6 +68,56 @@ export interface PlugConstructorOptions extends DeviceConstructorOptions {
   childId?: string;
 }
 
+export interface PlugEventEmitter {
+  on(
+    event: 'emeter-realtime-update',
+    listener: (value: Realtime) => void
+  ): this;
+
+  on(event: 'polling-error', listener: (error: Error) => void): this;
+  /**
+   * Plug's relay was turned on.
+   */
+  on(event: 'power-on', listener: () => void): this;
+  /**
+   * Plug's relay was turned off.
+   */
+  on(event: 'power-off', listener: () => void): this;
+  /**
+   * Plug's relay state was updated from device. Fired regardless if status was changed.
+   * @event Plug#power-update
+   */
+  on(event: 'power-update', listener: (value: boolean) => void): this;
+  /**
+   * Plug's relay was turned on _or_ power draw exceeded `inUseThreshold`
+   * @event Plug#in-use
+   */
+  on(event: 'in-use', listener: () => void): this;
+  /**
+   * Plug's relay was turned off _or_ power draw fell below `inUseThreshold`
+   */
+  on(event: 'not-in-use', listener: () => void): this;
+  /**
+   * Plug's in-use state was updated from device. Fired regardless if status was changed.
+   */
+  on(event: 'in-use-update', listener: (value: boolean) => void): this;
+  /**
+   * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+   * @event Plug#emeter-realtime-update
+   * @property {Object} value emeterRealtime
+   */
+
+  emit(event: 'emeter-realtime-update', value: Realtime): boolean;
+  emit(event: 'polling-error', error: Error): boolean;
+
+  emit(event: 'power-on'): boolean;
+  emit(event: 'power-off'): boolean;
+  emit(event: 'power-update', value: boolean): boolean;
+  emit(event: 'in-use'): boolean;
+  emit(event: 'not-in-use'): boolean;
+  emit(event: 'in-use-update', value: boolean): boolean;
+}
+
 /**
  * Plug Device.
  *
@@ -88,12 +138,7 @@ export interface PlugConstructorOptions extends DeviceConstructorOptions {
  * @fires  Plug#in-use-update
  * @fires  Plug#emeter-realtime-update
  */
-export default class Plug extends Device {
-  // private get _sysInfo(): PlugSysinfo {
-  //   // eslint-disable-next-line no-underscore-dangle
-  //   return super._sysInfo as PlugSysinfo;
-  // }
-
+export default class Plug extends Device implements PlugEventEmitter {
   protected _sysInfo: PlugSysinfo;
 
   #children: Map<string, PlugChild> = new Map();
@@ -273,7 +318,6 @@ export default class Plug extends Device {
     }
     if (this.#childId && this.#children) {
       if (this.#childId !== undefined) this.setChildId(this.#childId);
-      // this.#child = this.#children.get(this.normalizeChildId(this.#childId));
     }
   }
 
@@ -636,37 +680,6 @@ export default class Plug extends Device {
     return true;
   }
 
-  /**
-   * Plug's relay was turned on.
-   * @event Plug#power-on
-   */
-  /**
-   * Plug's relay was turned off.
-   * @event Plug#power-off
-   */
-  /**
-   * Plug's relay state was updated from device. Fired regardless if status was changed.
-   * @event Plug#power-update
-   * @property {boolean} value Relay State
-   */
-  /**
-   * Plug's relay was turned on _or_ power draw exceeded `inUseThreshold` for HS110
-   * @event Plug#in-use
-   */
-  /**
-   * Plug's relay was turned off _or_ power draw fell below `inUseThreshold` for HS110
-   * @event Plug#not-in-use
-   */
-  /**
-   * Plug's in-use state was updated from device. Fired regardless if status was changed.
-   * @event Plug#in-use-update
-   * @property {boolean} value In Use State
-   */
-  /**
-   * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
-   * @event Plug#emeter-realtime-update
-   * @property {Object} value emeterRealtime
-   */
   private emitEvents(): void {
     if (!this.emitEventsEnabled) {
       return;

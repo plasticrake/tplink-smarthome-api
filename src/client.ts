@@ -1,4 +1,4 @@
-import { Socket, createSocket } from 'dgram';
+import { Socket, createSocket, RemoteInfo } from 'dgram';
 import { EventEmitter } from 'events';
 import util from 'util';
 
@@ -169,13 +169,99 @@ export type SendOptions = {
   sharedSocketTimeout?: number;
 };
 
+export interface ClientEventEmitter {
+  /**
+   * First response from device.
+   */
+  on(
+    event: 'device-new',
+    listener: (device: Device | Bulb | Plug) => void
+  ): this;
+  /**
+   * Follow up response from device.
+   */
+  on(
+    event: 'device-online',
+    listener: (device: Device | Bulb | Plug) => void
+  ): this;
+  /**
+   * No response from device.
+   */
+  on(
+    event: 'device-offline',
+    listener: (device: Device | Bulb | Plug) => void
+  ): this;
+  /**
+   * First response from Bulb.
+   */
+  on(event: 'bulb-new', listener: (device: Bulb) => void): this;
+  /**
+   * Follow up response from Bulb.
+   */
+  on(event: 'bulb-online', listener: (device: Bulb) => void): this;
+  /**
+   * No response from Bulb.
+   */
+  on(event: 'bulb-offline', listener: (device: Bulb) => void): this;
+  /**
+   * First response from Plug.
+   */
+  on(event: 'plug-new', listener: (device: Plug) => void): this;
+  /**
+   * Follow up response from Plug.
+   */
+  on(event: 'plug-online', listener: (device: Plug) => void): this;
+  /**
+   * No response from Plug.
+   */
+  on(event: 'plug-offline', listener: (device: Plug) => void): this;
+  /**
+   * Invalid/Unknown response from device.
+   */
+  on(
+    event: 'discovery-invalid',
+    listener: ({
+      rinfo,
+      response,
+      decryptedResponse,
+    }: {
+      rinfo: RemoteInfo;
+      response: Buffer;
+      decryptedResponse: Buffer;
+    }) => void
+  ): this;
+  /**
+   * Error during discovery.
+   */
+  on(event: 'error', listener: (error: Error) => void): this;
+
+  emit(event: 'device-new', device: Device | Bulb | Plug): boolean;
+  emit(event: 'device-online', device: Device | Bulb | Plug): boolean;
+  emit(event: 'device-offline', device: Device | Bulb | Plug): boolean;
+  emit(event: 'bulb-new', device: Bulb): boolean;
+  emit(event: 'bulb-online', device: Bulb): boolean;
+  emit(event: 'bulb-offline', device: Bulb): boolean;
+  emit(event: 'plug-new', device: Plug): boolean;
+  emit(event: 'plug-online', device: Plug): boolean;
+  emit(event: 'plug-offline', device: Plug): boolean;
+  emit(
+    event: 'discovery-invalid',
+    {
+      rinfo,
+      response,
+      decryptedResponse,
+    }: { rinfo: RemoteInfo; response: Buffer; decryptedResponse: Buffer }
+  ): boolean;
+  emit(event: 'error', error: Error): boolean;
+}
+
 /**
  * Client that sends commands to specified devices or discover devices on the local subnet.
  * - Contains factory methods to create devices.
  * - Events are emitted after {@link #startDiscovery} is called.
  * @noInheritDoc
  */
-export default class Client extends EventEmitter {
+export default class Client extends EventEmitter implements ClientEventEmitter {
   defaultSendOptions: Required<SendOptions> = {
     timeout: 10000,
     transport: 'tcp',
@@ -426,64 +512,6 @@ export default class Client extends EventEmitter {
     }
   }
 
-  /**
-   * First response from device.
-   * @event Client#device-new
-   * @property {Device|Bulb|Plug}
-   */
-  /**
-   * Follow up response from device.
-   * @event Client#device-online
-   * @property {Device|Bulb|Plug}
-   */
-  /**
-   * No response from device.
-   * @event Client#device-offline
-   * @property {Device|Bulb|Plug}
-   */
-  /**
-   * First response from Bulb.
-   * @event Client#bulb-new
-   * @property {Bulb}
-   */
-  /**
-   * Follow up response from Bulb.
-   * @event Client#bulb-online
-   * @property {Bulb}
-   */
-  /**
-   * No response from Bulb.
-   * @event Client#bulb-offline
-   * @property {Bulb}
-   */
-  /**
-   * First response from Plug.
-   * @event Client#plug-new
-   * @property {Plug}
-   */
-  /**
-   * Follow up response from Plug.
-   * @event Client#plug-online
-   * @property {Plug}
-   */
-  /**
-   * No response from Plug.
-   * @event Client#plug-offline
-   * @property {Plug}
-   */
-  /**
-   * Invalid/Unknown response from device.
-   * @event Client#discovery-invalid
-   * @property {Object} rinfo
-   * @property {Buffer} response
-   * @property {Buffer} decryptedResponse
-   */
-  /**
-   * Error during discovery.
-   * @event Client#error
-   * @type {Object}
-   * @property {Error}
-   */
   /**
    * Discover TP-Link Smarthome devices on the network.
    *

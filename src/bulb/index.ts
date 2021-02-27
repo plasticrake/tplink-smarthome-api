@@ -3,18 +3,10 @@ import type { SendOptions } from '../client';
 import Device, { isBulbSysinfo } from '../device';
 import type { CommonSysinfo, DeviceConstructorOptions } from '../device';
 import Cloud from '../shared/cloud';
-import Emeter from '../shared/emeter';
-import Lighting from './lighting';
+import Emeter, { Realtime } from '../shared/emeter';
+import Lighting, { LightState } from './lighting';
 import Schedule from './schedule';
 import Time from '../shared/time';
-
-// type BulbGetInfo = {
-//   [BulbModules.emeter]: { get_realtime: {} };
-//   [BulbModules.lightingservice]: { get_light_state: {} };
-//   [BulbModules.schedule]: { get_next_action: {} };
-//   system: { get_sysinfo: {} };
-//   [BulbModules.cloud]: { get_info: {} };
-// };
 
 type BulbSysinfoLightState = {
   on_off: 0 | 1;
@@ -34,16 +26,57 @@ export interface BulbConstructorOptions extends DeviceConstructorOptions {
   sysInfo: BulbSysinfo;
 }
 
+export interface BulbEventEmitter {
+  on(
+    event: 'emeter-realtime-update',
+    listener: (value: Realtime) => void
+  ): this;
+
+  on(event: 'polling-error', listener: (error: Error) => void): this;
+  /**
+   * Bulb was turned on (`lightstate.on_off`).
+   * @event Bulb#lightstate-on
+   * @property {object} value lightstate
+   */
+  on(event: 'lightstate-on', listener: (value: LightState) => void): this;
+  /**
+   * Bulb was turned off (`lightstate.on_off`).
+   * @event Bulb#lightstate-off
+   * @property {object} value lightstate
+   */
+  on(event: 'lightstate-off', listener: (value: LightState) => void): this;
+  /**
+   * Bulb's lightstate was changed.
+   * @event Bulb#lightstate-change
+   * @property {object} value lightstate
+   */
+  on(event: 'lightstate-change', listener: (value: LightState) => void): this;
+  /**
+   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+   * @event Bulb#lightstate-update
+   * @property {object} value lightstate
+   */
+  on(event: 'lightstate-update', listener: (value: LightState) => void): this;
+
+  emit(event: 'polling-error', error: Error): boolean;
+
+  emit(event: 'emeter-realtime-update', value: Realtime): boolean;
+  emit(event: 'lightstate-on', value: LightState): boolean;
+  emit(event: 'lightstate-off', value: LightState): boolean;
+  emit(event: 'lightstate-change', value: LightState): boolean;
+  emit(event: 'lightstate-update', value: LightState): boolean;
+}
+
 /**
  * Bulb Device.
  *
+ * @fires  Bulb#emeter-realtime-update
  * @fires  Bulb#lightstate-on
  * @fires  Bulb#lightstate-off
  * @fires  Bulb#lightstate-change
  * @fires  Bulb#lightstate-update
- * @fires  Bulb#emeter-realtime-update
  */
-export default class Bulb extends Device {
+export default class Bulb extends Device implements BulbEventEmitter {
   protected _sysInfo: BulbSysinfo;
 
   lastState = { inUse: false, powerOn: false };
@@ -69,11 +102,6 @@ export default class Bulb extends Device {
    */
   readonly cloud = new Cloud(this, 'smartlife.iot.common.cloud');
 
-  /**
-   * Bulb's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
-   * @event Bulb#emeter-realtime-update
-   * @property {Object} value emeterRealtime
-   */
   /**
    * @borrows Emeter#realtime as Bulb.emeter#realtime
    * @borrows Emeter#getRealtime as Bulb.emeter#getRealtime

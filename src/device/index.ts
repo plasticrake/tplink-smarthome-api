@@ -2,7 +2,7 @@ import castArray from 'lodash.castarray';
 import { EventEmitter } from 'events';
 import type log from 'loglevel';
 
-import type { BulbSysinfo } from '../bulb';
+import type { BulbEventEmitter, BulbSysinfo } from '../bulb';
 // eslint-disable-next-line import/no-duplicates
 import type Client from '../client';
 // eslint-disable-next-line import/no-duplicates
@@ -11,7 +11,8 @@ import type { Logger } from '../logger';
 import Netif from './netif';
 import TcpConnection from '../network/tcp-connection';
 import UdpConnection from '../network/udp-connection';
-import type { PlugSysinfo } from '../plug';
+import type { Realtime } from '../shared/emeter';
+import type { PlugEventEmitter, PlugSysinfo } from '../plug';
 import {
   isObjectLike,
   processResponse,
@@ -100,6 +101,20 @@ function isSysinfo(candidate: unknown): candidate is Sysinfo {
   return isPlugSysinfo(candidate) || isBulbSysinfo(candidate);
 }
 
+export interface DeviceEventEmitter {
+  /**
+   * Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+   */
+  on(
+    event: 'emeter-realtime-update',
+    listener: (value: Realtime) => void
+  ): this;
+  on(event: 'polling-error', listener: (error: Error) => void): this;
+
+  emit(event: 'emeter-realtime-update', value: Realtime): boolean;
+  emit(event: 'polling-error', error: Error): boolean;
+}
+
 /**
  * TP-Link Device.
  *
@@ -107,7 +122,9 @@ function isSysinfo(candidate: unknown): candidate is Sysinfo {
  * @fires  Device#emeter-realtime-update
  * @noInheritDoc
  */
-export default abstract class Device extends EventEmitter {
+export default abstract class Device
+  extends EventEmitter
+  implements DeviceEventEmitter, PlugEventEmitter, BulbEventEmitter {
   readonly client: Client;
 
   host: string;
@@ -476,10 +493,7 @@ export default abstract class Device extends EventEmitter {
           this.alias,
           err
         );
-        /**
-         * @event Device#polling-error
-         * @property {Error} error
-         */
+
         this.emit('polling-error', err);
       }
     };

@@ -97,27 +97,6 @@ export default class Lighting {
   }
 
   private emitEvents(): void {
-    /**
-     * Bulb was turned on (`lightstate.on_off`).
-     * @event Bulb#lightstate-on
-     * @property {object} value lightstate
-     */
-    /**
-     * Bulb was turned off (`lightstate.on_off`).
-     * @event Bulb#lightstate-off
-     * @property {object} value lightstate
-     */
-    /**
-     * Bulb's lightstate was changed.
-     * @event Bulb#lightstate-change
-     * @property {object} value lightstate
-     */
-    /**
-     * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
-     * @event Bulb#lightstate-update
-     * @property {object} value lightstate
-     */
-
     if (!this.#lightState) return;
     const powerOn = this.#lightState.on_off === 1;
 
