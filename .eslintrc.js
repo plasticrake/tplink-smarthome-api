@@ -60,7 +60,7 @@ module.exports = {
     },
 
     {
-      files: ['examples/*.js'],
+      files: ['examples/*.js', 'examples/*.ts'],
       rules: {
         'no-console': 'off',
         'import/no-unresolved': 'off',

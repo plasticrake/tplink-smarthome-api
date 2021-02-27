@@ -30,8 +30,8 @@
   ],
   "scripts": {
     "prebuild": "npm run clean",
-    "build": "tsc",
-    "clean": "rimraf lib/",
+    "build": "tsc && tsc --project tsconfig.examples.json",
+    "clean": "rimraf lib/ build/",
     "coverage-report-lcov": "nyc report --reporter=lcov",
     "docs": "typedoc",
     "lint": "eslint --ignore-path .gitignore . --ext .js,.ts",
