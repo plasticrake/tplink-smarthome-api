@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.2.1](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.2.0...v3.2.1) (2021-02-28)
+
+
+### Bug Fixes
+
+* rename `getColorTemperatureRange` to `colorTemperatureRange` ([e3664d2](https://github.com/plasticrake/tplink-smarthome-api/commit/e3664d28867ad08801bf6eecf638ae5f4c6f4dac))
+
 ## [3.2.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.1.0...v3.2.0) (2021-02-28)
 
 
