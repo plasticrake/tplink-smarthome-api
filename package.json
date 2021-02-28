@@ -36,17 +36,13 @@
     "docs": "typedoc",
     "lint": "eslint --ignore-path .gitignore . --ext .js,.ts",
     "prepare": "npm run build",
-    "prerelease": "npm test",
-    "release": "standard-version --sign",
+    "release": "standard-version --commit-all --sign",
     "spellcheck": "cspell '{examples,src,test}/**/*' *.md",
     "pretest": "npm run lint && npm run build",
     "test": "npm run test:only",
     "test:ci": "npm run test:only",
     "test:cli": "bats test",
-    "test:only": "cross-env NODE_ENV=test && nyc mocha --color && npm run test:cli",
-    "preversion": "npm test",
-    "version": "npm run build && npm run docs && git add -A README.md CHANGELOG.md docs",
-    "postversion": "git push && git push --tags"
+    "test:only": "cross-env NODE_ENV=test && nyc mocha --color && npm run test:cli"
   },
   "dependencies": {
     "commander": "^7.1.0",
@@ -111,5 +107,11 @@
   },
   "engines": {
     "node": ">=10"
+  },
+  "standard-version": {
+    "scripts": {
+      "prerelease": "npm run build && npm test",
+      "postbump": "npm run docs && git add -A docs"
+    }
   }
 }
