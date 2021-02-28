@@ -1,6 +1,20 @@
-<!-- markdownlint-disable MD024 MD026 -->
+# Changelog
 
-# Change Log
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [3.2.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.1.0...v3.2.0) (2021-02-28)
+
+
+### Features
+
+* add EventEmitter types ([db259e9](https://github.com/plasticrake/tplink-smarthome-api/commit/db259e906455f7c9eb749350b8cb81163682e9ca))
+* export types Realtime, RealtimeV1, RealtimeV2 ([f5f020f](https://github.com/plasticrake/tplink-smarthome-api/commit/f5f020f7f7ef2f111a74be5a236db26b2419c906))
+* use standard-version ([#121](https://github.com/plasticrake/tplink-smarthome-api/issues/121)) ([e3a6cca](https://github.com/plasticrake/tplink-smarthome-api/commit/e3a6cca5d31a0f50df05a3ea82cd9463b9c1cfea))
+
+
+### Bug Fixes
+
+* **cli:** remove non-functional -c parameter for sendCommand ([c3bfe0e](https://github.com/plasticrake/tplink-smarthome-api/commit/c3bfe0ece3995d82c7655ad86e27a36eec8f48c6)), closes [#94](https://github.com/plasticrake/tplink-smarthome-api/issues/94)
 
 ## 3.1.0 / 2020-10-13
 

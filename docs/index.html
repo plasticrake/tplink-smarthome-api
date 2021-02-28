@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for tplink-smarthome-api">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -40,8 +41,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -51,11 +50,6 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<ul class="tsd-breadcrumb">
-				<li>
-					<a href="globals.html">Globals</a>
-				</li>
-			</ul>
 			<h1>tplink-smarthome-api</h1>
 		</div>
 	</div>
@@ -69,7 +63,7 @@
 					<h1>tplink-smarthome-api</h1>
 				</a>
 				<p><a href="https://www.npmjs.com/package/tplink-smarthome-api"><img src="https://img.shields.io/npm/v/tplink-smarthome-api.svg" alt="NPM Version"></a>
-					<a href="https://travis-ci.org/plasticrake/tplink-smarthome-api"><img src="https://travis-ci.com/plasticrake/tplink-smarthome-api.svg?branch=master" alt="Build Status"></a>
+					<a href="https://github.com/plasticrake/tplink-smarthome-api/actions?query=workflow%3ACI+branch%3Amaster"><img src="https://github.com/plasticrake/tplink-smarthome-api/workflows/CI/badge.svg?branch=master" alt="Build Status"></a>
 				<a href="https://codecov.io/gh/plasticrake/tplink-smarthome-api"><img src="https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg" alt="codecov"></a></p>
 				<p>TP-Link Smarthome API</p>
 				<p><strong><a href="https://github.com/plasticrake/tplink-smarthome-api/tree/master/CHANGELOG.md">Changelog</a></strong></p>
@@ -88,7 +82,7 @@
 							<td>Plug</td>
 						</tr>
 						<tr>
-							<td>LB100, LB110, LB120, LB130, LB200, LB230<br/>...etc.</td>
+							<td>LB100, LB110, LB120, LB130, LB200, LB230, KL120<br/>...etc.</td>
 							<td>Bulb</td>
 						</tr>
 				</tbody></table>
@@ -105,19 +99,20 @@
 					<h2>Examples</h2>
 				</a>
 				<p>See more <a href="https://github.com/plasticrake/tplink-smarthome-api/tree/master/examples">examples</a>.</p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { Client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;tplink-smarthome-api&#x27;</span>);
+				<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">Client</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;tplink-smarthome-api&#039;</span><span style="color: #000000">);</span>
 
-<span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> Client();
-<span class="hljs-keyword">const</span> plug = client.getDevice({ <span class="hljs-attr">host</span>: <span class="hljs-string">&#x27;10.0.1.2&#x27;</span> }).then(<span class="hljs-function">(<span class="hljs-params">device</span>) =&gt;</span> {
-  device.getSysInfo().then(<span class="hljs-built_in">console</span>.log);
-  device.setPowerState(<span class="hljs-literal">true</span>);
-});
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">client</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Client</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">plug</span><span style="color: #000000"> = </span><span style="color: #001080">client</span><span style="color: #000000">.</span><span style="color: #795E26">getDevice</span><span style="color: #000000">({ </span><span style="color: #001080">host:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;10.0.1.2&#039;</span><span style="color: #000000"> }).</span><span style="color: #795E26">then</span><span style="color: #000000">((</span><span style="color: #001080">device</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">device</span><span style="color: #000000">.</span><span style="color: #795E26">getSysInfo</span><span style="color: #000000">().</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #001080">log</span><span style="color: #000000">);</span>
+<span style="color: #000000">  </span><span style="color: #001080">device</span><span style="color: #000000">.</span><span style="color: #795E26">setPowerState</span><span style="color: #000000">(</span><span style="color: #0000FF">true</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
 
-<span class="hljs-comment">// Look for devices, log to console, and turn them on</span>
-client.startDiscovery().on(<span class="hljs-string">&#x27;device-new&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">device</span>) =&gt;</span> {
-  device.getSysInfo().then(<span class="hljs-built_in">console</span>.log);
-  device.setPowerState(<span class="hljs-literal">true</span>);
-});</code></pre>
+<span style="color: #008000">// Look for devices, log to console, and turn them on</span>
+<span style="color: #001080">client</span><span style="color: #000000">.</span><span style="color: #795E26">startDiscovery</span><span style="color: #000000">().</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;device-new&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">device</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">device</span><span style="color: #000000">.</span><span style="color: #795E26">getSysInfo</span><span style="color: #000000">().</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #001080">log</span><span style="color: #000000">);</span>
+<span style="color: #000000">  </span><span style="color: #001080">device</span><span style="color: #000000">.</span><span style="color: #795E26">setPowerState</span><span style="color: #000000">(</span><span style="color: #0000FF">true</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+</code></pre>
 				<a href="#cli" id="cli" style="color: inherit; text-decoration: none;">
 					<h2>CLI</h2>
 				</a>
@@ -138,91 +133,94 @@ client.startDiscovery().on(<span class="hljs-string">&#x27;device-new&#x27;</spa
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="globals.html"><em>Globals</em></a>
-					</li>
-					<li class="label tsd-is-external">
-						<span>Internals</span>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_index_.html">&quot;index&quot;</a>
-					</li>
-					<li class="label tsd-is-external">
-						<span>Externals</span>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_bulb_index_.html">&quot;bulb/index&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_bulb_lighting_.html">&quot;bulb/lighting&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_bulb_schedule_.html">&quot;bulb/schedule&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_client_.html">&quot;client&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_device_index_.html">&quot;device/index&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_device_netif_.html">&quot;device/netif&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_logger_.html">&quot;logger&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_network_tcp_connection_.html">&quot;network/tcp-<wbr>connection&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_network_tcp_socket_.html">&quot;network/tcp-<wbr>socket&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_network_tplink_connection_.html">&quot;network/tplink-<wbr>connection&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_network_tplink_socket_.html">&quot;network/tplink-<wbr>socket&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_network_udp_connection_.html">&quot;network/udp-<wbr>connection&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_network_udp_socket_.html">&quot;network/udp-<wbr>socket&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_plug_away_.html">&quot;plug/away&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_plug_dimmer_.html">&quot;plug/dimmer&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_plug_index_.html">&quot;plug/index&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_plug_schedule_.html">&quot;plug/schedule&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_plug_timer_.html">&quot;plug/timer&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_shared_cloud_.html">&quot;shared/cloud&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_shared_emeter_.html">&quot;shared/emeter&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_shared_schedule_.html">&quot;shared/schedule&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_shared_time_.html">&quot;shared/time&quot;</a>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_utils_.html">&quot;utils&quot;</a>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="classes/bulb.html" class="tsd-kind-icon">Bulb</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/client.html" class="tsd-kind-icon">Client</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/device.html" class="tsd-kind-icon">Device</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/plug.html" class="tsd-kind-icon">Plug</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/responseerror.html" class="tsd-kind-icon">Response<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/apimodulenamespace.html" class="tsd-kind-icon">Api<wbr>Module<wbr>Namespace</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/awayruleinput.html" class="tsd-kind-icon">Away<wbr>Rule<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/bulbconstructoroptions.html" class="tsd-kind-icon">Bulb<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/bulbscheduleruleinput.html" class="tsd-kind-icon">Bulb<wbr>Schedule<wbr>Rule<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clientconstructoroptions.html" class="tsd-kind-icon">Client<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/deviceconstructoroptions.html" class="tsd-kind-icon">Device<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/dimmeractioninput.html" class="tsd-kind-icon">Dimmer<wbr>Action<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/dimmertransitioninput.html" class="tsd-kind-icon">Dimmer<wbr>Transition<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/discoveryoptions.html" class="tsd-kind-icon">Discovery<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/lightstate.html" class="tsd-kind-icon">Light<wbr>State</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/lightstateinput.html" class="tsd-kind-icon">Light<wbr>State<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/plugconstructoroptions.html" class="tsd-kind-icon">Plug<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/plugscheduleruleinput.html" class="tsd-kind-icon">Plug<wbr>Schedule<wbr>Rule<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#awayrule" class="tsd-kind-icon">Away<wbr>Rule</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#bulbschedulerule" class="tsd-kind-icon">Bulb<wbr>Schedule<wbr>Rule</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#bulbsysinfo" class="tsd-kind-icon">Bulb<wbr>Sysinfo</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#plugschedulerule" class="tsd-kind-icon">Plug<wbr>Schedule<wbr>Rule</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#plugsysinfo" class="tsd-kind-icon">Plug<wbr>Sysinfo</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#realtime" class="tsd-kind-icon">Realtime</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#realtimev1" class="tsd-kind-icon">Realtime<wbr>V1</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#realtimev2" class="tsd-kind-icon">Realtime<wbr>V2</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#sysinfo" class="tsd-kind-icon">Sysinfo</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -232,6 +230,22 @@ client.startDiscovery().on(<span class="hljs-string">&#x27;device-new&#x27;</spa
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+			</ul>
 		</div>
 	</div>
 </footer>
