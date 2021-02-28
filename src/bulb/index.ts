@@ -229,7 +229,7 @@ export default class Bulb extends Device implements BulbEventEmitter {
    * Returns array with min and max supported color temperatures
    * @returns range in kelvin `{min,max}` or `null` if not supported
    */
-  get getColorTemperatureRange(): { min: number; max: number } | null {
+  get colorTemperatureRange(): { min: number; max: number } | null {
     if (!this.supportsColorTemperature) return null;
     switch (true) {
       case /LB130/i.test(this.sysInfo.model):
@@ -237,6 +237,16 @@ export default class Bulb extends Device implements BulbEventEmitter {
       default:
         return { min: 2700, max: 6500 };
     }
+  }
+
+  /**
+   * Returns array with min and max supported color temperatures
+   * @returns range in kelvin `{min,max}` or `null` if not supported
+   *
+   * @deprecated Renamed, use {@link Bulb.colorTemperatureRange}
+   */
+  get getColorTemperatureRange(): { min: number; max: number } | null {
+    return this.colorTemperatureRange;
   }
 
   /**
