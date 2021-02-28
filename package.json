@@ -110,7 +110,7 @@
   },
   "standard-version": {
     "scripts": {
-      "prerelease": "npm run build && npm test",
+      "prerelease": "npm test",
       "postbump": "npm run docs && git add -A docs"
     }
   }
