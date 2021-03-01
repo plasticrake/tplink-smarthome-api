@@ -73,7 +73,9 @@ export interface PlugEventEmitter {
     event: 'emeter-realtime-update',
     listener: (value: Realtime) => void
   ): this;
-
+  /**
+   * @deprecated This will be removed in a future release.
+   */
   on(event: 'polling-error', listener: (error: Error) => void): this;
   /**
    * Plug's relay was turned on.

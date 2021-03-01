@@ -109,6 +109,9 @@ export interface DeviceEventEmitter {
     event: 'emeter-realtime-update',
     listener: (value: Realtime) => void
   ): this;
+  /**
+   * @deprecated This will be removed in a future release.
+   */
   on(event: 'polling-error', listener: (error: Error) => void): this;
 
   emit(event: 'emeter-realtime-update', value: Realtime): boolean;
@@ -482,6 +485,8 @@ export default abstract class Device
    * Refer to specific device sections for event details.
    * @fires  Device#polling-error
    * @param   interval - (ms)
+   *
+   * @deprecated This will be removed in a future release.
    */
   startPolling(interval: number): this {
     const fn = async (): Promise<void> => {
