@@ -27,8 +27,24 @@ export interface DimmerActionInput {
  * TP-Link models: HS220.
  */
 export default class Dimmer {
+  /**
+   * @internal
+   */
+  lastState = { brightness: -1 };
+
+  /**
+   * @internal
+   */
+  #brightness = 0;
+
   constructor(readonly device: Plug, readonly apiModuleName: string) {}
 
+  /**
+   * Cached value of `sysinfo.brightness`.
+   */
+  get brightness(): number {
+    return this.#brightness;
+  }
   /**
    * Sets Plug to the specified `brightness`.
    *

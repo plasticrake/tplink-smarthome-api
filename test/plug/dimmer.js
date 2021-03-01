@@ -9,6 +9,16 @@ module.exports = function (ctx) {
       device = ctx.device;
     });
 
+    describe('#brightness get', function () {
+      it('should return brightness', async function () {
+        expect(device.dimmer.brightness).to.be.a('number');
+        await device.dimmer.setBrightness(50);
+        expect(device.dimmer.brightness).to.eql(50);
+        await device.dimmer.setBrightness(75);
+        expect(device.dimmer.brightness).to.eql(75);
+      });
+    });
+
     describe('#setBrightness()', function () {
       it('should set brightness', async function () {
         expect(device.dimmer.setBrightness(50)).to.eventually.have.property(
