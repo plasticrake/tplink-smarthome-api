@@ -1,4 +1,7 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-await-in-loop */
+
+const sinon = require('sinon');
 const { expect } = require('../setup');
 
 module.exports = function (ctx) {
@@ -36,6 +39,23 @@ module.exports = function (ctx) {
         si = await device.getSysInfo();
         expect(si.brightness).to.eql(20);
       });
+
+      it('should emit brightness-change / brightness-update', async function () {
+        const spyChange = sinon.spy();
+        const spyUpdate = sinon.spy();
+
+        const { dimmer } = device;
+
+        await dimmer.setBrightness(50);
+        device.on('brightness-change', spyChange);
+        device.on('brightness-update', spyUpdate);
+        await dimmer.setBrightness(75);
+        await dimmer.setBrightness(75);
+
+        expect(spyChange).to.be.calledOnce;
+        expect(spyUpdate).to.be.calledTwice;
+        expect(spyUpdate).to.be.always.calledWithMatch(sinon.match(75));
+      });
     });
 
     describe('#setDimmerTransition()', function () {
@@ -54,6 +74,35 @@ module.exports = function (ctx) {
         ).to.eventually.have.property('err_code', 0);
         si = await device.getSysInfo();
         expect(si.brightness).to.eql(20);
+      });
+
+      it('should emit brightness-change / brightness-update', async function () {
+        const spyChange = sinon.spy();
+        const spyUpdate = sinon.spy();
+
+        const { dimmer } = device;
+
+        await dimmer.setDimmerTransition({
+          brightness: 50,
+          mode: 'gentle_on_off',
+          duration: 1,
+        });
+        device.on('brightness-change', spyChange);
+        device.on('brightness-update', spyUpdate);
+        await dimmer.setDimmerTransition({
+          brightness: 75,
+          mode: 'gentle_on_off',
+          duration: 1,
+        });
+        await dimmer.setDimmerTransition({
+          brightness: 75,
+          mode: 'gentle_on_off',
+          duration: 1,
+        });
+
+        expect(spyChange).to.be.calledOnce;
+        expect(spyUpdate).to.be.calledTwice;
+        expect(spyUpdate).to.be.always.calledWithMatch(sinon.match(75));
       });
     });
 

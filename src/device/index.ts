@@ -136,7 +136,7 @@ export default abstract class Device
 
   netif = new Netif(this, 'netif');
 
-  protected log: Logger;
+  log: Logger;
 
   readonly defaultSendOptions: SendOptions;
 

@@ -64,6 +64,9 @@ export function isLightStateResponse(
 }
 
 export default class Lighting {
+  /**
+   * @internal
+   */
   lastState: { powerOn?: boolean; lightState?: LightState } = {
     powerOn: undefined,
     lightState: undefined,

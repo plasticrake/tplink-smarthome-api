@@ -69,6 +69,10 @@ export interface PlugConstructorOptions extends DeviceConstructorOptions {
 }
 
 export interface PlugEventEmitter {
+  /**
+   * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
+   * @event Plug#emeter-realtime-update
+   */
   on(
     event: 'emeter-realtime-update',
     listener: (value: Realtime) => void
@@ -87,12 +91,10 @@ export interface PlugEventEmitter {
   on(event: 'power-off', listener: () => void): this;
   /**
    * Plug's relay state was updated from device. Fired regardless if status was changed.
-   * @event Plug#power-update
    */
   on(event: 'power-update', listener: (value: boolean) => void): this;
   /**
    * Plug's relay was turned on _or_ power draw exceeded `inUseThreshold`
-   * @event Plug#in-use
    */
   on(event: 'in-use', listener: () => void): this;
   /**
@@ -103,11 +105,9 @@ export interface PlugEventEmitter {
    * Plug's in-use state was updated from device. Fired regardless if status was changed.
    */
   on(event: 'in-use-update', listener: (value: boolean) => void): this;
-  /**
-   * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
-   * @event Plug#emeter-realtime-update
-   * @property {Object} value emeterRealtime
-   */
+
+  on(event: 'brightness-change', listener: (value: boolean) => void): this;
+  on(event: 'brightness-update', listener: (value: boolean) => void): this;
 
   emit(event: 'emeter-realtime-update', value: Realtime): boolean;
   emit(event: 'polling-error', error: Error): boolean;
@@ -118,6 +118,8 @@ export interface PlugEventEmitter {
   emit(event: 'in-use'): boolean;
   emit(event: 'not-in-use'): boolean;
   emit(event: 'in-use-update', value: boolean): boolean;
+  emit(event: 'brightness-change', value: boolean): boolean;
+  emit(event: 'brightness-update', value: boolean): boolean;
 }
 
 /**
@@ -153,6 +155,9 @@ export default class Plug extends Device implements PlugEventEmitter {
 
   emitEventsEnabled = true;
 
+  /**
+   * @internal
+   */
   lastState = { inUse: false, relayState: false };
 
   static readonly apiModules = {
@@ -294,6 +299,9 @@ export default class Plug extends Device implements PlugEventEmitter {
     super.setSysInfo(sysInfo);
     if (sysInfo.children) {
       this.setChildren(sysInfo.children);
+    }
+    if (sysInfo.brightness !== undefined) {
+      this.dimmer.setBrightnessValue(sysInfo.brightness);
     }
     this.log.debug('[%s] plug sysInfo set', this.alias);
     this.emitEvents();
@@ -687,8 +695,7 @@ export default class Plug extends Device implements PlugEventEmitter {
       return;
     }
 
-    const { inUse } = this;
-    const { relayState } = this;
+    const { inUse, relayState } = this;
 
     this.log.debug(
       '[%s] plug.emitEvents() inUse: %s relayState: %s lastState: %j',
@@ -716,5 +723,9 @@ export default class Plug extends Device implements PlugEventEmitter {
       }
     }
     this.emit('power-update', relayState);
+
+    if (this.supportsDimmer) {
+      this.dimmer.emitEvents();
+    }
   }
 }

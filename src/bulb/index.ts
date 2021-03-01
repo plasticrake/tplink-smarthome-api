@@ -81,6 +81,9 @@ export interface BulbEventEmitter {
 export default class Bulb extends Device implements BulbEventEmitter {
   protected _sysInfo: BulbSysinfo;
 
+  /**
+   * @internal
+   */
   lastState = { inUse: false, powerOn: false };
 
   readonly supportsEmeter = true;

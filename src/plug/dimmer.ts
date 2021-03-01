@@ -45,6 +45,16 @@ export default class Dimmer {
   get brightness(): number {
     return this.#brightness;
   }
+
+  /**
+   * @internal
+   */
+  setBrightnessValue(brightness: number): void {
+    this.#brightness = brightness;
+    this.device.log.debug('[%s] plug.dimmer brightness set', this.device.alias);
+    this.emitEvents();
+  }
+
   /**
    * Sets Plug to the specified `brightness`.
    *
@@ -57,7 +67,7 @@ export default class Dimmer {
     brightness: number,
     sendOptions?: SendOptions
   ): Promise<unknown> {
-    return this.device.sendCommand(
+    const results = this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_brightness: { brightness },
@@ -66,6 +76,10 @@ export default class Dimmer {
       undefined,
       sendOptions
     );
+
+    this.setBrightnessValue(brightness);
+
+    return results;
   }
 
   /**
@@ -119,7 +133,7 @@ export default class Dimmer {
   ): Promise<unknown> {
     const { brightness, mode, duration } = dimmerTransition;
 
-    return this.device.sendCommand(
+    const results = this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_dimmer_transition: {
@@ -132,6 +146,10 @@ export default class Dimmer {
       undefined,
       sendOptions
     );
+
+    if (brightness !== undefined) this.setBrightnessValue(brightness);
+
+    return results;
   }
 
   /**
@@ -317,5 +335,27 @@ export default class Dimmer {
       undefined,
       sendOptions
     );
+  }
+
+  /**
+   * @internal
+   */
+  public emitEvents(): void {
+    const brightness = this.#brightness;
+
+    this.device.log.debug(
+      '[%s] plug.dimmer.emitEvents() brightness: %s lastState: %j',
+      this.device.alias,
+      brightness,
+      this.lastState
+    );
+
+    if (brightness !== undefined) {
+      if (this.lastState.brightness !== brightness) {
+        this.lastState.brightness = brightness;
+        this.device.emit('brightness-change', brightness);
+      }
+      this.device.emit('brightness-update', brightness);
+    }
   }
 }
