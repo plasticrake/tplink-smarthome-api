@@ -15,6 +15,7 @@ import type { Logger } from './logger';
 import TcpConnection from './network/tcp-connection';
 import UdpConnection from './network/udp-connection';
 import { compareMac, isObjectLike } from './utils';
+import { Realtime } from './shared/emeter';
 
 const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 
@@ -26,28 +27,14 @@ type AnyDeviceDiscovery = (Bulb | Plug) & Partial<DeviceDiscovery>;
 type SysinfoResponse = { system: { get_sysinfo: Sysinfo } };
 type EmeterResponse = PlugEmeterResponse | BulbEmeterResponse;
 type PlugEmeterResponse = {
-  emeter?: { get_realtime?: { err_code: number } & EmeterRealtime };
+  emeter?: { get_realtime?: { err_code: number } & Realtime };
 };
 type BulbEmeterResponse = {
   'smartlife.iot.common.emeter'?: {
-    get_realtime?: { err_code: number } & EmeterRealtime;
+    get_realtime?: { err_code: number } & Realtime;
   };
 };
 type DiscoveryResponse = SysinfoResponse & EmeterResponse;
-
-type EmeterRealtime = EmeterRealtimeV1 | EmeterRealtimeV2;
-type EmeterRealtimeV1 = {
-  voltage: number;
-  current: number;
-  power: number;
-  total: number;
-};
-type EmeterRealtimeV2 = {
-  voltage_mv: number;
-  current_ma: number;
-  power_mw: number;
-  total_wh: number;
-};
 
 type AnyDeviceOptions =
   | ConstructorParameters<typeof Bulb>[0]

@@ -10,7 +10,7 @@ import Away from './away';
 import Cloud, { isCloudInfo } from '../shared/cloud';
 import type { CloudInfo } from '../shared/cloud';
 import Dimmer from './dimmer';
-import Emeter, { Realtime } from '../shared/emeter';
+import Emeter, { RealtimeNormalized } from '../shared/emeter';
 import Schedule from './schedule';
 import Timer from './timer';
 import Time from '../shared/time';
@@ -75,7 +75,7 @@ export interface PlugEventEmitter {
    */
   on(
     event: 'emeter-realtime-update',
-    listener: (value: Realtime) => void
+    listener: (value: RealtimeNormalized) => void
   ): this;
   /**
    * @deprecated This will be removed in a future release.
@@ -109,7 +109,7 @@ export interface PlugEventEmitter {
   on(event: 'brightness-change', listener: (value: boolean) => void): this;
   on(event: 'brightness-update', listener: (value: boolean) => void): this;
 
-  emit(event: 'emeter-realtime-update', value: Realtime): boolean;
+  emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
   emit(event: 'polling-error', error: Error): boolean;
 
   emit(event: 'power-on'): boolean;
@@ -544,7 +544,7 @@ export default class Plug extends Device implements PlugEventEmitter {
       'get_realtime' in data.emeter &&
       isObjectLike(data.emeter.get_realtime)
     ) {
-      this.emeter.realtime = data.emeter.get_realtime;
+      this.emeter.setRealtime(data.emeter.get_realtime);
     }
 
     const scheduleNextAction = extractResponse(

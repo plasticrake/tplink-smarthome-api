@@ -1,5 +1,5 @@
 import util from 'util';
-import { Client, Device, LightState, Realtime } from '..'; // 'tplink-smarthome-api'
+import { Client, Device, LightState, RealtimeNormalized } from '..'; // 'tplink-smarthome-api'
 
 const client = new Client();
 
@@ -23,7 +23,7 @@ client.on('device-new', (device) => {
   device.startPolling(5000);
 
   // Device (Common) Events
-  device.on('emeter-realtime-update', (emeterRealtime: Realtime) => {
+  device.on('emeter-realtime-update', (emeterRealtime: RealtimeNormalized) => {
     logEvent('emeter-realtime-update', device, emeterRealtime);
   });
 

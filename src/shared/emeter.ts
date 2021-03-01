@@ -22,7 +22,7 @@ export type RealtimeV2 = {
 
 export type Realtime = RealtimeV1 | RealtimeV2;
 
-type RealtimeNormalized = RealtimeV1 & RealtimeV2;
+export type RealtimeNormalized = RealtimeV1 & RealtimeV2;
 
 export function isRealtime(candidate: unknown): candidate is Realtime {
   return isObjectLike(candidate);
@@ -41,14 +41,14 @@ export default class Emeter {
    * Returns cached results from last retrieval of `emeter.get_realtime`.
    * @returns {Object}
    */
-  get realtime(): Realtime {
+  get realtime(): RealtimeNormalized {
     return this.#realtime;
   }
 
   /**
    * @private
    */
-  set realtime(realtime: Realtime) {
+  setRealtime(realtime: Realtime): void {
     const normRealtime: RealtimeNormalized = { ...realtime }; // will coerce null/undefined to {}
 
     const normalize = <K extends keyof RealtimeNormalized>(
@@ -87,16 +87,18 @@ export default class Emeter {
    * @throws {@link ResponseError}
    */
   async getRealtime(sendOptions?: SendOptions): Promise<unknown> {
-    this.realtime = extractResponse<Realtime & HasErrCode>(
-      await this.device.sendCommand(
-        {
-          [this.apiModuleName]: { get_realtime: {} },
-        },
-        this.childId,
-        sendOptions
-      ),
-      '',
-      (c) => isRealtime(c) && hasErrCode(c)
+    this.setRealtime(
+      extractResponse<Realtime & HasErrCode>(
+        await this.device.sendCommand(
+          {
+            [this.apiModuleName]: { get_realtime: {} },
+          },
+          this.childId,
+          sendOptions
+        ),
+        '',
+        (c) => isRealtime(c) && hasErrCode(c)
+      )
     );
     return this.realtime;
   }

@@ -144,19 +144,19 @@ describe('Plug', function () {
               if (!plug.supportsEmeter) return;
 
               plug.inUseThreshold = 0;
-              plug.emeter.realtime = { power: 0 };
+              plug.emeter.setRealtime({ power: 0 });
               expect(plug.inUse).to.be.false;
 
               plug.inUseThreshold = 10;
-              plug.emeter.realtime = { power: 10 };
+              plug.emeter.setRealtime({ power: 10 });
               expect(plug.inUse).to.be.false;
 
               plug.inUseThreshold = 0;
-              plug.emeter.realtime = { power: 0.1 };
+              plug.emeter.setRealtime({ power: 0.1 });
               expect(plug.inUse).to.be.true;
 
               plug.inUseThreshold = 10;
-              plug.emeter.realtime = { power: 11 };
+              plug.emeter.setRealtime({ power: 11 });
               expect(plug.inUse).to.be.true;
             });
             it('should return status based on relay_state if Emeter not supported', function () {

@@ -20,6 +20,11 @@ export { AwayRule, AwayRuleInput } from './plug/away';
 export { DimmerActionInput, DimmerTransitionInput } from './plug/dimmer';
 export { PlugScheduleRule, PlugScheduleRuleInput } from './plug/schedule';
 
-export { Realtime, RealtimeV1, RealtimeV2 } from './shared/emeter';
+export {
+  Realtime,
+  RealtimeNormalized,
+  RealtimeV1,
+  RealtimeV2,
+} from './shared/emeter';
 
 export { ResponseError } from './utils';

@@ -3,7 +3,7 @@ import type { SendOptions } from '../client';
 import Device, { isBulbSysinfo } from '../device';
 import type { CommonSysinfo, DeviceConstructorOptions } from '../device';
 import Cloud from '../shared/cloud';
-import Emeter, { Realtime } from '../shared/emeter';
+import Emeter, { RealtimeNormalized } from '../shared/emeter';
 import Lighting, { LightState } from './lighting';
 import Schedule from './schedule';
 import Time from '../shared/time';
@@ -29,7 +29,7 @@ export interface BulbConstructorOptions extends DeviceConstructorOptions {
 export interface BulbEventEmitter {
   on(
     event: 'emeter-realtime-update',
-    listener: (value: Realtime) => void
+    listener: (value: RealtimeNormalized) => void
   ): this;
   /**
    * @deprecated This will be removed in a future release.
@@ -62,7 +62,7 @@ export interface BulbEventEmitter {
 
   emit(event: 'polling-error', error: Error): boolean;
 
-  emit(event: 'emeter-realtime-update', value: Realtime): boolean;
+  emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
   emit(event: 'lightstate-on', value: LightState): boolean;
   emit(event: 'lightstate-off', value: LightState): boolean;
   emit(event: 'lightstate-change', value: LightState): boolean;
@@ -297,7 +297,7 @@ export default class Bulb extends Device implements BulbEventEmitter {
     const data = JSON.parse(response);
     this.setSysInfo(data.system.get_sysinfo);
     this.cloud.info = data[this.apiModules.cloud].get_info;
-    this.emeter.realtime = data[this.apiModules.emeter].get_realtime;
+    this.emeter.setRealtime(data[this.apiModules.emeter].get_realtime);
     this.schedule.nextAction = data[this.apiModules.schedule].get_next_action;
     this.lighting.lightState =
       data[this.apiModules.lightingservice].get_light_state;

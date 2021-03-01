@@ -11,7 +11,7 @@ import type { Logger } from '../logger';
 import Netif from './netif';
 import TcpConnection from '../network/tcp-connection';
 import UdpConnection from '../network/udp-connection';
-import type { Realtime } from '../shared/emeter';
+import type { Realtime, RealtimeNormalized } from '../shared/emeter';
 import type { PlugEventEmitter, PlugSysinfo } from '../plug';
 import {
   isObjectLike,
@@ -114,7 +114,7 @@ export interface DeviceEventEmitter {
    */
   on(event: 'polling-error', listener: (error: Error) => void): this;
 
-  emit(event: 'emeter-realtime-update', value: Realtime): boolean;
+  emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
   emit(event: 'polling-error', error: Error): boolean;
 }
 
