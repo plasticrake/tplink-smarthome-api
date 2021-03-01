@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.2.1...v3.3.0) (2021-03-01)
+
+
+### Features
+
+* change emeter#realtime type to RealtimeNormalized ([1645215](https://github.com/plasticrake/tplink-smarthome-api/commit/1645215c4aa44a2b82752969401741c631044ff5))
+* **Plug:** add dimmer.brightness property ([47f28f7](https://github.com/plasticrake/tplink-smarthome-api/commit/47f28f7e403dd993e0a98e8083f863e67ff04618))
+* **Plug:** emit brightness-change & brightness-update ([3fb2897](https://github.com/plasticrake/tplink-smarthome-api/commit/3fb289710f616f88809a7e2c9c6d4f3911d322d5))
+
+
+### Bug Fixes
+
+* mark startPolling as deprecated ([cc658ec](https://github.com/plasticrake/tplink-smarthome-api/commit/cc658ecb3fc48993d726efbee2b5aa9cc337817d))
+
 ### [3.2.1](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.2.0...v3.2.1) (2021-02-28)
 
 
