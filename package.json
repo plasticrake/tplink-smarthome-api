@@ -32,6 +32,7 @@
     "prebuild": "npm run clean",
     "build": "tsc && tsc --project tsconfig.examples.json",
     "clean": "rimraf lib/ build/",
+    "cli": "ts-node src/cli.ts",
     "coverage-report-lcov": "nyc report --reporter=lcov",
     "docs": "typedoc",
     "lint": "eslint --ignore-path .gitignore . --ext .js,.ts",
