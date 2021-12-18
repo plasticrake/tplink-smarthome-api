@@ -1,5 +1,5 @@
 {
-  "name": "tplink-smarthome-api",
+  "name": "@delos-tech/tplink-smarthome-api",
   "version": "3.3.0",
   "description": "TP-Link Smart Home API",
   "keywords": [
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/plasticrake/tplink-smarthome-api.git"
+    "url": "git://github.com/Delos-tech/tplink-smarthome-api.git"
   },
   "license": "MIT",
   "author": "Patrick Seal",

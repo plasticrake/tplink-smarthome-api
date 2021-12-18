@@ -177,10 +177,12 @@ export default class Lighting {
     if (isDefinedAndNotNull(brightness)) state.brightness = brightness;
     if (isDefinedAndNotNull(color_temp)) state.color_temp = color_temp;
 
+    const command=this.apiModuleName.endsWith("lightStrip")?'set_light_state':'transition_light_state';
+
     this.lightState = extractResponse(
       await this.device.sendCommand(
         {
-          [this.apiModuleName]: { transition_light_state: state },
+          [this.apiModuleName]: { [command]: state },
         },
         undefined,
         sendOptions

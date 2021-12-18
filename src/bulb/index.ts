@@ -121,7 +121,7 @@ export default class Bulb extends Device implements BulbEventEmitter {
    * @borrows Lighting#getLightState as Bulb.lighting#getLightState
    * @borrows Lighting#setLightState as Bulb.lighting#setLightState
    */
-  readonly lighting = new Lighting(
+  lighting = new Lighting(
     this,
     'smartlife.iot.smartbulb.lightingservice'
   );
@@ -171,6 +171,13 @@ export default class Bulb extends Device implements BulbEventEmitter {
 
     this.setSysInfo(options.sysInfo);
     this._sysInfo = options.sysInfo;
+    if(options.sysInfo.description.includes('Smart Light Strip')) {
+      this.lighting = new Lighting(
+        this,
+        'smartlife.iot.lightStrip'
+      );
+
+    }
   }
 
   /**
