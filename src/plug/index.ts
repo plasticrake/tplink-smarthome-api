@@ -113,7 +113,11 @@ export default class Plug extends Device {
 
   emitEventsEnabled = true;
 
-  lastState = { inUse: false, relayState: false, brightness: undefined };
+  lastState: { inUse: boolean; relayState: boolean; brightness?: number } = {
+    inUse: false,
+    relayState: false,
+    brightness: undefined,
+  };
 
   static readonly apiModules = {
     system: 'system',
@@ -680,9 +684,7 @@ export default class Plug extends Device {
       return;
     }
 
-    const { inUse } = this;
-    const { relayState } = this;
-    const { brightness } = this;
+    const { inUse, relayState, brightness } = this;
 
     this.log.debug(
       '[%s] plug.emitEvents() inUse: %s relayState: %s lastState: %j',
