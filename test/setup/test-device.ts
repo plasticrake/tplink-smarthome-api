@@ -143,33 +143,34 @@ export function testDeviceDecorator(
           return parent.children.filter((oc) => oc.childId !== this.childId);
         };
 
-        testDevice.getOtherChildrenState = async function getOtherChildrenState(): Promise<
-          Array<{
-            childId: string;
-            relayState: boolean;
-            alias: string;
-          }>
-        > {
-          if (
-            !(
-              'getOtherChildren' in testDevice &&
-              testDevice.getOtherChildren !== undefined
-            )
-          ) {
-            throw new Error();
-          }
-          return Promise.all(
-            testDevice.getOtherChildren().map(async (childDevice) => {
-              const d = (await childDevice.getDevice()) as Plug;
-              if (d.childId === undefined) throw new TypeError();
-              return {
-                childId: d.childId,
-                relayState: d.relayState,
-                alias: d.alias,
-              };
-            })
-          );
-        };
+        testDevice.getOtherChildrenState =
+          async function getOtherChildrenState(): Promise<
+            Array<{
+              childId: string;
+              relayState: boolean;
+              alias: string;
+            }>
+          > {
+            if (
+              !(
+                'getOtherChildren' in testDevice &&
+                testDevice.getOtherChildren !== undefined
+              )
+            ) {
+              throw new Error();
+            }
+            return Promise.all(
+              testDevice.getOtherChildren().map(async (childDevice) => {
+                const d = (await childDevice.getDevice()) as Plug;
+                if (d.childId === undefined) throw new TypeError();
+                return {
+                  childId: d.childId,
+                  relayState: d.relayState,
+                  alias: d.alias,
+                };
+              })
+            );
+          };
       }
     }
   }

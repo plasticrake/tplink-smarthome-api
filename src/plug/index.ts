@@ -489,9 +489,7 @@ export default class Plug extends Device implements PlugEventEmitter {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
-  async getInfo(
-    sendOptions?: SendOptions
-  ): Promise<{
+  async getInfo(sendOptions?: SendOptions): Promise<{
     sysInfo: Record<string, unknown>;
     cloud: { info: Record<string, unknown> };
     emeter: { realtime: Record<string, unknown> };

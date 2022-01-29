@@ -137,8 +137,7 @@ describe('Device', function () {
                 await device.send('{"system":{"INVALID_MEMBER":{}}}')
               );
               expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([
-                -2,
-                -2000,
+                -2, -2000,
               ]);
             });
             it('should send a single invalid command (module) and receive response', async function () {
@@ -158,8 +157,7 @@ describe('Device', function () {
               );
               expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
               expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([
-                -2,
-                -2000,
+                -2, -2000,
               ]);
             });
 
@@ -233,8 +231,7 @@ describe('Device', function () {
                     'err_code'
                   );
                   expect(JSON.parse(err.response).err_code).to.be.oneOf([
-                    -2,
-                    -2000,
+                    -2, -2000,
                   ]);
                 });
             });
@@ -247,8 +244,7 @@ describe('Device', function () {
                     'err_code'
                   );
                   expect(JSON.parse(err.response).err_code).to.be.oneOf([
-                    -1,
-                    -2001,
+                    -1, -2001,
                   ]);
                 });
             });

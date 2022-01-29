@@ -181,8 +181,8 @@ export function createRule({
   end?: ScheduleRuleInputTime;
   daysOfWeek?: number[];
 }): MarkRequired<Partial<ScheduleRule>, 'wday' | 'repeat'> & ScheduleDateStart {
-  const sched: Partial<ScheduleRule> &
-    ScheduleDateStart = createScheduleDateStart(start);
+  const sched: Partial<ScheduleRule> & ScheduleDateStart =
+    createScheduleDateStart(start);
 
   if (isDefinedAndNotNull(end)) {
     Object.assign(sched, createScheduleDateEnd(end));
@@ -312,10 +312,7 @@ export default abstract class Schedule {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
-  async editRule(
-    rule: object,
-    sendOptions?: SendOptions
-  ): Promise<unknown> {
+  async editRule(rule: object, sendOptions?: SendOptions): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { edit_rule: rule },
