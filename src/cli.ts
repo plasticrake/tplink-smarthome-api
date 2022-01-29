@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 
 import castArray from 'lodash.castarray';
-import program from 'commander';
+import { program } from 'commander';
 import type { LogLevelDesc } from 'loglevel';
 import * as tplinkCrypto from 'tplink-smarthome-crypto';
 import type { PickProperties } from 'ts-essentials';
