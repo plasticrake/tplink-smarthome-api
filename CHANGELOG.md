@@ -2,6 +2,13 @@
 
 # Change Log
 
+## Unrelased
+
+### Added :heavy_plus_sign:
+
+- `Plug`
+  - For plugs with dimmer support, Emit `brightness-change` and `brightness-update`.
+
 ## 3.0.0-beta.0 / 2020-08-26
 
 ### Breaking Changes :boom:
