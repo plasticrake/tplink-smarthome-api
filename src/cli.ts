@@ -13,7 +13,7 @@ import { SendOptions, AnyDevice } from './client';
 
 let logLevel: LogLevelDesc;
 
-function outputError(err: Error): void {
+function outputError(err: Error | unknown): void {
   if (err instanceof ResponseError) {
     console.log('Response Error:');
     console.log(err.response);
