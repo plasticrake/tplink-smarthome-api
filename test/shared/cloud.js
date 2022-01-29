@@ -19,7 +19,9 @@ async function retryIfBusy(fn) {
       // else retry loop
       // wait before retrying
       // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
     }
   } while (runCount < 5);
 }

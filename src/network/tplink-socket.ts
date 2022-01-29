@@ -87,5 +87,3 @@ export default abstract class TplinkSocket {
     return this.socket.unref();
   }
 }
-
-module.exports = TplinkSocket;

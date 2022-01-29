@@ -214,5 +214,3 @@ export default class Away {
     );
   }
 }
-
-module.exports = Away;

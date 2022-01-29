@@ -3,9 +3,7 @@ import { EventEmitter } from 'events';
 import type log from 'loglevel';
 
 import type { BulbEventEmitter, BulbSysinfo } from '../bulb';
-// eslint-disable-next-line import/no-duplicates
 import type Client from '../client';
-// eslint-disable-next-line import/no-duplicates
 import type { SendOptions } from '../client';
 import type { Logger } from '../logger';
 import Netif from './netif';
@@ -127,7 +125,8 @@ export interface DeviceEventEmitter {
  */
 export default abstract class Device
   extends EventEmitter
-  implements DeviceEventEmitter, PlugEventEmitter, BulbEventEmitter {
+  implements DeviceEventEmitter, PlugEventEmitter, BulbEventEmitter
+{
   readonly client: Client;
 
   host: string;

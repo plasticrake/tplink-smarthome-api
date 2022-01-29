@@ -19,6 +19,7 @@ module.exports = {
       parser: '@typescript-eslint/parser',
       plugins: ['@typescript-eslint', 'eslint-plugin-tsdoc'],
       extends: [
+        'airbnb-base',
         'airbnb-typescript/base',
         'plugin:@typescript-eslint/eslint-recommended',
         'plugin:@typescript-eslint/recommended',
@@ -54,6 +55,7 @@ module.exports = {
             selector: 'ForOfStatement',
           },
         ],
+        'import/extensions': 'off',
         'import/no-unresolved': 'off',
       },
     },

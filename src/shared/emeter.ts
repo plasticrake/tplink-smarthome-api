@@ -167,5 +167,3 @@ export default class Emeter {
     );
   }
 }
-
-module.exports = Emeter;

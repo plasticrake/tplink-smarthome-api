@@ -59,6 +59,7 @@ export function normalizeMac(mac = ''): string {
   return mac.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 }
 
+// eslint-disable-next-line @typescript-eslint/default-param-last
 export function compareMac(mac = '', macPattern: string | string[]): boolean {
   const macPatterns = castArray(macPattern).map((p) => {
     return new RegExp(
