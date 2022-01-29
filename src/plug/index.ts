@@ -113,10 +113,9 @@ export default class Plug extends Device {
 
   emitEventsEnabled = true;
 
-  lastState: { inUse: boolean; relayState: boolean; brightness?: number } = {
+  lastState: { inUse: boolean; relayState: boolean } = {
     inUse: false,
     relayState: false,
-    brightness: undefined,
   };
 
   static readonly apiModules = {
@@ -244,7 +243,6 @@ export default class Plug extends Device {
     if (this.sysInfo) {
       this.lastState.inUse = this.inUse;
       this.lastState.relayState = this.relayState;
-      if (this.supportsDimmer) this.lastState.brightness = this.brightness;
     }
   }
 
@@ -684,7 +682,7 @@ export default class Plug extends Device {
       return;
     }
 
-    const { inUse, relayState, brightness } = this;
+    const { inUse, relayState } = this;
 
     this.log.debug(
       '[%s] plug.emitEvents() inUse: %s relayState: %s lastState: %j',
@@ -712,10 +710,5 @@ export default class Plug extends Device {
       }
     }
     this.emit('power-update', relayState);
-
-    if (this.supportsDimmer && this.lastState.brightness !== brightness) {
-      this.lastState.brightness = brightness;
-      this.emit('brightness-change', brightness);
-    }
   }
 }

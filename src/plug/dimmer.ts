@@ -27,7 +27,61 @@ export interface DimmerActionInput {
  * TP-Link models: HS220.
  */
 export default class Dimmer {
+  lastState: { brightness?: number } = {
+    brightness: undefined,
+  };
+
+  /**
+   * @internal
+   */
+  #brightness: number = 0;
+
   constructor(readonly device: Plug, readonly apiModuleName: string) {}
+
+  /**
+   * Returns cached results from last retrieval of `brightness`.
+   * @returns cached results from last retrieval of `brightness`.
+   */
+  get brightness(): number {
+    return this.#brightness;
+  }
+
+  /**
+   * @internal
+   */
+  set brightness(brightness: number) {
+    this.#brightness = brightness;
+    this.emitEvents();
+  }
+
+  private emitEvents(): void {
+    /**
+     * Bulb was turned on (`lightstate.on_off`).
+     * @event Bulb#lightstate-on
+     * @property {object} value lightstate
+     */
+    /**
+     * Bulb was turned off (`lightstate.on_off`).
+     * @event Bulb#lightstate-off
+     * @property {object} value lightstate
+     */
+    /**
+     * Bulb's lightstate was changed.
+     * @event Bulb#lightstate-change
+     * @property {object} value lightstate
+     */
+    /**
+     * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+     * @event Bulb#lightstate-update
+     * @property {object} value lightstate
+     */
+
+    if (this.lastState.brightness !== this.#brightness) {
+      this.lastState.brightness = this.#brightness;
+      this.device.emit('brightness-change', this.#brightness);
+    }
+    this.device.emit('brightness-update', this.#brightness);
+  }
 
   /**
    * Sets Plug to the specified `brightness`.
@@ -41,7 +95,7 @@ export default class Dimmer {
     brightness: number,
     sendOptions?: SendOptions
   ): Promise<unknown> {
-    return this.device.sendCommand(
+    const results = await this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_brightness: { brightness },
@@ -50,6 +104,8 @@ export default class Dimmer {
       undefined,
       sendOptions
     );
+    this.brightness = brightness;
+    return results;
   }
 
   /**
@@ -103,7 +159,7 @@ export default class Dimmer {
   ): Promise<unknown> {
     const { brightness, mode, duration } = dimmerTransition;
 
-    return this.device.sendCommand(
+    const results = this.device.sendCommand(
       {
         [this.apiModuleName]: {
           set_dimmer_transition: {
@@ -116,6 +172,8 @@ export default class Dimmer {
       undefined,
       sendOptions
     );
+    if (brightness != null) this.brightness = brightness;
+    return results;
   }
 
   /**
