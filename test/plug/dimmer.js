@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+const sinon = require('sinon');
 const { expect } = require('../setup');
 
 module.exports = function () {
@@ -18,6 +19,43 @@ module.exports = function () {
         si = await this.device.getSysInfo();
         expect(si.brightness).to.eql(20);
       });
+
+      it('should emit brightness-change when brightness changes to a different value', async function () {
+        if (!this.device.supportsDimmer) return;
+        const spy = sinon.spy();
+
+        const dimmer = this.device.dimmer;
+        await dimmer.setBrightness(50);
+
+        this.device.on('brightness-change', spy);
+
+        await dimmer.setBrightness(60);
+        await dimmer.setBrightness(70);
+        await dimmer.setBrightness(70);
+
+        expect(spy, 'brightness-change').to.be.calledTwice;
+        expect(spy.firstCall, 'brightness-change').to.be.calledWithExactly(60);
+        expect(spy.secondCall, 'brightness-change').to.be.calledWithExactly(70);
+      });
+
+      it('should emit brightness-update for each brightness update', async function () {
+        if (!this.device.supportsDimmer) return;
+        const spy = sinon.spy();
+
+        const dimmer = this.device.dimmer;
+        await dimmer.setBrightness(50);
+
+        this.device.on('brightness-update', spy);
+
+        await dimmer.setBrightness(60);
+        await dimmer.setBrightness(70);
+        await dimmer.setBrightness(70);
+
+        expect(spy, 'brightness-update').to.be.calledThrice;
+        expect(spy.firstCall, 'brightness-update').to.be.calledWithExactly(60);
+        expect(spy.secondCall, 'brightness-update').to.be.calledWithExactly(70);
+        expect(spy.thirdCall, 'brightness-update').to.be.calledWithExactly(70);
+      });
     });
 
     describe('#setDimmerTransition()', function () {
@@ -36,6 +74,43 @@ module.exports = function () {
         ).to.eventually.have.property('err_code', 0);
         si = await this.device.getSysInfo();
         expect(si.brightness).to.eql(20);
+      });
+
+      it('should emit brightness-change when brightness changes to a different value', async function () {
+        if (!this.device.supportsDimmer) return;
+        const spy = sinon.spy();
+
+        const dimmer = this.device.dimmer;
+        await dimmer.setDimmerTransition({ brightness: 50 });
+
+        this.device.on('brightness-change', spy);
+
+        await dimmer.setDimmerTransition({ brightness: 60 });
+        await dimmer.setDimmerTransition({ brightness: 70 });
+        await dimmer.setDimmerTransition({ brightness: 70 });
+
+        expect(spy, 'brightness-change').to.be.calledTwice;
+        expect(spy.firstCall, 'brightness-change').to.be.calledWithExactly(60);
+        expect(spy.secondCall, 'brightness-change').to.be.calledWithExactly(70);
+      });
+
+      it('should emit brightness-update for each brightness update', async function () {
+        if (!this.device.supportsDimmer) return;
+        const spy = sinon.spy();
+
+        const dimmer = this.device.dimmer;
+        await dimmer.setDimmerTransition({ brightness: 50 });
+
+        this.device.on('brightness-update', spy);
+
+        await dimmer.setDimmerTransition({ brightness: 60 });
+        await dimmer.setDimmerTransition({ brightness: 70 });
+        await dimmer.setDimmerTransition({ brightness: 70 });
+
+        expect(spy, 'brightness-update').to.be.calledThrice;
+        expect(spy.firstCall, 'brightness-update').to.be.calledWithExactly(60);
+        expect(spy.secondCall, 'brightness-update').to.be.calledWithExactly(70);
+        expect(spy.thirdCall, 'brightness-update').to.be.calledWithExactly(70);
       });
     });
 
