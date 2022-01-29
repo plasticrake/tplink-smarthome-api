@@ -88,5 +88,3 @@ export default class UdpConnection extends TplinkConnection {
     }
   }
 }
-
-module.exports = UdpConnection;

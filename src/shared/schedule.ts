@@ -287,7 +287,6 @@ export default abstract class Schedule {
    */
 
   async addRule(
-    // eslint-disable-next-line @typescript-eslint/ban-types
     rule: object,
     sendOptions?: SendOptions
   ): Promise<{ id: string }> {
@@ -314,7 +313,6 @@ export default abstract class Schedule {
    * @throws {@link ResponseError}
    */
   async editRule(
-    // eslint-disable-next-line @typescript-eslint/ban-types
     rule: object,
     sendOptions?: SendOptions
   ): Promise<unknown> {

@@ -642,10 +642,15 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
         socket.setBroadcast(true);
 
         this.discoveryTimer = setInterval(() => {
-          this.sendDiscovery(socket, broadcast, devices, offlineTolerance);
+          this.sendDiscovery(
+            socket,
+            broadcast,
+            devices ?? [],
+            offlineTolerance
+          );
         }, discoveryInterval);
 
-        this.sendDiscovery(socket, broadcast, devices, offlineTolerance);
+        this.sendDiscovery(socket, broadcast, devices ?? [], offlineTolerance);
         if (discoveryTimeout > 0) {
           setTimeout(() => {
             this.log.debug(
@@ -750,7 +755,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
   private sendDiscovery(
     socket: Socket,
     address: string,
-    devices: DiscoveryDevice[] = [],
+    devices: DiscoveryDevice[],
     offlineTolerance: number
   ): void {
     this.log.debug(
