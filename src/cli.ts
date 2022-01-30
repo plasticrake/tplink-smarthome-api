@@ -115,7 +115,7 @@ async function sendCommandDynamic(
   // eslint-disable-next-line @typescript-eslint/ban-types
   command: Exclude<keyof PickProperties<AnyDevice, Function>, undefined>,
   commandParams: Array<boolean | number | string> = [],
-  sendOptions: SendOptions,
+  sendOptions?: SendOptions,
   childId?: string
 ): Promise<void> {
   try {
@@ -131,12 +131,6 @@ async function sendCommandDynamic(
     );
     const device = await client.getDevice({ host, port, childId });
 
-    // This line gets "TypeError: Found non-callable @@iterator" error
-    // // @ts-ignore: ignoring for now
-    // const results = await device[command](...commandParams);
-
-    // Use (...args:any) typecast to pass the call-by-name that otherwise picks up
-    // collection of all call signatures and failing.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const func = device[command] as (...args: any) => Promise<any>;
     const results = await func.apply(device, [
