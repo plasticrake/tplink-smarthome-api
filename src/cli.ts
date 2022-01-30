@@ -115,6 +115,7 @@ async function sendCommandDynamic(
   // eslint-disable-next-line @typescript-eslint/ban-types
   command: Exclude<keyof PickProperties<AnyDevice, Function>, undefined>,
   commandParams: Array<boolean | number | string> = [],
+  sendOptions?: SendOptions,
   childId?: string
 ): Promise<void> {
   try {
@@ -122,11 +123,21 @@ async function sendCommandDynamic(
     console.log(
       `Sending ${command} command to ${host}:${port || ''} ${
         childId ? `childId: ${childId}` : ''
-      } via ${client.defaultSendOptions.transport}...`
+      } via ${
+        sendOptions && sendOptions.transport
+          ? sendOptions.transport
+          : client.defaultSendOptions.transport
+      }...`
     );
     const device = await client.getDevice({ host, port, childId });
-    // @ts-ignore: ignoring for now
-    const results = await device[command](...commandParams);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const func = device[command] as (...args: any) => Promise<any>;
+    const results = await func.apply(device, [
+      ...commandParams,
+      { ...sendOptions },
+    ]);
+
     console.log('response:');
     console.dir(results, { colors: program.opts().color === 'on', depth: 10 });
   } catch (err) {
@@ -312,7 +323,11 @@ program
 
 type CommandSetup = {
   name: Parameters<typeof sendCommandDynamic>[2];
-  params?: { name: string; type: 'boolean' | 'number' | 'string' }[];
+  params?: {
+    name: string;
+    type: 'boolean' | 'number' | 'string';
+    optional?: boolean;
+  }[];
   supportsChildId?: boolean;
   action?: (device: AnyDevice, ...args: unknown[]) => Promise<unknown>;
 };
@@ -320,7 +335,11 @@ type CommandSetup = {
 const commandSetup: CommandSetup[] = [
   { name: 'getSysInfo', supportsChildId: true },
   { name: 'getInfo', supportsChildId: true },
-  { name: 'setAlias', supportsChildId: true },
+  {
+    name: 'setAlias',
+    params: [{ name: 'alias', type: 'string' }],
+    supportsChildId: true,
+  },
   { name: 'getModel', supportsChildId: true },
   {
     name: 'setPowerState',
@@ -340,11 +359,13 @@ const commandSetup: CommandSetup[] = [
 
 for (const command of commandSetup) {
   const paramsString = command.params
-    ? command.params.map((p) => `[${p.name}]`).join(' ')
+    ? command.params
+        .map((p) => (p.optional ? `[${p.name}]` : `<${p.name}>`))
+        .join(' ')
     : '';
 
   const cmd = program
-    .command(`${command.name} <host> ${paramsString}`)
+    .command(`${command.name} <host>${paramsString ? ` ${paramsString}` : ''}`)
     .description(
       `Send ${command.name} to device (using Device#${command.name})`
     )
@@ -353,27 +374,28 @@ for (const command of commandSetup) {
     cmd.option('-c, --childId [childId]', 'childId');
   }
 
-  cmd.action((host, paramsInput, optionsInput) => {
+  cmd.action((...args) => {
+    // commander provides last parameter as reference to current command
+    // remove it with slice
+    const [host, arg2, arg3] = args.slice(0, -1);
     const [hostOnly, port] = host.split(':');
 
-    // paramsInput will be options when command has not params
-    let options;
-    let params;
-    if (optionsInput === undefined) {
-      options = paramsInput;
-      params = undefined;
-    } else {
-      options = optionsInput;
-      params = paramsInput;
-    }
+    // signatures will be either:
+    //   host, options (arg2), params (arg3)
+    //   host, params (arg2)
+    const options = arg3 === undefined ? arg2 : arg3;
+    const params = arg3 === undefined ? undefined : arg2;
+
     const commandParams = setParamTypes(params, command);
 
+    const { childId, ...sendOptions } = options;
     sendCommandDynamic(
       hostOnly,
       port,
       command.name,
       commandParams,
-      options.childId
+      sendOptions,
+      childId
     );
   });
 }
