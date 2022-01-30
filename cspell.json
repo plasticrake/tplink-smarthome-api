@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.2",
 
   "language": "en",
   "words": [
@@ -65,7 +65,7 @@
   "languageSettings": [
     {
       "languageId": "markdown",
-      "local": "*",
+      "locale": "*",
       "dictionaries": ["node", "npm", "softwareTerms", "typescript"]
     }
   ],
