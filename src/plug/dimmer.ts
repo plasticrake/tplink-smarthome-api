@@ -248,19 +248,19 @@ export default class Dimmer {
    * Set Plug `dimmer_parameters` for `gentleOffTime`.
    *
    * Sends `dimmer.set_gentle_off_time`. Does not support childId.
-   * @param   fadeTime - duration in ms
+   * @param   duration - duration in ms
    * @param   sendOptions
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
   async setGentleOffTime(
-    fadeTime: number,
+    duration: number,
     sendOptions?: SendOptions
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
-          set_gentle_off_time: { fadeTime },
+          set_gentle_off_time: { duration },
         },
       },
       undefined,
@@ -272,19 +272,19 @@ export default class Dimmer {
    * Set Plug `dimmer_parameters` for `gentleOnTime`.
    *
    * Sends `dimmer.set_gentle_on_time`. Does not support childId.
-   * @param   fadeTime - duration in ms
+   * @param   duration - duration in ms
    * @param   sendOptions
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
   async setGentleOnTime(
-    fadeTime: number,
+    duration: number,
     sendOptions?: SendOptions
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: {
-          set_gentle_on_time: { fadeTime },
+          set_gentle_on_time: { duration },
         },
       },
       undefined,
