@@ -98,7 +98,6 @@ export default class TcpSocket extends TplinkSocket {
           const actualResponseLen = deviceDataBuf.length - 4;
 
           if (actualResponseLen >= expectedResponseLen) {
-            setSocketTimeout(0);
             decryptedMsg = decrypt(deviceDataBuf.slice(4)).toString('utf8');
             this.logDebug(
               `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} [${replaceControlCharacters(
