@@ -349,7 +349,7 @@ const commandSetup: CommandSetup[] = [
   { name: 'getModel', supportsChildId: true },
   {
     name: 'setPowerState',
-    params: [{ name: 'state', type: 'boolean', optional: true }],
+    params: [{ name: 'state', type: 'boolean' }],
     supportsChildId: true,
   },
   {
