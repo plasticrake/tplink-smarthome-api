@@ -380,22 +380,21 @@ for (const command of commandSetup) {
     cmd.option('-c, --childId [childId]', 'childId');
   }
 
-  // From commander README:
-  // The action handler gets passed a parameter for each command-argument you
-  // declared, and two additional parameters which are the parsed options and
-  // the command object itself.
-  cmd.action((...paramsInput) => {
-    // To deal with arbitrary counbt of command-arguments, we take all into
-    // variadic paramsInput to sort out last two into optionsInput and
-    // (UNUSED) thisCommand:
-    const [optionsInput /* UNUSED: , thisCommand */] = paramsInput.splice(
-      paramsInput.length - 2
-    );
-    const host = paramsInput.shift();
+  cmd.action((...args) => {
+    // commander provides last parameter as reference to current command
+    // remove it with slice
+    const [host, arg2, arg3] = args.slice(0, -1);
     const [hostOnly, port] = host.split(':');
 
-    const commandParams = setParamTypes(paramsInput, command);
-    const { childId, ...sendOptions } = optionsInput;
+    // signatures will be either:
+    //   host, options (arg2), params (arg3)
+    //   host, params (arg2)
+    const options = arg3 === undefined ? arg2 : arg3;
+    const params = arg3 === undefined ? undefined : arg2;
+
+    const commandParams = setParamTypes(params, command);
+
+    const { childId, ...sendOptions } = options;
     sendCommandDynamic(
       hostOnly,
       port,
