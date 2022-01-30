@@ -371,7 +371,7 @@ for (const command of commandSetup) {
     : '';
 
   const cmd = program
-    .command(`${command.name} <host> ${paramsString}`)
+    .command(`${command.name} <host>${paramsString ? ` ${paramsString}` : ''}`)
     .description(
       `Send ${command.name} to device (using Device#${command.name})`
     )
