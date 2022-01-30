@@ -209,5 +209,12 @@ module.exports = function (ctx) {
         );
       });
     });
+
+    describe('#getLightDetails()', function () {
+      it('should return light details', async function () {
+        const ld = await device.lighting.getLightDetails();
+        expect(ld).to.have.property('max_lumens');
+      });
+    });
   });
 };

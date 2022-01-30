@@ -190,4 +190,21 @@ export default class Lighting {
     ) as LightStateResponse;
     return true;
   }
+
+  /**
+   * Get Bulb light details.
+   *
+   * Requests `lightingservice.get_light_details`.
+   * @returns parsed JSON response
+   * @throws {@link ResponseError}
+   */
+  async getLightDetails(sendOptions?: SendOptions): Promise<unknown> {
+    return this.device.sendCommand(
+      {
+        [this.apiModuleName]: { get_light_details: {} },
+      },
+      undefined,
+      sendOptions
+    );
+  }
 }
