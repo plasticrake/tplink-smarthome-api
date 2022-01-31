@@ -1,22 +1,16 @@
 // spell-checker:ignore Mock’s
-// @ts-ignore: no types for this package
-import simulator from 'tplink-smarthome-simulator';
-import type { Client } from '../../src';
+import * as simulator from 'tplink-smarthome-simulator';
+import type { Client, PlugSysinfo } from '../../src';
 import type { AnyDevice } from '../../src/client';
 
 type SimulatorDevice = {
-  start: () => Promise<void>;
-  stop: () => Promise<void>;
+  start: () => Promise<unknown>;
+  stop: () => Promise<unknown>;
   model: string;
   data: { mac: string; system: { sysinfo: { hw_ver: string } } };
   address: string;
   port: number;
   children: Array<{ sysinfo: { id: string } }>;
-};
-
-type SimulatedUdpServer = {
-  start: () => Promise<SimulatedUdpServer>;
-  stop: () => Promise<void>;
 };
 
 async function simulatorToDevice(
@@ -29,10 +23,9 @@ async function simulatorToDevice(
   });
 }
 
-export const startUdpServer: () => Promise<SimulatedUdpServer> =
-  simulator.UdpServer.start;
+export const startUdpServer = simulator.UdpServer.start;
 
-export const stopUdpServer: () => Promise<void> = simulator.UdpServer.stop;
+export const stopUdpServer = simulator.UdpServer.stop;
 
 const simulatorDevices: SimulatorDevice[] = [];
 
@@ -46,7 +39,7 @@ export async function getSimulatedUnreliableDevice(
     data: { mac: 'aa:aa:aa:00:00:99' },
   });
 
-  const sysInfo = device.api.system.get_sysinfo();
+  const sysInfo = device.api.system.get_sysinfo() as PlugSysinfo;
 
   await device.start();
   simulatorDevices.push(device);

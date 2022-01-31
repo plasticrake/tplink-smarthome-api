@@ -100,7 +100,7 @@
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.21",
     "standard-version": "^9.3.2",
-    "tplink-smarthome-simulator": "^2.0.1",
+    "tplink-smarthome-simulator": "^3.0.0",
     "ts-essentials": "^9.1.2",
     "ts-node": "^10.4.0",
     "typedoc": "^0.22.11",
