@@ -160,7 +160,7 @@ export default class Plug extends Device implements PlugEventEmitter {
    */
   lastState = { inUse: false, relayState: false };
 
-  static readonly apiModules = {
+  readonly apiModules = {
     system: 'system',
     cloud: 'cnCloud',
     schedule: 'schedule',

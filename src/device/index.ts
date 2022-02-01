@@ -147,7 +147,7 @@ export default abstract class Device
 
   protected _sysInfo: Sysinfo;
 
-  static readonly apiModules: ApiModuleNamespace;
+  abstract readonly apiModules: ApiModuleNamespace;
 
   abstract supportsEmeter: boolean;
 
@@ -201,11 +201,6 @@ export default abstract class Device
       this.log,
       this.client
     );
-  }
-
-  get apiModules(): ApiModuleNamespace {
-    // @ts-ignore: https://github.com/Microsoft/TypeScript/issues/3841
-    return this.constructor.apiModules;
   }
 
   /**
