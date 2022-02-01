@@ -47,9 +47,9 @@ module.exports = function (ctx) {
             brightness: 20,
           })
         ).to.be.true;
-        let ls = await device.lighting.getLightState();
-        expect(ls).to.have.property('on_off', 1);
-        expect(ls).to.have.property('brightness', 20);
+        let si = await device.getSysInfo();
+        expect(si.light_state).to.have.property('on_off', 1);
+        expect(si.light_state).to.have.property('brightness', 20);
 
         expect(
           await device.lighting.setLightState({
@@ -57,9 +57,9 @@ module.exports = function (ctx) {
             brightness: 60,
           })
         ).to.be.true;
-        ls = await device.lighting.getLightState();
-        expect(ls).to.have.property('on_off', 1);
-        expect(ls).to.have.property('brightness', 60);
+        si = await device.getSysInfo();
+        expect(si.light_state).to.have.property('on_off', 1);
+        expect(si.light_state).to.have.property('brightness', 60);
       });
 
       it('should change color temperature if supported', async function () {
@@ -71,9 +71,9 @@ module.exports = function (ctx) {
             color_temp: 4000,
           })
         ).to.be.true;
-        let ls = await device.lighting.getLightState();
-        expect(ls).to.have.property('on_off', 1);
-        expect(ls).to.have.property('color_temp', 4000);
+        let si = await device.getSysInfo();
+        expect(si.light_state).to.have.property('on_off', 1);
+        expect(si.light_state).to.have.property('color_temp', 4000);
 
         expect(
           await device.lighting.setLightState({
@@ -81,9 +81,9 @@ module.exports = function (ctx) {
             color_temp: 5000,
           })
         ).to.be.true;
-        ls = await device.lighting.getLightState();
-        expect(ls).to.have.property('on_off', 1);
-        expect(ls).to.have.property('color_temp', 5000);
+        si = await device.getSysInfo();
+        expect(si.light_state).to.have.property('on_off', 1);
+        expect(si.light_state).to.have.property('color_temp', 5000);
       });
 
       it('should change color if supported', async function () {
@@ -97,11 +97,11 @@ module.exports = function (ctx) {
             brightness: 20,
           })
         ).to.be.true;
-        let ls = await device.lighting.getLightState();
-        expect(ls).to.have.property('on_off', 1);
-        expect(ls).to.have.property('hue', 100);
-        expect(ls).to.have.property('saturation', 40);
-        expect(ls).to.have.property('brightness', 20);
+        let si = await device.getSysInfo();
+        expect(si.light_state).to.have.property('on_off', 1);
+        expect(si.light_state).to.have.property('hue', 100);
+        expect(si.light_state).to.have.property('saturation', 40);
+        expect(si.light_state).to.have.property('brightness', 20);
 
         expect(
           await device.lighting.setLightState({
@@ -111,11 +111,11 @@ module.exports = function (ctx) {
             brightness: 60,
           })
         ).to.be.true;
-        ls = await device.lighting.getLightState();
-        expect(ls).to.have.property('on_off', 1);
-        expect(ls).to.have.property('hue', 200);
-        expect(ls).to.have.property('saturation', 50);
-        expect(ls).to.have.property('brightness', 60);
+        si = await device.getSysInfo();
+        expect(si.light_state).to.have.property('on_off', 1);
+        expect(si.light_state).to.have.property('hue', 200);
+        expect(si.light_state).to.have.property('saturation', 50);
+        expect(si.light_state).to.have.property('brightness', 60);
       });
 
       it('should emit lightstate-on / lightstate-off / lightstate-change / lightstate-update', async function () {
@@ -177,6 +177,7 @@ module.exports = function (ctx) {
         const spyChange = sinon.spy();
         const spyUpdate = sinon.spy();
 
+        await device.lighting.getLightState();
         await device.lighting.setLightState({ on_off: 0 });
 
         device.on('lightstate-on', spyOn);

@@ -12,10 +12,11 @@ TP-Link Smarthome API
 
 ## Known Supported Devices
 
-| Model                                                                                                    | Type |
-| -------------------------------------------------------------------------------------------------------- | ---- |
-| HS100, HS103, HS105, HS107, HS110,<br/>HS200, HS210, HS220, HS300, KP303, KP400<br/>ES20M, EP40, ...etc. | Plug |
-| LB100, LB110, LB120, LB130, LB200, LB230, KL50, KL120, KL125<br/>...etc.                                 | Bulb |
+| Model                                                                                                    | Type               |
+| -------------------------------------------------------------------------------------------------------- | ------------------ |
+| HS100, HS103, HS105, HS107, HS110,<br/>HS200, HS210, HS220, HS300, KP303, KP400<br/>ES20M, EP40, ...etc. | Plug               |
+| LB100, LB110, LB120, LB130, LB200, LB230, KL50, KL120, KL125<br/>...etc.                                 | Bulb               |
+| KL430<br/>...etc.                                                                                        | Bulb (light strip) |
 
 Many other TP-Link Plug and Bulb models may work as well. Note that Tapo devices are not supported.
 

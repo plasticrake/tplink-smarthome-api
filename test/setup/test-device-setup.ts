@@ -119,6 +119,13 @@ const testDevicesPartial: Partial<TestDevices> = {
       name: 'LB130(bulb)',
       isSimulated: config.useSimulator,
     },
+    {
+      model: 'kl430',
+      deviceType: 'bulb',
+      name: 'KL430(bulb/lightStrip)',
+      isSimulated: config.useSimulator,
+      supports: { netif: false, schedule: false },
+    },
   ],
   anyDevice: {
     name: 'Device',

@@ -455,7 +455,7 @@ describe('Device', function () {
           describe('#getModel()', function () {
             it('should return model', function () {
               return expect(device.getModel()).to.eventually.match(
-                /^HS\d\d\d|^LB\d\d\d/
+                /^[A-Za-z]{2}\d\d\d|^[A-Za-z]{2}\d\d\d/
               );
             });
           });
@@ -588,8 +588,12 @@ describe('Device', function () {
 
           cloudTests(ctx, testDevice);
           emeterTests(ctx, testDevice);
-          netifTests(ctx, testDevice);
-          scheduleTests(ctx, testDevice);
+          if (testDevice.supports == null || testDevice.supports.netif) {
+            netifTests(ctx, testDevice);
+          }
+          if (testDevice.supports == null || testDevice.supports.schedule) {
+            scheduleTests(ctx, testDevice);
+          }
           timeTests(ctx, testDevice);
         });
       });

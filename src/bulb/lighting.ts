@@ -79,8 +79,8 @@ export default class Lighting {
 
   constructor(
     private readonly device: Bulb,
-
-    private readonly apiModuleName: string
+    private readonly apiModuleName: string,
+    private readonly setLightStateMethodName: string
   ) {}
 
   /**
@@ -104,7 +104,6 @@ export default class Lighting {
     const powerOn = this.#lightState.on_off === 1;
 
     if (this.lastState.powerOn !== powerOn) {
-      this.lastState.powerOn = powerOn;
       if (powerOn) {
         this.device.emit('lightstate-on', this.#lightState);
       } else {
@@ -113,10 +112,12 @@ export default class Lighting {
     }
 
     if (!isEqual(this.lastState.lightState, this.#lightState)) {
-      this.lastState.lightState = this.#lightState;
       this.device.emit('lightstate-change', this.#lightState);
     }
     this.device.emit('lightstate-update', this.#lightState);
+
+    this.lastState.powerOn = powerOn;
+    this.lastState.lightState = this.#lightState;
   }
 
   /**
@@ -177,10 +178,10 @@ export default class Lighting {
     if (isDefinedAndNotNull(brightness)) state.brightness = brightness;
     if (isDefinedAndNotNull(color_temp)) state.color_temp = color_temp;
 
-    this.lightState = extractResponse(
+    const response = extractResponse(
       await this.device.sendCommand(
         {
-          [this.apiModuleName]: { transition_light_state: state },
+          [this.apiModuleName]: { [this.setLightStateMethodName]: state },
         },
         undefined,
         sendOptions
@@ -188,6 +189,11 @@ export default class Lighting {
       '',
       isLightStateResponse
     ) as LightStateResponse;
+
+    // The light strip in particular returns more detail with get(), so only
+    // apply the subset that is returned with set()
+    this.lightState = { ...this.lightState, ...response };
+
     return true;
   }
 
