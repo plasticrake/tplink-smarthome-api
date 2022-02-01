@@ -120,6 +120,12 @@ async function getSimulatorDevices(): Promise<SimulatorDevice[]> {
       alias: 'Mock LB130',
       data: { mac: 'aa:aa:aa:00:00:10' },
     }),
+
+    new simulator.Device({
+      model: 'kl430',
+      alias: 'Mock KL430',
+      data: { mac: 'aa:aa:aa:00:00:11' },
+    }),
   ];
 
   for (const sd of simulatedDevices) {

@@ -8,6 +8,10 @@ import Lighting, { LightState } from './lighting';
 import Schedule from './schedule';
 import Time from '../shared/time';
 
+function isLightStrip(sysinfo: BulbSysinfo) {
+  return (sysinfo.length ?? 0) > 0;
+}
+
 type BulbSysinfoLightState = {
   on_off: 0 | 1;
 };
@@ -20,6 +24,7 @@ export type BulbSysinfo = CommonSysinfo & {
   is_dimmable: 0 | 1;
   is_color: 0 | 1;
   is_variable_color_temp: 0 | 1;
+  length?: number;
 };
 
 export interface BulbConstructorOptions extends DeviceConstructorOptions {
@@ -121,10 +126,7 @@ export default class Bulb extends Device implements BulbEventEmitter {
    * @borrows Lighting#getLightState as Bulb.lighting#getLightState
    * @borrows Lighting#setLightState as Bulb.lighting#setLightState
    */
-  readonly lighting = new Lighting(
-    this,
-    'smartlife.iot.smartbulb.lightingservice'
-  );
+  readonly lighting;
 
   /**
    * @borrows Schedule#getNextAction as Bulb.schedule#getNextAction
@@ -176,8 +178,18 @@ export default class Bulb extends Device implements BulbEventEmitter {
       timesetting: 'smartlife.iot.common.timesetting',
       emeter: 'smartlife.iot.common.emeter',
       netif: 'netif',
-      lightingservice: 'smartlife.iot.smartbulb.lightingservice',
+      lightingservice: isLightStrip(options.sysInfo)
+        ? 'smartlife.iot.lightStrip'
+        : 'smartlife.iot.smartbulb.lightingservice',
     };
+
+    this.lighting = new Lighting(
+      this,
+      this.apiModules.lightingservice,
+      isLightStrip(options.sysInfo)
+        ? 'set_light_state'
+        : 'transition_light_state'
+    );
 
     this.setSysInfo(options.sysInfo);
     this._sysInfo = options.sysInfo;
@@ -247,7 +259,7 @@ export default class Bulb extends Device implements BulbEventEmitter {
   get colorTemperatureRange(): { min: number; max: number } | null {
     if (!this.supportsColorTemperature) return null;
     switch (true) {
-      case /LB130/i.test(this.sysInfo.model):
+      case /LB130|KL430/i.test(this.sysInfo.model):
         return { min: 2500, max: 9000 };
       default:
         return { min: 2700, max: 6500 };

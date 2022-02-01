@@ -30,6 +30,7 @@ export type TestDevice = {
       alias: string;
     }>
   >;
+  supports?: { netif: boolean; schedule: boolean };
 };
 
 export function likeTestDevice(candidate: unknown): candidate is TestDevice {

@@ -14,7 +14,7 @@ import log from 'loglevel';
 dotenv.config();
 
 const envIsTrue = function envIsTrue(value: unknown): boolean {
-  return !(value == null || value === 0 || value === 'false');
+  return !(value == null || value === 0 || value === '0' || value === 'false');
 };
 
 const envHasValue = function envHasValue(value: unknown): boolean {

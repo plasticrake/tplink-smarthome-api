@@ -73,7 +73,7 @@ describe('Bulb', function () {
           });
 
           describe('#getColorTemperatureRange get', function () {
-            it('should return is_variable_color_temp from cached sysInfo if supported (LB120/LB130)', function () {
+            it('should return is_variable_color_temp from cached sysInfo if supported (LB120/LB130/KL430)', function () {
               const range = bulb.getColorTemperatureRange;
               if (bulb.supportsColorTemperature) {
                 expect(range)
@@ -85,11 +85,14 @@ describe('Bulb', function () {
                   .a('number')
                   .within(2500, 9000);
 
-                expect(testDevice.model).to.match(/lb1[23]0/);
+                expect(testDevice.model).to.match(/lb1[23]0|kl430/);
                 if (testDevice.model === 'lb120') {
                   expect(range.min).to.eql(2700);
                   expect(range.max).to.eql(6500);
                 } else if (testDevice.model === 'lb130') {
+                  expect(range.min).to.eql(2500);
+                  expect(range.max).to.eql(9000);
+                } else if (testDevice.model === 'kl430') {
                   expect(range.min).to.eql(2500);
                   expect(range.max).to.eql(9000);
                 }
@@ -116,7 +119,10 @@ describe('Bulb', function () {
           });
 
           lightingTests(ctx, testDevice);
-          scheduleTests(ctx, testDevice);
+
+          if (testDevice.supports == null || testDevice.supports.schedule) {
+            scheduleTests(ctx, testDevice);
+          }
 
           describe('#setPowerState()', function () {
             it('should turn on', function () {
