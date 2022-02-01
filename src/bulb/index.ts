@@ -88,7 +88,7 @@ export default class Bulb extends Device implements BulbEventEmitter {
 
   readonly supportsEmeter = true;
 
-  static readonly apiModules = {
+  readonly apiModules = {
     system: 'smartlife.iot.common.system',
     cloud: 'smartlife.iot.common.cloud',
     schedule: 'smartlife.iot.common.schedule',
@@ -168,6 +168,16 @@ export default class Bulb extends Device implements BulbEventEmitter {
       powerOn: null,
       inUse: null,
     });
+
+    this.apiModules = {
+      system: 'smartlife.iot.common.system',
+      cloud: 'smartlife.iot.common.cloud',
+      schedule: 'smartlife.iot.common.schedule',
+      timesetting: 'smartlife.iot.common.timesetting',
+      emeter: 'smartlife.iot.common.emeter',
+      netif: 'netif',
+      lightingservice: 'smartlife.iot.smartbulb.lightingservice',
+    };
 
     this.setSysInfo(options.sysInfo);
     this._sysInfo = options.sysInfo;
