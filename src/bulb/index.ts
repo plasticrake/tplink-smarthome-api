@@ -12,6 +12,20 @@ function isLightStrip(sysinfo: BulbSysinfo) {
   return (sysinfo.length ?? 0) > 0;
 }
 
+const TPLINK_KELVIN: Array<[RegExp, number, number]> = [
+  [/^KB130/, 2500, 9000],
+  [/^KL120\(EU\)/, 2700, 6500],
+  [/^KL120\(US\)/, 2700, 5000],
+  [/^KL125/, 2500, 6500],
+  [/^KL130/, 2500, 9000],
+  [/^KL135/, 2500, 9000],
+  [/^KL430/, 2500, 9000],
+  [/^LB120/, 2700, 6500],
+  [/^LB130/, 2500, 9000],
+  [/^LB230/, 2500, 9000],
+  [/./, 2700, 6500], // default
+];
+
 type BulbSysinfoLightState = {
   on_off: 0 | 1;
 };
@@ -258,12 +272,12 @@ export default class Bulb extends Device implements BulbEventEmitter {
    */
   get colorTemperatureRange(): { min: number; max: number } | null {
     if (!this.supportsColorTemperature) return null;
-    switch (true) {
-      case /LB130|KL430/i.test(this.sysInfo.model):
-        return { min: 2500, max: 9000 };
-      default:
-        return { min: 2700, max: 6500 };
-    }
+
+    const { model } = this.sysInfo;
+
+    const k = TPLINK_KELVIN.find(([re]) => re.test(model));
+    if (k != null) return { min: k[1], max: k[2] };
+    return null;
   }
 
   /**
