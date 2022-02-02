@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.3.0...v4.0.0) (2022-02-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **Bulb:** removed previously deprecated
+`getColorTemperatureRange`. Use `colorTemperatureRange` instead.
+* apiModules is now non-static property
+* require minimum node version v12.20.0
+
+### Features
+
+* **Bulb:** removed deprecated getColorTemperatureRange ([3dd442b](https://github.com/plasticrake/tplink-smarthome-api/commit/3dd442b25decfb03656dc9054231ec1c26c8a8a3))
+* add color temp ranges for additional models ([#137](https://github.com/plasticrake/tplink-smarthome-api/issues/137)) ([48eb046](https://github.com/plasticrake/tplink-smarthome-api/commit/48eb046bc9600fa2ec0c857884e5b24b70d3698a))
+* **Plug:** add support for light strips such as KL430 ([874a431](https://github.com/plasticrake/tplink-smarthome-api/commit/874a4314460d90af133daccab2e12c7a10de1a95)), closes [#130](https://github.com/plasticrake/tplink-smarthome-api/issues/130) [#90](https://github.com/plasticrake/tplink-smarthome-api/issues/90)
+* change static property apiModules to non-static ([6a171aa](https://github.com/plasticrake/tplink-smarthome-api/commit/6a171aa4f4f7fb3afdb9697ecc4fca11b6dc617b))
+* **Bulb:** add getLightDetails ([#135](https://github.com/plasticrake/tplink-smarthome-api/issues/135)) ([705392f](https://github.com/plasticrake/tplink-smarthome-api/commit/705392fc65ce0a091f0497974d3dfe7567dec26f)), closes [#92](https://github.com/plasticrake/tplink-smarthome-api/issues/92)
+
+
+### Bug Fixes
+
+* cli `TypeError: Found non-callable @[@iterator](https://github.com/iterator)` ([#125](https://github.com/plasticrake/tplink-smarthome-api/issues/125)) ([3e53050](https://github.com/plasticrake/tplink-smarthome-api/commit/3e5305042d5e8d0297ea94a775bbbc65c692ea0b)), closes [#124](https://github.com/plasticrake/tplink-smarthome-api/issues/124)
+* dimmer.setGentle*Time incorrectly named parameter ([db9993f](https://github.com/plasticrake/tplink-smarthome-api/commit/db9993f904bc39c612290c8301c41b5f53aa5772)), closes [#129](https://github.com/plasticrake/tplink-smarthome-api/issues/129)
+* keep socket timer going until close emitted ([416ce38](https://github.com/plasticrake/tplink-smarthome-api/commit/416ce387f28036029a6db73c86b97ba7383c0ebf)), closes [#108](https://github.com/plasticrake/tplink-smarthome-api/issues/108)
+
+
+* upgrade commander ([1911aa4](https://github.com/plasticrake/tplink-smarthome-api/commit/1911aa4d033fbe91671f7dc6491bdaa759373e64))
+
 ## [3.3.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.2.1...v3.3.0) (2021-03-01)
 
 
