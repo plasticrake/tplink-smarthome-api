@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import type { MarkRequired } from 'ts-essentials';
+import type { MarkOptional, MarkRequired } from 'ts-essentials';
 import { Client, Plug } from '../../src';
 import { AnyDevice } from '../../src/client';
 import { isObjectLike } from '../../src/utils';
@@ -12,7 +12,7 @@ export type TestDevice = {
   deviceOptions?: Parameters<Client['getDevice']>[0];
   deviceType?: 'bulb' | 'plug';
   mac?: string;
-  getDevice?: (
+  getDevice: (
     deviceOptions?: Parameters<Client['getDevice']>[0],
     sendOptions?: Parameters<Client['getDevice']>[1]
   ) => ReturnType<Client['getDevice']>;
@@ -63,7 +63,7 @@ export function createTestDevice(
     childId: string;
   }
 ): TestDevice {
-  const testDevice: TestDevice = {
+  const testDevice: MarkOptional<TestDevice, 'getDevice'> = {
     name,
     model,
     hardwareVersion,
@@ -77,7 +77,7 @@ export function createTestDevice(
 }
 
 export function testDeviceDecorator(
-  testDevice: TestDevice,
+  testDevice: MarkOptional<TestDevice, 'getDevice'>,
   device: AnyDevice,
   client: Client,
   {
@@ -129,7 +129,7 @@ export function testDeviceDecorator(
               model: testDevice.model,
               hardwareVersion: testDevice.hardwareVersion,
               isSimulated: testDevice.isSimulated,
-              parent: testDevice,
+              parent: testDevice as TestDevice,
               childId: key,
             }) as MarkRequired<TestDevice, 'getDevice' | 'childId' | 'parent'>;
           });
@@ -176,6 +176,6 @@ export function testDeviceDecorator(
     }
   }
 
-  testDevices.push(testDevice);
-  return testDevice;
+  testDevices.push(testDevice as TestDevice);
+  return testDevice as TestDevice;
 }

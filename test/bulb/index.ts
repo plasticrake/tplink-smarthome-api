@@ -1,9 +1,12 @@
-/* eslint-disable no-unused-expressions */
+import assert from 'assert';
 
-const { config, expect, retry, testDevices } = require('../setup');
+import type { Bulb } from '../../src';
+import { AnyDevice } from '../../src/client';
 
-const lightingTests = require('./lighting');
-const scheduleTests = require('./schedule');
+import { config, expect, retry, testDevices } from '../setup';
+
+import lightingTests from './lighting';
+import scheduleTests from './schedule';
 
 describe('Bulb', function () {
   this.timeout(config.defaultTestTimeout);
@@ -14,8 +17,8 @@ describe('Bulb', function () {
     context(testSendOptions.name, function () {
       testDevices.bulb.forEach((testDevice) => {
         context(testDevice.name, function () {
-          const ctx = {};
-          let bulb;
+          const ctx: { device?: AnyDevice } = {};
+          let bulb: Bulb;
 
           before('Bulb', async function () {
             if (!testDevice.getDevice) {
@@ -30,7 +33,10 @@ describe('Bulb', function () {
             }
             await retry(async () => {
               // this is in beforeEach since many of the tests may overwrite some properties
-              bulb = await testDevice.getDevice(undefined, testSendOptions);
+              bulb = (await testDevice.getDevice(
+                undefined,
+                testSendOptions
+              )) as Bulb;
               ctx.device = bulb;
             }, 2);
           });
@@ -77,13 +83,15 @@ describe('Bulb', function () {
               const range = bulb.colorTemperatureRange;
               if (bulb.supportsColorTemperature) {
                 expect(range)
-                  .to.to.have.property('min')
+                  .to.have.property('min')
                   .a('number')
                   .within(2500, 9000);
                 expect(range)
-                  .to.to.have.property('max')
+                  .to.have.property('max')
                   .a('number')
                   .within(2500, 9000);
+
+                assert(range != null);
 
                 expect(testDevice.model).to.match(/lb1[23]0|kl430/);
                 if (testDevice.model === 'lb120') {
@@ -118,7 +126,7 @@ describe('Bulb', function () {
             });
           });
 
-          lightingTests(ctx, testDevice);
+          lightingTests(ctx);
 
           if (testDevice.supports == null || testDevice.supports.schedule) {
             scheduleTests(ctx, testDevice);
