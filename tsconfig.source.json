@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./lib"
+  },
+  "include": ["src/**/*"],
+  "typedocOptions": {
+    "entryPoints": ["src/index.ts"],
+    "excludeInternal": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "out": "docs"
+  }
+}
