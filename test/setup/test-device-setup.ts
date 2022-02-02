@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import groupBy from 'lodash.groupby';
+import { DeepPartial } from 'ts-essentials';
 
 import { Client } from '../../src';
 import type { AnyDevice } from '../../src/client';
@@ -45,8 +46,8 @@ type TestDevices = {
   plugWithChildren: TestDevice;
   unreachable: TestDevice;
   unreliable: TestDevice;
-  bulb: TestDevice[] | undefined;
-  plug: TestDevice[] | undefined;
+  bulb: TestDevice[];
+  plug: TestDevice[];
 };
 
 /**
@@ -55,7 +56,7 @@ type TestDevices = {
  * devices are added to this original object.
  */
 
-const testDevicesPartial: Partial<TestDevices> = {
+const testDevicesPartial: DeepPartial<TestDevices> = {
   devices: [
     {
       model: 'hs100',

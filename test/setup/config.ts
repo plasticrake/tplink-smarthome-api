@@ -39,7 +39,13 @@ export const discoveryMacAllow = ((): string[] => {
   return [];
 })();
 
-export const testSendOptionsSets = [
+export const testSendOptionsSets: Array<{
+  name: string;
+  timeout: number;
+  transport: 'tcp' | 'udp';
+  useSharedSocket: boolean;
+  sharedSocketTimeout?: number;
+}> = [
   {
     name: 'tcp',
     timeout: useSimulator ? 250 : 8000,

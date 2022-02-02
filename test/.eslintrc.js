@@ -3,6 +3,7 @@ module.exports = {
     mocha: true,
   },
   rules: {
-    'func-names': ['off'],
+    'func-names': 'off',
+    '@typescript-eslint/no-unused-expressions': 'off',
   },
 };
