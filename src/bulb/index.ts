@@ -281,16 +281,6 @@ export default class Bulb extends Device implements BulbEventEmitter {
   }
 
   /**
-   * Returns array with min and max supported color temperatures
-   * @returns range in kelvin `{min,max}` or `null` if not supported
-   *
-   * @deprecated Renamed, use {@link Bulb.colorTemperatureRange}
-   */
-  get getColorTemperatureRange(): { min: number; max: number } | null {
-    return this.colorTemperatureRange;
-  }
-
-  /**
    * Gets bulb's SysInfo.
    *
    * Requests `system.sysinfo` from device.
