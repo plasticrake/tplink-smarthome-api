@@ -72,9 +72,9 @@ describe('Bulb', function () {
             });
           });
 
-          describe('#getColorTemperatureRange get', function () {
+          describe('#colorTemperatureRange get', function () {
             it('should return is_variable_color_temp from cached sysInfo if supported (LB120/LB130/KL430)', function () {
-              const range = bulb.getColorTemperatureRange;
+              const range = bulb.colorTemperatureRange;
               if (bulb.supportsColorTemperature) {
                 expect(range)
                   .to.to.have.property('min')
@@ -99,7 +99,7 @@ describe('Bulb', function () {
               }
             });
             it('should return null if not supported (LB100)', function () {
-              const range = bulb.getColorTemperatureRange;
+              const range = bulb.colorTemperatureRange;
               if (!bulb.supportsColorTemperature) {
                 expect(range).to.be.null;
                 expect(testDevice.model).to.not.match(/lb1[23]0/);
