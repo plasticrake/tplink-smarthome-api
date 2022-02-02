@@ -3,5 +3,5 @@
   "compilerOptions": {
     "outDir": "./build/examples"
   },
-  "include": ["examples/**/*.ts"]
+  "include": ["examples/**/*"]
 }

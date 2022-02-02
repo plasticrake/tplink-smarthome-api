@@ -1,14 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./lib"
+    "outDir": "./build"
   },
-  "include": ["src/**/*"],
-  "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
-    "excludeInternal": true,
-    "excludePrivate": true,
-    "excludeProtected": true,
-    "out": "docs"
-  }
+  "include": ["src/**/*", "test/**/*", "examples/**/*", ".eslintrc.js"]
 }
