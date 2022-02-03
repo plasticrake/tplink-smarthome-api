@@ -34,7 +34,7 @@
     "clean": "rimraf lib/ build/",
     "cli": "ts-node src/cli.ts",
     "coverage-report-lcov": "nyc report --reporter=lcov",
-    "docs": "typedoc",
+    "docs": "typedoc --tsconfig tsconfig.source.json",
     "lint": "eslint --ignore-path .gitignore . --ext .js,.ts --format=pretty && tsc --noEmit",
     "prepare": "npm run build",
     "release": "standard-version --commit-all --sign",
