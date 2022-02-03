@@ -29,7 +29,6 @@ export interface LightState {
   brightness?: number;
   /**
    * Kelvin
-   * (LB120:2700-6500 LB130:2500-9000)
    */
   color_temp?: number;
   ignore_default?: 0 | 1;
@@ -40,6 +39,20 @@ export interface LightState {
     color_temp?: number;
     brightness?: number;
   };
+}
+
+export interface LightStripLightState {
+  /**
+   * (ms)
+   */
+  transition: number;
+  length: number;
+  on_off: 0 | 1;
+  mode: string;
+  /**
+   * Start Index (inclusive), End Index (inclusive), Hue, Saturation, Brightness, Color Temp (Kelvin)
+   */
+  groups: Array<[number, number, number, number, number, number]>;
 }
 
 export interface LightStateInput extends LightState {

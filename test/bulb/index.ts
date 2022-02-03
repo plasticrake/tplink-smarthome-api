@@ -1,4 +1,5 @@
 import assert from 'assert';
+import sinon from 'sinon';
 
 import type { Bulb } from '../../src';
 import { AnyDevice } from '../../src/client';
@@ -165,6 +166,44 @@ describe('Bulb', function () {
               expect(await bulb.setPowerState(true)).to.be.true;
               expect(await bulb.togglePowerState()).to.be.false;
               expect(await bulb.getPowerState()).to.be.false;
+            });
+          });
+
+          describe('#getSysInfo()', function () {
+            it('should emit lightstate-sysinfo-on / lightstate-sysinfo-update', async function () {
+              const spy = sinon.spy();
+              const spyPowerUpdate = sinon.spy();
+
+              await bulb.lighting.setLightState({ on_off: 0 });
+              await bulb.getSysInfo();
+
+              bulb.on('lightstate-sysinfo-on', spy);
+              bulb.on('lightstate-sysinfo-update', spyPowerUpdate);
+              await bulb.getSysInfo();
+              await bulb.lighting.setLightState({ on_off: 1 });
+              await bulb.getSysInfo();
+              await bulb.getSysInfo();
+
+              expect(spy).to.be.calledOnce;
+              expect(spyPowerUpdate).to.be.calledThrice;
+            });
+
+            it('should emit lightstate-sysinfo-off / lightstate-sysinfo-update', async function () {
+              const spy = sinon.spy();
+              const spyPowerUpdate = sinon.spy();
+
+              await bulb.lighting.setLightState({ on_off: 1 });
+              await bulb.getSysInfo();
+
+              bulb.on('lightstate-sysinfo-off', spy);
+              bulb.on('lightstate-sysinfo-update', spyPowerUpdate);
+              await bulb.getSysInfo();
+              await bulb.lighting.setLightState({ on_off: 0 });
+              await bulb.getSysInfo();
+              await bulb.getSysInfo();
+
+              expect(spy).to.be.calledOnce;
+              expect(spyPowerUpdate).to.be.calledThrice;
             });
           });
         });
