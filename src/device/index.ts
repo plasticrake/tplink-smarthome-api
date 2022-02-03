@@ -2,7 +2,7 @@ import castArray from 'lodash.castarray';
 import { EventEmitter } from 'events';
 import type log from 'loglevel';
 
-import type { BulbEventEmitter, BulbSysinfo } from '../bulb';
+import type { BulbSysinfo } from '../bulb';
 import type Client from '../client';
 import type { SendOptions } from '../client';
 import type { Logger } from '../logger';
@@ -125,7 +125,7 @@ export interface DeviceEventEmitter {
  */
 export default abstract class Device
   extends EventEmitter
-  implements DeviceEventEmitter, PlugEventEmitter, BulbEventEmitter
+  implements DeviceEventEmitter, PlugEventEmitter
 {
   readonly client: Client;
 
@@ -503,6 +503,8 @@ export default abstract class Device
 
   /**
    * Stops device polling.
+   *
+   * @deprecated This will be removed in a future release.
    */
   stopPolling(): void {
     if (this.pollingTimer === null) return;

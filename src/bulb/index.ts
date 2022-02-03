@@ -1,4 +1,6 @@
 /* eslint-disable no-underscore-dangle */
+import isEqual from 'lodash.isequal';
+
 import type { SendOptions } from '../client';
 import Device, { isBulbSysinfo } from '../device';
 import type { CommonSysinfo, DeviceConstructorOptions } from '../device';
@@ -26,9 +28,42 @@ const TPLINK_KELVIN: Array<[RegExp, number, number]> = [
   [/./, 2700, 6500], // default
 ];
 
-type BulbSysinfoLightState = {
-  on_off: 0 | 1;
-};
+export interface BulbSysinfoLightState {
+  /**
+   * (ms)
+   */
+  transition_period?: number;
+  /**
+   * (ms)
+   */
+  transition?: number;
+  on_off?: 0 | 1;
+  mode?: string;
+  /**
+   * 0-360
+   */
+  hue?: number;
+  /**
+   * 0-100
+   */
+  saturation?: number;
+  /**
+   * 0-100
+   */
+  brightness?: number;
+  /**
+   * Kelvin
+   */
+  color_temp?: number;
+  ignore_default?: 0 | 1;
+  dft_on_state?: {
+    mode?: string;
+    hue?: number;
+    saturation?: number;
+    color_temp?: number;
+    brightness?: number;
+  };
+}
 
 export type BulbSysinfo = CommonSysinfo & {
   mic_type: string; // 'IOT.SMARTBULB';
@@ -45,47 +80,69 @@ export interface BulbConstructorOptions extends DeviceConstructorOptions {
   sysInfo: BulbSysinfo;
 }
 
-export interface BulbEventEmitter {
-  on(
-    event: 'emeter-realtime-update',
-    listener: (value: RealtimeNormalized) => void
-  ): this;
+interface BulbEvents {
+  'emeter-realtime-update': (value: RealtimeNormalized) => void;
   /**
    * @deprecated This will be removed in a future release.
    */
-  on(event: 'polling-error', listener: (error: Error) => void): this;
+  'polling-error': (error: Error) => void;
   /**
    * Bulb was turned on (`lightstate.on_off`).
    * @event Bulb#lightstate-on
-   * @property {object} value lightstate
+   * @property {LightState} value lightstate
    */
-  on(event: 'lightstate-on', listener: (value: LightState) => void): this;
+  'lightstate-on': (value: LightState) => void;
   /**
    * Bulb was turned off (`lightstate.on_off`).
    * @event Bulb#lightstate-off
-   * @property {object} value lightstate
+   * @property {LightState} value lightstate
    */
-  on(event: 'lightstate-off', listener: (value: LightState) => void): this;
+  'lightstate-off': (value: LightState) => void;
   /**
    * Bulb's lightstate was changed.
    * @event Bulb#lightstate-change
-   * @property {object} value lightstate
+   * @property {LightState} value lightstate
    */
-  on(event: 'lightstate-change', listener: (value: LightState) => void): this;
+  'lightstate-change': (value: LightState) => void;
   /**
-   * Bulb's lightstate state was updated from device. Fired regardless if status was changed.
+   * Bulb's lightstate was updated from device. Fired regardless if status was changed.
    * @event Bulb#lightstate-update
-   * @property {object} value lightstate
+   * @property {LightState} value lightstate
    */
-  on(event: 'lightstate-update', listener: (value: LightState) => void): this;
+  'lightstate-update': (value: LightState) => void;
+  /**
+   * Bulb was turned on (`sysinfo.light_state.on_off`).
+   * @event Bulb#lightstate-sysinfo-on
+   * @property {BulbSysinfoLightState} value BulbSysinfoLightState
+   */
+  'lightstate-sysinfo-on': (value: BulbSysinfoLightState) => void;
+  /**
+   * Bulb was turned off (`sysinfo.light_state.on_off`).
+   * @event Bulb#lightstate-sysinfo-off
+   * @property {BulbSysinfoLightState} value BulbSysinfoLightState
+   */
+  'lightstate-sysinfo-off': (value: BulbSysinfoLightState) => void;
+  /**
+   * Bulb's lightstate (`sysinfo.light_state`) was changed.
+   * @event Bulb#lightstate-sysinfo-change
+   * @property {BulbSysinfoLightState} value BulbSysinfoLightState
+   */
+  'lightstate-sysinfo-change': (value: BulbSysinfoLightState) => void;
+  /**
+   * Bulb's lightstate (`sysinfo.light_state`) was updated from device. Fired regardless if status was changed.
+   * @event Bulb#lightstate-sysinfo-update
+   * @property {BulbSysinfoLightState} value BulbSysinfoLightState
+   */
+  'lightstate-sysinfo-update': (value: BulbSysinfoLightState) => void;
+}
 
-  emit(event: 'polling-error', error: Error): boolean;
+declare interface Bulb {
+  on<U extends keyof BulbEvents>(event: U, listener: BulbEvents[U]): this;
 
-  emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
-  emit(event: 'lightstate-on', value: LightState): boolean;
-  emit(event: 'lightstate-off', value: LightState): boolean;
-  emit(event: 'lightstate-change', value: LightState): boolean;
-  emit(event: 'lightstate-update', value: LightState): boolean;
+  emit<U extends keyof BulbEvents>(
+    event: U,
+    ...args: Parameters<BulbEvents[U]>
+  ): boolean;
 }
 
 /**
@@ -96,14 +153,20 @@ export interface BulbEventEmitter {
  * @fires  Bulb#lightstate-off
  * @fires  Bulb#lightstate-change
  * @fires  Bulb#lightstate-update
+ * @fires  Bulb#lightstate-sysinfo-on
+ * @fires  Bulb#lightstate-sysinfo-off
+ * @fires  Bulb#lightstate-sysinfo-change
+ * @fires  Bulb#lightstate-sysinfo-update
  */
-export default class Bulb extends Device implements BulbEventEmitter {
+class Bulb extends Device {
+  emitEventsEnabled = true;
+
   protected _sysInfo: BulbSysinfo;
 
   /**
    * @internal
    */
-  lastState = { inUse: false, powerOn: false };
+  lastState = { powerOn: false, sysinfoLightState: {} };
 
   readonly supportsEmeter = true;
 
@@ -222,8 +285,7 @@ export default class Bulb extends Device implements BulbEventEmitter {
    */
   setSysInfo(sysInfo: BulbSysinfo): void {
     super.setSysInfo(sysInfo);
-    // TODO / XXX Verify that sysInfo.light_state can be set here to trigger events
-    this.lighting.lightState = sysInfo.light_state;
+    this.emitEvents();
   }
 
   protected setAliasProperty(alias: string): void {
@@ -372,4 +434,33 @@ export default class Bulb extends Device implements BulbEventEmitter {
     await this.setPowerState(!powerState, sendOptions);
     return !powerState;
   }
+
+  private emitEvents(): void {
+    if (!this.emitEventsEnabled) {
+      return;
+    }
+
+    const { light_state: sysinfoLightState } = this._sysInfo;
+
+    if (sysinfoLightState == null) return;
+    const powerOn = sysinfoLightState.on_off === 1;
+
+    if (this.lastState.powerOn !== powerOn) {
+      if (powerOn) {
+        this.emit('lightstate-sysinfo-on', sysinfoLightState);
+      } else {
+        this.emit('lightstate-sysinfo-off', sysinfoLightState);
+      }
+    }
+
+    if (!isEqual(this.lastState.sysinfoLightState, sysinfoLightState)) {
+      this.emit('lightstate-sysinfo-change', sysinfoLightState);
+    }
+    this.emit('lightstate-sysinfo-update', sysinfoLightState);
+
+    this.lastState.powerOn = powerOn;
+    this.lastState.sysinfoLightState = sysinfoLightState;
+  }
 }
+
+export default Bulb;
