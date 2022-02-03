@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v4.0.0...v4.1.0) (2022-02-03)
+
+
+### Features
+
+* **Bulb:** add lightstate-sysinfo events ([6b844a1](https://github.com/plasticrake/tplink-smarthome-api/commit/6b844a178806fc794bc8e04e9d8f3ab1c95d6a5e))
+
 ## [4.0.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v3.3.0...v4.0.0) (2022-02-02)
 
 
