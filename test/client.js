@@ -316,6 +316,45 @@ describe('Client', function () {
         done();
       }, 1000);
     });
+
+    it('should create devices using default port (9999) when devicesUseDiscoveryPort is false', function (done) {
+      const devices = [];
+      client
+        .startDiscovery({
+          discoveryInterval: 250,
+          devicesUseDiscoveryPort: false,
+        })
+        .on('device-new', (device) => {
+          devices.push(device);
+        });
+
+      setTimeout(() => {
+        client.stopDiscovery();
+        expect(devices.length).to.be.greaterThan(0);
+        devices.forEach((d) => expect(d.port).to.eql(9999));
+        done();
+      }, 1000);
+    });
+
+    it('should create devices using response port when devicesUseDiscoveryPort is true', function (done) {
+      // This test assumes at least one test device is not responding to discovery 9999
+      const devices = [];
+      client
+        .startDiscovery({
+          discoveryInterval: 250,
+          devicesUseDiscoveryPort: true,
+        })
+        .on('device-new', (device) => {
+          devices.push(device);
+        });
+
+      setTimeout(() => {
+        client.stopDiscovery();
+        expect(devices.length).to.be.greaterThan(0);
+        expect(devices.findIndex((d) => d.port !== 9999)).to.not.eql(-1);
+        done();
+      }, 1000);
+    });
   });
 
   config.testSendOptionsSets.forEach((sendOptions) => {
