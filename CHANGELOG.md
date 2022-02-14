@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v4.1.0...v4.2.0) (2022-02-14)
+
+
+### Features
+
+* **Client:** add devicesUseDiscoveryPort to DiscoveryOptions ([#139](https://github.com/plasticrake/tplink-smarthome-api/issues/139)) ([245dcd8](https://github.com/plasticrake/tplink-smarthome-api/commit/245dcd8d39d94d3721d52b1a287dfd8101422a58)), closes [plasticrake/homebridge-tplink-smarthome#244](https://github.com/plasticrake/homebridge-tplink-smarthome/issues/244) [plasticrake/homebridge-tplink-smarthome#250](https://github.com/plasticrake/homebridge-tplink-smarthome/issues/250)
+
 ## [4.1.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v4.0.0...v4.1.0) (2022-02-03)
 
 
