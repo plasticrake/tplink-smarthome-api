@@ -132,6 +132,11 @@ export interface DiscoveryOptions {
    */
   breakoutChildren?: boolean;
   /**
+   * Set device port to the port it responded with to the discovery ping
+   * @defaultValue false
+   */
+  devicesUseDiscoveryPort?: boolean;
+  /**
    * passed to device constructors
    */
   deviceOptions?: DeviceOptionsDiscovery;
@@ -538,6 +543,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
       excludeMacAddresses = [],
       filterCallback,
       breakoutChildren = true,
+      devicesUseDiscoveryPort = false,
       deviceOptions,
       devices,
     } = options;
@@ -620,7 +626,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
         this.createOrUpdateDeviceFromSysInfo({
           sysInfo,
           host: rinfo.address,
-          port: rinfo.port,
+          port: devicesUseDiscoveryPort ? rinfo.port : undefined,
           breakoutChildren,
           options: deviceOptions,
         });
@@ -698,7 +704,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
   }: {
     sysInfo: Sysinfo;
     host: string;
-    port: number;
+    port?: number;
     options?: DeviceOptionsDiscovery;
     breakoutChildren: boolean;
   }): void {
@@ -708,19 +714,21 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         device = this.devices.get(id)!;
         device.host = host;
-        device.port = port;
+        if (port != null) device.port = port;
         Client.setSysInfoForDevice(device, sysInfo);
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
         this.emit('online', device);
       } else {
-        device = this.getDeviceFromSysInfo(sysInfo, {
+        const opts: AnyDeviceOptionsCon = {
           ...options,
           client: this,
           host,
-          port,
           childId,
-        });
+        };
+        if (port != null) opts.port = port;
+        device = this.getDeviceFromSysInfo(sysInfo, opts);
+
         device.status = 'online';
         device.seenOnDiscovery = this.discoveryPacketSequence;
         this.devices.set(id, device);
