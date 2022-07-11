@@ -80,7 +80,6 @@
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
     "chai-things": "^0.2.0",
-    "codecov": "^3.8.2",
     "cross-env": "^7.0.3",
     "cspell": "^6.2.3",
     "dotenv": "^16.0.1",

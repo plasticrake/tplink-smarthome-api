@@ -12,20 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v2
+      - name: Use Node.js current with cache
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-
-      - name: Setup cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: current
+          cache: 'npm'
 
       - name: npm install
         run: |
@@ -35,37 +28,25 @@ jobs:
         run: |
           npm run lint
 
-  build:
+  test:
     name: Build and Test
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14, 16, 18]
         os: [ubuntu-latest]
-        include:
-          - os: ubuntu-latest
-            node-version: 16.x
-            env:
-              COVERAGE: 1
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Use Node.js ${{ matrix.node-version }} with cache
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Setup cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          cache: 'npm'
 
       - name: npm install, build and test
         run: |
@@ -74,20 +55,23 @@ jobs:
           npm run test:ci
         env:
           CI: true
-          COVERAGE: '${{ matrix.env.COVERAGE }}'
 
       - name: Generate Coverage Report
-        if: '${{ matrix.env.COVERAGE }}'
         run: npm run coverage-report-lcov
 
       - name: Upload Coverage to Coveralls
-        if: '${{ matrix.env.COVERAGE }}'
         uses: coverallsapp/github-action@master
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
+          flag-name: ${{matrix.os}}-node-${{ matrix.node-version }}
+          parallel: true
 
-      - name: Upload Coverage to Codecov
-        if: '${{ matrix.env.COVERAGE }}'
-        uses: codecov/codecov-action@v1
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
         with:
-          fail_ci_if_error: true
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true
