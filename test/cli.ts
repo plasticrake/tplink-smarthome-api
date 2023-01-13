@@ -6,6 +6,9 @@ const runner = 'ts-node';
 const cli = './src/cli.ts';
 
 describe('cli', function () {
+  this.slow(5000);
+  this.timeout(10000);
+
   // @ts-expect-error: buildable
   let { execute, cleanup }: Awaited<ReturnType<typeof prepareEnvironment>> = {};
 
