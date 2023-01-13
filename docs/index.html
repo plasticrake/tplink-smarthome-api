@@ -5,10 +5,10 @@
   <h1>tplink-smarthome-api</h1>
 </a>
 <p><a href="https://www.npmjs.com/package/tplink-smarthome-api"><img src="https://img.shields.io/npm/v/tplink-smarthome-api.svg" alt="NPM Version"></a>
-<a href="https://github.com/plasticrake/tplink-smarthome-api/actions?query=workflow%3ACI+branch%3Amaster"><img src="https://github.com/plasticrake/tplink-smarthome-api/workflows/CI/badge.svg?branch=master" alt="Build Status"></a>
-<a href="https://codecov.io/gh/plasticrake/tplink-smarthome-api"><img src="https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg" alt="codecov"></a></p>
+<a href="https://github.com/plasticrake/tplink-smarthome-api/actions?query=workflow%3ACI+branch%3Amain"><img src="https://github.com/plasticrake/tplink-smarthome-api/workflows/CI/badge.svg?branch=main" alt="Build Status"></a>
+<a href="https://codecov.io/gh/plasticrake/tplink-smarthome-api"><img src="https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/main/graph/badge.svg" alt="codecov"></a></p>
 <p>TP-Link Smarthome API</p>
-<p><strong><a href="https://github.com/plasticrake/tplink-smarthome-api/tree/master/CHANGELOG.md">Changelog</a></strong></p>
+<p><strong><a href="https://github.com/plasticrake/tplink-smarthome-api/tree/main/CHANGELOG.md">Changelog</a></strong></p>
 
 <a href="#known-supported-devices" id="known-supported-devices" style="color: inherit; text-decoration: none;">
   <h2>Known Supported Devices</h2>
@@ -47,7 +47,7 @@
 <a href="#examples" id="examples" style="color: inherit; text-decoration: none;">
   <h2>Examples</h2>
 </a>
-<p>See more <a href="https://github.com/plasticrake/tplink-smarthome-api/tree/master/examples">examples</a>.</p>
+<p>See more <a href="https://github.com/plasticrake/tplink-smarthome-api/tree/main/examples">examples</a>.</p>
 <pre><code class="language-javascript"><span class="hl-0">const</span><span class="hl-1"> { </span><span class="hl-2">Client</span><span class="hl-1"> } = </span><span class="hl-3">require</span><span class="hl-1">(</span><span class="hl-4">&#39;tplink-smarthome-api&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">client</span><span class="hl-1"> = </span><span class="hl-0">new</span><span class="hl-1"> </span><span class="hl-3">Client</span><span class="hl-1">();</span><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">plug</span><span class="hl-1"> = </span><span class="hl-5">client</span><span class="hl-1">.</span><span class="hl-3">getDevice</span><span class="hl-1">({ </span><span class="hl-5">host:</span><span class="hl-1"> </span><span class="hl-4">&#39;10.0.1.2&#39;</span><span class="hl-1"> }).</span><span class="hl-3">then</span><span class="hl-1">((</span><span class="hl-5">device</span><span class="hl-1">) </span><span class="hl-0">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-5">device</span><span class="hl-1">.</span><span class="hl-3">getSysInfo</span><span class="hl-1">().</span><span class="hl-3">then</span><span class="hl-1">(</span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-5">log</span><span class="hl-1">);</span><br/><span class="hl-1">  </span><span class="hl-5">device</span><span class="hl-1">.</span><span class="hl-3">setPowerState</span><span class="hl-1">(</span><span class="hl-0">true</span><span class="hl-1">);</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">// Look for devices, log to console, and turn them on</span><br/><span class="hl-5">client</span><span class="hl-1">.</span><span class="hl-3">startDiscovery</span><span class="hl-1">().</span><span class="hl-3">on</span><span class="hl-1">(</span><span class="hl-4">&#39;device-new&#39;</span><span class="hl-1">, (</span><span class="hl-5">device</span><span class="hl-1">) </span><span class="hl-0">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-5">device</span><span class="hl-1">.</span><span class="hl-3">getSysInfo</span><span class="hl-1">().</span><span class="hl-3">then</span><span class="hl-1">(</span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-5">log</span><span class="hl-1">);</span><br/><span class="hl-1">  </span><span class="hl-5">device</span><span class="hl-1">.</span><span class="hl-3">setPowerState</span><span class="hl-1">(</span><span class="hl-0">true</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
 </code></pre>
 

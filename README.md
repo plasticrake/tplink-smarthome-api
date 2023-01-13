@@ -3,12 +3,12 @@
 # tplink-smarthome-api
 
 [![NPM Version](https://img.shields.io/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
-[![Build Status](https://github.com/plasticrake/tplink-smarthome-api/workflows/CI/badge.svg?branch=master)](https://github.com/plasticrake/tplink-smarthome-api/actions?query=workflow%3ACI+branch%3Amaster)
-[![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/master/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
+[![Build Status](https://github.com/plasticrake/tplink-smarthome-api/workflows/CI/badge.svg?branch=main)](https://github.com/plasticrake/tplink-smarthome-api/actions?query=workflow%3ACI+branch%3Amain)
+[![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/main/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
 
 TP-Link Smarthome API
 
-**[Changelog](https://github.com/plasticrake/tplink-smarthome-api/tree/master/CHANGELOG.md)**
+**[Changelog](https://github.com/plasticrake/tplink-smarthome-api/tree/main/CHANGELOG.md)**
 
 ## Known Supported Devices
 
@@ -28,7 +28,7 @@ Many other TP-Link Plug and Bulb models may work as well. Note that Tapo devices
 
 ## Examples
 
-See more [examples](https://github.com/plasticrake/tplink-smarthome-api/tree/master/examples).
+See more [examples](https://github.com/plasticrake/tplink-smarthome-api/tree/main/examples).
 
 ```javascript
 const { Client } = require('tplink-smarthome-api');
