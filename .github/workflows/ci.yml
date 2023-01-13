@@ -32,9 +32,14 @@ jobs:
     name: Build and Test
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [14, 16, 18]
+        node-version: [14.x, 16.x, 18.x]
         os: [ubuntu-latest]
+        include:
+          - node-version: 14.x
+            os: ubuntu-latest
+            npm-version: '7'
 
     runs-on: ${{ matrix.os }}
 
@@ -47,6 +52,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+
+      - if: ${{ matrix.npm-version }}
+        run: npm install -g npm@${{ matrix.npm-version }}
 
       - name: npm install, build and test
         run: |
