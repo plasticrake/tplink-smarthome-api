@@ -57,6 +57,7 @@
     "tplink-smarthome-crypto": "^4.0.0"
   },
   "devDependencies": {
+    "@gmrchk/cli-testing-library": "^0.1.2",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
