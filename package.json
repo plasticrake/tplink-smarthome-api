@@ -100,11 +100,11 @@
     "source-map-support": "^0.5.21",
     "standard-version": "^9.5.0",
     "tplink-smarthome-simulator": "^4.0.0",
-    "ts-essentials": "9.2.0",
-    "ts-node": "10.8.2",
+    "ts-essentials": "9.3.0",
+    "ts-node": "10.9.1",
     "typedoc": "^0.23.24",
     "typedoc-plugin-no-inherit": "^1.4.0",
-    "typescript": "4.7.4"
+    "typescript": "4.9.4"
   },
   "engines": {
     "node": ">=14"
