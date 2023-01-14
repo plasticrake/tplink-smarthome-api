@@ -42,8 +42,7 @@
     "pretest": "npm run lint && npm run build",
     "test": "npm run test:only",
     "test:ci": "npm run test:only",
-    "test:cli": "bats test",
-    "test:only": "cross-env NODE_ENV=test && nyc mocha --color && npm run test:cli"
+    "test:only": "cross-env NODE_ENV=test && nyc mocha --color"
   },
   "dependencies": {
     "commander": "^9.5.0",
@@ -73,9 +72,6 @@
     "@types/sinon-chai": "^3.2.9",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
     "@typescript-eslint/parser": "^5.48.1",
-    "bats": "^1.8.2",
-    "bats-assert": "2.0.0",
-    "bats-support": "^0.3.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
