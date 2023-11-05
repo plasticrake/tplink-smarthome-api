@@ -1,6 +1,10 @@
 /* eslint-disable no-unused-expressions */
 
 const sinon = require('sinon');
+const dgram = require('dgram');
+const EventEmitter = require('events');
+const { encrypt } = require('tplink-smarthome-crypto');
+
 const { config, expect, getTestClient, testDevices } = require('./setup');
 
 const { default: Client } = require('../src/client');
@@ -9,6 +13,22 @@ const { default: Plug } = require('../src/plug');
 const { default: Bulb } = require('../src/bulb');
 
 const { compareMac } = require('../src/utils');
+
+const validPlugDiscoveryResponse = {
+  system: {
+    get_sysinfo: {
+      alias: 'test',
+      deviceId: 'test',
+      model: 'test',
+      sw_ver: 'test',
+      hw_ver: 'test',
+      type: 'plug',
+      mac: 'test',
+      feature: 'test',
+      relay_state: 0,
+    },
+  },
+};
 
 describe('Client', function () {
   describe('constructor', function () {
@@ -179,6 +199,97 @@ describe('Client', function () {
           client.stopDiscovery();
           done();
         });
+    });
+
+    it('should ignore invalid devices that respond without encryption', function (done) {
+      const socket = new EventEmitter();
+
+      const createSocket = function () {
+        socket.bind = sinon.fake();
+        socket.address = () => ({ address: '1.2.3.4', port: 1234 });
+        socket.setBroadcast = sinon.fake();
+        return socket;
+      };
+
+      sinon.replace(dgram, 'createSocket', createSocket);
+
+      const message = JSON.stringify(validPlugDiscoveryResponse);
+
+      client
+        .startDiscovery({ discoveryInterval: 250 })
+        .on('device-new', (device) => {
+          client.stopDiscovery();
+          done(new Error(`Device should have been ignored: ${device.host}`));
+        })
+        .on('discovery-invalid', ({ rinfo, response }) => {
+          expect(rinfo.address).to.eql('1.2.3.5');
+          expect(rinfo.port).to.eql(1235);
+          expect(response).to.eql(message);
+          done();
+        });
+
+      socket.emit('message', message, {
+        address: '1.2.3.5',
+        port: 1235,
+      });
+    });
+
+    describe('should ignore invalid devices that respond without valid response', function () {
+      [
+        JSON.stringify(''),
+        JSON.stringify('data'),
+        JSON.stringify({}),
+        JSON.stringify({ unexpected: 'data' }),
+        JSON.stringify({ system: undefined }),
+        JSON.stringify({ system: {} }),
+        JSON.stringify({ system: 'data' }),
+        JSON.stringify({ system: { get_sysinfo: undefined } }),
+        JSON.stringify({ system: { get_sysinfo: {} } }),
+        JSON.stringify({ system: { get_sysinfo: 'data' } }),
+        JSON.stringify({ system: { get_sysinfo: { alias: 'test' } } }),
+      ].forEach((t) => {
+        ['encrypted', 'unencrypted'].forEach((te) => {
+          it(`${t} - ${te}`, function (done) {
+            const socket = new EventEmitter();
+
+            const createSocket = function () {
+              socket.bind = sinon.fake();
+              socket.address = () => ({ address: '1.2.3.4', port: 1234 });
+              socket.setBroadcast = sinon.fake();
+              return socket;
+            };
+
+            sinon.replace(dgram, 'createSocket', createSocket);
+
+            let message;
+            if (te === 'encrypted') {
+              message = encrypt(t);
+            } else {
+              message = t;
+            }
+
+            client
+              .startDiscovery({ discoveryInterval: 250 })
+              .on('device-new', (device) => {
+                client.stopDiscovery();
+                done(
+                  new Error(`Device should have been ignored: ${device.host}`)
+                );
+              })
+              .on('discovery-invalid', ({ rinfo, response }) => {
+                expect(rinfo.address).to.eql('1.2.3.5');
+                expect(rinfo.port).to.eql(1235);
+                expect(response).to.eql(message);
+                done();
+              });
+
+            socket.emit('message', message, {
+              address: '1.2.3.5',
+              port: 1235,
+            });
+          });
+        });
+      });
     });
 
     const events = ['new', 'online', 'offline'];

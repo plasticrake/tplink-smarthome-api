@@ -1,3 +1,5 @@
+const sinon = require('sinon');
+
 const {
   config,
   expect,
@@ -111,4 +113,9 @@ describe('Test Environment Setup', function () {
       });
     });
   });
+});
+
+afterEach(() => {
+  // Restore the default sandbox here
+  sinon.restore();
 });
