@@ -559,14 +559,86 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
           `client.startDiscovery(): socket:message From: ${rinfo.address} ${rinfo.port} Message: ${decryptedMsg}`
         );
 
-        let response: DiscoveryResponse;
-        let sysInfo: Sysinfo;
         try {
-          response = JSON.parse(decryptedMsg);
-          sysInfo = response.system.get_sysinfo;
+          // TODO: Type checking of response/sysInfo could be improved
+          let response: DiscoveryResponse;
+          let sysInfo: Sysinfo;
+          try {
+            response = JSON.parse(decryptedMsg);
+            sysInfo = response.system.get_sysinfo;
+            if (sysInfo == null)
+              throw new Error('system.get_sysinfo is null or undefined');
+            if (!isObjectLike(sysInfo))
+              throw new Error('system.get_sysinfo is not an object');
+          } catch (err) {
+            this.log.debug(
+              `client.startDiscovery(): Error parsing JSON: %s\nFrom: ${rinfo.address} ${rinfo.port} Original: [%s] Decrypted: [${decryptedMsg}]`,
+              err,
+              msg
+            );
+            this.emit('discovery-invalid', {
+              rinfo,
+              response: msg,
+              decryptedResponse: decryptedMsg,
+            });
+            return;
+          }
+
+          if (deviceTypes && deviceTypes.length > 0) {
+            const deviceType = this.getTypeFromSysInfo(sysInfo);
+            if (!(deviceTypes as string[]).includes(deviceType)) {
+              this.log.debug(
+                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${deviceType}), allowed device types: (%j)`,
+                deviceTypes
+              );
+              return;
+            }
+          }
+
+          let mac: string;
+          if ('mac' in sysInfo) mac = sysInfo.mac;
+          else if ('mic_mac' in sysInfo) mac = sysInfo.mic_mac;
+          else if ('ethernet_mac' in sysInfo) mac = sysInfo.ethernet_mac;
+          else mac = '';
+
+          if (macAddresses && macAddresses.length > 0) {
+            if (!compareMac(mac, macAddresses)) {
+              this.log.debug(
+                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), allowed macs: (%j)`,
+                macAddresses
+              );
+              return;
+            }
+          }
+
+          if (excludeMacAddresses && excludeMacAddresses.length > 0) {
+            if (compareMac(mac, excludeMacAddresses)) {
+              this.log.debug(
+                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`
+              );
+              return;
+            }
+          }
+
+          if (typeof filterCallback === 'function') {
+            if (!filterCallback(sysInfo)) {
+              this.log.debug(
+                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}], callback`
+              );
+              return;
+            }
+          }
+
+          this.createOrUpdateDeviceFromSysInfo({
+            sysInfo,
+            host: rinfo.address,
+            port: devicesUseDiscoveryPort ? rinfo.port : undefined,
+            breakoutChildren,
+            options: deviceOptions,
+          });
         } catch (err) {
           this.log.debug(
-            `client.startDiscovery(): Error parsing JSON: %s\nFrom: ${rinfo.address} ${rinfo.port} Original: [%s] Decrypted: [${decryptedMsg}]`,
+            `client.startDiscovery(): Error processing response: %s\nFrom: ${rinfo.address} ${rinfo.port} Original: [%s] Decrypted: [${decryptedMsg}]`,
             err,
             msg
           );
@@ -575,61 +647,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
             response: msg,
             decryptedResponse: decrypt(msg),
           });
-          return;
         }
-
-        if (deviceTypes && deviceTypes.length > 0) {
-          const deviceType = this.getTypeFromSysInfo(sysInfo);
-          if (!(deviceTypes as string[]).includes(deviceType)) {
-            this.log.debug(
-              `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${deviceType}), allowed device types: (%j)`,
-              deviceTypes
-            );
-            return;
-          }
-        }
-
-        let mac: string;
-        if ('mac' in sysInfo) mac = sysInfo.mac;
-        else if ('mic_mac' in sysInfo) mac = sysInfo.mic_mac;
-        else if ('ethernet_mac' in sysInfo) mac = sysInfo.ethernet_mac;
-        else mac = '';
-
-        if (macAddresses && macAddresses.length > 0) {
-          if (!compareMac(mac, macAddresses)) {
-            this.log.debug(
-              `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), allowed macs: (%j)`,
-              macAddresses
-            );
-            return;
-          }
-        }
-
-        if (excludeMacAddresses && excludeMacAddresses.length > 0) {
-          if (compareMac(mac, excludeMacAddresses)) {
-            this.log.debug(
-              `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`
-            );
-            return;
-          }
-        }
-
-        if (typeof filterCallback === 'function') {
-          if (!filterCallback(sysInfo)) {
-            this.log.debug(
-              `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}], callback`
-            );
-            return;
-          }
-        }
-
-        this.createOrUpdateDeviceFromSysInfo({
-          sysInfo,
-          host: rinfo.address,
-          port: devicesUseDiscoveryPort ? rinfo.port : undefined,
-          breakoutChildren,
-          options: deviceOptions,
-        });
       });
 
       socket.on('error', (err) => {
