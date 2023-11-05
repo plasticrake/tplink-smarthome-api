@@ -161,6 +161,7 @@ export type SendOptions = {
   sharedSocketTimeout?: number;
 };
 
+/* eslint-disable @typescript-eslint/unified-signatures -- for jsdoc we don't want to combine signatures */
 export interface ClientEventEmitter {
   /**
    * First response from device.
@@ -246,6 +247,7 @@ export interface ClientEventEmitter {
   ): boolean;
   emit(event: 'error', error: Error): boolean;
 }
+/* eslint-enable @typescript-eslint/unified-signatures */
 
 /**
  * Client that sends commands to specified devices or discover devices on the local subnet.
