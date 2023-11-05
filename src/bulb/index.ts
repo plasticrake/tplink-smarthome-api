@@ -136,6 +136,8 @@ interface BulbEvents {
   'lightstate-sysinfo-update': (value: BulbSysinfoLightState) => void;
 }
 
+// TODO: Fix this
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 declare interface Bulb {
   on<U extends keyof BulbEvents>(event: U, listener: BulbEvents[U]): this;
 
@@ -158,6 +160,8 @@ declare interface Bulb {
  * @fires  Bulb#lightstate-sysinfo-change
  * @fires  Bulb#lightstate-sysinfo-update
  */
+// TODO: Fix this
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class Bulb extends Device {
   emitEventsEnabled = true;
 

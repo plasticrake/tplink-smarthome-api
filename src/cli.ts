@@ -178,7 +178,7 @@ async function blink(
   getClient()
     .getDevice({ host, port })
     .then((device) => {
-      // @ts-ignore: ignoring for now, need to implement blink on bulb
+      // @ts-expect-error: ignoring for now, need to implement blink on bulb
       return device.blink(times, rate).then(() => {
         console.log('Blinking complete');
       });
@@ -198,7 +198,6 @@ async function getScanInfo(
   getClient()
     .getDevice({ host, port })
     .then((device) => {
-      // @ts-ignore: ignoring for now, need to implement blink on bulb
       return device.netif
         .getScanInfo(refresh, timeoutInSeconds)
         .then((value) => {

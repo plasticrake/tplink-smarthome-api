@@ -68,6 +68,7 @@ export interface PlugConstructorOptions extends DeviceConstructorOptions {
   childId?: string;
 }
 
+/* eslint-disable @typescript-eslint/unified-signatures -- for jsdoc we don't want to combine signatures */
 export interface PlugEventEmitter {
   /**
    * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
@@ -121,6 +122,7 @@ export interface PlugEventEmitter {
   emit(event: 'brightness-change', value: boolean): boolean;
   emit(event: 'brightness-update', value: boolean): boolean;
 }
+/* eslint-enable @typescript-eslint/unified-signatures */
 
 /**
  * Plug Device.
