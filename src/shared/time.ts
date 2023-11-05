@@ -1,7 +1,10 @@
 import type { AnyDevice, SendOptions } from '../client';
 
 export default class Time {
-  constructor(readonly device: AnyDevice, readonly apiModuleName: string) {}
+  constructor(
+    readonly device: AnyDevice,
+    readonly apiModuleName: string,
+  ) {}
 
   /**
    * Gets device's time.
@@ -17,7 +20,7 @@ export default class Time {
         [this.apiModuleName]: { get_time: {} },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -35,7 +38,7 @@ export default class Time {
         [this.apiModuleName]: { get_timezone: {} },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 }

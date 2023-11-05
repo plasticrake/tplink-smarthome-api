@@ -37,7 +37,7 @@ export default class BulbSchedule extends Schedule {
   constructor(
     readonly device: Bulb,
     readonly apiModuleName: string,
-    readonly childId?: string
+    readonly childId?: string,
   ) {
     super(device, apiModuleName, childId);
   }
@@ -51,7 +51,7 @@ export default class BulbSchedule extends Schedule {
    */
   async addRule(
     rule: BulbScheduleRuleInput,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<{ id: string }> {
     const { lightState, start, daysOfWeek, name = '', enable = true } = rule;
 
@@ -77,7 +77,7 @@ export default class BulbSchedule extends Schedule {
    */
   async editRule(
     rule: BulbScheduleRuleInput & { id: string },
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     const {
       id,

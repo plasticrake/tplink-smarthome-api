@@ -36,7 +36,7 @@ function search(
   breakoutChildren: boolean,
   discoveryTimeout: number,
   broadcast: string,
-  params: Parameters<Client['startDiscovery']>[0]
+  params: Parameters<Client['startDiscovery']>[0],
 ): void {
   try {
     console.log('Searching...');
@@ -53,7 +53,7 @@ function search(
       .startDiscovery(commandParams)
       .on('device-new', (device) => {
         console.log(
-          `${device.model} ${device.deviceType} ${device.type} ${device.host} ${device.port} ${device.macNormalized} ${device.deviceId} ${device.alias}`
+          `${device.model} ${device.deviceType} ${device.type} ${device.host} ${device.port} ${device.macNormalized} ${device.deviceId} ${device.alias}`,
         );
         if (sysInfo) {
           console.dir(device.sysInfo, {
@@ -70,14 +70,14 @@ function search(
 async function send(
   host: string,
   port: number,
-  payload: string
+  payload: string,
 ): Promise<void> {
   try {
     const client = getClient();
     console.log(
       `Sending to ${host}:${port || ''} via ${
         client.defaultSendOptions.transport
-      }...`
+      }...`,
     );
     const data = await client.send(payload, host, port);
     console.log('response:');
@@ -91,14 +91,14 @@ async function sendCommand(
   host: string,
   port: number,
   childId: string,
-  payload: string
+  payload: string,
 ): Promise<void> {
   try {
     const client = getClient();
     console.log(
       `Sending to ${host}:${port || ''} ${
         childId ? `childId: ${childId}` : ''
-      } via ${client.defaultSendOptions.transport}...`
+      } via ${client.defaultSendOptions.transport}...`,
     );
     const device = await client.getDevice({ host, port, childId });
     const results = await device.sendCommand(payload);
@@ -116,7 +116,7 @@ async function sendCommandDynamic(
   command: Exclude<keyof PickProperties<AnyDevice, Function>, undefined>,
   commandParams: Array<boolean | number | string> = [],
   sendOptions?: SendOptions,
-  childId?: string
+  childId?: string,
 ): Promise<void> {
   try {
     const client = getClient();
@@ -127,7 +127,7 @@ async function sendCommandDynamic(
         sendOptions && sendOptions.transport
           ? sendOptions.transport
           : client.defaultSendOptions.transport
-      }...`
+      }...`,
     );
     const device = await client.getDevice({ host, port, childId });
 
@@ -161,7 +161,7 @@ async function details(host: string, port: number): Promise<void> {
         hardwareVersion: device.hardwareVersion,
         mac: device.mac,
       },
-      { colors: program.opts().color === 'on', depth: 10 }
+      { colors: program.opts().color === 'on', depth: 10 },
     );
   } catch (err) {
     outputError(err);
@@ -172,7 +172,7 @@ async function blink(
   host: string,
   port: number,
   times: number,
-  rate: number
+  rate: number,
 ): Promise<void> {
   console.log(`Sending blink commands to ${host}:${port || ''}...`);
   getClient()
@@ -192,7 +192,7 @@ async function getScanInfo(
   host: string,
   port: number,
   refresh?: boolean,
-  timeoutInSeconds?: number
+  timeoutInSeconds?: number,
 ) {
   console.log(`Sending getScanInfo command to ${host}:${port || ''}...`);
   getClient()
@@ -220,7 +220,7 @@ function toBoolean(s: string): boolean {
 
 function setParamTypes(
   params: string[] | undefined,
-  commandSetup: CommandSetup
+  commandSetup: CommandSetup,
 ): Array<boolean | number | string> | undefined {
   if (
     params &&
@@ -252,7 +252,7 @@ program
   .option(
     '-c, --color [on]',
     'output will be styled with ANSI color codes',
-    'on'
+    'on',
   );
 
 program
@@ -263,7 +263,7 @@ program
   .option(
     '-b, --breakout-children',
     'output children (multi-outlet plugs)',
-    true
+    true,
   )
   .action((params, options) => {
     let paramsObj;
@@ -276,7 +276,7 @@ program
       options.breakoutChildren || false,
       program.opts().timeout,
       options.broadcast,
-      paramsObj
+      paramsObj,
     );
   });
 
@@ -317,7 +317,7 @@ program
       hostOnly,
       port,
       refresh !== undefined ? toBoolean(refresh) : undefined,
-      timeoutInSeconds
+      timeoutInSeconds,
     );
   });
 
@@ -367,7 +367,7 @@ for (const command of commandSetup) {
   const cmd = program
     .command(`${command.name} <host>${paramsString ? ` ${paramsString}` : ''}`)
     .description(
-      `Send ${command.name} to device (using Device#${command.name})`
+      `Send ${command.name} to device (using Device#${command.name})`,
     )
     .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 10000);
   if (command.supportsChildId) {
@@ -395,7 +395,7 @@ for (const command of commandSetup) {
       command.name,
       commandParams,
       sendOptions,
-      childId
+      childId,
     );
   });
 }

@@ -167,21 +167,21 @@ export interface ClientEventEmitter {
    */
   on(
     event: 'device-new',
-    listener: (device: Device | Bulb | Plug) => void
+    listener: (device: Device | Bulb | Plug) => void,
   ): this;
   /**
    * Follow up response from device.
    */
   on(
     event: 'device-online',
-    listener: (device: Device | Bulb | Plug) => void
+    listener: (device: Device | Bulb | Plug) => void,
   ): this;
   /**
    * No response from device.
    */
   on(
     event: 'device-offline',
-    listener: (device: Device | Bulb | Plug) => void
+    listener: (device: Device | Bulb | Plug) => void,
   ): this;
   /**
    * First response from Bulb.
@@ -220,7 +220,7 @@ export interface ClientEventEmitter {
       rinfo: RemoteInfo;
       response: Buffer;
       decryptedResponse: Buffer;
-    }) => void
+    }) => void,
   ): this;
   /**
    * Error during discovery.
@@ -242,7 +242,7 @@ export interface ClientEventEmitter {
       rinfo,
       response,
       decryptedResponse,
-    }: { rinfo: RemoteInfo; response: Buffer; decryptedResponse: Buffer }
+    }: { rinfo: RemoteInfo; response: Buffer; decryptedResponse: Buffer },
   ): boolean;
   emit(event: 'error', error: Error): boolean;
 }
@@ -323,7 +323,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
     payload: Record<string, unknown> | string,
     host: string,
     port = 9999,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<string> {
     const thisSendOptions = {
       ...this.defaultSendOptions,
@@ -346,7 +346,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
       payloadString,
       port,
       host,
-      thisSendOptions
+      thisSendOptions,
     );
     connection.close();
     return response;
@@ -362,14 +362,14 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
   async getSysInfo(
     host: string,
     port = 9999,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<Sysinfo> {
     this.log.debug('client.getSysInfo(%j)', { host, port, sendOptions });
     const response = await this.send(
       '{"system":{"get_sysinfo":{}}}',
       host,
       port,
-      sendOptions
+      sendOptions,
     );
 
     const responseObj = JSON.parse(response);
@@ -409,7 +409,10 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    * @param   deviceOptions - passed to [Bulb constructor]{@link Bulb}
    */
   getBulb(
-    deviceOptions: MarkOptional<ConstructorParameters<typeof Bulb>[0], 'client'>
+    deviceOptions: MarkOptional<
+      ConstructorParameters<typeof Bulb>[0],
+      'client'
+    >,
   ): Bulb {
     return new Bulb({
       defaultSendOptions: this.defaultSendOptions,
@@ -425,7 +428,10 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    * @param   deviceOptions - passed to [Plug constructor]{@link Plug}
    */
   getPlug(
-    deviceOptions: MarkOptional<ConstructorParameters<typeof Plug>[0], 'client'>
+    deviceOptions: MarkOptional<
+      ConstructorParameters<typeof Plug>[0],
+      'client'
+    >,
   ): Plug {
     return new Plug({
       defaultSendOptions: this.defaultSendOptions,
@@ -443,7 +449,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    */
   async getDevice(
     deviceOptions: AnyDeviceOptionsCon,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<AnyDevice> {
     this.log.debug('client.getDevice(%j)', { deviceOptions, sendOptions });
     let sysInfo: Sysinfo;
@@ -453,7 +459,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
       sysInfo = await this.getSysInfo(
         deviceOptions.host,
         deviceOptions.port,
-        sendOptions
+        sendOptions,
       );
     }
 
@@ -473,7 +479,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    */
   getDeviceFromSysInfo(
     sysInfo: Sysinfo,
-    deviceOptions: AnyDeviceOptionsCon
+    deviceOptions: AnyDeviceOptionsCon,
   ): AnyDevice {
     if (isPlugSysinfo(sysInfo)) {
       return this.getPlug({ ...deviceOptions, sysInfo });
@@ -491,7 +497,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    */
   // eslint-disable-next-line class-methods-use-this
   getTypeFromSysInfo(
-    sysInfo: { type: string } | { mic_type: string }
+    sysInfo: { type: string } | { mic_type: string },
   ): 'plug' | 'bulb' | 'device' {
     const type = 'type' in sysInfo ? sysInfo.type : sysInfo.mic_type;
     switch (true) {
@@ -556,7 +562,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
         const decryptedMsg = decrypt(msg).toString('utf8');
 
         this.log.debug(
-          `client.startDiscovery(): socket:message From: ${rinfo.address} ${rinfo.port} Message: ${decryptedMsg}`
+          `client.startDiscovery(): socket:message From: ${rinfo.address} ${rinfo.port} Message: ${decryptedMsg}`,
         );
 
         try {
@@ -574,7 +580,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
             this.log.debug(
               `client.startDiscovery(): Error parsing JSON: %s\nFrom: ${rinfo.address} ${rinfo.port} Original: [%s] Decrypted: [${decryptedMsg}]`,
               err,
-              msg
+              msg,
             );
             this.emit('discovery-invalid', {
               rinfo,
@@ -589,7 +595,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
             if (!(deviceTypes as string[]).includes(deviceType)) {
               this.log.debug(
                 `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${deviceType}), allowed device types: (%j)`,
-                deviceTypes
+                deviceTypes,
               );
               return;
             }
@@ -605,7 +611,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
             if (!compareMac(mac, macAddresses)) {
               this.log.debug(
                 `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), allowed macs: (%j)`,
-                macAddresses
+                macAddresses,
               );
               return;
             }
@@ -614,7 +620,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
           if (excludeMacAddresses && excludeMacAddresses.length > 0) {
             if (compareMac(mac, excludeMacAddresses)) {
               this.log.debug(
-                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`
+                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}] (${mac}), excluded mac`,
               );
               return;
             }
@@ -623,7 +629,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
           if (typeof filterCallback === 'function') {
             if (!filterCallback(sysInfo)) {
               this.log.debug(
-                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}], callback`
+                `client.startDiscovery(): Filtered out: ${sysInfo.alias} [${sysInfo.deviceId}], callback`,
               );
               return;
             }
@@ -640,7 +646,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
           this.log.debug(
             `client.startDiscovery(): Error processing response: %s\nFrom: ${rinfo.address} ${rinfo.port} Original: [%s] Decrypted: [${decryptedMsg}]`,
             err,
-            msg
+            msg,
           );
           this.emit('discovery-invalid', {
             rinfo,
@@ -661,7 +667,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
         this.isSocketBound = true;
         const sockAddress = socket.address();
         this.log.debug(
-          `client.socket: UDP ${sockAddress.family} listening on ${sockAddress.address}:${sockAddress.port}`
+          `client.socket: UDP ${sockAddress.family} listening on ${sockAddress.address}:${sockAddress.port}`,
         );
         socket.setBroadcast(true);
 
@@ -670,7 +676,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
             socket,
             broadcast,
             devices ?? [],
-            offlineTolerance
+            offlineTolerance,
           );
         }, discoveryInterval);
 
@@ -678,7 +684,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
         if (discoveryTimeout > 0) {
           setTimeout(() => {
             this.log.debug(
-              'client.startDiscovery: discoveryTimeout reached, stopping discovery'
+              'client.startDiscovery: discoveryTimeout reached, stopping discovery',
             );
             this.stopDiscovery();
           }, discoveryTimeout);
@@ -694,19 +700,19 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
 
   private static setSysInfoForDevice(
     device: AnyDeviceDiscovery,
-    sysInfo: Sysinfo
+    sysInfo: Sysinfo,
   ): void {
     if (device instanceof Plug) {
       if (!isPlugSysinfo(sysInfo)) {
         throw new TypeError(
-          util.format('Expected PlugSysinfo but received: %O', sysInfo)
+          util.format('Expected PlugSysinfo but received: %O', sysInfo),
         );
       }
       device.setSysInfo(sysInfo);
     } else if (device instanceof Bulb) {
       if (!isBulbSysinfo(sysInfo)) {
         throw new TypeError(
-          util.format('Expected BulbSysinfo but received: %O', sysInfo)
+          util.format('Expected BulbSysinfo but received: %O', sysInfo),
         );
       }
       device.setSysInfo(sysInfo);
@@ -782,13 +788,13 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
     socket: Socket,
     address: string,
     devices: DiscoveryDevice[],
-    offlineTolerance: number
+    offlineTolerance: number,
   ): void {
     this.log.debug(
       'client.sendDiscovery(%s, %j, %s)',
       address,
       devices,
-      offlineTolerance
+      offlineTolerance,
     );
     try {
       this.devices.forEach((device) => {
@@ -818,7 +824,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
           0,
           discoveryMsgBuf.length,
           d.port || 9999,
-          d.host
+          d.host,
         );
       });
 

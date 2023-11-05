@@ -15,13 +15,16 @@ export default abstract class TplinkSocket {
 
   queue = new Queue(1, Infinity);
 
-  constructor(readonly socketId: number, readonly log: Logger) {}
+  constructor(
+    readonly socketId: number,
+    readonly log: Logger,
+  ) {}
 
   protected abstract createSocketImpl(): Promise<dgram.Socket | net.Socket>;
 
   async createSocket(): Promise<dgram.Socket | net.Socket> {
     this.log.debug(
-      `[${this.socketId}] TplinkSocket(${this.socketType}).createSocket()`
+      `[${this.socketId}] TplinkSocket(${this.socketType}).createSocket()`,
     );
 
     if (this.socket) {
@@ -42,18 +45,18 @@ export default abstract class TplinkSocket {
     payload: string,
     port: number,
     host: string,
-    timeout: number
+    timeout: number,
   ): Promise<string>;
 
   async send(
     payload: string,
     port: number,
     host: string,
-    { timeout }: { timeout: number }
+    { timeout }: { timeout: number },
   ): Promise<string> {
     this.log.debug(
       `[${this.socketId}] TplinkSocket(${this.socketType}).send(%j)`,
-      { payload, port, host, timeout }
+      { payload, port, host, timeout },
     );
 
     return this.queue
@@ -63,7 +66,7 @@ export default abstract class TplinkSocket {
         } catch (err) {
           this.log.debug(
             `[${this.socketId}] TplinkSocket(${this.socketType}).send()`,
-            err
+            err,
           );
           if (this.isBound) this.close();
           throw err;
@@ -76,7 +79,7 @@ export default abstract class TplinkSocket {
 
   close(): void {
     this.log.debug(
-      `[${this.socketId}] TplinkSocket(${this.socketType}).close()`
+      `[${this.socketId}] TplinkSocket(${this.socketType}).close()`,
     );
     this.isBound = false;
   }

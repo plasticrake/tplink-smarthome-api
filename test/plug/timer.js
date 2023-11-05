@@ -14,7 +14,7 @@ module.exports = function (ctx) {
       it('should return timer rules', function () {
         return expect(device.timer.getRules()).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });
@@ -60,7 +60,7 @@ module.exports = function (ctx) {
             delay: 20,
             powerState: false,
             deleteExisting: false,
-          })
+          }),
         ).to.eventually.be.rejectedWith(ResponseError);
       });
     });
@@ -87,7 +87,7 @@ module.exports = function (ctx) {
     describe('#deleteAllRules()', function () {
       it('should delete timer rules', function () {
         return expect(
-          device.timer.deleteAllRules()
+          device.timer.deleteAllRules(),
         ).to.eventually.have.property('err_code', 0);
       });
     });

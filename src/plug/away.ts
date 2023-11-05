@@ -43,7 +43,7 @@ export default class Away {
   constructor(
     readonly device: Plug,
     readonly apiModuleName: string,
-    readonly childId: string | undefined = undefined
+    readonly childId: string | undefined = undefined,
   ) {}
 
   /**
@@ -53,7 +53,7 @@ export default class Away {
    * @throws {@link ResponseError}
    */
   async getRules(
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<HasRuleListWithRuleIds & HasErrCode> {
     return extractResponse<HasRuleListWithRuleIds & HasErrCode>(
       await this.device.sendCommand(
@@ -61,10 +61,10 @@ export default class Away {
           [this.apiModuleName]: { get_rules: {} },
         },
         this.childId,
-        sendOptions
+        sendOptions,
       ),
       '',
-      (c) => hasRuleListWithRuleIds(c) && hasErrCode(c)
+      (c) => hasRuleListWithRuleIds(c) && hasErrCode(c),
     );
   }
 
@@ -76,7 +76,7 @@ export default class Away {
    */
   async getRule(
     id: string,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<{ id: string } & HasErrCode> {
     const rules = await this.getRules(sendOptions);
     const rule = rules.rule_list.find((r) => r.id === id);
@@ -93,7 +93,7 @@ export default class Away {
    */
   async addRule(
     rule: AwayRuleInput,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     const {
       start,
@@ -116,7 +116,7 @@ export default class Away {
         [this.apiModuleName]: { add_rule: awayRule },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -129,7 +129,7 @@ export default class Away {
    */
   async editRule(
     rule: AwayRuleInput & { id: string },
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     const {
       id,
@@ -154,7 +154,7 @@ export default class Away {
         [this.apiModuleName]: { edit_rule: awayRule },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -171,7 +171,7 @@ export default class Away {
         [this.apiModuleName]: { delete_all_rules: {} },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -188,7 +188,7 @@ export default class Away {
         [this.apiModuleName]: { delete_rule: { id } },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -201,7 +201,7 @@ export default class Away {
    */
   async setOverallEnable(
     enable: boolean | 0 | 1,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -210,7 +210,7 @@ export default class Away {
         },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 }

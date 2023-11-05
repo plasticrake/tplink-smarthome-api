@@ -34,7 +34,7 @@ export default class Emeter {
   constructor(
     readonly device: AnyDevice,
     readonly apiModuleName: string,
-    readonly childId: string | undefined = undefined
+    readonly childId: string | undefined = undefined,
   ) {}
 
   /**
@@ -54,7 +54,7 @@ export default class Emeter {
     const normalize = <K extends keyof RealtimeNormalized>(
       key1: K,
       key2: K,
-      multiplier: number
+      multiplier: number,
     ): void => {
       const r = normRealtime;
       if (typeof r[key1] === 'number' && r[key2] === undefined) {
@@ -94,11 +94,11 @@ export default class Emeter {
             [this.apiModuleName]: { get_realtime: {} },
           },
           this.childId,
-          sendOptions
+          sendOptions,
         ),
         '',
-        (c) => isRealtime(c) && hasErrCode(c)
-      )
+        (c) => isRealtime(c) && hasErrCode(c),
+      ),
     );
     return this.realtime;
   }
@@ -116,14 +116,14 @@ export default class Emeter {
   async getDayStats(
     year: number,
     month: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_daystat: { year, month } },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -138,14 +138,14 @@ export default class Emeter {
    */
   async getMonthStats(
     year: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_monthstat: { year } },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -163,7 +163,7 @@ export default class Emeter {
         [this.apiModuleName]: { erase_emeter_stat: {} },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 }

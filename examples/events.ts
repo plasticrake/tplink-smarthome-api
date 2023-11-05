@@ -6,13 +6,13 @@ const client = new Client();
 const logEvent = function logEvent(
   eventName: string,
   device: Device,
-  state?: unknown
+  state?: unknown,
 ) {
   const stateString = state != null ? util.inspect(state) : '';
   console.log(
     `${new Date().toISOString()} ${eventName} ${device.model} ${device.host}:${
       device.port
-    } ${stateString}`
+    } ${stateString}`,
   );
 };
 

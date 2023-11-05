@@ -19,7 +19,7 @@ export default class TcpConnection extends TplinkConnection {
     payload: string,
     port: number,
     host: string,
-    { timeout }: { timeout: number }
+    { timeout }: { timeout: number },
   ): Promise<string> {
     return super.send(payload, port, host, { timeout });
   }

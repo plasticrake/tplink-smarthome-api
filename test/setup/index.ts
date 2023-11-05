@@ -23,10 +23,10 @@ export { config };
 
 export function retry(
   fn: () => Promise<unknown>,
-  retries = 3
+  retries = 3,
 ): Promise<unknown> {
   return fn().catch((e) =>
-    retries <= 0 ? Promise.reject(e) : retry(fn, retries - 1)
+    retries <= 0 ? Promise.reject(e) : retry(fn, retries - 1),
   );
 }
 
@@ -42,7 +42,7 @@ export function delayError(fn: () => Promise<void>, ms: number): () => void {
 }
 
 export async function createUnresponsiveDevice(
-  transport: 'tcp' | 'udp'
+  transport: 'tcp' | 'udp',
 ): Promise<{ port: number; host: string; close: () => void }> {
   return new Promise((resolve, reject) => {
     let port: number;

@@ -64,23 +64,23 @@ describe('Device', function () {
               });
 
               const anotherDevice = clientTest.getDeviceFromSysInfo(
-                device.sysInfo
+                device.sysInfo,
               );
 
               expect(clientTest.defaultSendOptions.timeout, 'client').to.equal(
-                timeout
+                timeout,
               );
               expect(
                 clientTest.defaultSendOptions.transport,
-                'client'
+                'client',
               ).to.equal(transport);
               expect(
                 anotherDevice.defaultSendOptions.timeout,
-                'device'
+                'device',
               ).to.equal(timeout);
               expect(
                 anotherDevice.defaultSendOptions.transport,
-                'device'
+                'device',
               ).to.equal(transport);
             });
 
@@ -92,11 +92,11 @@ describe('Device', function () {
               const clientTest = new Client({ logger });
 
               const anotherDevice = clientTest.getDeviceFromSysInfo(
-                device.sysInfo
+                device.sysInfo,
               );
 
               expect(clientTest.log.debug, 'client').to.equal(
-                anotherDevice.log.debug
+                anotherDevice.log.debug,
               );
             });
           });
@@ -104,18 +104,18 @@ describe('Device', function () {
           describe('#send', function () {
             it('should send a single valid command and receive response', async function () {
               const response = JSON.parse(
-                await device.send('{"system":{"get_sysinfo":{}}}')
+                await device.send('{"system":{"get_sysinfo":{}}}'),
               );
               expect(response).to.have.nested.property(
                 'system.get_sysinfo.err_code',
-                0
+                0,
               );
             });
             it('should send multiple valid commands (same module) and receive response', async function () {
               const response = JSON.parse(
                 await device.send(
-                  `{"${time}":{"get_time":{},"get_timezone":{}}}`
-                )
+                  `{"${time}":{"get_time":{},"get_timezone":{}}}`,
+                ),
               );
               expect(response[time].get_time.err_code).to.eql(0);
               expect(response[time].get_timezone.err_code).to.eql(0);
@@ -123,18 +123,18 @@ describe('Device', function () {
             it('should send multiple valid commands (diff modules) and receive response', async function () {
               const response = JSON.parse(
                 await device.send(
-                  `{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`
-                )
+                  `{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`,
+                ),
               );
               expect(response).to.have.nested.property(
                 'system.get_sysinfo.err_code',
-                0
+                0,
               );
               expect(response[time].get_time.err_code).to.eql(0);
             });
             it('should send a single invalid command (member) and receive response', async function () {
               const response = JSON.parse(
-                await device.send('{"system":{"INVALID_MEMBER":{}}}')
+                await device.send('{"system":{"INVALID_MEMBER":{}}}'),
               );
               expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([
                 -2, -2000,
@@ -142,18 +142,18 @@ describe('Device', function () {
             });
             it('should send a single invalid command (module) and receive response', async function () {
               const response = JSON.parse(
-                await device.send('{"INVALID_MODULE":{"INVALID_MEMBER":{}}}')
+                await device.send('{"INVALID_MODULE":{"INVALID_MEMBER":{}}}'),
               );
               expect(response).to.have.nested.property(
-                'INVALID_MODULE.err_code'
+                'INVALID_MODULE.err_code',
               );
               expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
             });
             it('should send multiple invalid commands and receive response', async function () {
               const response = JSON.parse(
                 await device.send(
-                  '{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}'
-                )
+                  '{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}',
+                ),
               );
               expect(response.INVALID_MODULE.err_code).to.be.oneOf([-1, -2001]);
               expect(response.system.INVALID_MEMBER.err_code).to.be.oneOf([
@@ -166,9 +166,8 @@ describe('Device', function () {
               unreachableDevice.host =
                 testDevices.unreachable.deviceOptions.host;
 
-              expect(
-                unreachableDevice.send('{"system":{"get_sysinfo":{}}}')
-              ).to.be.eventually.rejected;
+              expect(unreachableDevice.send('{"system":{"get_sysinfo":{}}}')).to
+                .be.eventually.rejected;
             });
 
             describe('unresponsive', function () {
@@ -176,7 +175,7 @@ describe('Device', function () {
               let unresponsiveDevice;
               beforeEach(async function () {
                 unresponsive = await createUnresponsiveDevice(
-                  testSendOptions.transport
+                  testSendOptions.transport,
                 );
                 unresponsiveDevice = await testDevice.getDevice();
                 unresponsiveDevice.host = unresponsive.host;
@@ -191,7 +190,7 @@ describe('Device', function () {
                 expect(
                   unresponsiveDevice.send('{"system":{"get_sysinfo":{}}}', {
                     timeout: 4000,
-                  })
+                  }),
                 ).to.be.eventually.rejected;
               });
             });
@@ -200,13 +199,13 @@ describe('Device', function () {
           describe('#sendCommand', function () {
             it('should send a single valid command and receive response', async function () {
               const response = await device.sendCommand(
-                '{"system":{"get_sysinfo":{}}}'
+                '{"system":{"get_sysinfo":{}}}',
               );
               return expect(response).to.have.property('err_code', 0);
             });
             it('should send multiple valid commands (same module) and receive response', async function () {
               const response = await device.sendCommand(
-                `{"${time}":{"get_time":{},"get_timezone":{}}}`
+                `{"${time}":{"get_time":{},"get_timezone":{}}}`,
               );
 
               expect(response[time].get_time.err_code).to.eql(0);
@@ -214,11 +213,11 @@ describe('Device', function () {
             });
             it('should send multiple valid commands (diff modules) and receive response', async function () {
               const response = await device.sendCommand(
-                `{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`
+                `{"system":{"get_sysinfo":{}},"${time}":{"get_time":{}}}`,
               );
               expect(response).to.have.nested.property(
                 'system.get_sysinfo.err_code',
-                0
+                0,
               );
               expect(response[time].get_time.err_code).to.eql(0);
             });
@@ -228,7 +227,7 @@ describe('Device', function () {
                 .catch((err) => {
                   expect(err).to.be.instanceof(ResponseError);
                   expect(JSON.parse(err.response)).to.have.nested.property(
-                    'err_code'
+                    'err_code',
                   );
                   expect(JSON.parse(err.response).err_code).to.be.oneOf([
                     -2, -2000,
@@ -241,7 +240,7 @@ describe('Device', function () {
                 .catch((err) => {
                   expect(err).to.be.instanceof(ResponseError);
                   expect(JSON.parse(err.response)).to.have.nested.property(
-                    'err_code'
+                    'err_code',
                   );
                   expect(JSON.parse(err.response).err_code).to.be.oneOf([
                     -1, -2001,
@@ -251,15 +250,15 @@ describe('Device', function () {
             it('should send multiple invalid commands and reject with ResponseError', function () {
               return device
                 .sendCommand(
-                  '{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}'
+                  '{"system":{"INVALID_MEMBER":{}},"INVALID_MODULE":{"INVALID_MEMBER":{}}}',
                 )
                 .catch((err) => {
                   expect(err).to.be.an.instanceof(ResponseError);
                   expect(
-                    JSON.parse(err.response).INVALID_MODULE.err_code
+                    JSON.parse(err.response).INVALID_MODULE.err_code,
                   ).to.be.oneOf([-1, -2001]);
                   expect(
-                    JSON.parse(err.response).system.INVALID_MEMBER.err_code
+                    JSON.parse(err.response).system.INVALID_MEMBER.err_code,
                   ).to.be.oneOf([-2, -2000]);
                 });
             });
@@ -267,7 +266,7 @@ describe('Device', function () {
               const promises = [];
               for (let i = 0; i < 20; i += 1) {
                 promises.push(
-                  device.sendCommand('{"system":{"get_sysinfo":{}}}')
+                  device.sendCommand('{"system":{"get_sysinfo":{}}}'),
                 );
               }
 
@@ -283,7 +282,7 @@ describe('Device', function () {
                 testDevices.unreachable.deviceOptions.host;
 
               expect(
-                unreachableDevice.sendCommand('{"system":{"get_sysinfo":{}}}')
+                unreachableDevice.sendCommand('{"system":{"get_sysinfo":{}}}'),
               ).to.be.eventually.rejected;
             });
           });
@@ -299,7 +298,7 @@ describe('Device', function () {
             it('should return alias from cached sysInfo', function () {
               if (device.childId) {
                 const child = device.sysInfo.children.find(
-                  (c) => c.id === device.childId
+                  (c) => c.id === device.childId,
                 );
                 expect(device.alias).to.eql(child.alias);
                 child.alias = 'My Test Alias';
@@ -323,7 +322,7 @@ describe('Device', function () {
           describe('#description get', function () {
             it('should return description from cached sysInfo', function () {
               expect(device.description).to.eql(
-                device.sysInfo.description || device.sysInfo.dev_name
+                device.sysInfo.description || device.sysInfo.dev_name,
               );
             });
           });
@@ -339,7 +338,7 @@ describe('Device', function () {
           describe('#type get', function () {
             it('should return type from cached sysInfo', function () {
               expect(device.type).to.eql(
-                device.sysInfo.type || device.sysInfo.mic_type
+                device.sysInfo.type || device.sysInfo.mic_type,
               );
               device.sysInfo.type = 'My Test type';
               delete device.sysInfo.mic_type;
@@ -377,7 +376,7 @@ describe('Device', function () {
               expect(device.mac).to.eql(
                 device.sysInfo.mac ||
                   device.sysInfo.mic_mac ||
-                  device.sysInfo.ethernet_mac
+                  device.sysInfo.ethernet_mac,
               );
               device.sysInfo.mac = 'My Test mac';
               device.sysInfo.mic_mac = undefined;
@@ -415,7 +414,7 @@ describe('Device', function () {
             it('should return info', function () {
               return expect(device.getSysInfo()).to.eventually.have.property(
                 'err_code',
-                0
+                0,
               );
             });
           });
@@ -436,7 +435,7 @@ describe('Device', function () {
 
             it('should change the alias', async function () {
               const testAlias = `Testing ${Math.floor(
-                Math.random() * (100 + 1)
+                Math.random() * (100 + 1),
               )}`;
               expect(await device.setAlias(testAlias)).to.be.true;
               await device.getSysInfo();
@@ -447,7 +446,7 @@ describe('Device', function () {
           describe('#setLocation()', function () {
             it('should return model', function () {
               return expect(
-                device.setLocation(10, 10)
+                device.setLocation(10, 10),
               ).to.eventually.have.property('err_code', 0);
             });
           });
@@ -455,7 +454,7 @@ describe('Device', function () {
           describe('#getModel()', function () {
             it('should return model', function () {
               return expect(device.getModel()).to.eventually.match(
-                /^[A-Za-z]{2}\d\d\d|^[A-Za-z]{2}\d\d\d/
+                /^[A-Za-z]{2}\d\d\d|^[A-Za-z]{2}\d\d\d/,
               );
             });
           });
@@ -465,7 +464,7 @@ describe('Device', function () {
               if (!testDevice.isSimulated) this.skip();
               return expect(device.reboot(1)).to.eventually.have.property(
                 'err_code',
-                0
+                0,
               );
             });
           });
@@ -475,7 +474,7 @@ describe('Device', function () {
               if (!testDevice.isSimulated) this.skip();
               return expect(device.reset(1)).to.eventually.have.property(
                 'err_code',
-                0
+                0,
               );
             });
           });
@@ -518,7 +517,7 @@ describe('Device', function () {
                   host: testDevices.unreachable.deviceOptions.host,
                   sysInfo: device.sysInfo,
                 },
-                testSendOptions
+                testSendOptions,
               );
 
               const spy = sinon.spy();
@@ -550,7 +549,7 @@ describe('Device', function () {
             it('should throw error for unreachable device', async function () {
               badDevice = await testDevice.getDevice(
                 undefined,
-                testSendOptions
+                testSendOptions,
               );
               badDevice.host = testDevices.unreachable.deviceOptions.host;
 
@@ -569,7 +568,7 @@ describe('Device', function () {
             it('should throw error for unreachable device', async function () {
               badDevice = await testDevice.getDevice(
                 undefined,
-                testSendOptions
+                testSendOptions,
               );
               badDevice.host = testDevices.unreachable.deviceOptions.host;
 

@@ -26,7 +26,10 @@ export function isCloudInfo(candidate: unknown): candidate is CloudInfo {
 export default class Cloud {
   info: (CloudInfo & HasErrCode) | undefined;
 
-  constructor(readonly device: AnyDevice, readonly apiModuleName: string) {}
+  constructor(
+    readonly device: AnyDevice,
+    readonly apiModuleName: string,
+  ) {}
 
   /**
    * Gets device's TP-Link cloud info.
@@ -42,10 +45,10 @@ export default class Cloud {
           [this.apiModuleName]: { get_info: {} },
         },
         undefined,
-        sendOptions
+        sendOptions,
       ),
       '',
-      (c) => isCloudInfo(c) && hasErrCode(c)
+      (c) => isCloudInfo(c) && hasErrCode(c),
     );
     return this.info;
   }
@@ -62,14 +65,14 @@ export default class Cloud {
   async bind(
     username: string,
     password: string,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { bind: { username, password } },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -86,7 +89,7 @@ export default class Cloud {
         [this.apiModuleName]: { unbind: {} },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -103,7 +106,7 @@ export default class Cloud {
         [this.apiModuleName]: { get_intl_fw_list: {} },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -117,14 +120,14 @@ export default class Cloud {
    */
   async setServerUrl(
     server: string,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { set_server_url: { server } },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 }

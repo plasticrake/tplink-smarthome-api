@@ -12,7 +12,7 @@ module.exports = function (ctx) {
       it('should return time', function () {
         return expect(device.time.getTime()).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });
@@ -21,7 +21,7 @@ module.exports = function (ctx) {
       it('should return get time zone', function () {
         return expect(device.time.getTimezone()).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });

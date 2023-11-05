@@ -3,7 +3,10 @@ import type { SendOptions } from '../client';
 import type Device from '.';
 
 export default class Netif {
-  constructor(readonly device: Device, readonly apiModuleName: string) {}
+  constructor(
+    readonly device: Device,
+    readonly apiModuleName: string,
+  ) {}
 
   /**
    * Requests `netif.get_scaninfo` (list of WiFi networks).
@@ -19,7 +22,7 @@ export default class Netif {
   async getScanInfo(
     refresh = false,
     timeoutInSeconds = 10,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     const sendOptionsWithTimeout = clone(sendOptions || {});
     if (sendOptionsWithTimeout.timeout == null) {
@@ -37,7 +40,7 @@ export default class Netif {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 }

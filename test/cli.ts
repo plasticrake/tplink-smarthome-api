@@ -27,7 +27,7 @@ describe('cli', function () {
       expect(stderr[0]).to.include('Usage:');
       expect(
         stderr.some((x) => x.includes('Commands:')),
-        'outputs Commands'
+        'outputs Commands',
       ).to.be.true;
     });
   });
@@ -39,7 +39,7 @@ describe('cli', function () {
       expect(stdout[0]).to.include('Usage:');
       expect(
         stdout.some((x) => x.includes('Commands:')),
-        'outputs Commands'
+        'outputs Commands',
       ).to.be.true;
     });
   });
@@ -57,7 +57,7 @@ describe('cli', function () {
     it('returns zero code & outputs encrypted result', async function () {
       const { code, stdout } = await execute(
         runner,
-        `${cli} encrypt base64 test`
+        `${cli} encrypt base64 test`,
       );
       expect(code).to.equal(0);
       expect(stdout.join()).to.equal('37rJvQ==');
@@ -68,7 +68,7 @@ describe('cli', function () {
     it('returns zero code & outputs encrypted result', async function () {
       const { code, stdout } = await execute(
         runner,
-        `${cli} encryptWithHeader base64 test`
+        `${cli} encryptWithHeader base64 test`,
       );
       expect(code).to.equal(0);
       expect(stdout.join()).to.equal('AAAABN+6yb0=');
@@ -79,7 +79,7 @@ describe('cli', function () {
     it('returns zero code & outputs decrypted result', async function () {
       const { code, stdout } = await execute(
         runner,
-        `${cli} decrypt base64 37rJvQ==`
+        `${cli} decrypt base64 37rJvQ==`,
       );
       expect(code).to.equal(0);
       expect(stdout.join()).to.equal('test');
@@ -90,7 +90,7 @@ describe('cli', function () {
     it('returns zero code & outputs decrypted result', async function () {
       const { code, stdout } = await execute(
         runner,
-        `${cli} decryptWithHeader base64 AAAABN+6yb0=`
+        `${cli} decryptWithHeader base64 AAAABN+6yb0=`,
       );
       expect(code).to.equal(0);
       expect(stdout.join()).to.equal('test');

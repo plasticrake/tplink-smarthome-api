@@ -164,7 +164,7 @@ module.exports = function (ctx, testDevice) {
     describe('#getNextAction()', function () {
       it('should return schedule next action', function () {
         return expect(
-          device.schedule.getNextAction()
+          device.schedule.getNextAction(),
         ).to.eventually.have.property('err_code', 0);
       });
     });
@@ -173,7 +173,7 @@ module.exports = function (ctx, testDevice) {
       it('should return schedule rules', function () {
         return expect(device.schedule.getRules()).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });
@@ -222,13 +222,13 @@ module.exports = function (ctx, testDevice) {
       it('should enable', async function () {
         expect(await device.schedule.setOverallEnable(true)).to.have.property(
           'err_code',
-          0
+          0,
         );
       });
       it('should disable', async function () {
         expect(await device.schedule.setOverallEnable(false)).to.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });
@@ -236,7 +236,7 @@ module.exports = function (ctx, testDevice) {
     describe('#getDayStats()', function () {
       it('should return day stats', function () {
         return expect(
-          device.schedule.getDayStats(year, month)
+          device.schedule.getDayStats(year, month),
         ).to.eventually.have.property('err_code', 0);
       });
     });
@@ -244,7 +244,7 @@ module.exports = function (ctx, testDevice) {
     describe('#getMonthStats()', function () {
       it('should return day stats', function () {
         return expect(
-          device.schedule.getMonthStats(year)
+          device.schedule.getMonthStats(year),
         ).to.eventually.have.property('err_code', 0);
       });
     });
@@ -254,7 +254,7 @@ module.exports = function (ctx, testDevice) {
         if (testDevice.type !== 'simulated') this.skip();
         return expect(device.schedule.eraseStats()).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });

@@ -13,13 +13,13 @@ module.exports = function (ctx) {
         this.timeout(config.defaultTestTimeout * 4);
         this.slow(config.defaultTestTimeout * 2);
         return expect(
-          device.netif.getScanInfo(true, 2)
+          device.netif.getScanInfo(true, 2),
         ).to.eventually.have.property('err_code', 0);
       });
 
       it('should return cached scan info', function () {
         return expect(
-          device.netif.getScanInfo(false)
+          device.netif.getScanInfo(false),
         ).to.eventually.have.property('err_code', 0);
       });
     });

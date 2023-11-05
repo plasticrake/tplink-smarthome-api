@@ -60,7 +60,7 @@ export type CommonSysinfo = {
 };
 
 export function isCommonSysinfo(
-  candidate: unknown
+  candidate: unknown,
 ): candidate is CommonSysinfo {
   return (
     isObjectLike(candidate) &&
@@ -105,7 +105,7 @@ export interface DeviceEventEmitter {
    */
   on(
     event: 'emeter-realtime-update',
-    listener: (value: Realtime) => void
+    listener: (value: Realtime) => void,
   ): this;
   /**
    * @deprecated This will be removed in a future release.
@@ -192,14 +192,14 @@ export default abstract class Device
       this.host,
       this.port,
       this.log,
-      this.client
+      this.client,
     );
 
     this.tcpConnection = new TcpConnection(
       this.host,
       this.port,
       this.log,
-      this.client
+      this.client,
     );
   }
 
@@ -345,7 +345,7 @@ export default abstract class Device
    */
   async send(
     payload: string | Record<string, unknown>,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<string> {
     this.log.debug('[%s] device.send()', this.alias);
 
@@ -363,14 +363,14 @@ export default abstract class Device
           payloadString,
           this.port,
           this.host,
-          thisSendOptions
+          thisSendOptions,
         );
       }
       return await this.tcpConnection.send(
         payloadString,
         this.port,
         this.host,
-        thisSendOptions
+        thisSendOptions,
       );
     } catch (err) {
       this.log.error('[%s] device.send() %s', this.alias, err);
@@ -387,7 +387,7 @@ export default abstract class Device
     methodName: string,
     parameters: HasAtLeastOneProperty,
     childIds: string[] | string | undefined = this.childId,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<HasErrCode> {
     const payload: {
       [key: string]: {
@@ -401,7 +401,7 @@ export default abstract class Device
     if (childIds) {
       const childIdsArray = castArray(childIds).map(
         this.normalizeChildId,
-        this
+        this,
       );
       payload.context = { child_ids: childIdsArray };
     }
@@ -413,7 +413,7 @@ export default abstract class Device
       moduleName,
       methodName,
       payloadString,
-      response
+      response,
     );
     return results;
   }
@@ -442,7 +442,7 @@ export default abstract class Device
   async sendCommand(
     command: string | Record<string, unknown>,
     childIds: string[] | string | undefined = this.childId,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     // TODO allow certain err codes (particularly emeter for non HS110 devices)
     const commandObj =
@@ -451,7 +451,7 @@ export default abstract class Device
     if (childIds) {
       const childIdsArray = castArray(childIds).map(
         this.normalizeChildId,
-        this
+        this,
       );
       commandObj.context = { child_ids: childIdsArray };
     }
@@ -490,7 +490,7 @@ export default abstract class Device
         this.log.debug(
           '[%s] device.startPolling(): getInfo(): error:',
           this.alias,
-          err
+          err,
         );
 
         this.emit('polling-error', err);
@@ -525,10 +525,10 @@ export default abstract class Device
       await this.sendCommand(
         '{"system":{"get_sysinfo":{}}}',
         undefined,
-        sendOptions
+        sendOptions,
       ),
       '',
-      isSysinfo
+      isSysinfo,
     ) as Sysinfo;
 
     this.setSysInfo(response);
@@ -550,7 +550,7 @@ export default abstract class Device
         },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
     this.setAliasProperty(alias);
     return true;
@@ -568,7 +568,7 @@ export default abstract class Device
   async setLocation(
     latitude: number,
     longitude: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<Record<string, unknown>> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const latitude_i = Math.round(latitude * 10000);
@@ -581,7 +581,7 @@ export default abstract class Device
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
     if (isObjectLike(response)) return response;
     throw new Error('Unexpected Response');
@@ -612,7 +612,7 @@ export default abstract class Device
         [this.apiModules.system]: { reboot: { delay } },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -629,7 +629,7 @@ export default abstract class Device
         [this.apiModules.system]: { reset: { delay } },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 

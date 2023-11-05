@@ -43,13 +43,13 @@ export type ScheduleRulesResponse = ScheduleRules & HasErrCode;
 export type ScheduleNextActionResponse = ScheduleNextAction & HasErrCode;
 
 function isScheduleNextAction(
-  candidate: unknown
+  candidate: unknown,
 ): candidate is ScheduleNextAction {
   return isObjectLike(candidate);
 }
 
 export function isScheduleNextActionResponse(
-  candidate: unknown
+  candidate: unknown,
 ): candidate is ScheduleNextActionResponse {
   return isScheduleNextAction(candidate) && hasErrCode(candidate);
 }
@@ -57,7 +57,7 @@ export function isScheduleNextActionResponse(
 export type HasRuleListWithRuleIds = { rule_list: { id: string }[] };
 
 export function hasRuleListWithRuleIds(
-  candidate: unknown
+  candidate: unknown,
 ): candidate is { rule_list: { id: string }[] } {
   return (
     isObjectLike(candidate) &&
@@ -65,7 +65,7 @@ export function hasRuleListWithRuleIds(
     isObjectLike(candidate.rule_list) &&
     Array.isArray(candidate.rule_list) &&
     candidate.rule_list.every(
-      (rule) => 'id' in rule && typeof rule.id === 'string'
+      (rule) => 'id' in rule && typeof rule.id === 'string',
     )
   );
 }
@@ -77,13 +77,13 @@ function isScheduleRules(candidate: unknown): candidate is ScheduleRules {
     isObjectLike(candidate.rule_list) &&
     Array.isArray(candidate.rule_list) &&
     candidate.rule_list.every(
-      (rule) => 'id' in rule && typeof rule.id === 'string'
+      (rule) => 'id' in rule && typeof rule.id === 'string',
     )
   );
 }
 
 export function isScheduleRulesResponse(
-  candidate: unknown
+  candidate: unknown,
 ): candidate is ScheduleNextActionResponse {
   return isScheduleRules(candidate) && hasErrCode(candidate);
 }
@@ -92,7 +92,7 @@ export type ScheduleRuleInputTime = Date | number | 'sunrise' | 'sunset';
 
 function createScheduleDate(
   date: ScheduleRuleInputTime,
-  startOrEnd: 'start' | 'end'
+  startOrEnd: 'start' | 'end',
 ): ScheduleDateStart | ScheduleDateEnd {
   let min = 0;
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -117,7 +117,7 @@ function createScheduleDate(
 }
 
 function createScheduleDateStart(
-  date: ScheduleRuleInputTime
+  date: ScheduleRuleInputTime,
 ): ScheduleDateStart {
   return createScheduleDate(date, 'start') as ScheduleDateStart;
 }
@@ -211,7 +211,7 @@ export default abstract class Schedule {
   constructor(
     readonly device: AnyDevice,
     readonly apiModuleName: string,
-    readonly childId?: string
+    readonly childId?: string,
   ) {}
 
   /**
@@ -221,7 +221,7 @@ export default abstract class Schedule {
    * @throws {@link ResponseError}
    */
   async getNextAction(
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<ScheduleNextActionResponse> {
     this.nextAction = extractResponse(
       await this.device.sendCommand(
@@ -229,10 +229,10 @@ export default abstract class Schedule {
           [this.apiModuleName]: { get_next_action: {} },
         },
         this.childId,
-        sendOptions
+        sendOptions,
       ),
       '',
-      isScheduleNextActionResponse
+      isScheduleNextActionResponse,
     ) as ScheduleNextActionResponse;
 
     return this.nextAction;
@@ -251,10 +251,10 @@ export default abstract class Schedule {
           [this.apiModuleName]: { get_rules: {} },
         },
         this.childId,
-        sendOptions
+        sendOptions,
       ),
       '',
-      isScheduleRulesResponse
+      isScheduleRulesResponse,
     ) as ScheduleRulesResponse;
   }
 
@@ -267,12 +267,12 @@ export default abstract class Schedule {
    */
   async getRule(
     id: string,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<ScheduleRuleResponse> {
     const rules = await this.getRules(sendOptions);
 
     const rule: ScheduleRule | undefined = rules.rule_list.find(
-      (r) => r.id === id
+      (r) => r.id === id,
     );
     if (rule === undefined) throw new Error(`Rule id not found: ${id}`);
 
@@ -289,7 +289,7 @@ export default abstract class Schedule {
 
   async addRule(
     rule: object,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<{ id: string }> {
     return extractResponse(
       await this.device.sendCommand(
@@ -297,12 +297,12 @@ export default abstract class Schedule {
           [this.apiModuleName]: { add_rule: rule },
         },
         this.childId,
-        sendOptions
+        sendOptions,
       ),
       '',
       (candidate) => {
         return isObjectLike(candidate) && typeof candidate.id === 'string';
-      }
+      },
     ) as { id: string };
   }
 
@@ -319,7 +319,7 @@ export default abstract class Schedule {
         [this.apiModuleName]: { edit_rule: rule },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -336,7 +336,7 @@ export default abstract class Schedule {
         [this.apiModuleName]: { delete_all_rules: {} },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -353,7 +353,7 @@ export default abstract class Schedule {
         [this.apiModuleName]: { delete_rule: { id } },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -366,7 +366,7 @@ export default abstract class Schedule {
    */
   async setOverallEnable(
     enable: boolean,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -375,7 +375,7 @@ export default abstract class Schedule {
         },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -389,14 +389,14 @@ export default abstract class Schedule {
   async getDayStats(
     year: number,
     month: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_daystat: { year, month } },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -409,14 +409,14 @@ export default abstract class Schedule {
    */
   async getMonthStats(
     year: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
         [this.apiModuleName]: { get_monthstat: { year } },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -433,7 +433,7 @@ export default abstract class Schedule {
         [this.apiModuleName]: { erase_runtime_stat: {} },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 }

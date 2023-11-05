@@ -71,7 +71,7 @@ export function isLightState(candidate: unknown): candidate is LightState {
 }
 
 export function isLightStateResponse(
-  candidate: unknown
+  candidate: unknown,
 ): candidate is LightStateResponse {
   return isObjectLike(candidate) && hasErrCode(candidate);
 }
@@ -93,7 +93,7 @@ export default class Lighting {
   constructor(
     private readonly device: Bulb,
     private readonly apiModuleName: string,
-    private readonly setLightStateMethodName: string
+    private readonly setLightStateMethodName: string,
   ) {}
 
   /**
@@ -147,10 +147,10 @@ export default class Lighting {
           [this.apiModuleName]: { get_light_state: {} },
         },
         undefined,
-        sendOptions
+        sendOptions,
       ),
       '',
-      isLightStateResponse
+      isLightStateResponse,
     ) as LightStateResponse;
 
     return this.lightState;
@@ -165,7 +165,7 @@ export default class Lighting {
    */
   async setLightState(
     lightState: LightStateInput,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<true> {
     const {
       /* eslint-disable @typescript-eslint/naming-convention */
@@ -197,10 +197,10 @@ export default class Lighting {
           [this.apiModuleName]: { [this.setLightStateMethodName]: state },
         },
         undefined,
-        sendOptions
+        sendOptions,
       ),
       '',
-      isLightStateResponse
+      isLightStateResponse,
     ) as LightStateResponse;
 
     // The light strip in particular returns more detail with get(), so only
@@ -223,7 +223,7 @@ export default class Lighting {
         [this.apiModuleName]: { get_light_details: {} },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 }

@@ -35,7 +35,7 @@ export default class PlugSchedule extends Schedule {
   constructor(
     readonly device: Plug,
     readonly apiModuleName: string,
-    readonly childId?: string
+    readonly childId?: string,
   ) {
     super(device, apiModuleName, childId);
   }
@@ -49,7 +49,7 @@ export default class PlugSchedule extends Schedule {
    */
   async addRule(
     rule: PlugScheduleRuleInput,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): ReturnType<Schedule['addRule']> {
     const {
       powerState,
@@ -86,7 +86,7 @@ export default class PlugSchedule extends Schedule {
    */
   async editRule(
     rule: PlugScheduleRuleInput & { id: string },
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     const {
       id,

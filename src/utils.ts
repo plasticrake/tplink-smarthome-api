@@ -2,7 +2,7 @@ import castArray from 'lodash.castarray';
 import get from 'lodash.get';
 
 export function isObjectLike(
-  candidate: unknown
+  candidate: unknown,
 ): candidate is Record<string, unknown> {
   return typeof candidate === 'object' && candidate !== null;
 }
@@ -31,7 +31,7 @@ export class ResponseError extends Error {
     readonly response: string,
     readonly command: string,
     readonly modules: string[] = [],
-    readonly methods: string[] = []
+    readonly methods: string[] = [],
   ) {
     super(message);
     this.name = 'ResponseError';
@@ -41,7 +41,7 @@ export class ResponseError extends Error {
 }
 
 export function isDefinedAndNotNull<T>(
-  candidate: T
+  candidate: T,
 ): candidate is Exclude<T, null | undefined> {
   return candidate !== undefined && candidate !== null;
 }
@@ -67,7 +67,7 @@ export function compareMac(mac = '', macPattern: string | string[]): boolean {
         .replace(/[^A-Za-z0-9?*]/g, '')
         .replace(/[?]/g, '.')
         .replace(/[*]/g, '.*')
-        .toUpperCase()}$`
+        .toUpperCase()}$`,
     );
   });
   const normalizedMac = normalizeMac(mac);
@@ -76,7 +76,7 @@ export function compareMac(mac = '', macPattern: string | string[]): boolean {
 
 export function replaceControlCharacters(
   input: string,
-  replace = '﹖'
+  replace = '﹖',
 ): string {
   return input.replace(/[\x00-\x1F]/g, replace); // eslint-disable-line no-control-regex
 }
@@ -90,7 +90,7 @@ function flattenResponses(
     module: string;
     method?: string;
     response: Record<string, unknown>;
-  }> = []
+  }> = [],
 ): Array<{
   module: string;
   method?: string;
@@ -123,7 +123,7 @@ function flattenResponses(
             response[key] as Record<string, unknown>,
             depth + 1,
             key,
-            results
+            results,
           );
         }
       }
@@ -142,7 +142,7 @@ export function processSingleCommandResponse(
   module: string,
   method: string,
   command: string,
-  response: string
+  response: string,
 ): HasErrCode {
   let responseObj;
   try {
@@ -174,7 +174,7 @@ export function processSingleCommandResponse(
  */
 export function processResponse(
   command: Record<string, unknown>,
-  response: Record<string, unknown>
+  response: Record<string, unknown>,
 ): Record<string, unknown> {
   const multipleResponses = Object.keys(response).length > 1;
   const commandResponses = flattenResponses(command, response);
@@ -190,7 +190,7 @@ export function processResponse(
     throw new ResponseError(
       'err_code missing',
       JSON.stringify(response),
-      JSON.stringify(command)
+      JSON.stringify(command),
     );
   }
 
@@ -222,7 +222,7 @@ export function processResponse(
       JSON.stringify(errors[0].response),
       JSON.stringify(command),
       [errors[0].module],
-      errors[0].method === undefined ? undefined : [errors[0].method]
+      errors[0].method === undefined ? undefined : [errors[0].method],
     );
   } else if (errors.length > 0) {
     throw new ResponseError(
@@ -232,7 +232,7 @@ export function processResponse(
       errors.map((e) => e.module),
       errors
         .filter((e) => e.method !== undefined)
-        .map((e) => e.method as string)
+        .map((e) => e.method as string),
     );
   }
 
@@ -255,18 +255,18 @@ export function processResponse(
 export function extractResponse<T>(
   response: unknown,
   path: string,
-  typeGuardFn: (arg0: unknown) => boolean
+  typeGuardFn: (arg0: unknown) => boolean,
 ): T {
   const ret = path.length > 0 ? get(response, path) : response;
 
   if (ret === undefined || !isObjectLike(ret)) {
     throw new Error(
-      `Could not find path:"${path}" in ${JSON.stringify(response)}`
+      `Could not find path:"${path}" in ${JSON.stringify(response)}`,
     );
   }
   if (!typeGuardFn(ret))
     throw new TypeError(
-      `Unexpected object path:"${path}" in ${JSON.stringify(response)}`
+      `Unexpected object path:"${path}" in ${JSON.stringify(response)}`,
     );
   return ret as T;
 }

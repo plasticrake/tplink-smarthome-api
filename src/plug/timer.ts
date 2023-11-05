@@ -18,7 +18,7 @@ export default class Timer {
   constructor(
     readonly device: AnyDevice,
     readonly apiModuleName: string,
-    readonly childId: string | undefined = undefined
+    readonly childId: string | undefined = undefined,
   ) {}
 
   /**
@@ -35,7 +35,7 @@ export default class Timer {
         [this.apiModuleName]: { get_rules: {} },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -61,7 +61,7 @@ export default class Timer {
       enable = true,
       deleteExisting = true,
     }: TimerRuleInput & { deleteExisting: boolean },
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     if (deleteExisting) await this.deleteAllRules(sendOptions);
     return this.device.sendCommand(
@@ -76,7 +76,7 @@ export default class Timer {
         },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -102,7 +102,7 @@ export default class Timer {
       name = 'timer',
       enable = true,
     }: TimerRuleInput & { id: string },
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -117,7 +117,7 @@ export default class Timer {
         },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -134,7 +134,7 @@ export default class Timer {
         [this.apiModuleName]: { delete_all_rules: {} },
       },
       this.childId,
-      sendOptions
+      sendOptions,
     );
   }
 }

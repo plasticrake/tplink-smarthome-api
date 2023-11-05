@@ -15,7 +15,7 @@ type SimulatorDevice = {
 
 async function simulatorToDevice(
   client: Client,
-  simulatorDevice: SimulatorDevice
+  simulatorDevice: SimulatorDevice,
 ): Promise<AnyDevice> {
   return client.getDevice({
     host: simulatorDevice.address,
@@ -30,7 +30,7 @@ export const stopUdpServer = simulator.UdpServer.stop;
 const simulatorDevices: SimulatorDevice[] = [];
 
 export async function getSimulatedUnreliableDevice(
-  client: Client
+  client: Client,
 ): Promise<AnyDevice> {
   const device = new simulator.Device({
     model: 'hs100',
@@ -138,14 +138,14 @@ async function getSimulatorDevices(): Promise<SimulatorDevice[]> {
 }
 
 export async function getSimulatedDevices(
-  client: Client
+  client: Client,
 ): Promise<AnyDevice[]> {
   const devices: AnyDevice[] = [];
 
   for (const sim of await getSimulatorDevices()) {
     devices.push(
       // eslint-disable-next-line no-await-in-loop
-      await simulatorToDevice(client, sim)
+      await simulatorToDevice(client, sim),
     );
   }
 

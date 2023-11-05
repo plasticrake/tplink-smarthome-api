@@ -46,7 +46,7 @@ export default class UdpSocket extends TplinkSocket {
     payload: string,
     port: number,
     host: string,
-    timeout: number
+    timeout: number,
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       const { socket } = this;
@@ -61,8 +61,8 @@ export default class UdpSocket extends TplinkSocket {
             this.logDebug(`: socketTimeout(${socketTimeout})`);
             reject(
               new Error(
-                `UDP Timeout after ${socketTimeout}ms\n${host}:${port} ${payload}`
-              )
+                `UDP Timeout after ${socketTimeout}ms\n${host}:${port} ${payload}`,
+              ),
             );
           }, socketTimeout);
         }
@@ -81,18 +81,18 @@ export default class UdpSocket extends TplinkSocket {
 
           decryptedMsg = decrypt(msg).toString('utf8');
           this.logDebug(
-            `: socket:data message:${replaceControlCharacters(decryptedMsg)}`
+            `: socket:data message:${replaceControlCharacters(decryptedMsg)}`,
           );
 
           return resolve(decryptedMsg);
         } catch (err) {
           this.log.error(
             `Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(
-              decryptedMsg
+              decryptedMsg,
             )}]`,
             rinfo,
             socket.getRecvBufferSize(),
-            msg
+            msg,
           );
           return reject(err);
         }
@@ -129,7 +129,7 @@ export default class UdpSocket extends TplinkSocket {
                 `: socket:send socket:error length: ${
                   encryptedPayload.length
                 } SO_SNDBUF:${socket.getSendBufferSize()} `,
-                err
+                err,
               );
               if (this.isBound) this.close();
             } finally {
@@ -138,7 +138,7 @@ export default class UdpSocket extends TplinkSocket {
             return;
           }
           this.logDebug(': socket:send sent');
-        }
+        },
       );
     });
   }

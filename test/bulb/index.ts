@@ -36,7 +36,7 @@ describe('Bulb', function () {
               // this is in beforeEach since many of the tests may overwrite some properties
               bulb = (await testDevice.getDevice(
                 undefined,
-                testSendOptions
+                testSendOptions,
               )) as Bulb;
               ctx.device = bulb;
             }, 2);
@@ -45,7 +45,7 @@ describe('Bulb', function () {
           describe('#supportsBrightness get', function () {
             it('should return is_dimmable from cached sysInfo', function () {
               expect(bulb.supportsBrightness).to.eql(
-                bulb.sysInfo.is_dimmable === 1
+                bulb.sysInfo.is_dimmable === 1,
               );
 
               bulb.sysInfo.is_dimmable = 0;
@@ -69,7 +69,7 @@ describe('Bulb', function () {
           describe('#supportsColorTemperature get', function () {
             it('should return is_variable_color_temp from cached sysInfo', function () {
               expect(bulb.supportsColorTemperature).to.eql(
-                bulb.sysInfo.is_variable_color_temp === 1
+                bulb.sysInfo.is_variable_color_temp === 1,
               );
 
               bulb.sysInfo.is_variable_color_temp = 0;

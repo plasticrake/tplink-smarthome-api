@@ -9,7 +9,7 @@ const logEvent = function logEvent(eventName, device, state) {
   console.log(
     `${new Date().toISOString()} ${eventName} ${device.model} ${device.host}:${
       device.port
-    } ${stateString}`
+    } ${stateString}`,
   );
 };
 

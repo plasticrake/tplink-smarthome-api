@@ -36,11 +36,11 @@ module.exports = function (ctx, testDevice) {
       it('should return Realtime if supported or throw error', async function () {
         if (supportsEmeter) {
           return expect(
-            device.emeter.getRealtime()
+            device.emeter.getRealtime(),
           ).to.eventually.have.property('err_code', 0);
         }
         return expect(
-          device.emeter.getRealtime()
+          device.emeter.getRealtime(),
         ).to.eventually.be.rejectedWith(ResponseError);
       });
       it('should emit emeter-realtime-update if supported', async function () {
@@ -64,7 +64,7 @@ module.exports = function (ctx, testDevice) {
             expect(response).to.have.property('current_ma');
             expect(response.current, 'current').to.be.closeTo(
               response.current_ma / 1000,
-              1
+              1,
             );
           }
           if (response.power != null || response.power_mw != null) {
@@ -72,7 +72,7 @@ module.exports = function (ctx, testDevice) {
             expect(response).to.have.property('power_mw');
             expect(response.power, 'power').to.be.closeTo(
               response.power_mw / 1000,
-              1
+              1,
             );
           }
           if (response.total != null || response.total_wh != null) {
@@ -80,7 +80,7 @@ module.exports = function (ctx, testDevice) {
             expect(response).to.have.property('total_wh');
             expect(response.total, 'total').to.be.closeTo(
               response.total_wh / 1000,
-              1
+              1,
             );
           }
           if (response.voltage != null || response.voltage_mv != null) {
@@ -88,12 +88,12 @@ module.exports = function (ctx, testDevice) {
             expect(response).to.have.property('voltage_mv');
             expect(response.voltage, 'voltage').to.be.closeTo(
               response.voltage_mv / 1000,
-              1
+              1,
             );
           }
         } else {
           return expect(
-            device.emeter.getRealtime()
+            device.emeter.getRealtime(),
           ).to.eventually.be.rejectedWith(ResponseError);
         }
         return null;
@@ -104,11 +104,11 @@ module.exports = function (ctx, testDevice) {
       it('should return day stats', function () {
         if (supportsEmeter) {
           return expect(
-            device.emeter.getDayStats(year, month)
+            device.emeter.getDayStats(year, month),
           ).to.eventually.have.property('err_code', 0);
         }
         return expect(
-          device.emeter.getDayStats(year, month)
+          device.emeter.getDayStats(year, month),
         ).to.eventually.be.rejectedWith(ResponseError);
       });
     });
@@ -117,11 +117,11 @@ module.exports = function (ctx, testDevice) {
       it('should return day stats', function () {
         if (supportsEmeter) {
           return expect(
-            device.emeter.getMonthStats(year)
+            device.emeter.getMonthStats(year),
           ).to.eventually.have.property('err_code', 0);
         }
         return expect(
-          device.emeter.getMonthStats(year)
+          device.emeter.getMonthStats(year),
         ).to.eventually.be.rejectedWith(ResponseError);
       });
     });
@@ -132,11 +132,11 @@ module.exports = function (ctx, testDevice) {
         if (supportsEmeter) {
           return expect(device.emeter.eraseStats()).to.eventually.have.property(
             'err_code',
-            0
+            0,
           );
         }
         return expect(device.emeter.eraseStats()).to.eventually.be.rejectedWith(
-          ResponseError
+          ResponseError,
         );
       });
     });

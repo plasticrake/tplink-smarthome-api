@@ -37,7 +37,10 @@ export default class Dimmer {
    */
   #brightness = 0;
 
-  constructor(readonly device: Plug, readonly apiModuleName: string) {}
+  constructor(
+    readonly device: Plug,
+    readonly apiModuleName: string,
+  ) {}
 
   /**
    * Cached value of `sysinfo.brightness`.
@@ -65,7 +68,7 @@ export default class Dimmer {
    */
   async setBrightness(
     brightness: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     const results = this.device.sendCommand(
       {
@@ -74,7 +77,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
 
     this.setBrightnessValue(brightness);
@@ -97,7 +100,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -116,7 +119,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -129,7 +132,7 @@ export default class Dimmer {
    */
   async setDimmerTransition(
     dimmerTransition: DimmerTransitionInput,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     const { brightness, mode, duration } = dimmerTransition;
 
@@ -144,7 +147,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
 
     if (brightness !== undefined) this.setBrightnessValue(brightness);
@@ -161,7 +164,7 @@ export default class Dimmer {
    */
   async setDoubleClickAction(
     { mode, index }: DimmerActionInput,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.setAction(
       {
@@ -169,7 +172,7 @@ export default class Dimmer {
         mode,
         index,
       },
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -183,7 +186,7 @@ export default class Dimmer {
       mode?: string;
       index?: number;
     },
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -192,7 +195,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -207,7 +210,7 @@ export default class Dimmer {
    */
   async setFadeOffTime(
     fadeTime: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -216,7 +219,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -231,7 +234,7 @@ export default class Dimmer {
    */
   async setFadeOnTime(
     fadeTime: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -240,7 +243,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -255,7 +258,7 @@ export default class Dimmer {
    */
   async setGentleOffTime(
     duration: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -264,7 +267,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -279,7 +282,7 @@ export default class Dimmer {
    */
   async setGentleOnTime(
     duration: number,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -288,7 +291,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -305,11 +308,11 @@ export default class Dimmer {
    */
   async setLongPressAction(
     { mode, index }: DimmerActionInput,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.setAction(
       { actionName: 'set_long_press_action', mode, index },
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -324,7 +327,7 @@ export default class Dimmer {
    */
   async setSwitchState(
     state: boolean | 0 | 1,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<unknown> {
     return this.device.sendCommand(
       {
@@ -333,7 +336,7 @@ export default class Dimmer {
         },
       },
       undefined,
-      sendOptions
+      sendOptions,
     );
   }
 
@@ -347,7 +350,7 @@ export default class Dimmer {
       '[%s] plug.dimmer.emitEvents() brightness: %s lastState: %j',
       this.device.alias,
       brightness,
-      this.lastState
+      this.lastState,
     );
 
     if (brightness !== undefined) {

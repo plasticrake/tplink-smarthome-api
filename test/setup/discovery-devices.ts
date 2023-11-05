@@ -4,7 +4,7 @@ import { AnyDevice } from '../../src/client';
 export default async function getDiscoveryDevices(
   client: Client,
   discoveryTimeout: number,
-  discoveryMacAllow: string[]
+  discoveryMacAllow: string[],
 ): Promise<AnyDevice[]> {
   return new Promise((resolve) => {
     const discoveredTestDevices: AnyDevice[] = [];

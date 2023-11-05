@@ -26,7 +26,7 @@ module.exports = function (ctx) {
       it('should set brightness', async function () {
         expect(device.dimmer.setBrightness(50)).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
 
         let si = await device.getSysInfo();
@@ -34,7 +34,7 @@ module.exports = function (ctx) {
 
         expect(device.dimmer.setBrightness(20)).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
         si = await device.getSysInfo();
         expect(si.brightness).to.eql(20);
@@ -62,7 +62,7 @@ module.exports = function (ctx) {
       it('should set brightness', async function () {
         const tran = { brightness: 50, mode: 'gentle_on_off', duration: 1 };
         expect(
-          device.dimmer.setDimmerTransition(tran)
+          device.dimmer.setDimmerTransition(tran),
         ).to.eventually.have.property('err_code', 0);
 
         let si = await device.getSysInfo();
@@ -70,7 +70,7 @@ module.exports = function (ctx) {
 
         tran.brightness = 20;
         expect(
-          device.dimmer.setDimmerTransition(tran)
+          device.dimmer.setDimmerTransition(tran),
         ).to.eventually.have.property('err_code', 0);
         si = await device.getSysInfo();
         expect(si.brightness).to.eql(20);
@@ -115,7 +115,7 @@ module.exports = function (ctx) {
           'hard_on',
           'long_press',
           'soft_on',
-          'err_code'
+          'err_code',
         );
       });
     });
@@ -125,7 +125,7 @@ module.exports = function (ctx) {
         for (const fadeTime of [2100, 3200]) {
           expect(await device.dimmer.setFadeOffTime(fadeTime)).to.have.property(
             'err_code',
-            0
+            0,
           );
           const response = await device.dimmer.getDimmerParameters();
           expect(response).to.have.property('err_code', 0);
@@ -139,7 +139,7 @@ module.exports = function (ctx) {
         for (const fadeTime of [2100, 3200]) {
           expect(await device.dimmer.setFadeOnTime(fadeTime)).to.have.property(
             'err_code',
-            0
+            0,
           );
           const response = await device.dimmer.getDimmerParameters();
           expect(response).to.have.property('err_code', 0);
@@ -152,7 +152,7 @@ module.exports = function (ctx) {
       it('should set GentleOffTime', async function () {
         for (const fadeTime of [2100, 3200]) {
           expect(
-            await device.dimmer.setGentleOffTime(fadeTime)
+            await device.dimmer.setGentleOffTime(fadeTime),
           ).to.have.property('err_code', 0);
           const response = await device.dimmer.getDimmerParameters();
           expect(response).to.have.property('err_code', 0);
@@ -165,7 +165,7 @@ module.exports = function (ctx) {
       it('should set GentleOnTime', async function () {
         for (const fadeTime of [2100, 3200]) {
           expect(
-            await device.dimmer.setGentleOnTime(fadeTime)
+            await device.dimmer.setGentleOnTime(fadeTime),
           ).to.have.property('err_code', 0);
           const response = await device.dimmer.getDimmerParameters();
           expect(response).to.have.property('err_code', 0);
@@ -186,7 +186,7 @@ module.exports = function (ctx) {
           'fadeOffTime',
           'gentleOnTime',
           'gentleOffTime',
-          'rampRate'
+          'rampRate',
         );
       });
     });
@@ -200,7 +200,7 @@ module.exports = function (ctx) {
           { mode: 'customize_preset', index: 2 },
         ]) {
           expect(
-            await device.dimmer.setDoubleClickAction(action)
+            await device.dimmer.setDoubleClickAction(action),
           ).to.have.property('err_code', 0);
           const response = await device.dimmer.getDefaultBehavior();
           expect(response).to.have.property('err_code', 0);
@@ -218,7 +218,7 @@ module.exports = function (ctx) {
           { mode: 'customize_preset', index: 2 },
         ]) {
           expect(
-            await device.dimmer.setLongPressAction(action)
+            await device.dimmer.setLongPressAction(action),
           ).to.have.property('err_code', 0);
           const response = await device.dimmer.getDefaultBehavior();
           expect(response).to.have.property('err_code', 0);
@@ -232,7 +232,7 @@ module.exports = function (ctx) {
         for (const state of [true, false, true]) {
           expect(await device.dimmer.setSwitchState(state)).to.have.property(
             'err_code',
-            0
+            0,
           );
           expect(await device.getPowerState()).to.eql(state);
         }
