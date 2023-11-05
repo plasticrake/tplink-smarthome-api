@@ -107,13 +107,8 @@ export interface DeviceEventEmitter {
     event: 'emeter-realtime-update',
     listener: (value: Realtime) => void,
   ): this;
-  /**
-   * @deprecated This will be removed in a future release.
-   */
-  on(event: 'polling-error', listener: (error: Error) => void): this;
 
   emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
-  emit(event: 'polling-error', error: Error): boolean;
 }
 
 /**
@@ -142,8 +137,6 @@ export default abstract class Device
   private readonly udpConnection: UdpConnection;
 
   private readonly tcpConnection: TcpConnection;
-
-  private pollingTimer: NodeJS.Timeout | null = null;
 
   protected _sysInfo: Sysinfo;
 
@@ -470,46 +463,6 @@ export default abstract class Device
     }
 
     return childId;
-  }
-
-  /**
-   * Polls the device every `interval`.
-   *
-   * Returns `this` (for chaining) that emits events based on state changes.
-   * Refer to specific device sections for event details.
-   * @fires  Device#polling-error
-   * @param   interval - (ms)
-   *
-   * @deprecated This will be removed in a future release.
-   */
-  startPolling(interval: number): this {
-    const fn = async (): Promise<void> => {
-      try {
-        await this.getInfo();
-      } catch (err) {
-        this.log.debug(
-          '[%s] device.startPolling(): getInfo(): error:',
-          this.alias,
-          err,
-        );
-
-        this.emit('polling-error', err);
-      }
-    };
-    this.pollingTimer = setInterval(fn, interval);
-    fn();
-    return this;
-  }
-
-  /**
-   * Stops device polling.
-   *
-   * @deprecated This will be removed in a future release.
-   */
-  stopPolling(): void {
-    if (this.pollingTimer === null) return;
-    clearInterval(this.pollingTimer);
-    this.pollingTimer = null;
   }
 
   /**
