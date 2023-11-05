@@ -17,11 +17,11 @@ module.exports = function (ctx) {
           await device.lighting.setLightState({
             on_off: true,
             ignore_default: true,
-          })
+          }),
         ).to.be.true;
         expect(await device.lighting.getLightState()).to.have.property(
           'on_off',
-          1
+          1,
         );
       });
 
@@ -30,11 +30,11 @@ module.exports = function (ctx) {
           await device.lighting.setLightState({
             on_off: false,
             transition_period: 100,
-          })
+          }),
         ).to.be.true;
         expect(await device.lighting.getLightState()).to.have.property(
           'on_off',
-          0
+          0,
         );
       });
 
@@ -45,7 +45,7 @@ module.exports = function (ctx) {
           await device.lighting.setLightState({
             on_off: 1,
             brightness: 20,
-          })
+          }),
         ).to.be.true;
         let si = await device.getSysInfo();
         expect(si.light_state).to.have.property('on_off', 1);
@@ -55,7 +55,7 @@ module.exports = function (ctx) {
           await device.lighting.setLightState({
             on_off: 1,
             brightness: 60,
-          })
+          }),
         ).to.be.true;
         si = await device.getSysInfo();
         expect(si.light_state).to.have.property('on_off', 1);
@@ -69,7 +69,7 @@ module.exports = function (ctx) {
           await device.lighting.setLightState({
             on_off: 1,
             color_temp: 4000,
-          })
+          }),
         ).to.be.true;
         let si = await device.getSysInfo();
         expect(si.light_state).to.have.property('on_off', 1);
@@ -79,7 +79,7 @@ module.exports = function (ctx) {
           await device.lighting.setLightState({
             on_off: 1,
             color_temp: 5000,
-          })
+          }),
         ).to.be.true;
         si = await device.getSysInfo();
         expect(si.light_state).to.have.property('on_off', 1);
@@ -95,7 +95,7 @@ module.exports = function (ctx) {
             hue: 100,
             saturation: 40,
             brightness: 20,
-          })
+          }),
         ).to.be.true;
         let si = await device.getSysInfo();
         expect(si.light_state).to.have.property('on_off', 1);
@@ -109,7 +109,7 @@ module.exports = function (ctx) {
             hue: 200,
             saturation: 50,
             brightness: 60,
-          })
+          }),
         ).to.be.true;
         si = await device.getSysInfo();
         expect(si.light_state).to.have.property('on_off', 1);
@@ -146,12 +146,12 @@ module.exports = function (ctx) {
 
         expect(spyChange).to.be.calledThrice;
         expect(spyChange).to.be.always.calledWithMatch(
-          sinon.match.has('on_off')
+          sinon.match.has('on_off'),
         );
 
         expect(spyUpdate).to.have.callCount(6);
         expect(spyUpdate).to.be.always.calledWithMatch(
-          sinon.match.has('on_off')
+          sinon.match.has('on_off'),
         );
       });
     });
@@ -196,17 +196,17 @@ module.exports = function (ctx) {
 
         expect(spyOff, 'spyOff').to.be.calledOnce;
         expect(spyOff, 'spyOff').to.be.always.calledWithMatch(
-          sinon.match.has('on_off')
+          sinon.match.has('on_off'),
         );
 
         expect(spyChange, 'spyChange').to.be.calledOnce;
         expect(spyChange, 'spyChange').to.be.always.calledWithMatch(
-          sinon.match.has('on_off')
+          sinon.match.has('on_off'),
         );
 
         expect(spyUpdate, 'spyUpdate').to.have.callCount(4);
         expect(spyUpdate, 'spyUpdate').to.be.always.calledWithMatch(
-          sinon.match.has('on_off')
+          sinon.match.has('on_off'),
         );
       });
     });

@@ -18,13 +18,13 @@ export default class UdpConnection extends TplinkConnection {
 
     if (useSharedSocket && this.sharedSocket !== undefined) {
       this.log.debug(
-        `UdpConnection(${this.description}).getSocket(): reusing shared socket`
+        `UdpConnection(${this.description}).getSocket(): reusing shared socket`,
       );
       if (this.sharedSocket.socket != null && this.sharedSocket.isBound) {
         return this.sharedSocket;
       }
       this.log.debug(
-        `UdpConnection(${this.description}).getSocket(): recreating shared socket`
+        `UdpConnection(${this.description}).getSocket(): recreating shared socket`,
       );
     }
 
@@ -61,7 +61,7 @@ export default class UdpConnection extends TplinkConnection {
       timeout: number;
       useSharedSocket: boolean;
       sharedSocketTimeout: number;
-    }
+    },
   ): Promise<string> {
     if (useSharedSocket && sharedSocketTimeout != null) {
       this.setTimeout(sharedSocketTimeout);
@@ -82,7 +82,7 @@ export default class UdpConnection extends TplinkConnection {
 
     if (this.sharedSocket && this.sharedSocket.isBound) {
       this.log.debug(
-        `TplinkConnection(${this.description}).close() closing shared socket`
+        `TplinkConnection(${this.description}).close() closing shared socket`,
       );
       this.sharedSocket.close();
     }

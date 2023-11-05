@@ -26,7 +26,7 @@ export const testClientLogLevel = envHasValue(process.env.TEST_CLIENT_LOGLEVEL)
   : 'silent';
 
 export const useSimulator = envIsTrue(
-  envHasValue(process.env.TEST_SIMULATOR) ? process.env.TEST_SIMULATOR : true
+  envHasValue(process.env.TEST_SIMULATOR) ? process.env.TEST_SIMULATOR : true,
 );
 
 export const discoveryTimeout = envHasValue(process.env.TEST_DISCOVERY_TIMEOUT)

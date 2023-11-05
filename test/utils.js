@@ -110,7 +110,7 @@ describe('Utils', function () {
         'voltage',
         'power',
         'total',
-        'err_code'
+        'err_code',
       );
     });
 
@@ -206,13 +206,13 @@ describe('Utils', function () {
         'voltage',
         'power',
         'total',
-        'err_code'
+        'err_code',
       );
       expect(pr.system.get_sysinfo).to.include.keys(
         'err_code',
         'sw_ver',
         'hw_ver',
-        'type'
+        'type',
       );
     });
 
@@ -264,7 +264,7 @@ describe('Utils', function () {
       const response = { emeter: { get_realtime: {} } };
       expect(() => processResponse(command, response)).to.throw(
         ResponseError,
-        'err_code missing'
+        'err_code missing',
       );
     });
 
@@ -273,7 +273,7 @@ describe('Utils', function () {
       const response = { emeter: {} };
       expect(() => processResponse(command, response)).to.throw(
         ResponseError,
-        'err_code missing'
+        'err_code missing',
       );
     });
 
@@ -282,7 +282,7 @@ describe('Utils', function () {
       const response = {};
       expect(() => processResponse(command, response)).to.throw(
         ResponseError,
-        'err_code missing'
+        'err_code missing',
       );
     });
 
@@ -294,7 +294,7 @@ describe('Utils', function () {
       };
       expect(() => processResponse(command, response)).to.throw(
         ResponseError,
-        'err_code'
+        'err_code',
       );
     });
   });

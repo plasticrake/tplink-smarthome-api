@@ -39,7 +39,7 @@ describe('Plug', function () {
               // eslint-disable-next-line no-await-in-loop
               const childPlug = await child.getDevice(
                 undefined,
-                testSendOptions
+                testSendOptions,
               );
               // eslint-disable-next-line no-await-in-loop
               await fn(childPlug);
@@ -59,7 +59,7 @@ describe('Plug', function () {
                 const origAlias = childPlug.alias;
 
                 const testAlias = `Testing ${Math.floor(
-                  Math.random() * (100 + 1)
+                  Math.random() * (100 + 1),
                 )}`;
                 expect(await childPlug.setAlias(testAlias)).to.be.true;
                 await childPlug.getSysInfo();
@@ -232,7 +232,7 @@ describe('Plug', function () {
               expect(spy).to.be.calledOnce;
               expect(spyPowerUpdate).to.be.calledTwice;
               expect(spyPowerUpdate).to.be.always.calledWithMatch(
-                sinon.match.bool
+                sinon.match.bool,
               );
             });
 
@@ -248,7 +248,7 @@ describe('Plug', function () {
               expect(spy).to.be.calledOnce;
               expect(spyPowerUpdate).to.be.calledTwice;
               expect(spyPowerUpdate).to.be.always.calledWithMatch(
-                sinon.match.bool
+                sinon.match.bool,
               );
             });
 
@@ -271,7 +271,7 @@ describe('Plug', function () {
               expect(spyInUseUpdate, 'in-use-update').to.be.calledThrice;
               expect(
                 spyInUseUpdate,
-                'in-use-update'
+                'in-use-update',
               ).to.be.always.calledWithMatch(sinon.match.bool);
             });
           });
@@ -310,7 +310,7 @@ describe('Plug', function () {
 
               expect(spyInUseUpdate).to.be.calledTwice;
               expect(spyInUseUpdate).to.be.always.calledWithMatch(
-                sinon.match.bool
+                sinon.match.bool,
               );
             });
           });

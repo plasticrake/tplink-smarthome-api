@@ -8,13 +8,13 @@ const client = new Client({
 const logEvent = function logEvent(
   eventName: string,
   device: Device,
-  state?: unknown
+  state?: unknown,
 ) {
   const stateString = state != null ? util.inspect(state) : '';
   console.log(
     `${new Date().toISOString()} ${eventName} ${device.model} ${device.host}:${
       device.port
-    } ${device.childId} ${stateString}`
+    } ${device.childId} ${stateString}`,
   );
 };
 
@@ -65,7 +65,7 @@ const monitorEvents = function monitorEvents(device: Device) {
     Array.from(device.children.keys(), async (childId) => {
       const childPlug = await client.getDevice({ host: '10.0.1.136', childId });
       monitorEvents(childPlug);
-    })
+    }),
   );
 
   monitorEvents(device);

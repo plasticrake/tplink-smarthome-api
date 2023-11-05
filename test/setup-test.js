@@ -26,16 +26,16 @@ describe('Test Environment Setup', function () {
     context(contextName, function () {
       it('should have a device', function () {
         expect(testDevice.getDevice, 'function').to.exist.and.be.an.instanceof(
-          Function
+          Function,
         );
         return expect(
-          testDevice.getDevice()
+          testDevice.getDevice(),
         ).to.eventually.exist.and.be.an.instanceof(Device);
       });
       it('should have deviceOptions', function () {
         expect(testDevice.deviceOptions).to.exist.and.to.contain.keys(
           'host',
-          'port'
+          'port',
         );
       });
       describe('getTestClient()', function () {
@@ -93,11 +93,10 @@ describe('Test Environment Setup', function () {
         context(testSendOptions.name, function () {
           it('should have getDevice and throw', function () {
             expect(testDevice.getDevice).to.exist.and.be.an.instanceof(
-              Function
+              Function,
             );
-            return expect(
-              testDevice.getDevice(undefined, testSendOptions)
-            ).to.eventually.be.rejected;
+            return expect(testDevice.getDevice(undefined, testSendOptions)).to
+              .eventually.be.rejected;
           });
         });
       });
@@ -108,7 +107,7 @@ describe('Test Environment Setup', function () {
         expect(testDevices.unreachable).to.have.property('deviceOptions');
         expect(testDevices.unreachable.deviceOptions).to.contain.keys(
           'host',
-          'port'
+          'port',
         );
       });
     });

@@ -14,7 +14,7 @@ export type TestDevice = {
   mac?: string;
   getDevice: (
     deviceOptions?: Parameters<Client['getDevice']>[0],
-    sendOptions?: Parameters<Client['getDevice']>[1]
+    sendOptions?: Parameters<Client['getDevice']>[1],
   ) => ReturnType<Client['getDevice']>;
   parent?: TestDevice;
   children?: MarkRequired<TestDevice, 'getDevice' | 'childId' | 'parent'>[];
@@ -61,7 +61,7 @@ export function createTestDevice(
     hardwareVersion?: string;
     parent: TestDevice;
     childId: string;
-  }
+  },
 ): TestDevice {
   const testDevice: MarkOptional<TestDevice, 'getDevice'> = {
     name,
@@ -86,7 +86,7 @@ export function testDeviceDecorator(
   }: {
     parent?: TestDevice;
     childId?: string;
-  } = {}
+  } = {},
 ): TestDevice {
   testDevice.parent = parent;
   testDevice.childId = childId;
@@ -105,7 +105,7 @@ export function testDeviceDecorator(
 
     testDevice.getDevice = function getDevice(
       deviceOptions?: Parameters<Client['getDevice']>[0],
-      sendOptions?: Parameters<Client['getDevice']>[1]
+      sendOptions?: Parameters<Client['getDevice']>[1],
     ): ReturnType<Client['getDevice']> {
       return client.getDevice(
         {
@@ -113,7 +113,7 @@ export function testDeviceDecorator(
           defaultSendOptions: sendOptions,
           ...deviceOptions,
         } as Parameters<Client['getDevice']>[0], // TODO: I don't like this cast but only way I could get it to work
-        sendOptions
+        sendOptions,
       );
     };
 
@@ -169,7 +169,7 @@ export function testDeviceDecorator(
                   relayState: d.relayState,
                   alias: d.alias,
                 };
-              })
+              }),
             );
           };
       }

@@ -14,7 +14,7 @@ module.exports = function (ctx) {
       it('should return away rules', function () {
         return expect(device.away.getRules()).to.eventually.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });
@@ -113,13 +113,13 @@ module.exports = function (ctx) {
       it('should enable', async function () {
         expect(await device.away.setOverallEnable(true)).to.have.property(
           'err_code',
-          0
+          0,
         );
       });
       it('should disable', async function () {
         expect(await device.away.setOverallEnable(false)).to.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });

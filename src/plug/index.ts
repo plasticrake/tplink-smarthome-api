@@ -44,7 +44,7 @@ export type PlugSysinfo = CommonSysinfo &
   };
 
 export function hasSysinfoChildren(
-  candidate: Sysinfo
+  candidate: Sysinfo,
 ): candidate is Sysinfo & Required<SysinfoChildren> {
   return (
     isObjectLike(candidate) &&
@@ -75,7 +75,7 @@ export interface PlugEventEmitter {
    */
   on(
     event: 'emeter-realtime-update',
-    listener: (value: RealtimeNormalized) => void
+    listener: (value: RealtimeNormalized) => void,
   ): this;
   /**
    * @deprecated This will be removed in a future release.
@@ -321,7 +321,7 @@ export default class Plug extends Device implements PlugEventEmitter {
           // eslint-disable-next-line no-param-reassign
           child.id = this.normalizeChildId(child.id);
           return [child.id, child];
-        })
+        }),
       );
     } else if (children instanceof Map) {
       this.#children = children;
@@ -506,7 +506,7 @@ export default class Plug extends Device implements PlugEventEmitter {
       data = await this.sendCommand(
         '{"emeter":{"get_realtime":{}},"schedule":{"get_next_action":{}},"system":{"get_sysinfo":{}},"cnCloud":{"get_info":{}}}',
         this.#childId,
-        sendOptionsForGetInfo
+        sendOptionsForGetInfo,
       );
     } catch (err) {
       // Ignore emeter section errors as not all devices support it
@@ -524,14 +524,14 @@ export default class Plug extends Device implements PlugEventEmitter {
     const sysinfo = extractResponse(
       data,
       'system.get_sysinfo',
-      isPlugSysinfo
+      isPlugSysinfo,
     ) as PlugSysinfo;
     this.setSysInfo(sysinfo);
 
     const cloudInfo = extractResponse<CloudInfo & HasErrCode>(
       data,
       'cnCloud.get_info',
-      (c) => isCloudInfo(c) && hasErrCode(c)
+      (c) => isCloudInfo(c) && hasErrCode(c),
     );
     this.cloud.info = cloudInfo;
 
@@ -548,7 +548,7 @@ export default class Plug extends Device implements PlugEventEmitter {
     const scheduleNextAction = extractResponse(
       data,
       'schedule.get_next_action',
-      hasErrCode
+      hasErrCode,
     ) as HasErrCode;
     this.schedule.nextAction = scheduleNextAction;
 
@@ -598,7 +598,7 @@ export default class Plug extends Device implements PlugEventEmitter {
     await this.sendCommand(
       `{"system":{"set_led_off":{"off":${value ? 0 : 1}}}}`,
       undefined,
-      sendOptions
+      sendOptions,
     );
     this.sysInfo.led_off = value ? 0 : 1;
     return true;
@@ -623,12 +623,12 @@ export default class Plug extends Device implements PlugEventEmitter {
    */
   async setPowerState(
     value: boolean,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<true> {
     await this.sendCommand(
       `{"system":{"set_relay_state":{"state":${value ? 1 : 0}}}}`,
       this.#childId,
-      sendOptions
+      sendOptions,
     );
     this.setRelayState(value);
     this.emitEvents();
@@ -659,7 +659,7 @@ export default class Plug extends Device implements PlugEventEmitter {
   async blink(
     times = 5,
     rate = 1000,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<boolean> {
     const delay = (t: number): Promise<void> => {
       return new Promise((resolve) => {
@@ -700,7 +700,7 @@ export default class Plug extends Device implements PlugEventEmitter {
       this.alias,
       inUse,
       relayState,
-      this.lastState
+      this.lastState,
     );
     if (this.lastState.inUse !== inUse) {
       this.lastState.inUse = inUse;

@@ -20,7 +20,7 @@ export default abstract class TplinkConnection extends EventEmitter {
     public host: string,
     public port: number,
     readonly log: Logger,
-    readonly client: Client
+    readonly client: Client,
   ) {
     super();
 
@@ -28,7 +28,7 @@ export default abstract class TplinkConnection extends EventEmitter {
       this.log.debug(
         `TplinkConnection(${this.description}): timeout()`,
         this.host,
-        this.port
+        this.port,
       );
       this.queue.add(async () => {
         this.close();
@@ -41,7 +41,7 @@ export default abstract class TplinkConnection extends EventEmitter {
   }
 
   protected abstract getSocket(
-    useSharedSocket?: boolean
+    useSharedSocket?: boolean,
   ): Promise<UdpSocket | TcpSocket>;
 
   async send(
@@ -56,7 +56,7 @@ export default abstract class TplinkConnection extends EventEmitter {
       timeout: number;
       useSharedSocket?: boolean;
       sharedSocketTimeout?: number;
-    }
+    },
   ): Promise<string> {
     this.log.debug(`TplinkConnection(${this.description}).send(%j)`, {
       payload,

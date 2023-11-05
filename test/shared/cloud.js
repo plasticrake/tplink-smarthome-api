@@ -32,7 +32,7 @@ async function bindCloud(device, force = false) {
   if (ci.binded === 1 && force) {
     expect(await retryIfBusy(() => device.cloud.unbind())).to.have.property(
       'err_code',
-      0
+      0,
     );
     ci.binded = 0;
   }
@@ -40,8 +40,8 @@ async function bindCloud(device, force = false) {
   if (ci.binded === 0) {
     expect(
       await retryIfBusy(() =>
-        device.cloud.bind(config.cloudUsername, config.cloudPassword)
-      )
+        device.cloud.bind(config.cloudUsername, config.cloudPassword),
+      ),
     ).to.have.property('err_code', 0);
   }
 }
@@ -51,15 +51,15 @@ async function unbindCloud(device, force = false) {
   if (ci.binded === 0 && force) {
     expect(
       await retryIfBusy(() =>
-        device.cloud.bind(config.cloudUsername, config.cloudPassword)
-      )
+        device.cloud.bind(config.cloudUsername, config.cloudPassword),
+      ),
     ).to.have.property('err_code', 0);
     ci.binded = 1;
   }
   if (ci.binded === 1) {
     expect(await retryIfBusy(() => device.cloud.unbind())).to.have.property(
       'err_code',
-      0
+      0,
     );
   }
 }
@@ -96,13 +96,13 @@ module.exports = function (ctx, testDevice) {
       const currentCloudInfo = await retryIfBusy(() => device.cloud.getInfo());
       if (originalCloudInfo.server !== currentCloudInfo.server) {
         await retryIfBusy(() =>
-          device.cloud.setServerUrl(originalCloudInfo.server)
+          device.cloud.setServerUrl(originalCloudInfo.server),
         );
       }
       if (originalCloudInfo.binded !== currentCloudInfo.binded) {
         if (originalCloudInfo.binded === 1) {
           await retryIfBusy(() =>
-            device.cloud.bind(config.cloudUsername, config.cloudPassword)
+            device.cloud.bind(config.cloudUsername, config.cloudPassword),
           );
         } else {
           await retryIfBusy(() => device.cloud.unbind());
@@ -133,7 +133,7 @@ module.exports = function (ctx, testDevice) {
       it('should get firmware list from cloud', async function () {
         expect(await device.cloud.getFirmwareList()).to.have.property(
           'err_code',
-          0
+          0,
         );
       });
     });
@@ -141,7 +141,7 @@ module.exports = function (ctx, testDevice) {
       // Does not require to be logged in to cloud
       it('should change cloud server url', async function () {
         expect(
-          await device.cloud.setServerUrl(config.cloudServerUrl)
+          await device.cloud.setServerUrl(config.cloudServerUrl),
         ).to.have.property('err_code', 0);
       });
     });

@@ -43,7 +43,7 @@ export default class TcpSocket extends TplinkSocket {
     payload: string,
     port: number,
     host: string,
-    timeout: number
+    timeout: number,
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       const { socket } = this;
@@ -65,8 +65,8 @@ export default class TcpSocket extends TplinkSocket {
             } finally {
               reject(
                 new Error(
-                  `TCP Timeout after ${socketTimeout}ms\n${host}:${port} ${payload}`
-                )
+                  `TCP Timeout after ${socketTimeout}ms\n${host}:${port} ${payload}`,
+                ),
               );
             }
           }, socketTimeout);
@@ -84,13 +84,13 @@ export default class TcpSocket extends TplinkSocket {
           } else {
             deviceDataBuf = Buffer.concat(
               [deviceDataBuf, data],
-              deviceDataBuf.length + data.length
+              deviceDataBuf.length + data.length,
             );
           }
 
           if (deviceDataBuf.length < 4) {
             this.logDebug(
-              `: socket:data: segment:${segmentCount} bufferLength:${deviceDataBuf.length} ...`
+              `: socket:data: segment:${segmentCount} bufferLength:${deviceDataBuf.length} ...`,
             );
             return;
           }
@@ -101,13 +101,13 @@ export default class TcpSocket extends TplinkSocket {
             decryptedMsg = decrypt(deviceDataBuf.slice(4)).toString('utf8');
             this.logDebug(
               `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} [${replaceControlCharacters(
-                decryptedMsg
-              )}]`
+                decryptedMsg,
+              )}]`,
             );
             socket.end();
           } else {
             this.logDebug(
-              `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} ...`
+              `: socket:data: segment:${segmentCount} ${actualResponseLen}/${expectedResponseLen} ...`,
             );
           }
         } catch (err) {
@@ -125,7 +125,7 @@ export default class TcpSocket extends TplinkSocket {
           this.isBound = false;
           if (hadError || segmentCount === 0) {
             throw new Error(
-              `TCP Socket Closed. segment:${segmentCount} hadError:${hadError}`
+              `TCP Socket Closed. segment:${segmentCount} hadError:${hadError}`,
             );
           }
           try {
@@ -135,9 +135,9 @@ export default class TcpSocket extends TplinkSocket {
               `Error parsing JSON: From: [${socket.remoteAddress} ${
                 socket.remotePort
               }] TCP segment:${segmentCount} data:%O decrypted:[${replaceControlCharacters(
-                decryptedMsg
+                decryptedMsg,
               )}]`,
-              deviceDataBuf
+              deviceDataBuf,
             );
             throw err;
           }
@@ -162,18 +162,18 @@ export default class TcpSocket extends TplinkSocket {
       this.logDebug(': socket:send payload.length', encryptedPayload.length);
 
       this.logDebug(
-        `: socket:send attempting to connect. host:${host}, port:${port}`
+        `: socket:send attempting to connect. host:${host}, port:${port}`,
       );
       socket.connect({ port, host }, () => {
         try {
           this.logDebug(
-            `: socket:connect ${socket.localAddress} ${socket.localPort} ${socket.remoteAddress} ${socket.remotePort}`
+            `: socket:connect ${socket.localAddress} ${socket.localPort} ${socket.remoteAddress} ${socket.remotePort}`,
           );
           this.isBound = true;
           const writeRet = socket.write(encryptedPayload);
           this.logDebug(
             ': socket:connect:write',
-            writeRet ? 'flushed' : 'queued'
+            writeRet ? 'flushed' : 'queued',
           );
         } catch (err) {
           this.logDebug(': socket:connect error');

@@ -265,7 +265,7 @@ class Bulb extends Device {
       this.apiModules.lightingservice,
       isLightStrip(options.sysInfo)
         ? 'set_light_state'
-        : 'transition_light_state'
+        : 'transition_light_state',
     );
 
     this.setSysInfo(options.sysInfo);
@@ -380,7 +380,7 @@ class Bulb extends Device {
     // TODO switch to sendCommand, but need to handle error for devices that don't support emeter
     const response = await this.send(
       `{"${this.apiModules.emeter}":{"get_realtime":{}},"${this.apiModules.lightingservice}":{"get_light_state":{}},"${this.apiModules.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModules.cloud}":{"get_info":{}}}`,
-      sendOptionsForGetInfo
+      sendOptionsForGetInfo,
     );
     const data = JSON.parse(response);
     this.setSysInfo(data.system.get_sysinfo);
@@ -418,7 +418,7 @@ class Bulb extends Device {
    */
   async setPowerState(
     value: boolean,
-    sendOptions?: SendOptions
+    sendOptions?: SendOptions,
   ): Promise<boolean> {
     return this.lighting.setLightState({ on_off: value ? 1 : 0 }, sendOptions);
   }

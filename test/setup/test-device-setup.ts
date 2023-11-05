@@ -33,7 +33,7 @@ const clientDefaultOptions = ((): ConstructorParameters<typeof Client>[0] => {
 })();
 
 export function getTestClient(
-  options: ConstructorParameters<typeof Client>[0] = {}
+  options: ConstructorParameters<typeof Client>[0] = {},
 ): Client {
   return new Client({ ...clientDefaultOptions, ...options });
 }
@@ -170,7 +170,7 @@ const testDevicesPartial: DeepPartial<TestDevices> = {
 Object.entries(groupBy(testDevicesPartial.devices, 'deviceType')).forEach(
   ([key, value]) => {
     testDevicesPartial[key as 'bulb' | 'plug'] = value;
-  }
+  },
 );
 
 export const testDevices = testDevicesPartial as TestDevices;
@@ -182,7 +182,7 @@ async function getDevices(): Promise<AnyDevice[]> {
   return getDiscoveryDevices(
     getTestClient(),
     config.discoveryTimeout,
-    config.discoveryMacAllow
+    config.discoveryMacAllow,
   );
 }
 
@@ -250,7 +250,7 @@ export async function testDeviceCleanup(): Promise<void> {
         testDeviceDecorator(
           testDevices.plugWithChildren,
           device,
-          device.client
+          device.client,
         );
       }
       if (
@@ -269,7 +269,7 @@ export async function testDeviceCleanup(): Promise<void> {
 
   function testDeviceOut(
     td: TestDevice | undefined,
-    description: string
+    description: string,
   ): {
     description: string;
     model?: string;
@@ -313,7 +313,7 @@ export async function testDeviceCleanup(): Promise<void> {
         }
         return acc;
       }, [])
-      .map(([key, td]) => testDeviceOut(td, key))
+      .map(([key, td]) => testDeviceOut(td, key)),
   );
 
   run();

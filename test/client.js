@@ -273,7 +273,7 @@ describe('Client', function () {
               .on('device-new', (device) => {
                 client.stopDiscovery();
                 done(
-                  new Error(`Device should have been ignored: ${device.host}`)
+                  new Error(`Device should have been ignored: ${device.host}`),
                 );
               })
               .on('discovery-invalid', ({ rinfo, response }) => {
@@ -384,7 +384,7 @@ describe('Client', function () {
           if (device.model.match(/^HS300/)) {
             expect(device.children).to.have.property('size', 6);
             expect(device.sysInfo.children).to.have.lengthOf(
-              device.children.size
+              device.children.size,
             );
             if (devices[device.deviceId] == null) {
               devices[device.deviceId] = {};
@@ -416,7 +416,7 @@ describe('Client', function () {
           if (device.model.match(/^HS300/)) {
             expect(device.children).to.have.property('size', 6);
             expect(device.sysInfo.children).to.have.lengthOf(
-              device.children.size
+              device.children.size,
             );
             expect(devices[device.deviceId]).to.be.undefined;
             devices[device.deviceId] = device;
@@ -487,7 +487,7 @@ describe('Client', function () {
         it('should find a device by IP address', function () {
           return expect(device.getSysInfo()).to.eventually.have.property(
             'err_code',
-            0
+            0,
           );
         });
 
@@ -542,14 +542,13 @@ describe('Client', function () {
         it('should find a plug by IP address', function () {
           return expect(plug.getSysInfo()).to.eventually.have.property(
             'err_code',
-            0
+            0,
           );
         });
 
         it('should be rejected with an invalid IP address', function () {
-          return expect(
-            unreachablePlug.getSysInfo({ timeout: 500 })
-          ).to.eventually.be.rejected;
+          return expect(unreachablePlug.getSysInfo({ timeout: 500 })).to
+            .eventually.be.rejected;
         });
       });
 
@@ -589,14 +588,13 @@ describe('Client', function () {
         it('should find a bulb by IP address', function () {
           return expect(bulb.getSysInfo()).to.eventually.have.property(
             'err_code',
-            0
+            0,
           );
         });
 
         it('should be rejected with an invalid IP address', function () {
-          return expect(
-            unreachableBulb.getSysInfo({ timeout: 500 })
-          ).to.eventually.be.rejected;
+          return expect(unreachableBulb.getSysInfo({ timeout: 500 })).to
+            .eventually.be.rejected;
         });
       });
     });
@@ -616,9 +614,9 @@ describe('Client', function () {
                 '{"system":{"get_sysinfo":{}}}',
                 options.host,
                 options.port,
-                { sendOptions: { transport } }
-              )
-            )
+                { sendOptions: { transport } },
+              ),
+            ),
           ).to.have.nested.property('system.get_sysinfo.err_code', 0);
         });
         it(`should return info with object payload ${sendOptions.transport}`, async function () {
@@ -628,9 +626,9 @@ describe('Client', function () {
                 { system: { get_sysinfo: {} } },
                 options.host,
                 options.port,
-                { sendOptions: { transport } }
-              )
-            )
+                { sendOptions: { transport } },
+              ),
+            ),
           ).to.have.nested.property('system.get_sysinfo.err_code', 0);
         });
 
@@ -641,9 +639,9 @@ describe('Client', function () {
                 { system: { get_sysinfo: {} } },
                 options.host,
                 options.port,
-                { sendOptions: { transport } }
-              )
-            )
+                { sendOptions: { transport } },
+              ),
+            ),
           ).to.have.nested.property('system.get_sysinfo.err_code', 0);
         });
       });
