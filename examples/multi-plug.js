@@ -41,7 +41,13 @@ const monitorEvents = function monitorEvents(device) {
     logEvent('in-use-update', device, inUse);
   });
 
-  device.startPolling(5000);
+  // Poll device every 5 seconds
+  setTimeout(function pollDevice() {
+    device.getInfo().then((data) => {
+      console.log(data);
+      setTimeout(pollDevice, 5000);
+    });
+  }, 5000);
 };
 
 (async () => {

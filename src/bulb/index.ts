@@ -83,10 +83,6 @@ export interface BulbConstructorOptions extends DeviceConstructorOptions {
 interface BulbEvents {
   'emeter-realtime-update': (value: RealtimeNormalized) => void;
   /**
-   * @deprecated This will be removed in a future release.
-   */
-  'polling-error': (error: Error) => void;
-  /**
    * Bulb was turned on (`lightstate.on_off`).
    * @event Bulb#lightstate-on
    * @property {LightState} value lightstate

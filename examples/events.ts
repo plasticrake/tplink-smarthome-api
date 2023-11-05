@@ -20,7 +20,14 @@ const logEvent = function logEvent(
 // Use those if you want only events for those types and not all devices.
 client.on('device-new', (device) => {
   logEvent('device-new', device);
-  device.startPolling(5000);
+
+  // Poll device every 5 seconds
+  setTimeout(function pollDevice() {
+    device.getInfo().then((data: unknown) => {
+      console.log(data);
+      setTimeout(pollDevice, 5000);
+    });
+  }, 5000);
 
   // Device (Common) Events
   device.on('emeter-realtime-update', (emeterRealtime: RealtimeNormalized) => {

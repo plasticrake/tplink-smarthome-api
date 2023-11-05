@@ -79,10 +79,6 @@ export interface PlugEventEmitter {
     listener: (value: RealtimeNormalized) => void,
   ): this;
   /**
-   * @deprecated This will be removed in a future release.
-   */
-  on(event: 'polling-error', listener: (error: Error) => void): this;
-  /**
    * Plug's relay was turned on.
    */
   on(event: 'power-on', listener: () => void): this;
@@ -111,7 +107,6 @@ export interface PlugEventEmitter {
   on(event: 'brightness-update', listener: (value: boolean) => void): this;
 
   emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
-  emit(event: 'polling-error', error: Error): boolean;
 
   emit(event: 'power-on'): boolean;
   emit(event: 'power-off'): boolean;
