@@ -38,7 +38,7 @@
     "docs": "typedoc --tsconfig tsconfig.source.json",
     "lint": "eslint --ignore-path .gitignore . --ext .js,.ts --format=pretty && tsc --noEmit",
     "prepare": "npm run build",
-    "release": "standard-version --commit-all --sign",
+    "release": "commit-and-tag-version --commit-all --sign",
     "spellcheck": "cspell '{examples,src,test}/**/*' *.md",
     "pretest": "npm run lint && npm run build",
     "test": "npm run test:only",
@@ -78,6 +78,7 @@
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
     "chai-things": "^0.2.0",
+    "commit-and-tag-version": "^12.0.0",
     "cross-env": "^7.0.3",
     "cspell": "^7.3.8",
     "dotenv": "^16.3.1",
@@ -96,7 +97,6 @@
     "sinon": "^17.0.1",
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.21",
-    "standard-version": "^9.5.0",
     "tplink-smarthome-simulator": "^4.0.0",
     "ts-essentials": "9.4.1",
     "ts-node": "10.9.1",
@@ -107,7 +107,7 @@
   "engines": {
     "node": ">=16"
   },
-  "standard-version": {
+  "commit-and-tag-version": {
     "scripts": {
       "prerelease": "npm test",
       "postbump": "npm run docs && git add -A docs"
