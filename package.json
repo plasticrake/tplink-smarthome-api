@@ -21,7 +21,8 @@
   },
   "license": "MIT",
   "author": "Patrick Seal",
-  "main": "lib/index.js",
+  "type": "commonjs",
+  "main": "./lib/index.js",
   "bin": {
     "tplink-smarthome-api": "lib/cli.js"
   },

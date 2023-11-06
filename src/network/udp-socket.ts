@@ -10,7 +10,7 @@ import { replaceControlCharacters } from '../utils';
 export default class UdpSocket extends TplinkSocket {
   readonly socketType = 'UDP';
 
-  socket?: dgram.Socket;
+  override socket?: dgram.Socket;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logDebug(...args: any[]): void {

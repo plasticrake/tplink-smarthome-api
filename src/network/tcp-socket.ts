@@ -10,7 +10,7 @@ import { replaceControlCharacters } from '../utils';
 export default class TcpSocket extends TplinkSocket {
   readonly socketType = 'TCP';
 
-  socket?: net.Socket;
+  override socket?: net.Socket;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logDebug(...args: any[]): void {

@@ -9,7 +9,7 @@ import type { Logger } from '../logger';
 export default abstract class TplinkSocket {
   abstract socketType: string;
 
-  socket?: dgram.Socket | net.Socket;
+  abstract socket?: dgram.Socket | net.Socket;
 
   isBound = false;
 
