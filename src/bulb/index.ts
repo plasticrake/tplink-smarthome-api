@@ -161,7 +161,7 @@ declare interface Bulb {
 class Bulb extends Device {
   emitEventsEnabled = true;
 
-  protected _sysInfo: BulbSysinfo;
+  protected override _sysInfo: BulbSysinfo;
 
   /**
    * @internal
@@ -276,14 +276,14 @@ class Bulb extends Device {
    * Returns cached results from last retrieval of `system.sysinfo`.
    * @returns system.sysinfo
    */
-  get sysInfo(): BulbSysinfo {
+  override get sysInfo(): BulbSysinfo {
     return this._sysInfo;
   }
 
   /**
    * @internal
    */
-  setSysInfo(sysInfo: BulbSysinfo): void {
+  override setSysInfo(sysInfo: BulbSysinfo): void {
     super.setSysInfo(sysInfo);
     this.emitEvents();
   }
@@ -300,7 +300,7 @@ class Bulb extends Device {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  get deviceType(): 'bulb' {
+  override get deviceType(): 'bulb' {
     return 'bulb';
   }
 
@@ -348,7 +348,7 @@ class Bulb extends Device {
    * Requests `system.sysinfo` from device.
    * @returns parsed JSON response
    */
-  async getSysInfo(sendOptions?: SendOptions): Promise<BulbSysinfo> {
+  override async getSysInfo(sendOptions?: SendOptions): Promise<BulbSysinfo> {
     const response = await super.getSysInfo(sendOptions);
 
     if (!isBulbSysinfo(response)) {

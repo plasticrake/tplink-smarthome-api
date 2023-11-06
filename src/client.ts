@@ -386,7 +386,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    * @internal
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  emit(eventName: string, ...args: any[]): boolean {
+  override emit(eventName: string, ...args: any[]): boolean {
     // Add device- / plug- / bulb- to eventName
     let ret = false;
     if (args[0] instanceof Device) {

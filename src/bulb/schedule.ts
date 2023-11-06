@@ -35,9 +35,9 @@ export interface BulbScheduleRuleInput {
 
 export default class BulbSchedule extends Schedule {
   constructor(
-    readonly device: Bulb,
-    readonly apiModuleName: string,
-    readonly childId?: string,
+    override readonly device: Bulb,
+    override readonly apiModuleName: string,
+    override readonly childId?: string,
   ) {
     super(device, apiModuleName, childId);
   }
@@ -49,7 +49,7 @@ export default class BulbSchedule extends Schedule {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
-  async addRule(
+  override async addRule(
     rule: BulbScheduleRuleInput,
     sendOptions?: SendOptions,
   ): Promise<{ id: string }> {
@@ -75,7 +75,7 @@ export default class BulbSchedule extends Schedule {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
-  async editRule(
+  override async editRule(
     rule: BulbScheduleRuleInput & { id: string },
     sendOptions?: SendOptions,
   ): Promise<unknown> {

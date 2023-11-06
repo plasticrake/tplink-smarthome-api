@@ -140,7 +140,7 @@ export interface PlugEventEmitter {
  * @fires  Plug#emeter-realtime-update
  */
 export default class Plug extends Device implements PlugEventEmitter {
-  protected _sysInfo: PlugSysinfo;
+  protected override _sysInfo: PlugSysinfo;
 
   #children: Map<string, PlugChild> = new Map();
 
@@ -285,14 +285,14 @@ export default class Plug extends Device implements PlugEventEmitter {
     }
   }
 
-  get sysInfo(): PlugSysinfo {
+  override get sysInfo(): PlugSysinfo {
     return this._sysInfo;
   }
 
   /**
    * @internal
    */
-  setSysInfo(sysInfo: PlugSysinfo): void {
+  override setSysInfo(sysInfo: PlugSysinfo): void {
     super.setSysInfo(sysInfo);
     if (sysInfo.children) {
       this.setChildren(sysInfo.children);
@@ -331,7 +331,7 @@ export default class Plug extends Device implements PlugEventEmitter {
   /**
    * Returns childId.
    */
-  get childId(): string | undefined {
+  override get childId(): string | undefined {
     return this.#childId;
   }
 
@@ -348,7 +348,7 @@ export default class Plug extends Device implements PlugEventEmitter {
   /**
    * Cached value of `sysinfo.alias` or `sysinfo.children[childId].alias` if childId set.
    */
-  get alias(): string {
+  override get alias(): string {
     if (this.#childId && this.#child !== undefined) {
       return this.#child.alias;
     }
@@ -371,14 +371,14 @@ export default class Plug extends Device implements PlugEventEmitter {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  get deviceType(): 'plug' {
+  override get deviceType(): 'plug' {
     return 'plug';
   }
 
   /**
    * Cached value of `sysinfo.deviceId` or `childId` if set.
    */
-  get id(): string {
+  override get id(): string {
     if (this.#childId && this.#child !== undefined) {
       return this.#childId;
     }
@@ -463,7 +463,7 @@ export default class Plug extends Device implements PlugEventEmitter {
    * Requests `system.sysinfo` from device. Does not support childId.
 
    */
-  async getSysInfo(sendOptions?: SendOptions): Promise<PlugSysinfo> {
+  override async getSysInfo(sendOptions?: SendOptions): Promise<PlugSysinfo> {
     const response = await super.getSysInfo(sendOptions);
 
     if (!isPlugSysinfo(response)) {

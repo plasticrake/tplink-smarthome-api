@@ -24,7 +24,7 @@ export default class TcpSocket extends TplinkSocket {
     });
   }
 
-  close(): void {
+  override close(): void {
     if (this.socket !== undefined) this.socket.end();
     super.close();
   }
