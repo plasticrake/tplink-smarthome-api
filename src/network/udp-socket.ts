@@ -37,7 +37,7 @@ export default class UdpSocket extends TplinkSocket {
     });
   }
 
-  close(): void {
+  override close(): void {
     if (this.socket !== undefined) this.socket.close();
     super.close();
   }

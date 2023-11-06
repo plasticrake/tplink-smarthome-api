@@ -16,7 +16,7 @@ export class ResponseError extends Error {
   /**
    * Set by `Error.captureStackTrace`
    */
-  readonly stack = '';
+  override readonly stack = '';
 
   /**
    *

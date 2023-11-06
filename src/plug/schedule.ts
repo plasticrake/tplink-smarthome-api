@@ -33,9 +33,9 @@ export interface PlugScheduleRuleInput {
 
 export default class PlugSchedule extends Schedule {
   constructor(
-    readonly device: Plug,
-    readonly apiModuleName: string,
-    readonly childId?: string,
+    override readonly device: Plug,
+    override readonly apiModuleName: string,
+    override readonly childId?: string,
   ) {
     super(device, apiModuleName, childId);
   }
@@ -47,7 +47,7 @@ export default class PlugSchedule extends Schedule {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
-  async addRule(
+  override async addRule(
     rule: PlugScheduleRuleInput,
     sendOptions?: SendOptions,
   ): ReturnType<Schedule['addRule']> {
@@ -84,7 +84,7 @@ export default class PlugSchedule extends Schedule {
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
-  async editRule(
+  override async editRule(
     rule: PlugScheduleRuleInput & { id: string },
     sendOptions?: SendOptions,
   ): Promise<unknown> {

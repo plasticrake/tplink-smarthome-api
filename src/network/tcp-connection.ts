@@ -15,7 +15,7 @@ export default class TcpConnection extends TplinkConnection {
     return socket;
   }
 
-  async send(
+  override async send(
     payload: string,
     port: number,
     host: string,

@@ -49,7 +49,7 @@ export default class UdpConnection extends TplinkConnection {
     }
   }
 
-  async send(
+  override async send(
     payload: string,
     port: number,
     host: string,
@@ -76,7 +76,7 @@ export default class UdpConnection extends TplinkConnection {
     return response;
   }
 
-  close(): void {
+  override close(): void {
     super.close();
     this.setTimeout(0);
 
