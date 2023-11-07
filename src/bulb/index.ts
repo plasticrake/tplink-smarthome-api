@@ -6,7 +6,7 @@ import Device, { isBulbSysinfo } from '../device';
 import type { CommonSysinfo, DeviceConstructorOptions } from '../device';
 import Cloud from '../shared/cloud';
 import Emeter, { RealtimeNormalized } from '../shared/emeter';
-import Lighting, { LightState } from './lighting';
+import Lighting, { LightState, LightStateInput } from './lighting';
 import Schedule from './schedule';
 import Time from '../shared/time';
 
@@ -433,6 +433,52 @@ class Bulb extends Device {
     const powerState = await this.getPowerState(sendOptions);
     await this.setPowerState(!powerState, sendOptions);
     return !powerState;
+  }
+
+  /**
+   * Blink Bulb.
+   *
+   * Sends `system.lighting.set_light_state` command alternating on at full brightness and off number of `times` at `rate`,
+   * then sets the light state to its pre-blink state.
+   * @throws {@link ResponseError}
+   */
+  async blink(
+    times = 5,
+    rate = 1000,
+    sendOptions?: SendOptions,
+  ): Promise<boolean> {
+    const delay = (t: number): Promise<void> => {
+      return new Promise((resolve) => {
+        setTimeout(resolve, t);
+      });
+    };
+
+    const origLightState = await this.lighting.getLightState(sendOptions);
+    let lastBlink: number;
+
+    let isBlinkOn = false;
+    for (let i = 0; i < times * 2; i += 1) {
+      isBlinkOn = !isBlinkOn;
+      lastBlink = Date.now();
+
+      const lightState: LightStateInput = isBlinkOn
+        ? { on_off: 1, brightness: 100 }
+        : { on_off: 0 };
+
+      // eslint-disable-next-line no-await-in-loop
+      await this.lighting.setLightState(lightState, sendOptions);
+
+      const timeToWait = rate / 2 - (Date.now() - lastBlink);
+      if (timeToWait > 0) {
+        // eslint-disable-next-line no-await-in-loop
+        await delay(timeToWait);
+      }
+    }
+    const currLightState = await this.lighting.getLightState(sendOptions);
+    if (currLightState !== origLightState) {
+      await this.lighting.setLightState(origLightState, sendOptions);
+    }
+    return true;
   }
 
   private emitEvents(): void {

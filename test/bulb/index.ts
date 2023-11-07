@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 
-import type { Bulb } from '../../src';
+import type { Bulb, LightStateInput } from '../../src';
 import { AnyDevice } from '../../src/client';
 
 import { config, expect, retry, testDevices } from '../setup';
@@ -204,6 +204,32 @@ describe('Bulb', function () {
 
               expect(spy).to.be.calledOnce;
               expect(spyPowerUpdate).to.be.calledThrice;
+            });
+          });
+
+          describe('#blink()', function () {
+            it('should blink Bulb', async function () {
+              expect(await bulb.blink(2, 100)).to.be.true;
+            });
+
+            (
+              [
+                { on_off: 0 },
+                { on_off: 1 },
+                { on_off: 1, brightness: 50 },
+                { on_off: 1, brightness: 75 },
+              ] as LightStateInput[]
+            ).forEach((lightState) => {
+              it(`should restore the previous lightstate after blink: ${JSON.stringify(
+                lightState,
+              )}`, async function () {
+                await bulb.lighting.setLightState(lightState);
+
+                const preLightState = await bulb.lighting.getLightState();
+                expect(await bulb.blink(2, 100)).to.be.true;
+                const postLightState = await bulb.lighting.getLightState();
+                expect(postLightState).to.eql(preLightState);
+              });
             });
           });
         });
