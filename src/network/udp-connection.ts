@@ -63,7 +63,7 @@ export default class UdpConnection extends TplinkConnection {
       sharedSocketTimeout: number;
     },
   ): Promise<string> {
-    if (useSharedSocket && sharedSocketTimeout != null) {
+    if (useSharedSocket) {
       this.setTimeout(sharedSocketTimeout);
     }
 
@@ -82,7 +82,7 @@ export default class UdpConnection extends TplinkConnection {
 
     if (this.sharedSocket && this.sharedSocket.isBound) {
       this.log.debug(
-        `TplinkConnection(${this.description}).close() closing shared socket`,
+        `UdpConnection(${this.description}).close() closing shared socket`,
       );
       this.sharedSocket.close();
     }

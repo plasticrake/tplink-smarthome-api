@@ -14,6 +14,7 @@ export default class TcpSocket extends TplinkSocket {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logDebug(...args: any[]): void {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.log.debug(`[${this.socketId}] TcpSocket${args.shift()}`, ...args);
   }
 
@@ -50,11 +51,11 @@ export default class TcpSocket extends TplinkSocket {
       if (socket === undefined)
         throw new Error('send called without creating socket');
 
-      let deviceDataBuf: Buffer;
+      let deviceDataBuf: Buffer | undefined;
       let segmentCount = 0;
       let decryptedMsg: string;
 
-      let timer: NodeJS.Timeout;
+      let timer: NodeJS.Timeout | undefined;
       const setSocketTimeout = (socketTimeout: number): void => {
         if (timer != null) clearTimeout(timer);
         if (socketTimeout > 0) {
@@ -129,7 +130,7 @@ export default class TcpSocket extends TplinkSocket {
             );
           }
           try {
-            return resolve(decryptedMsg);
+            resolve(decryptedMsg);
           } catch (err) {
             this.log.error(
               `Error parsing JSON: From: [${socket.remoteAddress} ${
@@ -143,7 +144,7 @@ export default class TcpSocket extends TplinkSocket {
           }
         } catch (err) {
           this.logDebug(': socket:close error');
-          return reject(err);
+          reject(err);
         }
       });
 

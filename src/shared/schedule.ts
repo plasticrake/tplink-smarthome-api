@@ -4,9 +4,9 @@ import type { AnyDevice, SendOptions } from '../client';
 import {
   extractResponse,
   hasErrCode,
-  HasErrCode,
   isDefinedAndNotNull,
   isObjectLike,
+  type HasErrCode,
 } from '../utils';
 
 type ScheduleDateStart = {
@@ -65,7 +65,8 @@ export function hasRuleListWithRuleIds(
     isObjectLike(candidate.rule_list) &&
     Array.isArray(candidate.rule_list) &&
     candidate.rule_list.every(
-      (rule) => 'id' in rule && typeof rule.id === 'string',
+      (rule) =>
+        isObjectLike(rule) && 'id' in rule && typeof rule.id === 'string',
     )
   );
 }
@@ -77,7 +78,8 @@ function isScheduleRules(candidate: unknown): candidate is ScheduleRules {
     isObjectLike(candidate.rule_list) &&
     Array.isArray(candidate.rule_list) &&
     candidate.rule_list.every(
-      (rule) => 'id' in rule && typeof rule.id === 'string',
+      (rule) =>
+        isObjectLike(rule) && 'id' in rule && typeof rule.id === 'string',
     )
   );
 }
@@ -105,9 +107,13 @@ function createScheduleDate(
   } else if (date === 'sunrise') {
     min = 0;
     time_opt = 1;
+    // We want to validate
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (date === 'sunset') {
     min = 0;
     time_opt = 2;
+  } else {
+    throw new Error('invalid date');
   }
 
   if (startOrEnd === 'end') {
@@ -223,7 +229,7 @@ export default abstract class Schedule {
   async getNextAction(
     sendOptions?: SendOptions,
   ): Promise<ScheduleNextActionResponse> {
-    this.nextAction = extractResponse(
+    this.nextAction = extractResponse<ScheduleNextActionResponse>(
       await this.device.sendCommand(
         {
           [this.apiModuleName]: { get_next_action: {} },
@@ -233,7 +239,7 @@ export default abstract class Schedule {
       ),
       '',
       isScheduleNextActionResponse,
-    ) as ScheduleNextActionResponse;
+    );
 
     return this.nextAction;
   }
@@ -245,7 +251,7 @@ export default abstract class Schedule {
    * @throws {@link ResponseError}
    */
   async getRules(sendOptions?: SendOptions): Promise<ScheduleRulesResponse> {
-    return extractResponse(
+    return extractResponse<ScheduleRulesResponse>(
       await this.device.sendCommand(
         {
           [this.apiModuleName]: { get_rules: {} },
@@ -255,7 +261,7 @@ export default abstract class Schedule {
       ),
       '',
       isScheduleRulesResponse,
-    ) as ScheduleRulesResponse;
+    );
   }
 
   /**
@@ -291,7 +297,7 @@ export default abstract class Schedule {
     rule: object,
     sendOptions?: SendOptions,
   ): Promise<{ id: string }> {
-    return extractResponse(
+    return extractResponse<{ id: string }>(
       await this.device.sendCommand(
         {
           [this.apiModuleName]: { add_rule: rule },
@@ -303,7 +309,7 @@ export default abstract class Schedule {
       (candidate) => {
         return isObjectLike(candidate) && typeof candidate.id === 'string';
       },
-    ) as { id: string };
+    );
   }
 
   /**

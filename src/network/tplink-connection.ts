@@ -2,10 +2,9 @@ import { EventEmitter } from 'events';
 import Queue from 'promise-queue';
 
 import type Client from '../client';
-
+import type { Logger } from '../logger';
 import TcpSocket from './tcp-socket';
 import UdpSocket from './udp-socket';
-import type { Logger } from '../logger';
 
 /**
  * @hidden
@@ -30,9 +29,17 @@ export default abstract class TplinkConnection extends EventEmitter {
         this.host,
         this.port,
       );
-      this.queue.add(async () => {
-        this.close();
-      });
+      this.queue
+        .add(() => {
+          this.close();
+          return Promise.resolve();
+        })
+        .catch((err) => {
+          this.log.debug(
+            `TplinkConnection(${this.description}): timeout.close()`,
+            err,
+          );
+        });
     });
   }
 
@@ -69,7 +76,7 @@ export default abstract class TplinkConnection extends EventEmitter {
     this.port = port;
     this.host = host;
 
-    let socket: TcpSocket | UdpSocket;
+    let socket: TcpSocket | UdpSocket | undefined;
     return this.queue.add(async () => {
       try {
         socket = await this.getSocket(useSharedSocket);

@@ -1,9 +1,9 @@
 import type { AnyDevice, SendOptions } from '../client';
 import {
   extractResponse,
-  isObjectLike,
-  HasErrCode,
   hasErrCode,
+  isObjectLike,
+  type HasErrCode,
 } from '../utils';
 
 export type RealtimeV1 = {
@@ -64,12 +64,10 @@ export default class Emeter {
       }
     };
 
-    if (realtime != null) {
-      normalize('current', 'current_ma', 1000);
-      normalize('power', 'power_mw', 1000);
-      normalize('total', 'total_wh', 1000);
-      normalize('voltage', 'voltage_mv', 1000);
-    }
+    normalize('current', 'current_ma', 1000);
+    normalize('power', 'power_mw', 1000);
+    normalize('total', 'total_wh', 1000);
+    normalize('voltage', 'voltage_mv', 1000);
 
     this.#realtime = normRealtime;
     this.device.emit('emeter-realtime-update', this.#realtime);

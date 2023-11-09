@@ -1,5 +1,10 @@
 import util from 'util';
-import { Client, Device, LightState, RealtimeNormalized } from '..'; // 'tplink-smarthome-api'
+import {
+  Client,
+  type Device,
+  type LightState,
+  type RealtimeNormalized,
+} from '..'; // 'tplink-smarthome-api'
 
 const client = new Client();
 
@@ -18,15 +23,20 @@ const logEvent = function logEvent(
 
 // Client events `device-*` also have `bulb-*` and `plug-*` counterparts.
 // Use those if you want only events for those types and not all devices.
-client.on('device-new', (device) => {
+client.on('device-new', (device: Device) => {
   logEvent('device-new', device);
 
   // Poll device every 5 seconds
   setTimeout(function pollDevice() {
-    device.getInfo().then((data: unknown) => {
-      console.log(data);
-      setTimeout(pollDevice, 5000);
-    });
+    device
+      .getInfo()
+      .then((data: unknown) => {
+        console.log(data);
+        setTimeout(pollDevice, 5000);
+      })
+      .catch((reason: unknown) => {
+        console.error(reason);
+      });
   }, 5000);
 
   // Device (Common) Events
@@ -68,10 +78,10 @@ client.on('device-new', (device) => {
     logEvent('lightstate-update', device, lightstate);
   });
 });
-client.on('device-online', (device) => {
+client.on('device-online', (device: Device) => {
   logEvent('device-online', device);
 });
-client.on('device-offline', (device) => {
+client.on('device-offline', (device: Device) => {
   logEvent('device-offline', device);
 });
 

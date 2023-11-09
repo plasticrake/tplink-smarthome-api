@@ -1,27 +1,26 @@
 /* eslint-disable no-underscore-dangle */
 import type { SendOptions } from '../client';
-import Device, { isPlugSysinfo } from '../device';
-import type {
-  CommonSysinfo,
-  DeviceConstructorOptions,
-  Sysinfo,
+import Device, {
+  isPlugSysinfo,
+  type CommonSysinfo,
+  type DeviceConstructorOptions,
+  type Sysinfo,
 } from '../device';
-import Away from './away';
-import Cloud, { isCloudInfo } from '../shared/cloud';
-import type { CloudInfo } from '../shared/cloud';
-import Dimmer from './dimmer';
+import Cloud, { isCloudInfo, type CloudInfo } from '../shared/cloud';
 import Emeter, { RealtimeNormalized } from '../shared/emeter';
-import Schedule from './schedule';
-import Timer from './timer';
 import Time from '../shared/time';
 import {
+  ResponseError,
   extractResponse,
   hasErrCode,
-  HasErrCode,
   isDefinedAndNotNull,
   isObjectLike,
-  ResponseError,
+  type HasErrCode,
 } from '../utils';
+import Away from './away';
+import Dimmer from './dimmer';
+import Schedule from './schedule';
+import Timer from './timer';
 
 type PlugChild = { id: string; alias: string; state: number };
 
@@ -47,10 +46,10 @@ export function hasSysinfoChildren(
   candidate: Sysinfo,
 ): candidate is Sysinfo & Required<SysinfoChildren> {
   return (
-    isObjectLike(candidate) &&
     'children' in candidate &&
     candidate.children !== undefined &&
-    isObjectLike(candidate.children) &&
+    // eslint rule false positive
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     candidate.children.length > 0
   );
 }
@@ -279,10 +278,8 @@ export default class Plug extends Device implements PlugEventEmitter {
 
     if (isDefinedAndNotNull(childId)) this.setChildId(childId);
 
-    if (this.sysInfo) {
-      this.lastState.inUse = this.inUse;
-      this.lastState.relayState = this.relayState;
-    }
+    this.lastState.inUse = this.inUse;
+    this.lastState.relayState = this.relayState;
   }
 
   override get sysInfo(): PlugSysinfo {
@@ -323,9 +320,8 @@ export default class Plug extends Device implements PlugEventEmitter {
     } else if (children instanceof Map) {
       this.#children = children;
     }
-    if (this.#childId && this.#children) {
-      if (this.#childId !== undefined) this.setChildId(this.#childId);
-    }
+
+    if (this.#childId !== undefined) this.setChildId(this.#childId);
   }
 
   /**
@@ -337,7 +333,7 @@ export default class Plug extends Device implements PlugEventEmitter {
 
   private setChildId(childId: string): void {
     this.#childId = this.normalizeChildId(childId);
-    if (this.#childId && this.#children) {
+    if (this.#childId) {
       this.#child = this.#children.get(this.#childId);
     }
     if (this.#childId && this.#child == null) {
@@ -352,7 +348,6 @@ export default class Plug extends Device implements PlugEventEmitter {
     if (this.#childId && this.#child !== undefined) {
       return this.#child.alias;
     }
-    if (this.sysInfo === undefined) return '';
     return this.sysInfo.alias;
   }
 
@@ -415,7 +410,7 @@ export default class Plug extends Device implements PlugEventEmitter {
     if (this.#childId && this.#child !== undefined) {
       return this.#child.state === 1;
     }
-    if (this.#children && this.#children.size > 0) {
+    if (this.#children.size > 0) {
       return (
         Array.from(this.#children.values()).findIndex((child) => {
           return child.state === 1;
@@ -430,7 +425,7 @@ export default class Plug extends Device implements PlugEventEmitter {
       this.#child.state = relayState ? 1 : 0;
       return;
     }
-    if (this.#children && this.#children.size > 0) {
+    if (this.#children.size > 0) {
       for (const child of this.#children.values()) {
         child.state = relayState ? 1 : 0;
       }
@@ -453,7 +448,7 @@ export default class Plug extends Device implements PlugEventEmitter {
    */
   get supportsEmeter(): boolean {
     return this.sysInfo.feature && typeof this.sysInfo.feature === 'string'
-      ? this.sysInfo.feature.indexOf('ENE') >= 0
+      ? this.sysInfo.feature.includes('ENE')
       : false;
   }
 
@@ -467,7 +462,7 @@ export default class Plug extends Device implements PlugEventEmitter {
     const response = await super.getSysInfo(sendOptions);
 
     if (!isPlugSysinfo(response)) {
-      throw new Error(`Unexpected Response: ${response}`);
+      throw new Error(`Unexpected Response: ${JSON.stringify(response)}`);
     }
     return this.sysInfo;
   }
@@ -518,11 +513,11 @@ export default class Plug extends Device implements PlugEventEmitter {
       }
     }
 
-    const sysinfo = extractResponse(
+    const sysinfo = extractResponse<PlugSysinfo>(
       data,
       'system.get_sysinfo',
       isPlugSysinfo,
-    ) as PlugSysinfo;
+    );
     this.setSysInfo(sysinfo);
 
     const cloudInfo = extractResponse<CloudInfo & HasErrCode>(
@@ -542,11 +537,11 @@ export default class Plug extends Device implements PlugEventEmitter {
       this.emeter.setRealtime(data.emeter.get_realtime);
     }
 
-    const scheduleNextAction = extractResponse(
+    const scheduleNextAction = extractResponse<HasErrCode>(
       data,
       'schedule.get_next_action',
       hasErrCode,
-    ) as HasErrCode;
+    );
     this.schedule.nextAction = scheduleNextAction;
 
     return {

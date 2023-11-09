@@ -1,23 +1,22 @@
-import castArray from 'lodash.castarray';
 import { EventEmitter } from 'events';
+import castArray from 'lodash.castarray';
 import type log from 'loglevel';
 
 import type { BulbSysinfo } from '../bulb';
-import type Client from '../client';
-import type { SendOptions } from '../client';
+import type { default as Client, SendOptions } from '../client'; // eslint-disable-line import/no-named-default
 import type { Logger } from '../logger';
-import Netif from './netif';
 import TcpConnection from '../network/tcp-connection';
 import UdpConnection from '../network/udp-connection';
-import type { Realtime, RealtimeNormalized } from '../shared/emeter';
 import type { PlugEventEmitter, PlugSysinfo } from '../plug';
+import type { Realtime, RealtimeNormalized } from '../shared/emeter';
 import {
+  extractResponse,
   isObjectLike,
   processResponse,
-  extractResponse,
   processSingleCommandResponse,
-  HasErrCode,
+  type HasErrCode,
 } from '../utils';
+import Netif from './netif';
 
 type HasAtLeastOneProperty = {
   [key: string]: unknown;
@@ -218,7 +217,7 @@ export default abstract class Device
    * Cached value of `sysinfo.alias`.
    */
   get alias(): string {
-    return this.sysInfo !== undefined ? this.sysInfo.alias : '';
+    return this.sysInfo.alias;
   }
 
   /**
@@ -258,10 +257,8 @@ export default abstract class Device
    * Cached value of `sysinfo.[type|mic_type]`.
    */
   get type(): string {
-    if ('type' in this.sysInfo && this.sysInfo.type !== undefined)
-      return this.sysInfo.type;
-    if ('mic_type' in this.sysInfo && this.sysInfo.mic_type !== undefined)
-      return this.sysInfo.mic_type;
+    if ('type' in this.sysInfo) return this.sysInfo.type;
+    if ('mic_type' in this.sysInfo) return this.sysInfo.mic_type;
     return '';
   }
 
@@ -300,15 +297,9 @@ export default abstract class Device
    * Cached value of `sysinfo.[mac|mic_mac|ethernet_mac]`.
    */
   get mac(): string {
-    if ('mac' in this.sysInfo && this.sysInfo.mac !== undefined)
-      return this.sysInfo.mac;
-    if ('mic_mac' in this.sysInfo && this.sysInfo.mic_mac !== undefined)
-      return this.sysInfo.mic_mac;
-    if (
-      'ethernet_mac' in this.sysInfo &&
-      this.sysInfo.ethernet_mac !== undefined
-    )
-      return this.sysInfo.ethernet_mac;
+    if ('mac' in this.sysInfo) return this.sysInfo.mac;
+    if ('mic_mac' in this.sysInfo) return this.sysInfo.mic_mac;
+    if ('ethernet_mac' in this.sysInfo) return this.sysInfo.ethernet_mac;
     return '';
   }
 
@@ -392,9 +383,8 @@ export default abstract class Device
     };
 
     if (childIds) {
-      const childIdsArray = castArray(childIds).map(
-        this.normalizeChildId,
-        this,
+      const childIdsArray = castArray(childIds).map((childId) =>
+        this.normalizeChildId(childId),
       );
       payload.context = { child_ids: childIdsArray };
     }
@@ -437,20 +427,28 @@ export default abstract class Device
     childIds: string[] | string | undefined = this.childId,
     sendOptions?: SendOptions,
   ): Promise<unknown> {
-    // TODO allow certain err codes (particularly emeter for non HS110 devices)
-    const commandObj =
-      typeof command === 'string' ? JSON.parse(command) : command;
+    // TODO: allow certain err codes (particularly emeter for non HS110 devices)
+    const commandObj = (
+      typeof command === 'string' ? JSON.parse(command) : command
+    ) as {
+      [key: string]: {
+        [key: string]: unknown;
+        context?: { childIds: string[] };
+      };
+    };
 
     if (childIds) {
-      const childIdsArray = castArray(childIds).map(
-        this.normalizeChildId,
-        this,
+      const childIdsArray = castArray(childIds).map((childId) =>
+        this.normalizeChildId(childId),
       );
       commandObj.context = { child_ids: childIdsArray };
     }
 
     const response = await this.send(commandObj, sendOptions);
-    const results = processResponse(commandObj, JSON.parse(response));
+    const results = processResponse(
+      commandObj,
+      JSON.parse(response) as unknown,
+    );
     return results;
   }
 
@@ -474,7 +472,7 @@ export default abstract class Device
    */
   async getSysInfo(sendOptions?: SendOptions): Promise<Sysinfo> {
     this.log.debug('[%s] device.getSysInfo()', this.alias);
-    const response = extractResponse(
+    const response = extractResponse<Sysinfo>(
       await this.sendCommand(
         '{"system":{"get_sysinfo":{}}}',
         undefined,
@@ -482,7 +480,7 @@ export default abstract class Device
       ),
       '',
       isSysinfo,
-    ) as Sysinfo;
+    );
 
     this.setSysInfo(response);
     return this.sysInfo;

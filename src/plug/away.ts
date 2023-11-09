@@ -1,12 +1,12 @@
-import type Plug from '.';
 import type { SendOptions } from '../client';
 import {
+  ScheduleRuleInputTime,
   createRule,
   hasRuleListWithRuleIds,
-  ScheduleRuleInputTime,
+  type HasRuleListWithRuleIds,
 } from '../shared/schedule';
-import type { HasRuleListWithRuleIds } from '../shared/schedule';
-import { extractResponse, HasErrCode, hasErrCode } from '../utils';
+import { extractResponse, hasErrCode, type HasErrCode } from '../utils';
+import type Plug from './index';
 
 export type AwayRule = {
   name?: string;

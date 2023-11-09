@@ -46,7 +46,8 @@
     "test:only": "cross-env NODE_ENV=test && nyc mocha --color"
   },
   "dependencies": {
-    "commander": "^11.1.0",
+    "@commander-js/extra-typings": "~11.1.0",
+    "commander": "~11.1.0",
     "lodash.castarray": "^4.4.0",
     "lodash.clone": "^4.5.0",
     "lodash.defaultto": "^4.14.0",
@@ -97,7 +98,7 @@
     "sinon": "^17.0.1",
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.21",
-    "tplink-smarthome-simulator": "^4.0.0",
+    "tplink-smarthome-simulator": "^5.0.1",
     "ts-essentials": "9.4.1",
     "ts-node": "10.9.1",
     "typedoc": "^0.25.3",

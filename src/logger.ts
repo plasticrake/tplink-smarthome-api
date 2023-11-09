@@ -20,20 +20,32 @@ export default function logger({
   if (isDefinedAndNotNull(level)) loglevelLogger.setLevel(level);
 
   const log = {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    debug: (...msg: any[]): void => loglevelLogger.debug(...msg),
-    info: (...msg: any[]): void => loglevelLogger.info(...msg),
-    warn: (...msg: any[]): void => loglevelLogger.warn(...msg),
-    error: (...msg: any[]): void => loglevelLogger.error(...msg),
-    /* eslint-enable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
+    debug: (...msg: any[]): void => {
+      loglevelLogger.debug(...msg);
+    },
+    info: (...msg: any[]): void => {
+      loglevelLogger.info(...msg);
+    },
+    warn: (...msg: any[]): void => {
+      loglevelLogger.warn(...msg);
+    },
+    error: (...msg: any[]): void => {
+      loglevelLogger.error(...msg);
+    },
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
   };
 
   // if logger passed in, call logger functions instead of our loglevel functions
   if (isDefinedAndNotNull(logger)) {
-    levels.forEach((loggerLevel: LogLevelMethodNames) => {
+    levels.forEach((loggerLevel) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (logger[loggerLevel] !== undefined) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        log[loggerLevel] = (...msg: any[]): void => logger[loggerLevel](...msg);
+        log[loggerLevel] = (...msg: any[]): void => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          logger[loggerLevel](...msg);
+        };
       }
     });
   }
