@@ -1,6 +1,6 @@
 /* eslint camelcase: ["off"] */
 
-import type Bulb from '.';
+import type Bulb from './index';
 import Schedule, { createScheduleRule, ScheduleRule } from '../shared/schedule';
 import type { ScheduleRuleInputTime } from '../shared/schedule';
 import type { LightState } from './lighting';

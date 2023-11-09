@@ -1,5 +1,5 @@
 import type { SendOptions } from '../client';
-import type Plug from '.';
+import type Plug from './index';
 
 export interface DimmerTransitionInput {
   /**
@@ -353,12 +353,10 @@ export default class Dimmer {
       this.lastState,
     );
 
-    if (brightness !== undefined) {
-      if (this.lastState.brightness !== brightness) {
-        this.lastState.brightness = brightness;
-        this.device.emit('brightness-change', brightness);
-      }
-      this.device.emit('brightness-update', brightness);
+    if (this.lastState.brightness !== brightness) {
+      this.lastState.brightness = brightness;
+      this.device.emit('brightness-change', brightness);
     }
+    this.device.emit('brightness-update', brightness);
   }
 }

@@ -1,19 +1,35 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
+import { Command } from '@commander-js/extra-typings';
 import castArray from 'lodash.castarray';
-import { program } from 'commander';
 import type { LogLevelDesc } from 'loglevel';
 import * as tplinkCrypto from 'tplink-smarthome-crypto';
 import type { PickProperties } from 'ts-essentials';
 import util from 'util';
 
-import { Client, ResponseError } from '.';
-import { SendOptions, AnyDevice } from './client';
+import { type AnyDevice, type SendOptions } from './client';
+import { Client, ResponseError } from './index';
 
 let logLevel: LogLevelDesc;
 
-function outputError(err: Error | unknown): void {
+function toInt(s: string): number {
+  return parseInt(s, 10);
+}
+
+const program = new Command()
+  .option('-D, --debug', 'turn on debug level logging', () => {
+    logLevel = 'debug';
+  })
+  .option('-t, --timeout <ms>', 'timeout (ms)', toInt, 10000)
+  .option('-u, --udp', 'send via UDP')
+  .option(
+    '-c, --color [on]',
+    'output will be styled with ANSI color codes',
+    'on',
+  );
+
+function outputError(err: unknown): void {
   if (err instanceof ResponseError) {
     console.log('Response Error:');
     console.log(err.response);
@@ -51,7 +67,7 @@ function search(
     console.log(`startDiscovery(${util.inspect(commandParams)})`);
     getClient()
       .startDiscovery(commandParams)
-      .on('device-new', (device) => {
+      .on('device-new', (device: AnyDevice) => {
         console.log(
           `${device.model} ${device.deviceType} ${device.type} ${device.host} ${device.port} ${device.macNormalized} ${device.deviceId} ${device.alias}`,
         );
@@ -69,7 +85,7 @@ function search(
 
 async function send(
   host: string,
-  port: number,
+  port: number | undefined,
   payload: string,
 ): Promise<void> {
   try {
@@ -89,8 +105,8 @@ async function send(
 
 async function sendCommand(
   host: string,
-  port: number,
-  childId: string,
+  port: number | undefined,
+  childId: string | undefined,
   payload: string,
 ): Promise<void> {
   try {
@@ -100,7 +116,11 @@ async function sendCommand(
         childId ? `childId: ${childId}` : ''
       } via ${client.defaultSendOptions.transport}...`,
     );
-    const device = await client.getDevice({ host, port, childId });
+    const device = await client.getDevice({
+      host,
+      port,
+      childId,
+    });
     const results = await device.sendCommand(payload);
     console.log('response:');
     console.dir(results, { colors: program.opts().color === 'on', depth: 10 });
@@ -111,7 +131,7 @@ async function sendCommand(
 
 async function sendCommandDynamic(
   host: string,
-  port: number,
+  port: number | undefined,
   // eslint-disable-next-line @typescript-eslint/ban-types
   command: Exclude<keyof PickProperties<AnyDevice, Function>, undefined>,
   commandParams: Array<boolean | number | string> = [],
@@ -133,6 +153,7 @@ async function sendCommandDynamic(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const func = device[command] as (...args: any) => Promise<any>;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const results = await func.apply(device, [
       ...commandParams,
       { ...sendOptions },
@@ -145,7 +166,7 @@ async function sendCommandDynamic(
   }
 }
 
-async function details(host: string, port: number): Promise<void> {
+async function details(host: string, port: number | undefined): Promise<void> {
   try {
     console.log(`Getting details from ${host}:${port || ''}...`);
     const device = await getClient().getDevice({ host, port });
@@ -168,17 +189,16 @@ async function details(host: string, port: number): Promise<void> {
   }
 }
 
-async function blink(
+function blink(
   host: string,
-  port: number,
+  port: number | undefined,
   times: number,
   rate: number,
-): Promise<void> {
-  console.log(`Sending blink commands to ${host}:${port || ''}...`);
-  getClient()
+): Promise<unknown> {
+  console.log(`Sending blink commands to ${host}:${port ?? ''}...`);
+  return getClient()
     .getDevice({ host, port })
     .then((device) => {
-      // @ts-expect-error: ignoring for now, need to implement blink on bulb
       return device.blink(times, rate).then(() => {
         console.log('Blinking complete');
       });
@@ -188,9 +208,9 @@ async function blink(
     });
 }
 
-async function getScanInfo(
+function getScanInfo(
   host: string,
-  port: number,
+  port: number | undefined,
   refresh?: boolean,
   timeoutInSeconds?: number,
 ) {
@@ -207,10 +227,6 @@ async function getScanInfo(
     .catch((reason) => {
       outputError(reason);
     });
-}
-
-function toInt(s: string): number {
-  return parseInt(s, 10);
 }
 
 function toBoolean(s: string): boolean {
@@ -243,81 +259,88 @@ function setParamTypes(
 }
 
 program
-  .option('-D, --debug', 'turn on debug level logging', () => {
-    logLevel = 'debug';
-  })
-  .option('-t, --timeout <ms>', 'timeout (ms)', toInt, 10000)
-  .option('-u, --udp', 'send via UDP')
-  .option(
-    '-c, --color [on]',
-    'output will be styled with ANSI color codes',
-    'on',
-  );
-
-program
   .command('search [params]')
   .description('Search for devices')
   .option('--broadcast <address>', 'broadcast address', '255.255.255.255')
-  .option('-s, --sysinfo', 'output sysInfo')
+  .option('-s, --sysinfo', 'output sysInfo', false)
   .option(
     '-b, --breakout-children',
     'output children (multi-outlet plugs)',
-    true,
+    false,
   )
   .action((params, options) => {
     let paramsObj;
     if (params) {
       console.dir(params);
-      paramsObj = JSON.parse(params);
+      paramsObj = JSON.parse(params) as Parameters<Client['startDiscovery']>[0];
     }
     search(
       options.sysinfo,
-      options.breakoutChildren || false,
+      options.breakoutChildren,
       program.opts().timeout,
       options.broadcast,
       paramsObj,
     );
   });
 
+function parseHost(hostString: string): [string, number | undefined] {
+  const [hostOnly, port] = hostString.split(':');
+  if (hostOnly == null || hostOnly.length === 0)
+    throw new Error('host is required');
+  if (port != null && port.length > 0) {
+    return [hostOnly, toInt(port)];
+  }
+  return [hostOnly, undefined];
+}
+
 program
   .command('send <host> <payload>')
   .description('Send payload to device (using Client.send)')
   .action((host, payload) => {
-    const [hostOnly, port] = host.split(':');
-    send(hostOnly, port, payload);
+    const [hostOnly, port] = parseHost(host);
+    send(hostOnly, port, payload).catch((err) => {
+      outputError(err);
+    });
   });
 
 program
   .command('sendCommand <host> <payload>')
   .description('Send payload to device (using Device#sendCommand)')
-  .option('--childId [childId]', 'childId')
+  .option('--childId <childId>', 'childId')
   .action((host, payload, options) => {
-    const [hostOnly, port] = host.split(':');
-    sendCommand(hostOnly, port, options.childId, payload);
+    const [hostOnly, port] = parseHost(host);
+    sendCommand(hostOnly, port, options.childId, payload).catch((err) => {
+      outputError(err);
+    });
   });
 
 program.command('details <host>').action((host) => {
-  const [hostOnly, port] = host.split(':');
-  details(hostOnly, port);
+  const [hostOnly, port] = parseHost(host);
+  details(hostOnly, port).catch((err) => {
+    outputError(err);
+  });
 });
 
 program
-  .command('blink <host> [times] [rate]')
+  .command('blink')
+  .argument('<host>')
+  .argument('[times]', '', toInt)
+  .argument('[rate]', '', toInt)
   .action((host, times = 5, rate = 500) => {
-    const [hostOnly, port] = host.split(':');
-    blink(hostOnly, port, times, rate);
+    const [hostOnly, port] = parseHost(host);
+    blink(hostOnly, port, times, rate).catch((err) => {
+      outputError(err);
+    });
   });
 
 program
-  .command('getScanInfo <host> [refresh] [timeoutInSeconds]')
+  .command('getScanInfo')
+  .argument('<host>')
+  .argument('[refresh]', '', toBoolean)
+  .argument('[timeoutInSeconds]', '', toInt)
   .action((host, refresh = true, timeoutInSeconds = 5) => {
-    const [hostOnly, port] = host.split(':');
-    getScanInfo(
-      hostOnly,
-      port,
-      refresh !== undefined ? toBoolean(refresh) : undefined,
-      timeoutInSeconds,
-    );
+    const [hostOnly, port] = parseHost(host);
+    getScanInfo(hostOnly, port, refresh, timeoutInSeconds);
   });
 
 type CommandSetup = {
@@ -368,26 +391,26 @@ for (const command of commandSetup) {
     .description(
       `Send ${command.name} to device (using Device#${command.name})`,
     )
-    .option('-t, --timeout [timeout]', 'timeout (ms)', toInt, 10000);
+    .option('-t, --timeout <timeout>', 'timeout (ms)', toInt, 10000);
   if (command.supportsChildId) {
-    cmd.option('-c, --childId [childId]', 'childId');
+    cmd.option('-c, --childId <childId>', 'childId');
   }
 
-  cmd.action((...args) => {
-    // commander provides last parameter as reference to current command
-    // remove it with slice
-    const [host, arg2, arg3] = args.slice(0, -1);
-    const [hostOnly, port] = host.split(':');
-
-    // signatures will be either:
-    //   host, options (arg2), params (arg3)
-    //   host, params (arg2)
-    const options = arg3 === undefined ? arg2 : arg3;
-    const params = arg3 === undefined ? undefined : arg2;
+  cmd.action(function action(this: Command) {
+    const [host, ...params] = this.args;
+    const [hostOnly, port] = parseHost(host as string);
+    const options = this.opts() as { timeout?: number; childId?: string };
 
     const commandParams = setParamTypes(params, command);
 
-    const { childId, ...sendOptions } = options;
+    // // @ts-expect-error: childId is added conditionally and is optional
+    const childId = options.childId || undefined;
+
+    let sendOptions;
+    if (options.timeout != null) {
+      sendOptions = { timeout: options.timeout };
+    }
+
     sendCommandDynamic(
       hostOnly,
       port,
@@ -395,36 +418,50 @@ for (const command of commandSetup) {
       commandParams,
       sendOptions,
       childId,
-    );
+    ).catch((err) => {
+      outputError(err);
+    });
   });
 }
 
 program
-  .command('encrypt <outputEncoding> <input> [firstKey=0xAB]')
+  .command('encrypt')
+  .argument('<outputEncoding>')
+  .argument('<input>')
+  .argument('[firstKey=0xAB]', '', toInt)
   .action((outputEncoding, input, firstKey = 0xab) => {
     const outputBuf = tplinkCrypto.encrypt(input, firstKey);
-    console.log(outputBuf.toString(outputEncoding));
+    console.log(outputBuf.toString(outputEncoding as BufferEncoding));
   });
 
 program
-  .command('encryptWithHeader <outputEncoding> <input> [firstKey=0xAB]')
+  .command('encryptWithHeader')
+  .argument('<outputEncoding>')
+  .argument('<input>')
+  .argument('[firstKey=0xAB]', '', toInt)
   .action((outputEncoding, input, firstKey = 0xab) => {
     const outputBuf = tplinkCrypto.encryptWithHeader(input, firstKey);
-    console.log(outputBuf.toString(outputEncoding));
+    console.log(outputBuf.toString(outputEncoding as BufferEncoding));
   });
 
 program
-  .command('decrypt <inputEncoding> <input> [firstKey=0xAB]')
+  .command('decrypt')
+  .argument('<inputEncoding>')
+  .argument('<input>')
+  .argument('[firstKey=0xAB]', '', toInt)
   .action((inputEncoding, input, firstKey = 0xab) => {
-    const inputBuf = Buffer.from(input, inputEncoding);
+    const inputBuf = Buffer.from(input, inputEncoding as BufferEncoding);
     const outputBuf = tplinkCrypto.decrypt(inputBuf, firstKey);
     console.log(outputBuf.toString());
   });
 
 program
-  .command('decryptWithHeader <inputEncoding> <input> [firstKey=0xAB]')
+  .command('decryptWithHeader')
+  .argument('<inputEncoding>')
+  .argument('<input>')
+  .argument('[firstKey=0xAB]', '', toInt)
   .action((inputEncoding, input, firstKey = 0xab) => {
-    const inputBuf = Buffer.from(input, inputEncoding);
+    const inputBuf = Buffer.from(input, inputEncoding as BufferEncoding);
     const outputBuf = tplinkCrypto.decryptWithHeader(inputBuf, firstKey);
     console.log(outputBuf.toString());
   });

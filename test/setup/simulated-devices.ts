@@ -23,9 +23,11 @@ async function simulatorToDevice(
   });
 }
 
-export const startUdpServer = simulator.UdpServer.start;
+export const startUdpServer = () => simulator.UdpServer.start();
 
-export const stopUdpServer = simulator.UdpServer.stop;
+export const stopUdpServer = () => {
+  simulator.UdpServer.stop();
+};
 
 const simulatorDevices: SimulatorDevice[] = [];
 

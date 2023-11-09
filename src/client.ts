@@ -1,21 +1,19 @@
-import { Socket, createSocket, RemoteInfo } from 'dgram';
+import { RemoteInfo, Socket, createSocket } from 'dgram';
 import { EventEmitter } from 'events';
 import util from 'util';
 
 import type log from 'loglevel';
-import { encrypt, decrypt } from 'tplink-smarthome-crypto';
+import { decrypt, encrypt } from 'tplink-smarthome-crypto';
 import type { MarkOptional } from 'ts-essentials';
 
-import Device, { isBulbSysinfo, isPlugSysinfo } from './device';
-import type { Sysinfo } from './device';
 import Bulb from './bulb';
-import Plug, { hasSysinfoChildren } from './plug';
-import createLogger from './logger';
-import type { Logger } from './logger';
+import Device, { isBulbSysinfo, isPlugSysinfo, type Sysinfo } from './device';
+import createLogger, { type Logger } from './logger';
 import TcpConnection from './network/tcp-connection';
 import UdpConnection from './network/udp-connection';
+import Plug, { hasSysinfoChildren } from './plug';
+import type { Realtime } from './shared/emeter';
 import { compareMac, isObjectLike } from './utils';
-import { Realtime } from './shared/emeter';
 
 const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 
@@ -374,7 +372,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
       sendOptions,
     );
 
-    const responseObj = JSON.parse(response);
+    const responseObj: unknown = JSON.parse(response);
     if (isSysinfoResponse(responseObj)) {
       return responseObj.system.get_sysinfo;
     }
@@ -390,14 +388,17 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
     // Add device- / plug- / bulb- to eventName
     let ret = false;
     if (args[0] instanceof Device) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       if (super.emit(`device-${eventName}`, ...args)) {
         ret = true;
       }
       if (args[0].deviceType !== 'device') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         if (super.emit(`${args[0].deviceType}-${eventName}`, ...args)) {
           ret = true;
         }
       }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     } else if (super.emit(eventName, ...args)) {
       ret = true;
     }
@@ -572,8 +573,10 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
           let response: DiscoveryResponse;
           let sysInfo: Sysinfo;
           try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             response = JSON.parse(decryptedMsg);
             sysInfo = response.system.get_sysinfo;
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (sysInfo == null)
               throw new Error('system.get_sysinfo is null or undefined');
             if (!isObjectLike(sysInfo))
@@ -609,6 +612,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
           else if ('ethernet_mac' in sysInfo) mac = sysInfo.ethernet_mac;
           else mac = '';
 
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (macAddresses && macAddresses.length > 0) {
             if (!compareMac(mac, macAddresses)) {
               this.log.debug(
@@ -619,6 +623,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
             }
           }
 
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (excludeMacAddresses && excludeMacAddresses.length > 0) {
             if (compareMac(mac, excludeMacAddresses)) {
               this.log.debug(

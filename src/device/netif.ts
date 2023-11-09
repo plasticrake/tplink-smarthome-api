@@ -1,6 +1,6 @@
 import clone from 'lodash.clone';
 import type { SendOptions } from '../client';
-import type Device from '.';
+import type Device from './index';
 
 export default class Netif {
   constructor(

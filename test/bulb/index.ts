@@ -21,17 +21,7 @@ describe('Bulb', function () {
           const ctx: { device?: AnyDevice } = {};
           let bulb: Bulb;
 
-          before('Bulb', async function () {
-            if (!testDevice.getDevice) {
-              this.skip();
-            }
-          });
-
           beforeEach('Bulb', async function () {
-            // before() doesn't skip nested describes
-            if (!testDevice.getDevice) {
-              this.skip();
-            }
             await retry(async () => {
               // this is in beforeEach since many of the tests may overwrite some properties
               bulb = (await testDevice.getDevice(

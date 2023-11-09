@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import type { MarkOptional, MarkRequired } from 'ts-essentials';
-import { Client, Plug } from '../../src';
-import { AnyDevice } from '../../src/client';
+import type { Client, Plug } from '../../src';
+import type { AnyDevice } from '../../src/client';
 import { isObjectLike } from '../../src/utils';
 
 export type TestDevice = {
@@ -91,88 +91,86 @@ export function testDeviceDecorator(
   testDevice.parent = parent;
   testDevice.childId = childId;
 
-  if (device) {
-    testDevice.deviceType = device.deviceType;
-    testDevice.mac = device.mac;
-    testDevice.deviceOptions = {
-      host: device.host,
-      port: device.port,
-    };
-    if (childId !== undefined) {
-      // @ts-expect-error: childId is only on plugs, but harmless
-      testDevice.deviceOptions.childId = childId;
-    }
+  testDevice.deviceType = device.deviceType;
+  testDevice.mac = device.mac;
+  testDevice.deviceOptions = {
+    host: device.host,
+    port: device.port,
+  };
+  if (childId !== undefined) {
+    // @ts-expect-error: childId is only on plugs, but harmless
+    testDevice.deviceOptions.childId = childId;
+  }
 
-    testDevice.getDevice = function getDevice(
-      deviceOptions?: Parameters<Client['getDevice']>[0],
-      sendOptions?: Parameters<Client['getDevice']>[1],
-    ): ReturnType<Client['getDevice']> {
-      return client.getDevice(
-        {
-          ...testDevice.deviceOptions,
-          defaultSendOptions: sendOptions,
-          ...deviceOptions,
-        } as Parameters<Client['getDevice']>[0], // TODO: I don't like this cast but only way I could get it to work
-        sendOptions,
-      );
-    };
+  testDevice.getDevice = function getDevice(
+    deviceOptions?: Parameters<Client['getDevice']>[0],
+    sendOptions?: Parameters<Client['getDevice']>[1],
+  ): ReturnType<Client['getDevice']> {
+    return client.getDevice(
+      {
+        ...testDevice.deviceOptions,
+        defaultSendOptions: sendOptions,
+        ...deviceOptions,
+      } as Parameters<Client['getDevice']>[0], // TODO: I don't like this cast but only way I could get it to work
+      sendOptions,
+    );
+  };
 
-    if ('children' in device && device.children.size > 0) {
-      if (testDevice.childId === undefined) {
-        testDevice.children = ((): MarkRequired<
-          TestDevice,
-          'getDevice' | 'childId' | 'parent'
-        >[] => {
-          return Array.from(device.children.keys()).map((key) => {
-            return createTestDevice(device, client, {
-              name: testDevice.name,
-              model: testDevice.model,
-              hardwareVersion: testDevice.hardwareVersion,
-              isSimulated: testDevice.isSimulated,
-              parent: testDevice as TestDevice,
-              childId: key,
-            }) as MarkRequired<TestDevice, 'getDevice' | 'childId' | 'parent'>;
-          });
-        })();
-      } else {
-        testDevice.getOtherChildren = function getOtherChildren(): MarkRequired<
-          TestDevice,
-          'getDevice' | 'childId' | 'parent'
-        >[] {
-          if (!(parent !== undefined && parent.children !== undefined))
-            throw new TypeError();
-          return parent.children.filter((oc) => oc.childId !== this.childId);
+  if ('children' in device && device.children.size > 0) {
+    if (testDevice.childId === undefined) {
+      testDevice.children = ((): MarkRequired<
+        TestDevice,
+        'getDevice' | 'childId' | 'parent'
+      >[] => {
+        return Array.from(device.children.keys()).map((key) => {
+          return createTestDevice(device, client, {
+            name: testDevice.name,
+            model: testDevice.model,
+            hardwareVersion: testDevice.hardwareVersion,
+            isSimulated: testDevice.isSimulated,
+            parent: testDevice as TestDevice,
+            childId: key,
+          }) as MarkRequired<TestDevice, 'getDevice' | 'childId' | 'parent'>;
+        });
+      })();
+    } else {
+      testDevice.getOtherChildren = function getOtherChildren(): MarkRequired<
+        TestDevice,
+        'getDevice' | 'childId' | 'parent'
+      >[] {
+        if (!(parent !== undefined && parent.children !== undefined))
+          throw new TypeError();
+        return parent.children.filter((oc) => oc.childId !== this.childId);
+      };
+
+      testDevice.getOtherChildrenState =
+        async function getOtherChildrenState(): Promise<
+          Array<{
+            childId: string;
+            relayState: boolean;
+            alias: string;
+          }>
+        > {
+          if (
+            !(
+              'getOtherChildren' in testDevice &&
+              testDevice.getOtherChildren !== undefined
+            )
+          ) {
+            throw new Error();
+          }
+          return Promise.all(
+            testDevice.getOtherChildren().map(async (childDevice) => {
+              const d = (await childDevice.getDevice()) as Plug;
+              if (d.childId === undefined) throw new TypeError();
+              return {
+                childId: d.childId,
+                relayState: d.relayState,
+                alias: d.alias,
+              };
+            }),
+          );
         };
-
-        testDevice.getOtherChildrenState =
-          async function getOtherChildrenState(): Promise<
-            Array<{
-              childId: string;
-              relayState: boolean;
-              alias: string;
-            }>
-          > {
-            if (
-              !(
-                'getOtherChildren' in testDevice &&
-                testDevice.getOtherChildren !== undefined
-              )
-            ) {
-              throw new Error();
-            }
-            return Promise.all(
-              testDevice.getOtherChildren().map(async (childDevice) => {
-                const d = (await childDevice.getDevice()) as Plug;
-                if (d.childId === undefined) throw new TypeError();
-                return {
-                  childId: d.childId,
-                  relayState: d.relayState,
-                  alias: d.alias,
-                };
-              }),
-            );
-          };
-      }
     }
   }
 

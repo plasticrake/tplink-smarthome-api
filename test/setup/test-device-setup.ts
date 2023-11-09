@@ -25,7 +25,7 @@ const clientDefaultOptions = ((): ConstructorParameters<typeof Client>[0] => {
   if (config.useSimulator) {
     // set low timeout for simulator
     return {
-      defaultSendOptions: { timeout: 250 },
+      defaultSendOptions: { timeout: 500 },
       ...clientOptions,
     };
   }
@@ -244,7 +244,6 @@ export async function testDeviceCleanup(): Promise<void> {
       if (
         !('getDevice' in testDevices.plugWithChildren) &&
         device.deviceType === 'plug' &&
-        device.children &&
         device.children.size > 0
       ) {
         testDeviceDecorator(
@@ -306,7 +305,7 @@ export async function testDeviceCleanup(): Promise<void> {
     Object.entries(testDevices)
       .reduce((acc: [string, TestDevice | undefined][], [key, val]) => {
         if (Array.isArray(val)) {
-          const d = val.map((v) => [`${key}[]`, v]) as [string, TestDevice][];
+          const d = val.map<[string, TestDevice]>((v) => [`${key}[]`, v]);
           d.forEach((a) => acc.push(a));
         } else {
           acc.push([key, val]);
@@ -317,4 +316,6 @@ export async function testDeviceCleanup(): Promise<void> {
   );
 
   run();
-})();
+})().catch((e) => {
+  console.error(e);
+});

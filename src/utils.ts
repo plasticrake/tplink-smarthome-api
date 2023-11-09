@@ -7,6 +7,10 @@ export function isObjectLike(
   return typeof candidate === 'object' && candidate !== null;
 }
 
+export function objectHasKey<T>(obj: T, key: PropertyKey): key is keyof T {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
 /**
  * Represents an error result received from a TP-Link device.
  *
@@ -144,21 +148,29 @@ export function processSingleCommandResponse(
   command: string,
   response: string,
 ): HasErrCode {
-  let responseObj;
+  let responseObj: unknown;
   try {
     responseObj = JSON.parse(response);
+    if (!isObjectLike(responseObj)) throw new Error();
   } catch (err) {
     throw new ResponseError('Could not parse response', response, command);
   }
-  if (responseObj[module] === undefined) {
+  if (
+    !(module in responseObj) ||
+    responseObj[module] === undefined ||
+    !isObjectLike(responseObj[module])
+  ) {
     throw new ResponseError('Module not found in response', response, command);
   }
-  if (responseObj[module][method] === undefined) {
+
+  const moduleResponse = responseObj[module] as Record<string, unknown>;
+  if (!(method in moduleResponse) || moduleResponse[method] === undefined) {
     throw new ResponseError('Method not found in response', response, command, [
       module,
     ]);
   }
-  const methodResponse = responseObj[module][method];
+
+  const methodResponse = moduleResponse[method];
   if (!hasErrCode(methodResponse)) {
     throw new ResponseError('err_code missing', response, command, [module]);
   }
@@ -174,8 +186,15 @@ export function processSingleCommandResponse(
  */
 export function processResponse(
   command: Record<string, unknown>,
-  response: Record<string, unknown>,
+  response: unknown,
 ): Record<string, unknown> {
+  if (!isObjectLike(response))
+    throw new ResponseError(
+      'Response not object',
+      JSON.stringify(response),
+      JSON.stringify(command),
+    );
+
   const multipleResponses = Object.keys(response).length > 1;
   const commandResponses = flattenResponses(command, response);
 
@@ -254,19 +273,21 @@ export function processResponse(
  */
 export function extractResponse<T>(
   response: unknown,
-  path: string,
+  path: string | string[],
   typeGuardFn: (arg0: unknown) => boolean,
 ): T {
-  const ret = path.length > 0 ? get(response, path) : response;
+  const ret: unknown = path.length > 0 ? get(response, path) : response;
 
   if (ret === undefined || !isObjectLike(ret)) {
     throw new Error(
-      `Could not find path:"${path}" in ${JSON.stringify(response)}`,
+      `Could not find path:"${path.toString()}" in ${JSON.stringify(response)}`,
     );
   }
   if (!typeGuardFn(ret))
     throw new TypeError(
-      `Unexpected object path:"${path}" in ${JSON.stringify(response)}`,
+      `Unexpected object path:"${path.toString()}" in ${JSON.stringify(
+        response,
+      )}`,
     );
   return ret as T;
 }

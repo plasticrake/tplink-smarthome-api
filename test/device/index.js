@@ -378,15 +378,15 @@ describe('Device', function () {
                   device.sysInfo.ethernet_mac,
               );
               device.sysInfo.mac = 'My Test mac';
-              device.sysInfo.mic_mac = undefined;
-              device.sysInfo.ethernet_mac = undefined;
+              delete device.sysInfo.mic_mac;
+              delete device.sysInfo.ethernet_mac;
               expect(device.mac).to.eql(device.sysInfo.mac);
-              device.sysInfo.mac = undefined;
+              delete device.sysInfo.mac;
               device.sysInfo.mic_mac = 'My Test mic_mac';
-              device.sysInfo.ethernet_mac = undefined;
+              delete device.sysInfo.ethernet_mac;
               expect(device.mac).to.eql(device.sysInfo.mic_mac);
-              device.sysInfo.mac = undefined;
-              device.sysInfo.mic_mac = undefined;
+              delete device.sysInfo.mac;
+              delete device.sysInfo.mic_mac;
               device.sysInfo.ethernet_mac = 'My Test ethernet_mac';
               expect(device.mac).to.eql(device.sysInfo.ethernet_mac);
             });
@@ -395,15 +395,15 @@ describe('Device', function () {
           describe('#macNormalized get', function () {
             it('should return normalized mac from cached sysInfo', function () {
               device.sysInfo.mac = 'My Test mac';
-              device.sysInfo.mic_mac = undefined;
-              device.sysInfo.ethernet_mac = undefined;
+              delete device.sysInfo.mic_mac;
+              delete device.sysInfo.ethernet_mac;
               expect(device.macNormalized).to.eql('MYTESTMAC');
-              device.sysInfo.mac = undefined;
+              delete device.sysInfo.mac;
               device.sysInfo.mic_mac = 'My Test mic_mac';
-              device.sysInfo.ethernet_mac = undefined;
+              delete device.sysInfo.ethernet_mac;
               expect(device.macNormalized).to.eql('MYTESTMICMAC');
-              device.sysInfo.mac = undefined;
-              device.sysInfo.mic_mac = undefined;
+              delete device.sysInfo.mac;
+              delete device.sysInfo.mic_mac;
               device.sysInfo.ethernet_mac = 'My Test ethernet_mac';
               expect(device.macNormalized).to.eql('MYTESTETHERNETMAC');
             });

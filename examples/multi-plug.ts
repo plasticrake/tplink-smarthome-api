@@ -46,33 +46,45 @@ const monitorEvents = function monitorEvents(device: Device) {
 
   // Poll device every 5 seconds
   setTimeout(function pollDevice() {
-    device.getInfo().then((data) => {
-      console.log(data);
-      setTimeout(pollDevice, 5000);
-    });
+    device
+      .getInfo()
+      .then((data) => {
+        console.log(data);
+        setTimeout(pollDevice, 5000);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }, 5000);
 };
 
-(async () => {
-  const device = await client.getDevice({ host: '10.0.1.136' });
+void (async () => {
+  try {
+    const device = await client.getDevice({ host: '10.0.1.136' });
 
-  console.log(device.alias);
+    console.log(device.alias);
 
-  if (!('children' in device) || !device.children) {
-    console.log('device has no children');
-    return;
+    if (!('children' in device)) {
+      console.log('device has no children');
+      return;
+    }
+
+    device.children.forEach((child) => {
+      console.log(child);
+    });
+
+    await Promise.all(
+      Array.from(device.children.keys(), async (childId) => {
+        const childPlug = await client.getDevice({
+          host: '10.0.1.136',
+          childId,
+        });
+        monitorEvents(childPlug);
+      }),
+    );
+
+    monitorEvents(device);
+  } catch (err) {
+    console.error(err);
   }
-
-  device.children.forEach((child) => {
-    console.log(child);
-  });
-
-  await Promise.all(
-    Array.from(device.children.keys(), async (childId) => {
-      const childPlug = await client.getDevice({ host: '10.0.1.136', childId });
-      monitorEvents(childPlug);
-    }),
-  );
-
-  monitorEvents(device);
 })();

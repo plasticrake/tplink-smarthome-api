@@ -30,17 +30,6 @@ export function retry(
   );
 }
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-export function delayError(fn: () => Promise<void>, ms: number): () => void {
-  return () =>
-    fn().catch((e: Error) => delay(ms).then(() => Promise.reject(e)));
-}
-
 export async function createUnresponsiveDevice(
   transport: 'tcp' | 'udp',
 ): Promise<{ port: number; host: string; close: () => void }> {

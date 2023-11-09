@@ -1,8 +1,11 @@
-import type Plug from '.';
-import Schedule, { createScheduleRule } from '../shared/schedule';
-import type { ScheduleRule, ScheduleRuleInputTime } from '../shared/schedule';
 import type { SendOptions } from '../client';
+import Schedule, {
+  createScheduleRule,
+  type ScheduleRule,
+  type ScheduleRuleInputTime,
+} from '../shared/schedule';
 import { isDefinedAndNotNull } from '../utils';
+import type Plug from './index';
 
 export type PlugScheduleRule = Omit<ScheduleRule, 'emin'> & {
   sact?: number;

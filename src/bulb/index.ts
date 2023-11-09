@@ -2,13 +2,28 @@
 import isEqual from 'lodash.isequal';
 
 import type { SendOptions } from '../client';
-import Device, { isBulbSysinfo } from '../device';
-import type { CommonSysinfo, DeviceConstructorOptions } from '../device';
-import Cloud from '../shared/cloud';
-import Emeter, { RealtimeNormalized } from '../shared/emeter';
-import Lighting, { LightState, LightStateInput } from './lighting';
-import Schedule from './schedule';
+import Device, {
+  isBulbSysinfo,
+  type CommonSysinfo,
+  type DeviceConstructorOptions,
+} from '../device';
+import Cloud, { isCloudInfo, type CloudInfo } from '../shared/cloud';
+import type { Realtime, RealtimeNormalized } from '../shared/emeter';
+import Emeter from '../shared/emeter';
 import Time from '../shared/time';
+import {
+  extractResponse,
+  hasErrCode,
+  isObjectLike,
+  objectHasKey,
+  type HasErrCode,
+} from '../utils';
+import Lighting, {
+  isLightState,
+  type LightState,
+  type LightStateInput,
+} from './lighting';
+import Schedule from './schedule';
 
 function isLightStrip(sysinfo: BulbSysinfo) {
   return (sysinfo.length ?? 0) > 0;
@@ -352,7 +367,7 @@ class Bulb extends Device {
     const response = await super.getSysInfo(sendOptions);
 
     if (!isBulbSysinfo(response)) {
-      throw new Error(`Unexpected Response: ${response}`);
+      throw new Error(`Unexpected Response: ${JSON.stringify(response)}`);
     }
 
     return this.sysInfo;
@@ -382,13 +397,50 @@ class Bulb extends Device {
       `{"${this.apiModules.emeter}":{"get_realtime":{}},"${this.apiModules.lightingservice}":{"get_light_state":{}},"${this.apiModules.schedule}":{"get_next_action":{}},"system":{"get_sysinfo":{}},"${this.apiModules.cloud}":{"get_info":{}}}`,
       sendOptionsForGetInfo,
     );
-    const data = JSON.parse(response);
-    this.setSysInfo(data.system.get_sysinfo);
-    this.cloud.info = data[this.apiModules.cloud].get_info;
-    this.emeter.setRealtime(data[this.apiModules.emeter].get_realtime);
-    this.schedule.nextAction = data[this.apiModules.schedule].get_next_action;
-    this.lighting.lightState =
-      data[this.apiModules.lightingservice].get_light_state;
+    const data: unknown = JSON.parse(response);
+
+    const sysinfo = extractResponse<BulbSysinfo>(
+      data,
+      'system.get_sysinfo',
+      isBulbSysinfo,
+    );
+    this.setSysInfo(sysinfo);
+
+    const cloudInfo = extractResponse<CloudInfo & HasErrCode>(
+      data,
+      [this.apiModules.cloud, 'get_info'],
+      (c) => isCloudInfo(c) && hasErrCode(c),
+    );
+    this.cloud.info = cloudInfo;
+
+    const emeterKey = this.apiModules.emeter;
+    if (
+      isObjectLike(data) &&
+      objectHasKey(data, emeterKey) &&
+      isObjectLike(data[emeterKey]) &&
+      objectHasKey(data[emeterKey], 'get_realtime') &&
+      // @ts-expect-error: limitation of TS type checking
+      isObjectLike(data[emeterKey].get_realtime)
+    ) {
+      // @ts-expect-error: limitation of TS type checking
+      const realtime = data[emeterKey].get_realtime as Realtime;
+      this.emeter.setRealtime(realtime);
+    }
+
+    const scheduleNextAction = extractResponse<HasErrCode>(
+      data,
+      [this.apiModules.schedule, 'get_next_action'],
+      hasErrCode,
+    );
+    this.schedule.nextAction = scheduleNextAction;
+
+    const lightState = extractResponse<LightState>(
+      data,
+      [this.apiModules.lightingservice, 'get_light_state'],
+      isLightState,
+    );
+    this.lighting.lightState = lightState;
+
     return {
       sysInfo: this.sysInfo,
       cloud: { info: this.cloud.info },
@@ -488,7 +540,6 @@ class Bulb extends Device {
 
     const { light_state: sysinfoLightState } = this._sysInfo;
 
-    if (sysinfoLightState == null) return;
     const powerOn = sysinfoLightState.on_off === 1;
 
     if (this.lastState.powerOn !== powerOn) {

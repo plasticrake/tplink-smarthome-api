@@ -1,8 +1,8 @@
 import dgram from 'dgram';
-import { encrypt, decrypt } from 'tplink-smarthome-crypto';
+import { decrypt, encrypt } from 'tplink-smarthome-crypto';
 
-import TplinkSocket from './tplink-socket';
 import { replaceControlCharacters } from '../utils';
+import TplinkSocket from './tplink-socket';
 
 /**
  * @hidden
@@ -14,6 +14,7 @@ export default class UdpSocket extends TplinkSocket {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logDebug(...args: any[]): void {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.log.debug(`[${this.socketId}] UdpSocket${args.shift()}`, ...args);
   }
 
@@ -53,7 +54,7 @@ export default class UdpSocket extends TplinkSocket {
       if (socket === undefined)
         throw new Error('send called without creating socket');
 
-      let timer: NodeJS.Timeout;
+      let timer: NodeJS.Timeout | undefined;
       const setSocketTimeout = (socketTimeout: number): void => {
         if (timer != null) clearTimeout(timer);
         if (socketTimeout > 0) {
@@ -84,7 +85,7 @@ export default class UdpSocket extends TplinkSocket {
             `: socket:data message:${replaceControlCharacters(decryptedMsg)}`,
           );
 
-          return resolve(decryptedMsg);
+          resolve(decryptedMsg);
         } catch (err) {
           this.log.error(
             `Error processing UDP message: From:[%j] SO_RCVBUF:[%d]${'\n'}  msg:[%o]${'\n'}  decrypted:[${replaceControlCharacters(
@@ -94,7 +95,7 @@ export default class UdpSocket extends TplinkSocket {
             socket.getRecvBufferSize(),
             msg,
           );
-          return reject(err);
+          reject(err);
         }
       });
 

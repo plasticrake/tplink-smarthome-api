@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parserOptions: {
-    ecmaVersion: 2019,
+    ecmaVersion: 2022,
     project: ['./tsconfig.json'],
   },
   env: {
@@ -21,8 +21,7 @@ module.exports = {
       extends: [
         'airbnb-base',
         'airbnb-typescript/base',
-        'plugin:@typescript-eslint/eslint-recommended',
-        'plugin:@typescript-eslint/strict',
+        'plugin:@typescript-eslint/strict-type-checked',
         'plugin:prettier/recommended',
       ],
       rules: {
@@ -35,12 +34,14 @@ module.exports = {
             'ts-check': 'allow-with-description',
           },
         ],
+        '@typescript-no-unsafe-assignment': 'off',
         'no-restricted-syntax': [
           'off',
           {
             selector: 'ForOfStatement',
           },
         ],
+        'no-void': 'off',
         'tsdoc/syntax': 'off', // 'warn',
       },
     },

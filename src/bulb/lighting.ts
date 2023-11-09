@@ -1,12 +1,13 @@
 import isEqual from 'lodash.isequal';
+
 import type { SendOptions } from '../client';
-import type Bulb from '.';
 import {
   extractResponse,
   hasErrCode,
   isDefinedAndNotNull,
   isObjectLike,
 } from '../utils';
+import type Bulb from './index';
 
 export interface LightState {
   /**
@@ -113,7 +114,6 @@ export default class Lighting {
   }
 
   private emitEvents(): void {
-    if (!this.#lightState) return;
     const powerOn = this.#lightState.on_off === 1;
 
     if (this.lastState.powerOn !== powerOn) {
@@ -141,7 +141,7 @@ export default class Lighting {
    * @throws {@link ResponseError}
    */
   async getLightState(sendOptions?: SendOptions): Promise<LightState> {
-    this.lightState = extractResponse(
+    this.lightState = extractResponse<LightStateResponse>(
       await this.device.sendCommand(
         {
           [this.apiModuleName]: { get_light_state: {} },
@@ -151,7 +151,7 @@ export default class Lighting {
       ),
       '',
       isLightStateResponse,
-    ) as LightStateResponse;
+    );
 
     return this.lightState;
   }
@@ -191,7 +191,7 @@ export default class Lighting {
     if (isDefinedAndNotNull(brightness)) state.brightness = brightness;
     if (isDefinedAndNotNull(color_temp)) state.color_temp = color_temp;
 
-    const response = extractResponse(
+    const response = extractResponse<LightStateResponse>(
       await this.device.sendCommand(
         {
           [this.apiModuleName]: { [this.setLightStateMethodName]: state },
@@ -201,7 +201,7 @@ export default class Lighting {
       ),
       '',
       isLightStateResponse,
-    ) as LightStateResponse;
+    );
 
     // The light strip in particular returns more detail with get(), so only
     // apply the subset that is returned with set()

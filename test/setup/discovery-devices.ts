@@ -1,5 +1,5 @@
 import type { Client } from '../../src';
-import { AnyDevice } from '../../src/client';
+import type { AnyDevice } from '../../src/client';
 
 export default async function getDiscoveryDevices(
   client: Client,
@@ -20,7 +20,7 @@ export default async function getDiscoveryDevices(
       for (const device of client.devices.values()) {
         discoveredTestDevices.push(device);
       }
-      return resolve(discoveredTestDevices);
+      resolve(discoveredTestDevices);
     }, discoveryTimeout);
   });
 }
