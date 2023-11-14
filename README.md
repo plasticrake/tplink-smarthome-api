@@ -4,7 +4,7 @@
 
 [![NPM Version](https://img.shields.io/npm/v/tplink-smarthome-api.svg)](https://www.npmjs.com/package/tplink-smarthome-api)
 [![Build Status](https://github.com/plasticrake/tplink-smarthome-api/workflows/CI/badge.svg?branch=main)](https://github.com/plasticrake/tplink-smarthome-api/actions?query=workflow%3ACI+branch%3Amain)
-[![codecov](https://codecov.io/gh/plasticrake/tplink-smarthome-api/branch/main/graph/badge.svg)](https://codecov.io/gh/plasticrake/tplink-smarthome-api)
+[![Coverage Status](https://coveralls.io/repos/github/plasticrake/tplink-smarthome-api/badge.svg?branch=master)](https://coveralls.io/github/plasticrake/tplink-smarthome-api?branch=master)
 
 TP-Link Smarthome API
 
