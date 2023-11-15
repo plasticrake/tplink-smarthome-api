@@ -1,6 +1,30 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [5.0.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v4.2.0...v5.0.0) (2023-11-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **Device:** `Device#startPolling`, `Device#stopPolling`, and Device/Bulb/Plug event `polling-error` have been removed.
+* Requires minimum node version v16
+* Requires minimum node version v14
+
+* drop support for node < v14 ([348401a](https://github.com/plasticrake/tplink-smarthome-api/commit/348401afd10a3e6c8a82e3914350bb1d5574b3b2))
+* drop support for node < v16 ([#156](https://github.com/plasticrake/tplink-smarthome-api/issues/156)) ([893b82b](https://github.com/plasticrake/tplink-smarthome-api/commit/893b82bfd6a508ff34f36cfc8f883b498b825d8b))
+
+
+### Features
+
+* **Bulb:** add Bulb#blink method ([#162](https://github.com/plasticrake/tplink-smarthome-api/issues/162)) ([a8dd13d](https://github.com/plasticrake/tplink-smarthome-api/commit/a8dd13dd899f1dae53b43e61e2c97d764ed5b636))
+* catch more invalid discovery messages ([#154](https://github.com/plasticrake/tplink-smarthome-api/issues/154)) ([935d3f3](https://github.com/plasticrake/tplink-smarthome-api/commit/935d3f369fc0c958b59d2b5c8a307b02618d982e))
+* **Device:** remove startPolling, stopPolling, that were previously deprecated ([#157](https://github.com/plasticrake/tplink-smarthome-api/issues/157)) ([513deca](https://github.com/plasticrake/tplink-smarthome-api/commit/513decac9364633b138e459a2d3385231ac476fc))
+
+
+### Bug Fixes
+
+* exported type fixes ([fd336b2](https://github.com/plasticrake/tplink-smarthome-api/commit/fd336b20668b926c982e0cee5e83665b65f643ac))
 
 ## [4.2.0](https://github.com/plasticrake/tplink-smarthome-api/compare/v4.1.0...v4.2.0) (2022-02-14)
 
