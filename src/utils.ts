@@ -268,7 +268,7 @@ export function processResponse(
  * @param path passed to `lodash.get`
  * @param typeGuardFn
  * @returns value of `path` in `response`
- * @throws {@link Error}
+ * @throws Error
  * @throws {@link TypeError}
  */
 export function extractResponse<T>(

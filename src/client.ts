@@ -200,13 +200,13 @@ export interface ClientEvents {
    * Invalid/Unknown response from device.
    */
   'discovery-invalid': ({
-      rinfo,
-      response,
-      decryptedResponse,
-    }: {
-      rinfo: RemoteInfo;
-      response: Buffer;
-      decryptedResponse: Buffer;
+    rinfo,
+    response,
+    decryptedResponse,
+  }: {
+    rinfo: RemoteInfo;
+    response: Buffer;
+    decryptedResponse: Buffer;
   }) => void;
 
   /**
@@ -228,7 +228,7 @@ declare interface Client {
 /**
  * Client that sends commands to specified devices or discover devices on the local subnet.
  * - Contains factory methods to create devices.
- * - Events are emitted after {@link #startDiscovery} is called.
+ * - Events are emitted after {@link Client#startDiscovery} is called.
  * @noInheritDoc
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
@@ -336,7 +336,7 @@ class Client extends EventEmitter {
    *
    * @returns parsed JSON response
    * @throws {@link ResponseError}
-   * @throws {@link Error}
+   * @throws Error
    */
   async getSysInfo(
     host: string,
@@ -457,7 +457,7 @@ class Client extends EventEmitter {
    *
    * See [Device constructor]{@link Device}, [Bulb constructor]{@link Bulb}, [Plug constructor]{@link Plug} for valid options
    * @param  deviceOptions - passed to device constructor
-   * @throws {@link Error}
+   * @throws Error
    */
   getDeviceFromSysInfo(
     sysInfo: Sysinfo,
@@ -497,7 +497,7 @@ class Client extends EventEmitter {
    *
    * - Sends a discovery packet (via UDP) to the `broadcast` address every `discoveryInterval`(ms).
    * - Stops discovery after `discoveryTimeout`(ms) (if `0`, runs until {@link Client.stopDiscovery} is called).
-   *   - If a device does not respond after `offlineTolerance` number of attempts, {@link Client.device-offline} is emitted.
+   *   - If a device does not respond after `offlineTolerance` number of attempts, {@link ClientEvents.device-offline} is emitted.
    * - If `deviceTypes` are specified only matching devices are found.
    * - If `macAddresses` are specified only devices with matching MAC addresses are found.
    * - If `excludeMacAddresses` are specified devices with matching MAC addresses are excluded.

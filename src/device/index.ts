@@ -407,7 +407,7 @@ abstract class Device extends EventEmitter {
   /**
    * Sends command(s) to device.
    *
-   * Calls {@link #send} and processes the response.
+   * Calls {@link Device#send} and processes the response.
    *
    * - Adds context.child_ids:[] to the command.
    *   - If `childIds` parameter is set. _or_
@@ -417,9 +417,9 @@ abstract class Device extends EventEmitter {
    *   - Promise fulfills with specific parsed JSON response for command.\
    *     Example: `{system:{get_sysinfo:{}}}`
    *     - resolves to: `{err_code:0,...}`\
-   *     - instead of: `{system:{get_sysinfo:{err_code:0,...}}}` (as {@link #send} would)
+   *     - instead of: `{system:{get_sysinfo:{err_code:0,...}}}` (as {@link Device#send} would)
    * - If more than one operation was sent:
-   *   - Promise fulfills with full parsed JSON response (same as {@link #send})
+   *   - Promise fulfills with full parsed JSON response (same as {@link Device#send})
    *
    * Also, the response's `err_code`(s) are checked, if any are missing or != `0` the Promise is rejected with {@link ResponseError}.
    * @returns parsed JSON response
