@@ -19,8 +19,8 @@ const discoveryMsgBuf = encrypt('{"system":{"get_sysinfo":{}}}');
 
 export type AnyDevice = Bulb | Plug;
 
-type DeviceDiscovery = { status: string; seenOnDiscovery: number };
-type AnyDeviceDiscovery = (Bulb | Plug) & Partial<DeviceDiscovery>;
+export type DeviceDiscovery = { status: string; seenOnDiscovery: number };
+export type AnyDeviceDiscovery = (Bulb | Plug) & Partial<DeviceDiscovery>;
 
 type SysinfoResponse = { system: { get_sysinfo: Sysinfo } };
 type EmeterResponse = PlugEmeterResponse | BulbEmeterResponse;
@@ -38,11 +38,11 @@ type AnyDeviceOptions =
   | ConstructorParameters<typeof Bulb>[0]
   | ConstructorParameters<typeof Plug>[0];
 
-type AnyDeviceOptionsCon =
+export type AnyDeviceOptionsConstructable =
   | MarkOptional<ConstructorParameters<typeof Plug>[0], 'client' | 'sysInfo'>
   | MarkOptional<ConstructorParameters<typeof Bulb>[0], 'client' | 'sysInfo'>;
 
-type DeviceOptionsDiscovery =
+export type DeviceOptionsDiscovery =
   | MarkOptional<
       ConstructorParameters<typeof Plug>[0],
       'client' | 'sysInfo' | 'host'
@@ -159,59 +159,47 @@ export type SendOptions = {
   sharedSocketTimeout?: number;
 };
 
-/* eslint-disable @typescript-eslint/unified-signatures -- for jsdoc we don't want to combine signatures */
-export interface ClientEventEmitter {
+export interface ClientEvents {
   /**
    * First response from device.
    */
-  on(
-    event: 'device-new',
-    listener: (device: Device | Bulb | Plug) => void,
-  ): this;
+  'device-new': (device: Bulb | Plug) => void;
   /**
    * Follow up response from device.
    */
-  on(
-    event: 'device-online',
-    listener: (device: Device | Bulb | Plug) => void,
-  ): this;
+  'device-online': (device: Bulb | Plug) => void;
   /**
    * No response from device.
    */
-  on(
-    event: 'device-offline',
-    listener: (device: Device | Bulb | Plug) => void,
-  ): this;
+  'device-offline': (device: Bulb | Plug) => void;
   /**
    * First response from Bulb.
    */
-  on(event: 'bulb-new', listener: (device: Bulb) => void): this;
+  'bulb-new': (device: Bulb) => void;
   /**
    * Follow up response from Bulb.
    */
-  on(event: 'bulb-online', listener: (device: Bulb) => void): this;
+  'bulb-online': (device: Bulb) => void;
   /**
    * No response from Bulb.
    */
-  on(event: 'bulb-offline', listener: (device: Bulb) => void): this;
+  'bulb-offline': (device: Bulb) => void;
   /**
    * First response from Plug.
    */
-  on(event: 'plug-new', listener: (device: Plug) => void): this;
+  'plug-new': (device: Plug) => void;
   /**
    * Follow up response from Plug.
    */
-  on(event: 'plug-online', listener: (device: Plug) => void): this;
+  'plug-online': (device: Plug) => void;
   /**
    * No response from Plug.
    */
-  on(event: 'plug-offline', listener: (device: Plug) => void): this;
+  'plug-offline': (device: Plug) => void;
   /**
    * Invalid/Unknown response from device.
    */
-  on(
-    event: 'discovery-invalid',
-    listener: ({
+  'discovery-invalid': ({
       rinfo,
       response,
       decryptedResponse,
@@ -219,33 +207,23 @@ export interface ClientEventEmitter {
       rinfo: RemoteInfo;
       response: Buffer;
       decryptedResponse: Buffer;
-    }) => void,
-  ): this;
+  }) => void;
+
   /**
    * Error during discovery.
    */
-  on(event: 'error', listener: (error: Error) => void): this;
-
-  emit(event: 'device-new', device: Device | Bulb | Plug): boolean;
-  emit(event: 'device-online', device: Device | Bulb | Plug): boolean;
-  emit(event: 'device-offline', device: Device | Bulb | Plug): boolean;
-  emit(event: 'bulb-new', device: Bulb): boolean;
-  emit(event: 'bulb-online', device: Bulb): boolean;
-  emit(event: 'bulb-offline', device: Bulb): boolean;
-  emit(event: 'plug-new', device: Plug): boolean;
-  emit(event: 'plug-online', device: Plug): boolean;
-  emit(event: 'plug-offline', device: Plug): boolean;
-  emit(
-    event: 'discovery-invalid',
-    {
-      rinfo,
-      response,
-      decryptedResponse,
-    }: { rinfo: RemoteInfo; response: Buffer; decryptedResponse: Buffer },
-  ): boolean;
-  emit(event: 'error', error: Error): boolean;
+  error: (error: Error) => void;
 }
-/* eslint-enable @typescript-eslint/unified-signatures */
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+declare interface Client {
+  on<U extends keyof ClientEvents>(event: U, listener: ClientEvents[U]): this;
+
+  emit<U extends keyof ClientEvents>(
+    event: U,
+    ...args: Parameters<ClientEvents[U]>
+  ): boolean;
+}
 
 /**
  * Client that sends commands to specified devices or discover devices on the local subnet.
@@ -253,7 +231,8 @@ export interface ClientEventEmitter {
  * - Events are emitted after {@link #startDiscovery} is called.
  * @noInheritDoc
  */
-export default class Client extends EventEmitter implements ClientEventEmitter {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+class Client extends EventEmitter {
   defaultSendOptions: Required<SendOptions> = {
     timeout: 10000,
     transport: 'tcp',
@@ -451,7 +430,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    * @throws {@link ResponseError}
    */
   async getDevice(
-    deviceOptions: AnyDeviceOptionsCon,
+    deviceOptions: AnyDeviceOptionsConstructable,
     sendOptions?: SendOptions,
   ): Promise<AnyDevice> {
     this.log.debug('client.getDevice(%j)', { deviceOptions, sendOptions });
@@ -482,7 +461,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
    */
   getDeviceFromSysInfo(
     sysInfo: Sysinfo,
-    deviceOptions: AnyDeviceOptionsCon,
+    deviceOptions: AnyDeviceOptionsConstructable,
   ): AnyDevice {
     if (isPlugSysinfo(sysInfo)) {
       return this.getPlug({ ...deviceOptions, sysInfo });
@@ -751,7 +730,7 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
         device.seenOnDiscovery = this.discoveryPacketSequence;
         this.emit('online', device);
       } else {
-        const opts: AnyDeviceOptionsCon = {
+        const opts: AnyDeviceOptionsConstructable = {
           ...options,
           client: this,
           host,
@@ -846,3 +825,5 @@ export default class Client extends EventEmitter implements ClientEventEmitter {
     }
   }
 }
+
+export default Client;

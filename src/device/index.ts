@@ -7,8 +7,8 @@ import type { default as Client, SendOptions } from '../client'; // eslint-disab
 import type { Logger } from '../logger';
 import TcpConnection from '../network/tcp-connection';
 import UdpConnection from '../network/udp-connection';
-import type { PlugEventEmitter, PlugSysinfo } from '../plug';
-import type { Realtime, RealtimeNormalized } from '../shared/emeter';
+import type { PlugSysinfo } from '../plug';
+import type { RealtimeNormalized } from '../shared/emeter';
 import {
   extractResponse,
   isObjectLike,
@@ -98,16 +98,21 @@ function isSysinfo(candidate: unknown): candidate is Sysinfo {
   return isPlugSysinfo(candidate) || isBulbSysinfo(candidate);
 }
 
-export interface DeviceEventEmitter {
+export interface DeviceEvents {
   /**
    * Energy Monitoring Details were updated from device. Fired regardless if status was changed.
    */
-  on(
-    event: 'emeter-realtime-update',
-    listener: (value: Realtime) => void,
-  ): this;
+  'emeter-realtime-update': (value: RealtimeNormalized) => void;
+}
 
-  emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+declare interface Device {
+  on<U extends keyof DeviceEvents>(event: U, listener: DeviceEvents[U]): this;
+
+  emit<U extends keyof DeviceEvents>(
+    event: U,
+    ...args: Parameters<DeviceEvents[U]>
+  ): boolean;
 }
 
 /**
@@ -117,10 +122,8 @@ export interface DeviceEventEmitter {
  * @fires  Device#emeter-realtime-update
  * @noInheritDoc
  */
-export default abstract class Device
-  extends EventEmitter
-  implements DeviceEventEmitter, PlugEventEmitter
-{
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+abstract class Device extends EventEmitter {
   readonly client: Client;
 
   host: string;
@@ -586,3 +589,5 @@ export default abstract class Device
 
   abstract getInfo(sendOptions?: SendOptions): Promise<Record<string, unknown>>;
 }
+
+export default Device;

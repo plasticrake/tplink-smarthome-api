@@ -2,7 +2,7 @@ import loglevel from 'loglevel';
 
 import { isDefinedAndNotNull } from './utils';
 
-type LogLevelMethodNames = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevelMethodNames = 'debug' | 'info' | 'warn' | 'error';
 
 export type Logger = Record<LogLevelMethodNames, loglevel.LoggingMethod>;
 
