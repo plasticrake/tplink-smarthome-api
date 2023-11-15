@@ -9,7 +9,7 @@ import {
   type HasErrCode,
 } from '../utils';
 
-type ScheduleDateStart = {
+export type ScheduleDateStart = {
   smin: number;
   stime_opt: number;
 };
@@ -19,7 +19,15 @@ type ScheduleDateEnd = {
   etime_opt: number;
 };
 
-type WDay = [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
+export type WDay = [
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+];
 
 export type ScheduleRule = {
   name?: string;
@@ -35,8 +43,8 @@ export type ScheduleRule = {
 
 export type ScheduleRuleWithId = ScheduleRule & { id: string };
 
-type ScheduleRules = { rule_list: ScheduleRuleWithId[] };
-type ScheduleNextAction = Record<string, unknown>;
+export type ScheduleRules = { rule_list: ScheduleRuleWithId[] };
+export type ScheduleNextAction = Record<string, unknown>;
 
 export type ScheduleRuleResponse = ScheduleRule & HasErrCode;
 export type ScheduleRulesResponse = ScheduleRules & HasErrCode;

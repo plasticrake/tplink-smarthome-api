@@ -22,9 +22,9 @@ import Dimmer from './dimmer';
 import Schedule from './schedule';
 import Timer from './timer';
 
-type PlugChild = { id: string; alias: string; state: number };
+export type PlugChild = { id: string; alias: string; state: number };
 
-type SysinfoChildren = {
+export type SysinfoChildren = {
   children?: [{ id: string; alias: string; state: number }];
 };
 
@@ -67,56 +67,50 @@ export interface PlugConstructorOptions extends DeviceConstructorOptions {
   childId?: string;
 }
 
-/* eslint-disable @typescript-eslint/unified-signatures -- for jsdoc we don't want to combine signatures */
-export interface PlugEventEmitter {
+export interface PlugEvents {
   /**
    * Plug's Energy Monitoring Details were updated from device. Fired regardless if status was changed.
    * @event Plug#emeter-realtime-update
    */
-  on(
-    event: 'emeter-realtime-update',
-    listener: (value: RealtimeNormalized) => void,
-  ): this;
+  'emeter-realtime-update': (value: RealtimeNormalized) => void;
   /**
    * Plug's relay was turned on.
    */
-  on(event: 'power-on', listener: () => void): this;
+  'power-on': () => void;
   /**
    * Plug's relay was turned off.
    */
-  on(event: 'power-off', listener: () => void): this;
+  'power-off': () => void;
   /**
    * Plug's relay state was updated from device. Fired regardless if status was changed.
    */
-  on(event: 'power-update', listener: (value: boolean) => void): this;
+  'power-update': (value: boolean) => void;
   /**
    * Plug's relay was turned on _or_ power draw exceeded `inUseThreshold`
    */
-  on(event: 'in-use', listener: () => void): this;
+  'in-use': () => void;
   /**
    * Plug's relay was turned off _or_ power draw fell below `inUseThreshold`
    */
-  on(event: 'not-in-use', listener: () => void): this;
+  'not-in-use': () => void;
   /**
    * Plug's in-use state was updated from device. Fired regardless if status was changed.
    */
-  on(event: 'in-use-update', listener: (value: boolean) => void): this;
+  'in-use-update': (value: boolean) => void;
 
-  on(event: 'brightness-change', listener: (value: boolean) => void): this;
-  on(event: 'brightness-update', listener: (value: boolean) => void): this;
-
-  emit(event: 'emeter-realtime-update', value: RealtimeNormalized): boolean;
-
-  emit(event: 'power-on'): boolean;
-  emit(event: 'power-off'): boolean;
-  emit(event: 'power-update', value: boolean): boolean;
-  emit(event: 'in-use'): boolean;
-  emit(event: 'not-in-use'): boolean;
-  emit(event: 'in-use-update', value: boolean): boolean;
-  emit(event: 'brightness-change', value: boolean): boolean;
-  emit(event: 'brightness-update', value: boolean): boolean;
+  'brightness-change': (value: number) => void;
+  'brightness-update': (value: number) => void;
 }
-/* eslint-enable @typescript-eslint/unified-signatures */
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+declare interface Plug {
+  on<U extends keyof PlugEvents>(event: U, listener: PlugEvents[U]): this;
+
+  emit<U extends keyof PlugEvents>(
+    event: U,
+    ...args: Parameters<PlugEvents[U]>
+  ): boolean;
+}
 
 /**
  * Plug Device.
@@ -138,7 +132,8 @@ export interface PlugEventEmitter {
  * @fires  Plug#in-use-update
  * @fires  Plug#emeter-realtime-update
  */
-export default class Plug extends Device implements PlugEventEmitter {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+class Plug extends Device {
   protected override _sysInfo: PlugSysinfo;
 
   #children: Map<string, PlugChild> = new Map();
@@ -719,3 +714,5 @@ export default class Plug extends Device implements PlugEventEmitter {
     }
   }
 }
+
+export default Plug;

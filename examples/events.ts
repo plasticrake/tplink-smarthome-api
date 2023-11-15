@@ -1,6 +1,8 @@
 import util from 'util';
 import {
+  Bulb,
   Client,
+  Plug,
   type Device,
   type LightState,
   type RealtimeNormalized,
@@ -44,40 +46,45 @@ client.on('device-new', (device: Device) => {
     logEvent('emeter-realtime-update', device, emeterRealtime);
   });
 
-  // Plug Events
-  device.on('power-on', () => {
-    logEvent('power-on', device);
-  });
-  device.on('power-off', () => {
-    logEvent('power-off', device);
-  });
-  device.on('power-update', (powerOn: boolean) => {
-    logEvent('power-update', device, powerOn);
-  });
-  device.on('in-use', () => {
-    logEvent('in-use', device);
-  });
-  device.on('not-in-use', () => {
-    logEvent('not-in-use', device);
-  });
-  device.on('in-use-update', (inUse: boolean) => {
-    logEvent('in-use-update', device, inUse);
-  });
+  if (device instanceof Plug) {
+    // Plug Events
+    device.on('power-on', () => {
+      logEvent('power-on', device);
+    });
+    device.on('power-off', () => {
+      logEvent('power-off', device);
+    });
+    device.on('power-update', (powerOn: boolean) => {
+      logEvent('power-update', device, powerOn);
+    });
+    device.on('in-use', () => {
+      logEvent('in-use', device);
+    });
+    device.on('not-in-use', () => {
+      logEvent('not-in-use', device);
+    });
+    device.on('in-use-update', (inUse: boolean) => {
+      logEvent('in-use-update', device, inUse);
+    });
+  }
 
-  // Bulb Events
-  device.on('lightstate-on', (lightstate: LightState) => {
-    logEvent('lightstate-on', device, lightstate);
-  });
-  device.on('lightstate-off', (lightstate: LightState) => {
-    logEvent('lightstate-off', device, lightstate);
-  });
-  device.on('lightstate-change', (lightstate: LightState) => {
-    logEvent('lightstate-change', device, lightstate);
-  });
-  device.on('lightstate-update', (lightstate: LightState) => {
-    logEvent('lightstate-update', device, lightstate);
-  });
+  if (device instanceof Bulb) {
+    // Bulb Events
+    device.on('lightstate-on', (lightstate: LightState) => {
+      logEvent('lightstate-on', device, lightstate);
+    });
+    device.on('lightstate-off', (lightstate: LightState) => {
+      logEvent('lightstate-off', device, lightstate);
+    });
+    device.on('lightstate-change', (lightstate: LightState) => {
+      logEvent('lightstate-change', device, lightstate);
+    });
+    device.on('lightstate-update', (lightstate: LightState) => {
+      logEvent('lightstate-update', device, lightstate);
+    });
+  }
 });
+
 client.on('device-online', (device: Device) => {
   logEvent('device-online', device);
 });

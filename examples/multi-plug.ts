@@ -1,5 +1,5 @@
 import util from 'util';
-import { Client, Device } from '..'; // 'tplink-smarthome-api'
+import { Client, Device, Plug } from '..'; // 'tplink-smarthome-api'
 
 const client = new Client({
   defaultSendOptions: { timeout: 20000, transport: 'tcp' },
@@ -24,25 +24,27 @@ const monitorEvents = function monitorEvents(device: Device) {
     logEvent('emeter-realtime-update', device, emeterRealtime);
   });
 
-  // Plug Events
-  device.on('power-on', () => {
-    logEvent('power-on', device);
-  });
-  device.on('power-off', () => {
-    logEvent('power-off', device);
-  });
-  device.on('power-update', (powerOn) => {
-    logEvent('power-update', device, powerOn);
-  });
-  device.on('in-use', () => {
-    logEvent('in-use', device);
-  });
-  device.on('not-in-use', () => {
-    logEvent('not-in-use', device);
-  });
-  device.on('in-use-update', (inUse) => {
-    logEvent('in-use-update', device, inUse);
-  });
+  if (device instanceof Plug) {
+    // Plug Events
+    device.on('power-on', () => {
+      logEvent('power-on', device);
+    });
+    device.on('power-off', () => {
+      logEvent('power-off', device);
+    });
+    device.on('power-update', (powerOn) => {
+      logEvent('power-update', device, powerOn);
+    });
+    device.on('in-use', () => {
+      logEvent('in-use', device);
+    });
+    device.on('not-in-use', () => {
+      logEvent('not-in-use', device);
+    });
+    device.on('in-use-update', (inUse) => {
+      logEvent('in-use-update', device, inUse);
+    });
+  }
 
   // Poll device every 5 seconds
   setTimeout(function pollDevice() {

@@ -70,6 +70,7 @@ export default class Emeter {
     normalize('voltage', 'voltage_mv', 1000);
 
     this.#realtime = normRealtime;
+    // @ts-expect-error typescript limitation
     this.device.emit('emeter-realtime-update', this.#realtime);
   }
 

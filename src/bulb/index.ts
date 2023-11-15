@@ -95,7 +95,7 @@ export interface BulbConstructorOptions extends DeviceConstructorOptions {
   sysInfo: BulbSysinfo;
 }
 
-interface BulbEvents {
+export interface BulbEvents {
   'emeter-realtime-update': (value: RealtimeNormalized) => void;
   /**
    * Bulb was turned on (`lightstate.on_off`).
@@ -147,7 +147,6 @@ interface BulbEvents {
   'lightstate-sysinfo-update': (value: BulbSysinfoLightState) => void;
 }
 
-// TODO: Fix this
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 declare interface Bulb {
   on<U extends keyof BulbEvents>(event: U, listener: BulbEvents[U]): this;
@@ -171,7 +170,6 @@ declare interface Bulb {
  * @fires  Bulb#lightstate-sysinfo-change
  * @fires  Bulb#lightstate-sysinfo-update
  */
-// TODO: Fix this
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class Bulb extends Device {
   emitEventsEnabled = true;
