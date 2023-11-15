@@ -277,7 +277,7 @@ export default abstract class Schedule {
    *
    * Requests `schedule.get_rules` and return rule matching Id. Supports childId.
    * @throws {@link ResponseError}
-   * @throws {@link Error}
+   * @throws Error
    */
   async getRule(
     id: string,

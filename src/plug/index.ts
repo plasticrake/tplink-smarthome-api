@@ -121,7 +121,7 @@ declare interface Plug {
  * If Plug is instantiated with a childId it will control the outlet associated with that childId.
  * Some functions only apply to the entire device, and are noted below.
  *
- * Emits events after device status is queried, such as {@link #getSysInfo} and {@link #getEmeterRealtime}.
+ * Emits events after device status is queried, such as {@link Plug#getSysInfo} and {@link Plug#emeter.getRealtime}.
  * @extends Device
  * @extends EventEmitter
  * @fires  Plug#power-on
@@ -548,7 +548,7 @@ class Plug extends Device {
   }
 
   /**
-   * Same as {@link #inUse}, but requests current `emeter.get_realtime`. Supports childId.
+   * Same as {@link Plug#inUse}, but requests current `emeter.get_realtime`. Supports childId.
    * @returns parsed JSON response
    * @throws {@link ResponseError}
    */
@@ -594,7 +594,7 @@ class Plug extends Device {
   /**
    * Get Plug relay state (on/off).
    *
-   * Requests `system.get_sysinfo` and returns true if On. Calls {@link #relayState}. Supports childId.
+   * Requests `system.get_sysinfo` and returns true if On. Calls {@link Plug#relayState}. Supports childId.
    * @throws {@link ResponseError}
    */
   async getPowerState(sendOptions?: SendOptions): Promise<boolean> {
